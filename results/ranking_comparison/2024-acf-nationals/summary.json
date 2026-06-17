@@ -1,0 +1,18 @@
+{
+  "tournament": "2024-acf-nationals",
+  "actual_players_after_floor": 187,
+  "min_games": 8,
+  "min_tuh": 160,
+  "global_model_matches": 184,
+  "tournament_model_matches": 184,
+  "global_rank_correlation": 0.5546533808926732,
+  "tournament_rank_correlation": 0.5534121106141232,
+  "actual_top_20_in_global_model_rank_top_20": "3/20",
+  "actual_top_20_in_global_model_rank_top_50": "4/20",
+  "actual_top_20_in_global_model_rank_top_100": "5/20",
+  "actual_top_20_in_global_model_rank_top_200": "10/20",
+  "actual_top_20_in_tournament_model_rank_top_20": "4/20",
+  "actual_top_20_in_tournament_model_rank_top_50": "10/20",
+  "actual_top_20_in_tournament_model_rank_top_100": "18/20",
+  "actual_top_20_in_tournament_model_rank_top_200": "20/20"
+}
