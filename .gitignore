@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.project-context.md
+
+# Tests must use synthetic in-memory data or temporary directories.
+.test-output/
+
+# Generated/local experiment artifacts.
+data/database.db
+data/response_matrix.csv
+data/hf/
+results/
+
+# Prevent old manual smoke/inspection artifacts from being tracked again.
+results/compirt/*smoke*/
+results/compirt/*inspection*/

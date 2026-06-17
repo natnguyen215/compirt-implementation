@@ -1,0 +1,7 @@
+datasets==5.0.0
+matplotlib
+pandas
+pyro-ppl==1.9.1
+scikit-learn
+tabulate
+torch
