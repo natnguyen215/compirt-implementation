@@ -67,3 +67,12 @@ The full table schema is documented in `docs/dataset-schema.md`.
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
 ```
+
+## Important Implementation Details
+
+- Eq. 9 (Noisy-OR) not implemented
+- Neg handling/bounce back not implemented
+- Registered rosters stand in for game-specific four-player lineups since I was unable to recreate lineups.
+   - Full registered roster is used for every bonus.
+- SVI used instead of MCMC
+- Current local data covers 2024-2025 and links players by exact raw slug, not the paper's proposed 2023-2025 fuzzy/manual linking procedure.
