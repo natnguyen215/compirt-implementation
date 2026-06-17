@@ -23,10 +23,9 @@ The root CompIRT files are separated by responsibility through their names:
 See `docs/compirt-experiments.md` for setup, commands, assumptions, and
 limitations. 
 
-## Reading Order for the CompIRT Paper Implementation
+# CompIRT Paper Implementation 
 
-To follow the paper's two-stage model in code, read these files in order. Each
-has a module docstring and per-function paper-equation references; the smaller
+Each file has a module docstring and per-function paper-equation references; the smaller
 helper functions sit above the `run_experiment`/`main` entry point that ties
 them together.
 
