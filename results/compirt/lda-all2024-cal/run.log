@@ -1,0 +1,140 @@
+Topic-weighted CompIRT run
+Started: 2026-06-25T11:06:45-07:00
+ROOT: results/compirt/lda-all2024-cal
+SPLIT: year_2024
+TOURNAMENT: <all>
+DEVICE: cuda
+GPU: 0
+DIMENSIONS: 5
+TOPIC_VECTORS: topic-modeling/outputs/lda/document_latent_vectors.csv
+RUN_PLDA: 0
+RUN_SYNERGY: 1
+CALIBRATE_CORRECTNESS: 1
+
+NVIDIA GeForce RTX 4090
+Rows: 395,024  Players: 1,486  Tossups: 1,260  Topic dimensions: 5
+z
+CENSORED    341490
+BUZZ         47914
+NO-BUZZ       5620
+step    0  ELBO loss: 23,556,626.8
+step  100  ELBO loss: 8,388,155.1
+step  200  ELBO loss: 2,460,436.8
+step  300  ELBO loss: 783,623.4
+step  400  ELBO loss: 459,798.3
+step  500  ELBO loss: 417,972.6
+step  600  ELBO loss: 403,808.2
+step  700  ELBO loss: 393,538.5
+step  800  ELBO loss: 386,703.2
+step  900  ELBO loss: 381,893.5
+step 1000  ELBO loss: 377,982.5
+step 1100  ELBO loss: 374,741.0
+step 1200  ELBO loss: 371,853.0
+step 1300  ELBO loss: 369,508.1
+step 1400  ELBO loss: 367,513.5
+step 1500  ELBO loss: 365,793.4
+step 1600  ELBO loss: 364,174.0
+step 1700  ELBO loss: 363,173.2
+step 1800  ELBO loss: 361,976.3
+step 1900  ELBO loss: 361,206.0
+step 2000  ELBO loss: 360,660.3
+step 2100  ELBO loss: 360,093.1
+step 2200  ELBO loss: 359,829.2
+step 2300  ELBO loss: 359,379.3
+step 2400  ELBO loss: 359,136.3
+step 2500  ELBO loss: 359,171.1
+step 2600  ELBO loss: 358,958.1
+step 2700  ELBO loss: 359,027.0
+step 2800  ELBO loss: 358,866.8
+step 2900  ELBO loss: 358,892.5
+step 3000  ELBO loss: 358,868.0
+step 3100  ELBO loss: 358,778.0
+step 3200  ELBO loss: 358,769.7
+step 3300  ELBO loss: 358,722.9
+step 3400  ELBO loss: 358,872.9
+step 3500  ELBO loss: 358,758.4
+step 3600  ELBO loss: 358,751.9
+step 3700  ELBO loss: 358,733.5
+step 3800  ELBO loss: 358,540.7
+step 3900  ELBO loss: 358,745.8
+step 4000  ELBO loss: 358,703.5
+step 4100  ELBO loss: 358,648.3
+step 4200  ELBO loss: 358,643.4
+step 4300  ELBO loss: 358,830.0
+step 4400  ELBO loss: 358,740.8
+step 4500  ELBO loss: 358,748.7
+step 4600  ELBO loss: 358,661.5
+step 4700  ELBO loss: 358,765.5
+step 4800  ELBO loss: 358,762.1
+step 4900  ELBO loss: 358,686.2
+Bonus part rows: 133,461  Parts: 3,768  Topic dimensions: 5
+step    0  ELBO loss: 128,183.2
+step  100  ELBO loss: 101,913.2
+step  200  ELBO loss: 79,742.1
+step  300  ELBO loss: 69,657.1
+step  400  ELBO loss: 64,950.5
+step  500  ELBO loss: 62,426.7
+step  600  ELBO loss: 61,060.2
+step  700  ELBO loss: 60,312.3
+step  800  ELBO loss: 60,047.2
+step  900  ELBO loss: 59,913.5
+step 1000  ELBO loss: 59,827.7
+step 1100  ELBO loss: 59,809.2
+step 1200  ELBO loss: 59,902.3
+step 1300  ELBO loss: 59,871.2
+step 1400  ELBO loss: 59,770.1
+step 1500  ELBO loss: 59,761.7
+step 1600  ELBO loss: 59,782.3
+step 1700  ELBO loss: 59,809.4
+step 1800  ELBO loss: 59,806.7
+step 1900  ELBO loss: 59,818.5
+step 2000  ELBO loss: 59,834.1
+step 2100  ELBO loss: 59,801.4
+step 2200  ELBO loss: 59,857.1
+step 2300  ELBO loss: 59,793.6
+step 2400  ELBO loss: 59,786.2
+step 2500  ELBO loss: 59,839.7
+step 2600  ELBO loss: 59,751.6
+step 2700  ELBO loss: 59,823.1
+step 2800  ELBO loss: 59,792.3
+step 2900  ELBO loss: 59,787.5
+Bonus part rows: 133,461  Parts: 3,768  Topic dimensions: 5
+step    0  ELBO loss: 136,843.9
+step  100  ELBO loss: 104,488.6
+step  200  ELBO loss: 82,614.8
+step  300  ELBO loss: 73,297.0
+step  400  ELBO loss: 68,089.2
+step  500  ELBO loss: 65,631.0
+step  600  ELBO loss: 64,092.3
+step  700  ELBO loss: 63,579.5
+step  800  ELBO loss: 63,053.8
+step  900  ELBO loss: 62,894.9
+step 1000  ELBO loss: 62,793.1
+step 1100  ELBO loss: 62,891.4
+step 1200  ELBO loss: 62,874.3
+step 1300  ELBO loss: 62,675.6
+step 1400  ELBO loss: 63,250.8
+step 1500  ELBO loss: 63,238.8
+step 1600  ELBO loss: 63,118.1
+step 1700  ELBO loss: 62,889.3
+step 1800  ELBO loss: 62,883.4
+step 1900  ELBO loss: 62,873.8
+step 2000  ELBO loss: 62,829.8
+step 2100  ELBO loss: 63,201.9
+step 2200  ELBO loss: 63,094.3
+step 2300  ELBO loss: 62,646.5
+step 2400  ELBO loss: 62,890.2
+step 2500  ELBO loss: 62,781.6
+step 2600  ELBO loss: 63,008.2
+step 2700  ELBO loss: 63,189.8
+step 2800  ELBO loss: 62,837.3
+step 2900  ELBO loss: 62,882.1
+Traceback (most recent call last):
+  File "/teapot/students/natnguyen/CompIRT-Implementation/topic-modeling/evaluate_topic_compirt.py", line 14, in <module>
+    from topic_compirt.evaluation import evaluate_topic_compirt  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/teapot/students/natnguyen/CompIRT-Implementation/topic-modeling/topic_compirt/evaluation.py", line 14, in <module>
+    from compirt_eval.figures import (
+    ...<6 lines>...
+    )
+ImportError: cannot import name 'labeled_series' from 'compirt_eval.figures' (/teapot/students/natnguyen/CompIRT-Implementation/compirt_eval/figures.py)

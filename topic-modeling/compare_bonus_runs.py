@@ -7,7 +7,7 @@ points-per-bonus question, so the new all-2024 topic+synergy run can be
 compared head-to-head with the existing baselines.
 
 Usage:
-    python topic-modeling/experiments/compare_bonus_runs.py \
+    python topic-modeling/compare_bonus_runs.py \
         results/compirt/plda-all2024 \
         results/compirt/baseline-all2024 \
         results/compirt/topic_compirt_5d_syn

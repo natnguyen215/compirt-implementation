@@ -11,7 +11,6 @@ __pycache__/
 data/database.db
 data/response_matrix.csv
 data/hf/
-results/
 
 # Prevent old manual smoke/inspection artifacts from being tracked again.
 results/compirt/*smoke*/

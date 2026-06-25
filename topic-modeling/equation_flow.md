@@ -150,7 +150,7 @@ Its sign is not interpretable without held-out recombined-roster validation.
 
 ### Eq. 11 — bonus-part outcome
 
-$$\eta_{rb} = A_b(R_r) - \sum_k r_{bk} \cdot \beta_{bk} \quad (+\;\text{synergy if enabled})$$
+$$\eta_{rb} = A_b(R_r) - \sum_k r_{bk} \cdot \beta_{bk} \quad (+\;\text{synergy})$$
 
 $$y_{rb} \sim \mathrm{Bernoulli}\!\bigl(\sigma(\eta_{rb})\bigr)$$
 
