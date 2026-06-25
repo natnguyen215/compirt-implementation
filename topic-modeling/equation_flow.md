@@ -91,17 +91,8 @@ survival across the whole question and never a hazard/correctness term.
 
 Each rostered player is a competing risk for the event's first buzz:
 
-$$
-\sum_i \log S_{ij}(t^\star)
-+
-\log h_{i^\star j}(t^\star)
-+
-\log \Pr\!\left(
-y_{i^\star j}
-\mid
-p_{i^\star j}(t^\star)
-\right)
-$$
+$$\sum_i \log S_{ij}(t^*) \;+\; \log h_{i^*j}(t^*) \;+\; \log P\!\bigl(y_{i^*j} \mid p_{i^*j}(t^*)\bigr)$$
+
 where the first term runs over all rows (BUZZ, CENSORED, NO-BUZZ), the second
 and third terms apply only to the actual first buzzer $i^*$.
 
@@ -142,14 +133,9 @@ Padded roster slots are masked to $-\infty$ so they drop out.
 
 Not implemented (same as root CompIRT).
 
-### Eq. 10 — pairwise synergy (`synergy_contribution`)
+### Eq. 10 — pairwise synergy (`synergy_contribution`, optional)
 
-$$
-\operatorname{synergy}(R)
-=
-\sum_{i < k,\; i,k \in R}
-\psi_i \cdot \psi_k
-$$
+$$\text{synergy}(R) = \sum_{\substack{i < k \\ i,k \in R}} \psi_i \cdot \psi_k$$
 
 Synergy is intentionally independent of the topic weights and of $\theta$; it is
 the root CompIRT pairwise roster term, added to the logit after aggregation.
@@ -190,4 +176,3 @@ replays Eq. 8/10/11 at the medians.
 | Eq. 9 | Noisy-OR | not implemented | — |
 | Eq. 10 | synergy | `synergy_contribution` | — |
 | Eq. 11 | bonus outcome | `compositional_model` | per-topic $\beta_{bk}$ |
-
