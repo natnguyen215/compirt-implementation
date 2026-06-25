@@ -58,9 +58,10 @@ timing plots, and `experiment_report.md`. `TOPIC_NAMES` only affects plot labels
 - `evaluate_topic_compirt.py` + `topic_compirt/evaluation.py` — metrics and plots.
 - `topic_compirt/topics.py` — loads, normalizes, and aligns topic vectors to
   model tensors.
-- `experiments/run_topic_compirt_2024.sh` — full-2024 reproducibility wrapper.
-- `experiments/compare_bonus_runs.py` — side-by-side bonus metric comparison
-  across multiple result directories.
+- `topic_utils/` — shared corpus loading/tokenization (`corpus.py`), category
+  normalization (`categories.py`), and output paths/schema (`outputs.py`).
+- `compare_bonus_runs.py` — side-by-side bonus metric comparison across multiple
+  result directories.
 
 
 ## Build Topic Vectors
@@ -131,13 +132,6 @@ DIMENSIONS=5 \
 TOPIC_VECTORS=topic-modeling/outputs/plda/document_latent_vectors.csv \
 ROOT=results/compirt/plda-all2024 \
 topic-modeling/run_topic_compirt.sh
-```
-
-There's also a PLDA-specific helper with the all-2024 defaults baked in:
-
-```bash
-ROOT=results/compirt/plda-all2024 \
-topic-modeling/experiments/run_topic_compirt_2024.sh
 ```
 
 ### lda-all2024
@@ -217,7 +211,7 @@ cd /teapot/students/natnguyen/CompIRT-Implementation
 Compare bonus metrics across topic sources:
 
 ```bash
-.venv/bin/python topic-modeling/experiments/compare_bonus_runs.py \
+.venv/bin/python topic-modeling/compare_bonus_runs.py \
   results/compirt/plda-all2024 \
   results/compirt/lda-all2024 \
   results/compirt/category-all2024

@@ -9,7 +9,7 @@ from pyro.infer import SVI, Trace_ELBO
 from pyro.infer.autoguide import AutoNormal
 from pyro.optim import ClippedAdam
 
-from topic_utils.outputs import DEFAULT_TOPIC_VECTORS, REPO_ROOT, TOPIC_ROOT
+from topic_utils.outputs import DEFAULT_TOPIC_VECTORS, REPO_ROOT
 
 
 def add_repo_root_to_path() -> None:

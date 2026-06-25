@@ -1,6 +1,6 @@
 # Synergy-Model Bonus Metrics — Run Comparison
 
-**Scope.** All six runs use the *synergy* variant of the CompIRT bonus model on the
+**Scope.** All ten runs use the *synergy* variant of the CompIRT bonus model on the
 full 2024 dataset (`baseline-all2024`). They differ along the **topic source**
 fed to the model and whether the **correctness-calibration flag (`cal`)** is on.
 The goal of the comparison is to separate the effect of (a) adding topic structure
@@ -14,11 +14,15 @@ and (b) calibrating the correctness head.
 | Run | Topic source | `cal` | AUC ↑ | log_loss ↓ | ECE ↓ | part_acc ↑ | exact_acc ↑ | PPB MAE ↓ |
 |---|---|:--:|--:|--:|--:|--:|--:|--:|
 | `baseline-all2024` (baseline) | none | ✗ | **0.9390** | **0.3289** | 0.0449 | **0.8579** | **0.6242** | 1.8091 |
-| `baseline-all2024-cal` | none | ✓ | 0.9326 | 0.3388 | 0.0358 | 0.8512 | 0.6098 | **1.7920** |
+| `baseline-all2024-cal` | none | ✓ | 0.9326 | 0.3388 | 0.0358 | 0.8512 | 0.6098 | 1.7920 |
 | `plda-all2024` | PLDA 5d | ✗ | 0.9129 | 0.3950 | 0.0658 | 0.8336 | 0.5717 | 1.9077 |
 | `lda-all2024` | LDA 5d | ✗ | 0.9153 | 0.3866 | 0.0585 | 0.8351 | 0.5750 | 1.8934 |
+| `learned-all2024` | learned ProdLDA 5d | ✗ | 0.9143 | 0.3913 | 0.0636 | 0.8352 | 0.5736 | 1.8914 |
 | `category-all2024` | one-hot category 13d | ✗ | 0.9178 | 0.3716 | 0.0367 | 0.8365 | 0.5805 | 1.8583 |
-| `plda-all2024-cal` | PLDA 5d | ✓ | 0.9172 | 0.3673 | **0.0207** | 0.8367 | 0.5852 | 1.7977 |
+| `plda-all2024-cal` | PLDA 5d | ✓ | 0.9172 | 0.3673 | 0.0207 | 0.8367 | 0.5852 | 1.7977 |
+| `lda-all2024-cal` | LDA 5d | ✓ | 0.9187 | 0.3634 | 0.0179 | 0.8389 | 0.5886 | 1.7861 |
+| `category-all2024-cal` | one-hot category 13d | ✓ | 0.9190 | 0.3620 | **0.0124** | 0.8379 | 0.5897 | 1.7875 |
+| `learned-all2024-cal` | learned ProdLDA 5d | ✓ | 0.9187 | 0.3634 | 0.0176 | 0.8380 | 0.5885 | **1.7837** |
 
 Bold marks the best value in each column.
 
@@ -32,17 +36,21 @@ differ from uncalibrated ones here too.
 | Run | Topic source | `cal` | AUC ↑ | log_loss ↓ | ECE ↓ | acc ↑ |
 |---|---|:--:|--:|--:|--:|--:|
 | `baseline-all2024` (baseline) | none | ✗ | **0.7041** | 0.5811 | 0.1463 | 0.7082 |
-| `baseline-all2024-cal` | none | ✓ | 0.6650 | **0.5106** | **0.0073** | **0.7711** |
+| `baseline-all2024-cal` | none | ✓ | 0.6650 | **0.5106** | 0.0073 | **0.7711** |
 | `plda-all2024` | PLDA 5d | ✗ | 0.6644 | 0.6126 | 0.1824 | 0.6762 |
 | `lda-all2024` | LDA 5d | ✗ | 0.6650 | 0.6132 | 0.1802 | 0.6768 |
+| `learned-all2024` | learned ProdLDA 5d | ✗ | 0.6657 | 0.6138 | 0.1826 | 0.6757 |
 | `category-all2024` | one-hot category 13d | ✗ | 0.6750 | 0.6259 | 0.1935 | 0.6774 |
 | `plda-all2024-cal` | PLDA 5d | ✓ | 0.6330 | 0.5223 | 0.0098 | 0.7677 |
+| `lda-all2024-cal` | LDA 5d | ✓ | 0.6287 | 0.5236 | 0.0089 | 0.7676 |
+| `category-all2024-cal` | one-hot category 13d | ✓ | 0.6118 | 0.5281 | **0.0057** | 0.7674 |
+| `learned-all2024-cal` | learned ProdLDA 5d | ✓ | 0.6309 | 0.5231 | 0.0118 | 0.7674 |
 
 Bold marks the best value in each column.
 
 Notable patterns:
 
-- **Calibration collapses ECE and lifts accuracy.** Both calibrated runs drop ECE by
+- **Calibration collapses ECE and lifts accuracy.** Calibrated runs drop ECE by
   ~0.15 and gain ~0.06–0.09 accuracy versus their uncalibrated counterparts. AUC
   falls slightly — Platt scaling cannot re-rank, so discrimination is unchanged by
   construction, and the small AUC drop reflects the rescaling interacting with the
