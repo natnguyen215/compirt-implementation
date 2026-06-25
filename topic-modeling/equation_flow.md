@@ -133,9 +133,14 @@ Padded roster slots are masked to $-\infty$ so they drop out.
 
 Not implemented (same as root CompIRT).
 
-### Eq. 10 — pairwise synergy (`synergy_contribution`, optional)
+### Eq. 10 — pairwise synergy (`synergy_contribution`)
 
-$$\text{synergy}(R) = \sum_{\substack{i < k \\ i,k \in R}} \psi_i \cdot \psi_k$$
+$$
+\operatorname{synergy}(R)
+=
+\sum_{i < k,\; i,k \in R}
+\psi_i \cdot \psi_k
+$$
 
 Synergy is intentionally independent of the topic weights and of $\theta$; it is
 the root CompIRT pairwise roster term, added to the logit after aggregation.
