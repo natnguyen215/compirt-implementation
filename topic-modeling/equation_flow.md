@@ -91,8 +91,17 @@ survival across the whole question and never a hazard/correctness term.
 
 Each rostered player is a competing risk for the event's first buzz:
 
-$$\sum_i \log S_{ij}(t^*) \;+\; \log h_{i^*j}(t^*) \;+\; \log P\!\bigl(y_{i^\*j} \mid p_{i^*j}(t^*)\bigr)$$
-
+$$
+\sum_i \log S_{ij}(t^\star)
++
+\log h_{i^\star j}(t^\star)
++
+\log \Pr\!\left(
+y_{i^\star j}
+\mid
+p_{i^\star j}(t^\star)
+\right)
+$$
 where the first term runs over all rows (BUZZ, CENSORED, NO-BUZZ), the second
 and third terms apply only to the actual first buzzer $i^*$.
 
