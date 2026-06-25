@@ -1,13 +1,6 @@
 # Topic CompIRT Equation Flow
 
-This note walks the topic-weighted CompIRT model the way the CompIRT paper lays
-out its equations: priors, then the Stage 1 pyramidal tossup likelihood, then
-the Stage 2 compositional bonus likelihood. It is the forward-flow companion to
-`equation_changes.md` (which only records the old-prototype to current diff).
-
-Every equation keeps the paper's number. The topic variant changes **what plays
-the discrimination role**: root CompIRT learns a free question/bonus
-discrimination vector $\alpha$, while the topic model fixes a normalized topic
+The topic model fixes a normalized topic
 mixture $r$ (PLDA, LDA, or one-hot category) and learns a *per-topic* difficulty
 instead. So throughout, read "topic form of Eq. N" as "Eq. N with $\alpha_k$
 replaced by the fixed $r_k$, and difficulty pushed inside the per-topic sum."
