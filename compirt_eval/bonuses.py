@@ -2,7 +2,7 @@
 
 Bonus-part calibration, expected-points-by-observed-score figures, the
 fitted bonus-part parameter distributions, and the optional synergy
-diagnostics. ``evaluate_bonuses`` is the entry point.
+diagnostics. 'evaluate_bonuses' is the entry point.
 """
 
 from __future__ import annotations
@@ -18,6 +18,7 @@ from compirt_eval.figures import (
     reliability_plot,
 )
 from compirt_eval.metrics import bonus_metrics
+from compirt_eval.outputs import csv_path, graph_path
 
 
 def _bonus_part_panels_and_summary(parts, alpha_columns):
@@ -64,7 +65,7 @@ def _bonus_part_panels_and_summary(parts, alpha_columns):
 def _synergy_panels_and_summary(results_dir):
     """Build optional synergy density panels and their summary rows.
 
-    Covers the player-level synergy profiles ``psi`` (Eq. 10) plus the derived
+    Covers the player-level synergy profiles 'psi' (Eq. 10) plus the derived
     pairwise and team-level synergy contributions, when those files were saved.
     """
     panels = []
@@ -137,7 +138,7 @@ def bonus_parameter_distribution_plots(results_dir, output_dir):
 
     Writes the bonus-part panel figure, the optional synergy panel figure, and a
     combined summary CSV. Panel and summary construction is split between the
-    ``_bonus_part_*`` and ``_synergy_*`` helpers above.
+    '_bonus_part_*' and '_synergy_*' helpers above.
     """
     part_path = results_dir / "bonus_parts.csv"
     if not part_path.exists():
@@ -154,7 +155,7 @@ def bonus_parameter_distribution_plots(results_dir, output_dir):
         distribution_dashboard(
             part_panels,
             "Compositional bonus-part parameter distributions",
-            output_dir / "bonus_part_parameter_distributions.png",
+            graph_path(output_dir, "bonus_part_parameter_distributions.png"),
         )
 
     synergy_panels, synergy_rows = _synergy_panels_and_summary(results_dir)
@@ -163,14 +164,14 @@ def bonus_parameter_distribution_plots(results_dir, output_dir):
         distribution_dashboard(
             synergy_panels,
             "Synergy parameter and contribution distributions",
-            output_dir / "synergy_parameter_distributions.png",
+            graph_path(output_dir, "synergy_parameter_distributions.png"),
         )
     pd.DataFrame(rows).to_csv(
-        output_dir / "bonus_parameter_distribution_summary.csv", index=False
+        csv_path(output_dir, "bonus_parameter_distribution_summary.csv"), index=False
     )
 
 
-def evaluate_bonuses(results_dir, output_dir):
+def evaluate_bonuses(results_dir, output_dir, dimension_labels=None):
     """Evaluate binary bonus parts and total expected points per bonus."""
     parts = pd.read_csv(results_dir / "bonus_part_predictions.csv")
     teams = pd.read_csv(results_dir / "team_predictions.csv")
@@ -179,7 +180,7 @@ def evaluate_bonuses(results_dir, output_dir):
         parts["correct"],
         parts["predicted_correct"],
         "Bonus part reliability",
-        output_dir / "bonus_reliability.png",
+        graph_path(output_dir, "bonus_reliability.png"),
     )
     scores = (0, 10, 20, 30)
     score_groups = [
@@ -231,7 +232,7 @@ def evaluate_bonuses(results_dir, output_dir):
     ax.grid(alpha=0.25)
     ax.legend()
     fig.tight_layout()
-    fig.savefig(output_dir / "bonus_ppb_predictions.png", dpi=160)
+    fig.savefig(graph_path(output_dir, "bonus_ppb_predictions.png"), dpi=160)
     plt.close(fig)
     bonus_parameter_distribution_plots(results_dir, output_dir)
     return metrics

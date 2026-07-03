@@ -1,0 +1,28 @@
+{
+  "model": "topic-weighted-compositional",
+  "formula": "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * beta_bk",
+  "topic_vectors": "topic/fixed/outputs/plda/document_latent_vectors.csv",
+  "topic_dimensions": 5,
+  "topic_columns": [
+    "latent_topic_00",
+    "latent_topic_01",
+    "latent_topic_02",
+    "latent_topic_03",
+    "latent_topic_04"
+  ],
+  "tournament": "",
+  "steps": 3000,
+  "final_loss": 67158.70305526257,
+  "use_synergy": true,
+  "synergy_dimensions": 3,
+  "saved_synergy_details": true,
+  "calibrate_correctness": false,
+  "skill_dimensions": 5,
+  "bonus_part_observations": 133461,
+  "bonus_parts": 3768,
+  "tau": 0.3267200291156769,
+  "mean_synergy_contribution": -0.8482260704040527,
+  "median_synergy_contribution": -0.7464779019355774,
+  "negative_synergy_fraction": 0.88619147166588,
+  "positive_synergy_fraction": 0.082406096162924
+}

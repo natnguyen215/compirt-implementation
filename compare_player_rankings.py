@@ -1,6 +1,6 @@
 """Compare fitted player rankings to tournament individual scoring.
 
-The fitted ``top_players.csv`` ranks players by mean predicted correctness on
+The fitted 'top_players.csv' ranks players by mean predicted correctness on
 their observed buzzes. Public quizbowl standings usually rank by scoring volume
 or points per tossup heard, so this script joins both views for a named
 tournament and writes a compact audit report.

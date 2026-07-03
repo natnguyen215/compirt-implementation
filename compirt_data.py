@@ -5,7 +5,7 @@ Tossup pipeline:
         -> one row per player per game-tossup event
         -> integer-indexed, one-dimensional tensors
 
-Bonus pipeline is:
+Bonus pipeline:
     linked HuggingFace tables
         -> one row per team bonus part
         -> padded roster matrices plus a padding mask
@@ -37,8 +37,8 @@ TABLES = (
 def load_hf_tables(data_dir: str | Path = DEFAULT_DATA_DIR, split: str = "all"):
     """Load every linked HuggingFace table as a pandas DataFrame.
 
-    ``split`` is ``"all"`` or a year split such as ``"year_2024"``. The
-    returned dict is keyed by table name (``tables["games"]``, etc.).
+    'split' is '"all"' or a year split such as '"year_2024"'. The
+    returned dict is keyed by table name ('tables["games"]', etc.).
     """
     data_dir = Path(data_dir)
     # Each table is its own DatasetDict directory; pandas is easier to join.
@@ -51,7 +51,7 @@ def load_hf_tables(data_dir: str | Path = DEFAULT_DATA_DIR, split: str = "all"):
 def filter_tournament(tables, tournament: str | None):
     """Return linked table copies restricted to a tournament selection.
 
-    The value may be an exact ID or a prefix; e.g. ``"2024-acf-regionals"``
+    The value may be an exact ID or a prefix; e.g. '"2024-acf-regionals"'
     selects all 2024 Regionals mirror tournaments. Each table is filtered
     through its own foreign key so the result stays mutually consistent.
     """
@@ -102,40 +102,60 @@ def make_index(values):
     """Map readable string IDs to contiguous integer indices.
 
     Returns the sorted readable IDs and a mapping such as
-    ``{"andrew-heller": 0, ...}`` for indexing parameter tensors.
+    '{"andrew-heller": 0, ...}' for indexing parameter tensors.
     """
     ids = sorted({str(value) for value in values})
     return ids, {value: index for index, value in enumerate(ids)}
 
 
-def _game_roster(game, teams):
-    """Return a game's combined roster and a player-to-team lookup."""
-    player_team = {
-        player_id: team_id
-        for team_id in game["team_ids"]
-        for player_id in teams[team_id]["player_ids"]
-    }
+def _event_roster(game_id, game, lineups, question_number):
+    """Return the inferred combined lineup for a game-tossup event.
+
+    Both teams' inferred lineups (see 'lineup.py') for the segment containing
+    'question_number' compete for the buzz. Returns the combined player list and
+    a player-to-team lookup built from lineup membership.
+    """
+    player_team = {}
+    for team_id in game["team_ids"]:
+        for player_id in lineups.roster_for(game_id, team_id, question_number):
+            player_team[player_id] = team_id
     return list(player_team), player_team
 
 
-def build_tossup_observations(tables):
+def _player_team(game, teams, player_id):
+    """Return which of a game's teams a player is registered on, or None."""
+    for team_id in game["team_ids"]:
+        if player_id in teams[team_id]["player_ids"]:
+            return team_id
+    return None
+
+
+def build_tossup_observations(tables, lineups=None):
     """Build one model row per rostered player per game-tossup event.
 
     For a tossup with a recorded first buzz, the function emits:
 
-    * one ``BUZZ`` row for the first buzzer; its ``y`` is correctness;
-    * one ``CENSORED`` row for every other rostered player, meaning that player
+    * one 'BUZZ' row for the first buzzer; its 'y' is correctness;
+    * one 'CENSORED' row for every other rostered player, meaning that player
       had not buzzed before the observed first-buzz position.
 
-    For a recoverable dead tossup, it emits one ``NO-BUZZ`` row per player.
+    For a recoverable dead tossup, it emits one 'NO-BUZZ' row per player.
     These rows let the competing-risks model learn from nobody buzzing.
 
-    The model treats the registered team rosters as the players active in every
-    game because the source data does not contain game-specific lineups.
+    The active players are the per-game lineups inferred in 'lineup.py' (cached
+    under 'data/lineups/') rather than the full registered roster, so the
+    competing-risks population reflects who plausibly played each game. A
+    tossup's segment is chosen from its packet 'question_num' (<= 10 first half,
+    >= 11 second half).
     """
+    from lineup import LineupIndex
+
     games = tables["games"].set_index("game_id").to_dict("index")
     teams = tables["teams"].set_index("team_id").to_dict("index")
     tournaments = tables["tournaments"].set_index("tournament_id").to_dict("index")
+    if lineups is None:
+        lineups = LineupIndex.load_or_build(tables)
+    tossup_qnum = tables["tossups"].set_index("tossup_id")["question_num"].to_dict()
     buzzes = tables["tossup_buzzes"].copy()
     # Order by token position, breaking ties deterministically on the numeric
     # suffix of buzz_id, then keep only each event's first buzz. Later buzzes,
@@ -149,8 +169,18 @@ def build_tossup_observations(tables):
 
     for buzz in first_buzzes.itertuples(index=False):
         game = games[buzz.game_id]
-        # Both teams' rosters compete for the first buzz.
-        roster, player_team = _game_roster(game, teams)
+        # Both teams' inferred lineups for this tossup's segment compete.
+        question_number = int(tossup_qnum.get(buzz.tossup_id, 1))
+        roster, player_team = _event_roster(
+            buzz.game_id, game, lineups, question_number
+        )
+        # The observed buzzer must always yield a BUZZ row even if inference
+        # somehow omitted them (e.g. a buzz by a player off the roster).
+        if buzz.player_id not in player_team:
+            team_of = _player_team(game, teams, buzz.player_id)
+            if team_of is not None:
+                player_team[buzz.player_id] = team_of
+                roster.append(buzz.player_id)
         # Clamp into [1, T_j]; raw_t_star keeps any source-data anomaly visible.
         T_j = max(1, int(buzz.num_tokens_total))
         t_star = min(max(1, int(buzz.token_position)), T_j)
@@ -191,11 +221,14 @@ def build_tossup_observations(tables):
                 continue
             # A game may end before the packet is exhausted; only count reads.
             scheduled = scheduled.iloc[: int(game["tossups_read"])]
-            roster, player_team = _game_roster(game, teams)
             tier = tournaments[game["tournament_id"]]["tier"]
             for tossup in scheduled.itertuples(index=False):
                 if (game_id, tossup.tossup_id) in buzzed:
                     continue
+                # The dead tossup's segment follows its packet question number.
+                roster, player_team = _event_roster(
+                    game_id, game, lineups, int(tossup.question_num)
+                )
                 # Every player is observed as not buzzing before the end.
                 T_j = max(1, len(tossup.tokens))
                 for player_id in roster:
@@ -221,24 +254,32 @@ def build_tossup_observations(tables):
     return pd.DataFrame(rows)
 
 
-def build_bonus_part_observations(tables):
+def build_bonus_part_observations(tables, lineups=None):
     """Expand each observed team bonus into binary part-level observations.
 
     A standard bonus has three parts worth ten points each. One response such
-    as ``parts_correct=[True, False, True]`` becomes three rows with targets
-    ``1, 0, 1``. Every row includes the full registered team roster because the
-    compositional model predicts a team outcome rather than a single player's
-    outcome.
+    as 'parts_correct=[True, False, True]' becomes three rows with targets
+    '1, 0, 1'. Every row carries the answering team's inferred lineup (see
+    'lineup.py'); a bonus reuses the lineup of the tossup in the same cycle
+    because both resolve through the same (game, team, question -> segment)
+    mapping, so the compositional aggregation and synergy run over the players
+    who plausibly played that game rather than the full registered roster.
     """
+    from lineup import LineupIndex
+
     games = tables["games"].set_index("game_id").to_dict("index")
-    teams = tables["teams"].set_index("team_id").to_dict("index")
     tournaments = tables["tournaments"].set_index("tournament_id").to_dict("index")
     bonuses = tables["bonuses"].set_index("bonus_id").to_dict("index")
+    if lineups is None:
+        lineups = LineupIndex.load_or_build(tables)
     rows = []
     for response in tables["bonus_responses"].itertuples(index=False):
         game = games[response.game_id]
-        roster = list(teams[response.team_id]["player_ids"])
         bonus = bonuses[response.bonus_id]
+        # Reuse the tossup lineup for this cycle via the shared question number.
+        roster = lineups.roster_for(
+            response.game_id, response.team_id, int(bonus["question_num"])
+        )
         # part_index is zero-based; IDs use one-based part numbers.
         for part_index, correct in enumerate(response.parts_correct):
             rows.append(
@@ -264,7 +305,7 @@ def build_bonus_part_observations(tables):
 def tossup_tensors(observations, device="cpu"):
     """Convert readable tossup rows into tensors used by the Pyro models.
 
-    Every tensor below has shape ``(n_rows,)``; a row is one player in one
+    Every tensor below has shape '(n_rows,)'; a row is one player in one
     game-tossup event. Each entity type gets its own contiguous index space.
     """
     player_ids, player_index = make_index(observations["player_id"])
@@ -318,10 +359,10 @@ def tossup_tensors(observations, device="cpu"):
 def bonus_tensors(observations, player_ids, device="cpu"):
     """Convert bonus-part observations into indexed, padded roster tensors.
 
-    ``roster`` has shape ``(n_observations, max_roster_size)``; shorter rosters
-    are padded with player index zero and ``roster_mask`` marks the real
-    entries. ``player_ids`` must use the same order as the fitted tossup
-    ``theta`` matrix; that shared indexing connects the two model stages.
+    'roster' has shape '(n_observations, max_roster_size)'; shorter rosters
+    are padded with player index zero and 'roster_mask' marks the real
+    entries. 'player_ids' must use the same order as the fitted tossup
+    'theta' matrix; that shared indexing connects the two model stages.
     """
     if observations.empty:
         raise ValueError("Cannot build bonus tensors from an empty observation table")

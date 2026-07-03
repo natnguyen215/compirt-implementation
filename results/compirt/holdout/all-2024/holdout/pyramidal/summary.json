@@ -1,0 +1,17 @@
+{
+  "model": "competing-risks",
+  "tournament": "",
+  "dimensions": 5,
+  "steps": 5000,
+  "final_loss": 473270.12368011475,
+  "players": 1755,
+  "tossups": 1350,
+  "events": 65443,
+  "predicted_buzz_positions": true,
+  "calibrate_correctness": false,
+  "observation_counts": {
+    "CENSORED": 400683,
+    "BUZZ": 64834,
+    "NO-BUZZ": 4098
+  }
+}

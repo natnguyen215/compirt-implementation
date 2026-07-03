@@ -1,10 +1,10 @@
 """Train the second-stage CompIRT model for team bonus performance.
 
 Unlike pyramidal training, this file does not learn player skill from scratch.
-It loads fitted ``theta`` vectors from the pyramidal model, holds them fixed,
+It loads fitted 'theta' vectors from the pyramidal model, holds them fixed,
 and learns how those individual skills combine for bonus parts.
 
-Start reading at ``run_experiment`` to see the complete workflow.
+Start reading at 'run_experiment' to see the complete workflow.
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ DEFAULT_OUTPUT_DIR = ROOT / "results" / "compirt" / "compositional"
 
 
 def load_player_skills(path, device):
-    """Load player IDs and fixed theta vectors from pyramidal ``players.csv``."""
+    """Load player IDs and fixed theta vectors from pyramidal 'players.csv'."""
     players = pd.read_csv(path)
     # Sort by numeric suffix so theta_10 follows theta_9, not theta_1.
     theta_columns = sorted(
@@ -59,19 +59,25 @@ def load_player_skills(path, device):
     return players["player_id"].astype(str).tolist(), theta
 
 
-def train_model(data, theta, use_synergy, synergy_dimensions, n_steps, lr):
-    """Fit bonus-part parameters while treating ``theta`` as fixed input."""
+def train_model(
+    data, theta, use_synergy, synergy_dimensions, n_steps, lr, calibrate_correctness=False
+):
+    """Fit bonus-part parameters while treating 'theta' as fixed input."""
     pyro.clear_param_store()
-    # the guide only learns alpha, beta, tau, and optional psi.
+    # The guide only learns alpha, beta, tau, and optional psi.
     guide = AutoNormal(compositional_model)
     svi = SVI(compositional_model, guide, ClippedAdam({"lr": lr}), loss=Trace_ELBO())
     losses = []
     for step in range(n_steps):
-        loss = svi.step(data, theta, use_synergy, synergy_dimensions)
+        loss = svi.step(
+            data, theta, use_synergy, synergy_dimensions, calibrate_correctness
+        )
         losses.append(float(loss))
         if step % 100 == 0:
             print(f"step {step:4d}  ELBO loss: {loss:,.1f}")
-    return guide.median(data, theta, use_synergy, synergy_dimensions), losses
+    return guide.median(
+        data, theta, use_synergy, synergy_dimensions, calibrate_correctness
+    ), losses
 
 
 def expected_bonus_points(part_probabilities):
@@ -112,10 +118,16 @@ def run_experiment(args):
         f"Parts: {len(data['part_ids']):,}"
     )
     posterior, losses = train_model(
-        data, theta, args.use_synergy, args.synergy_dimensions, args.steps, args.lr
+        data,
+        theta,
+        args.use_synergy,
+        args.synergy_dimensions,
+        args.steps,
+        args.lr,
+        args.calibrate_correctness,
     )
     probabilities, aggregates, synergy = posterior_predictions(
-        data, theta, posterior, args.use_synergy
+        data, theta, posterior, args.use_synergy, args.calibrate_correctness
     )
 
     # One parameter row per unique bonus part.
@@ -165,11 +177,19 @@ def run_experiment(args):
         "use_synergy": args.use_synergy,
         "synergy_dimensions": args.synergy_dimensions if args.use_synergy else 0,
         "saved_synergy_details": args.use_synergy and args.save_synergy_details,
+        "calibrate_correctness": args.calibrate_correctness,
         "skill_dimensions": theta.shape[1],
         "bonus_part_observations": len(observations),
         "bonus_parts": len(data["part_ids"]),
         "tau": float(posterior["tau"].detach().cpu()),
     }
+    if args.calibrate_correctness and "correctness_scale" in posterior:
+        summary["correctness_scale"] = float(
+            posterior["correctness_scale"].detach().cpu()
+        )
+        summary["correctness_bias"] = float(
+            posterior["correctness_bias"].detach().cpu()
+        )
     if args.use_synergy:
         synergy_array = tensor_values(synergy)
         summary.update(
@@ -198,6 +218,7 @@ def parse_args():
     parser.add_argument("--use-synergy", action="store_true")
     parser.add_argument("--synergy-dimensions", type=int, default=1)
     parser.add_argument("--save-synergy-details", action="store_true")
+    parser.add_argument("--calibrate-correctness", action="store_true")
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     return parser.parse_args()
 

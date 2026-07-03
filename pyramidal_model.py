@@ -12,10 +12,10 @@ is always the latent skill dimension.
 
 Important Dimensions:
 
-* 'n_rows' is the number of player-by-game-tossup observation rows. 
-    - If one player buzzes first, that event creates 
-        - one 'BUZZ' row for the buzzer 
-        - 'CENSORED' rows for the other rostered players. 
+* 'n_rows' is the number of player-by-game-tossup observation rows.
+    - If one player buzzes first, that event creates
+        - one 'BUZZ' row for the buzzer
+        - 'CENSORED' rows for the other rostered players.
     - If nobody buzzes, it creates
         - 'NO-BUZZ' rows.
 * 'n_players' and 'n_tossups' count the unique players and tossups.
@@ -23,22 +23,22 @@ Important Dimensions:
 
 Important Shapes:
 
-* data is a Python dict of PyTorch tensors and ID lists of players, tossups, and events 
+* data is a Python dict of PyTorch tensors and ID lists of players, tossups, and events
 * Before indexing by observation row, player parameters are stored by player:
-    - 'theta' has shape '(n_players, n_dimensions)' 
+    - 'theta' has shape '(n_players, n_dimensions)'
     - 'c' has shape '(n_players,)'.
 * Before indexing by observation row, tossup parameters are stored by tossup:
-    - 'alpha' has shape '(n_tossups, n_dimensions), 
+    - 'alpha' has shape '(n_tossups, n_dimensions),
     - 'beta', 'gamma', and 'mu' each have shape '(n_tossups,)'.
-* 'data["player"]' and 'data["tossup"]' each have shape '(n_rows,)'. 
+* 'data["player"]' and 'data["tossup"]' each have shape '(n_rows,)'.
    They say which player and tossup belong to each observation row.
-* After 'row_parameters' uses those row indexes, 
+* After 'row_parameters' uses those row indexes,
     - 'theta' and 'alpha' have shape '(n_rows, n_dimensions)'
     - The scalar parameters 'c', 'beta', 'gamma', and 'mu' have shape '(n_rows,)'
 * Row-level data such as 'data["t_star"]', 'data["T_j"]', 'data["y"]', and
   'data["is_buzz"]' have shape '(n_rows,)'.
-* Inside 'log_survival', 
-    - token positions are broadcast to shape '(n_rows, max_t)'. 
+* Inside 'log_survival',
+    - token positions are broadcast to shape '(n_rows, max_t)'.
     - That lets each row sum no-buzz log-probabilities over
       positions before its own 't_star'.
 """
@@ -54,9 +54,9 @@ def difficulty_curve(beta, gamma, mu, t, T_j):
     """Return the question's difficulty at token position 't'.
 
     't / T_j' is the relative position (0-1).
-    'beta' is the size/sign of the difficulty 
+    'beta' is the size/sign of the difficulty
     'gamma' controls sharpness of difficulty transitions
-    'mu' is the inflection point. 
+    'mu' is the inflection point.
     """
     # Eq. 3: b_j(t) = beta_j * sigmoid(gamma_j * (mu_j - t / T_j)).
     # return shape is (n_rows,)
@@ -66,21 +66,21 @@ def difficulty_curve(beta, gamma, mu, t, T_j):
 def correctness_logit(theta, alpha, beta, gamma, mu, t, T_j):
     """Return the log-odds of a correct answer if the player buzzes at 't'.
 
-    'theta' is player skill 
-    'alpha' is discrmination 
+    'theta' is player skill
+    'alpha' is discrimination
     """
     # Eq. 4 logit: theta_i^T alpha_j - d_j(t).
     skill = (theta * alpha).sum(-1)
-    #return shape is (n_rows,) 
+    #return shape is (n_rows,)
     return skill - difficulty_curve(beta, gamma, mu, t, T_j)
 
 
 def hazard_logit(theta, alpha, beta, gamma, mu, c, t, T_j):
-    """Return the hazard at 't' 
-     
+    """Return the hazard at 't'
+
     Given that the player has not buzzed before
-    this token, what is the probability that they buzz now? 
-    
+    this token, what is the probability that they buzz now?
+
     'c' is the confidence threshold
     """
     # Eq. 5 logit: theta_i^T alpha_j - b_j(t) - c_i.
@@ -97,19 +97,19 @@ def log_survival(theta, alpha, beta, gamma, mu, c, t_star, T_j):
         stopping position?
 
     'T_j' is the total number of tokens in the tossup
-    't_star' is the buzz token 
-    
+    't_star' is the buzz token
+
     * for a 'BUZZ' row, it is that player's first-buzz position
-    * for a 'CENSORED' row, 't_star' is the same as the first buzz position of the buzzed player 
+    * for a 'CENSORED' row, 't_star' is the same as the first buzz position of the buzzed player
     * for a 'NO-BUZZ' row, 't_star' = 'T_j'.
 
     Survival is a product over token positions before 't_star':
 
         S(t_star) = product over s < t_star of (1 - hazard(s))
-    
+
     The code returns 'log S(t_star)' instead of 'S(t_star)' because summing log
     probabilities is more stable than multiplying many small probabilities.
-    
+
     """
     # Build one shared token-position grid: [1, 2, ..., max_t].
     max_t = int(t_star.max().item())
@@ -117,7 +117,7 @@ def log_survival(theta, alpha, beta, gamma, mu, c, t_star, T_j):
     # 'before_stop' is True only for positions that count for each row.
     # Shape: '(n_rows, max_t)' after broadcasting.
     before_stop = positions < t_star.unsqueeze(1)
-    
+
     # Unsqueezing row parameters lets PyTorch evaluate the hazard for every
     # row-position pair, producing logits with shape '(n_rows, max_t)'.
     logits = hazard_logit(
@@ -130,7 +130,7 @@ def log_survival(theta, alpha, beta, gamma, mu, c, t_star, T_j):
         positions,
         T_j.unsqueeze(1),
     )
-    
+
     # Eq. 6 in log space:
     #   log S_ij(t*) = sum_{s < t*} log(1 - h_ij(s)).
     # F.logsigmoid(-logits) is log(1 - hazard), computed stably.
@@ -143,19 +143,19 @@ def row_parameters(data, theta, c, alpha, beta, gamma, mu):
     """Index entity-level parameters down to one value per observation row."""
     player = data["player"]
     tossup = data["tossup"]
-    
-    # Before indexing, player parameters are 
+
+    # Before indexing, player parameters are
     # theta: (n_players, n_dimensions)
-    # c: (n_players,) 
-    # 
-    # tossup parameters are 
+    # c: (n_players,)
+    #
+    # tossup parameters are
     # alpha: (n_tossups, n_dimensions)
     # beta/gamma/mu: (n_tossups,).
-    # 
+    #
     # player/tossup are row index vectors with shape (n_rows,), so each returned
     # value is aligned to observations: theta/alpha become
     # (n_rows, n_dimensions), while c/beta/gamma/mu become (n_rows,).
-    
+
     return (
         theta[player],
         c[player],
@@ -175,21 +175,28 @@ def sample_parameters(data, n_dimensions):
     vector_zero = data["y"].new_zeros(n_dimensions)
     vector_one = data["y"].new_ones(n_dimensions)
 
-    # Eq. 14 player priors: 
-    # theta_i ~ N(0, I), c_i ~ N(0, 1).
+    # Eq. 14 player priors:
+    # theta_i ~ N(0, I), c_i ~ N(0, 1) by default. For held-out evaluation the
+    # caller can attach informative per-player priors to 'data' (training
+    # posterior for returning players, tier-conditioned for new players); when
+    # those keys are absent the defaults reproduce the standard model exactly.
     # Dimensions:
     # theta: (n_players, n_dimensions), c: (n_players,).
+    theta_loc = data.get("theta_prior_loc", vector_zero)
+    theta_scale = data.get("theta_prior_scale", vector_one)
+    c_loc = data.get("c_prior_loc", zero)
+    c_scale = data.get("c_prior_scale", one)
     with pyro.plate("players", n_players):
-        theta = pyro.sample("theta", dist.Normal(vector_zero, vector_one).to_event(1)) 
+        theta = pyro.sample("theta", dist.Normal(theta_loc, theta_scale).to_event(1))
         # .to_event forces Pyro to treat the whole skill vector as one player's latent vector
-        c = pyro.sample("c", dist.Normal(zero, one))
+        c = pyro.sample("c", dist.Normal(c_loc, c_scale))
 
-    # Eq. 14 tossup priors: 
+    # Eq. 14 tossup priors:
     # alpha_j ~ N(0, I), beta_j ~ N(0, 1),
     # gamma_j ~ Half-Cauchy(5), mu_j ~ Beta(2, 2).
     # Dimensions:
     # alpha: (n_tossups, n_dimensions), other tossup parameters: (n_tossups,).
-    # y is the correctness label: NaN on censored and no-buzz. 1 or 0 on buzz.  
+    # y is the correctness label: NaN on censored and no-buzz. 1 or 0 on buzz.
     with pyro.plate("tossups", n_tossups):
         alpha = pyro.sample("alpha", dist.Normal(vector_zero, vector_one).to_event(1))
         beta = pyro.sample("beta", dist.Normal(zero, one))
@@ -197,13 +204,23 @@ def sample_parameters(data, n_dimensions):
         mu = pyro.sample(
             "mu",
             dist.Beta(data["y"].new_tensor(2.0), data["y"].new_tensor(2.0)),
-            # data["y"].new_tensor(2.0) is written to keep the model device-agnostic 
-            # see https://docs.pytorch.org/docs/2.12/generated/torch.Tensor.new_tensor.html 
+            # data["y"].new_tensor(2.0) is written to keep the model device-agnostic
+            # see https://docs.pytorch.org/docs/2.12/generated/torch.Tensor.new_tensor.html
         )
     return theta, c, alpha, beta, gamma, mu
 
 
-def competing_risks_model(data, n_dimensions=1):
+def sample_correctness_calibration(data):
+    """Sample the global correctness recalibration scale and bias."""
+    zero = data["y"].new_tensor(0.0)
+    scale = pyro.sample(
+        "correctness_scale", dist.LogNormal(zero, data["y"].new_tensor(0.5))
+    )
+    bias = pyro.sample("correctness_bias", dist.Normal(zero, data["y"].new_tensor(3.0)))
+    return scale, bias
+
+
+def competing_risks_model(data, n_dimensions=1, calibrate_correctness=False):
     """Define the competing-risks likelihood for tossup observations.
 
     Each rostered player is a competing risk because any player could produce
@@ -214,18 +231,18 @@ def competing_risks_model(data, n_dimensions=1):
     * the actual first buzzer contributes observed correctness;
     * a dead tossup has only the roster's survival contributions.
     """
-    # Create latent parameters 
+    # Create latent parameters
     theta, c, alpha, beta, gamma, mu = sample_parameters(data, n_dimensions)
-    # From entity-level parameters, assign row-level parameters 
+    # From entity-level parameters, assign row-level parameters
     row_theta, row_c, row_alpha, row_beta, row_gamma, row_mu = row_parameters(
         data, theta, c, alpha, beta, gamma, mu
     )
 
-    # Produce log likelihood 
-    
+    # Produce log likelihood
+
     # Eq. 6 survival. Every BUZZ, CENSORED, and NO-BUZZ row contributes
-    # survival probability. 
-    # Eq 13 indirectly implemented as *t_star = T_j on no-buzzes   
+    # survival probability.
+    # Eq 13 indirectly implemented as *t_star = T_j on no-buzzes
     survival = log_survival(
         row_theta,
         row_alpha,
@@ -258,6 +275,11 @@ def competing_risks_model(data, n_dimensions=1):
         data["t_star"][buzz],
         data["T_j"][buzz],
     )
+    if calibrate_correctness:
+        # Recalibrate only correctness. Hazard/timing still use the original
+        # CompIRT logit so first-buzz position behavior is unchanged.
+        scale, bias = sample_correctness_calibration(data)
+        correctness = scale * correctness + bias
     # Eq. 7 / Eq. 12 in log space:
     #   sum_i log S_ij(t*) + log h_i*j(t*) + log Bernoulli(y_i*j | p_i*j(t*)).
     # log_likelihood is a single scalar: the joint log-likelihood of the whole dataset
@@ -277,7 +299,7 @@ def competing_risks_model(data, n_dimensions=1):
 # Predictions Code
 #-----------------------------------------------------------------------------------
 
-def posterior_row_predictions(data, posterior):
+def posterior_row_predictions(data, posterior, calibrate_correctness=False):
     """Return fitted correctness, hazard, and survival for every input row.
 
     Indexing each fitted parameter by the row's player and tossup recreates the
@@ -293,9 +315,15 @@ def posterior_row_predictions(data, posterior):
         posterior["mu"],
     )
     # Posterior prediction from Eq. 4, Eq. 5, and Eq. 6 for each row.
-    correctness = torch.sigmoid(
-        correctness_logit(theta, alpha, beta, gamma, mu, data["t_star"], data["T_j"])
+    correctness_logits = correctness_logit(
+        theta, alpha, beta, gamma, mu, data["t_star"], data["T_j"]
     )
+    if calibrate_correctness:
+        correctness_logits = (
+            posterior["correctness_scale"] * correctness_logits
+            + posterior["correctness_bias"]
+        )
+    correctness = torch.sigmoid(correctness_logits)
     hazard = torch.sigmoid(
         hazard_logit(theta, alpha, beta, gamma, mu, c, data["t_star"], data["T_j"])
     )

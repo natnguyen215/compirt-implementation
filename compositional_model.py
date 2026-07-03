@@ -35,7 +35,7 @@ Important Shapes:
   slot, and 'roster_mask' is True only for real (non-padded) slots.
 * 'data["y"]' has shape '(n_observations,)' and holds the 0/1 correctness label.
 * After indexing rosters by player,
-    - 'member_theta' has shape '(n_observations, max_roster_size, n_dimensions)' 
+    - 'member_theta' has shape '(n_observations, max_roster_size, n_dimensions)'
     - 'member_abilities' has shape '(n_observations, max_roster_size)'.
 """
 
@@ -65,8 +65,8 @@ def synergy_contribution(psi, roster, roster_mask):
 
     'psi' is the per-player synergy profile. A pair's synergy is the dot product
     of their two profiles, and a roster's synergy is that dot product summed over
-    every active/non-padded pair. 
-    
+    every active/non-padded pair.
+
     'psi' has shape (n_players, synergy_dimensions)
 
     When rosters are mostly fixed, can behave like a learned team intercept. Its
@@ -88,7 +88,9 @@ def synergy_contribution(psi, roster, roster_mask):
     return result
 
 
-def compositional_model(data, theta, use_synergy=False, synergy_dimensions=1):
+def compositional_model(
+    data, theta, use_synergy=False, synergy_dimensions=1, calibrate_correctness=False
+):
     """Define the team bonus-part correctness likelihood.
 
     'theta' comes from the tossup model and is treated as fixed input, so this
@@ -113,7 +115,7 @@ def compositional_model(data, theta, use_synergy=False, synergy_dimensions=1):
         alpha = pyro.sample("alpha", dist.Normal(vector_zero, vector_one).to_event(1))
         # .to_event forces Pyro to treat the whole discrimination vector as one bonus part's latent vector
         beta = pyro.sample("beta", dist.Normal(zero, one))
-        
+
     # tau is a single shared scalar, so it is sampled outside the part plate.
     tau = pyro.sample("tau", dist.HalfCauchy(one))
 
@@ -145,6 +147,14 @@ def compositional_model(data, theta, use_synergy=False, synergy_dimensions=1):
         # Eq. 10 adds the pairwise roster synergy term to Eq. 11's logit.
         logits = logits + synergy_contribution(psi, data["roster"], data["roster_mask"])
 
+    if calibrate_correctness:
+        # Platt-scale the whole part-correctness logit, matching the topic model.
+        scale = pyro.sample(
+            "correctness_scale", dist.LogNormal(zero, theta.new_tensor(0.5))
+        )
+        bias = pyro.sample("correctness_bias", dist.Normal(zero, theta.new_tensor(3.0)))
+        logits = scale * logits + bias
+
     # Eq. 11: y_rb ~ Bernoulli(sigmoid(eta_rb)).
     # Unlike the tossup model's competing risks, the bonus likelihood is a single
     # built-in Bernoulli, so it is observed directly with obs=data["y"] rather
@@ -157,7 +167,9 @@ def compositional_model(data, theta, use_synergy=False, synergy_dimensions=1):
 # Predictions Code
 #-----------------------------------------------------------------------------------
 
-def posterior_predictions(data, theta, posterior, use_synergy=False):
+def posterior_predictions(
+    data, theta, posterior, use_synergy=False, calibrate_correctness=False
+):
     """Return fitted correctness probability, team aggregate, and synergy per row.
 
     Indexing each learned posterior parameter by the row's bonus part and roster
@@ -177,5 +189,7 @@ def posterior_predictions(data, theta, posterior, use_synergy=False):
         )
     # Posterior replay of Eq. 11.
     logits = aggregate + synergy - posterior["beta"][data["part"]]
+    if calibrate_correctness:
+        logits = posterior["correctness_scale"] * logits + posterior["correctness_bias"]
     # Each returned tensor has shape (n_observations,).
     return torch.sigmoid(logits), aggregate, synergy

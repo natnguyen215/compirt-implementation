@@ -1,0 +1,95 @@
+# CompIRT Run Log
+
+Generated: 2026-07-02T14:08:53-07:00
+Placeholder: yes
+Captured stdout/stderr: unavailable
+Note: this log was reconstructed from saved result artifacts; historical command output was not captured.
+
+## Run Variables
+
+- BONUS_STEPS: 2000
+- CALIBRATE_CORRECTNESS: False
+- DEVICE: unknown
+- DIMENSIONS: 2
+- GPU: unknown
+- LR: unknown
+- MODEL: multidimensional-difficulty-competing-risks
+- PYRAMIDAL_STEPS: 3000
+- ROOT: results/compirt/holdout/multidim-ablation/dim_2
+- RUN_LOG_KIND: placeholder
+- SPLIT: unknown
+- SYNERGY_DIMENSIONS: 3
+- TEST_SPLIT: unknown
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: unknown
+- TRAIN_SPLIT: unknown
+
+## Recovered Stage Summaries
+
+### holdout/pyramidal
+
+```json
+{
+  "calibrate_correctness": false,
+  "dimensions": 2,
+  "events": 65443,
+  "final_loss": 471254.76457214355,
+  "formula": "logit_ij(t) = sum_k alpha_jk * (theta_ik - d_jk(t))",
+  "model": "multidimensional-difficulty-competing-risks",
+  "observation_counts": {
+    "BUZZ": 64834,
+    "CENSORED": 437024,
+    "NO-BUZZ": 4524
+  },
+  "players": 1791,
+  "predicted_buzz_positions": true,
+  "steps": 3000,
+  "tossups": 1350,
+  "tournament": ""
+}
+```
+
+### holdout/synergy
+
+```json
+{
+  "bonus_part_observations": 181362,
+  "bonus_parts": 4716,
+  "calibrate_correctness": false,
+  "final_loss": 84680.89344584942,
+  "mean_synergy_contribution": 0.014538925141096115,
+  "median_synergy_contribution": 0.0,
+  "negative_synergy_fraction": 0.4875938730274258,
+  "positive_synergy_fraction": 0.4894299798193668,
+  "saved_synergy_details": false,
+  "skill_dimensions": 2,
+  "steps": 2000,
+  "synergy_dimensions": 3,
+  "tau": 0.0701812133193016,
+  "tournament": "",
+  "use_synergy": true
+}
+```
+
+### train/pyramidal
+
+```json
+{
+  "calibrate_correctness": false,
+  "dimensions": 2,
+  "events": 48612,
+  "final_loss": 361973.73599243164,
+  "formula": "logit_ij(t) = sum_k alpha_jk * (theta_ik - d_jk(t))",
+  "model": "multidimensional-difficulty-competing-risks",
+  "observation_counts": {
+    "BUZZ": 47914,
+    "CENSORED": 341490,
+    "NO-BUZZ": 5620
+  },
+  "players": 1486,
+  "predicted_buzz_positions": true,
+  "steps": 3000,
+  "tossups": 1260,
+  "tournament": ""
+}
+```

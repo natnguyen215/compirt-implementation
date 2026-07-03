@@ -63,13 +63,30 @@ def numeric_columns(frame, prefix):
     )
 
 
+def labeled_series(frame, columns, dimension_labels=None):
+    """Return column values keyed by display labels.
+
+    'dimension_labels' maps 1-based coordinate numbers to friendly names,
+    letting topic-weighted runs label 'theta_1' as a category or topic name
+    while preserving the raw column name when no label exists.
+    """
+    series = {}
+    for column in columns:
+        suffix = column.rsplit("_", 1)[-1]
+        label = column
+        if dimension_labels and suffix.isdigit():
+            label = dimension_labels.get(int(suffix), column)
+        series[label] = frame[column]
+    return series
+
+
 def density_estimate(values, points=256, max_samples=10000, bounds=None):
     """Return a deterministic Gaussian kernel density estimate.
 
-    ``points`` is the number of x-grid points returned; ``max_samples`` caps the
-    inputs (evenly subsampled above that for speed); ``bounds`` is an optional
-    ``(lower, upper)`` clamp on the grid for parameters with a natural support,
-    such as ``(0, 1)`` for ``mu`` or ``(0, None)`` for a norm.
+    'points' is the number of x-grid points returned; 'max_samples' caps the
+    inputs (evenly subsampled above that for speed); 'bounds' is an optional
+    '(lower, upper)' clamp on the grid for parameters with a natural support,
+    such as '(0, 1)' for 'mu' or '(0, None)' for a norm.
     """
     values = np.asarray(values, dtype=float)
     values = values[np.isfinite(values)]
@@ -131,10 +148,10 @@ def distribution_summary(group, parameter, values):
 def density_panel(ax, series, title, xlabel, zero_line=False, bounds=None):
     """Draw histogram-backed density curves for one or more parameters.
 
-    ``series`` maps a legend label to its values; a single series also gets a
+    'series' maps a legend label to its values; a single series also gets a
     filled histogram, while multiple series share the axis with a legend.
-    ``zero_line`` draws a reference line at x=0 (useful for signed parameters),
-    and ``bounds`` is forwarded to ``density_estimate`` to clamp the grid.
+    'zero_line' draws a reference line at x=0 (useful for signed parameters),
+    and 'bounds' is forwarded to 'density_estimate' to clamp the grid.
     """
     colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
     multiple = len(series) > 1

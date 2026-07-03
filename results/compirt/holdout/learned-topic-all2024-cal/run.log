@@ -1,0 +1,147 @@
+# CompIRT Run Log
+
+Generated: 2026-07-02T14:08:53-07:00
+Placeholder: yes
+Captured stdout/stderr: unavailable
+Note: this log was reconstructed from saved result artifacts; historical command output was not captured.
+
+## Run Variables
+
+- BONUS_STEPS: 3000
+- CALIBRATE_CORRECTNESS: True
+- DEVICE: unknown
+- DIMENSIONS: 5
+- GPU: unknown
+- LR: unknown
+- MODEL: joint-slda-compositional, joint-slda-pyramidal
+- PYRAMIDAL_STEPS: 5000
+- ROOT: results/compirt/holdout/learned-topic-all2024-cal
+- RUN_LOG_KIND: placeholder
+- SPLIT: unknown
+- SYNERGY_DIMENSIONS: 0, 3
+- TEST_SPLIT: unknown
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: unknown
+- TRAIN_SPLIT: unknown
+
+## Recovered Stage Summaries
+
+### holdout/compositional
+
+```json
+{
+  "bonus_part_observations": 181362,
+  "bonus_parts": 4716,
+  "bonuses": 1572,
+  "bow_weight": 1.0,
+  "calibrate_correctness": true,
+  "correctness_bias": 0.3512316048145294,
+  "correctness_scale": 2.150818347930908,
+  "final_loss": 277421.7995696068,
+  "formula": "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * difficulty_beta_bk,  r_b = theta_doc_b (Dirichlet, sLDA)",
+  "lr": 0.005,
+  "model": "joint-slda-compositional",
+  "player_skills": "results/compirt/holdout-learned-topic-all2024-cal-splitclean/holdout/pyramidal/players.csv",
+  "saved_synergy_details": false,
+  "skill_dimensions": 5,
+  "split": "year_2025",
+  "steps": 3000,
+  "synergy_dimensions": 0,
+  "tau": 0.5432935953140259,
+  "topic_concentration": 1.0,
+  "topic_model_dir": "results/compirt/holdout-learned-topic-all2024-cal-splitclean/train/pyramidal",
+  "tournament": "",
+  "use_synergy": false,
+  "vocab_size": 2000
+}
+```
+
+### holdout/pyramidal
+
+```json
+{
+  "bonuses": 1640,
+  "bow_weight": 1.0,
+  "calibrate_correctness": true,
+  "dimensions": 5,
+  "events": 65443,
+  "final_loss": 848884.7415733337,
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t)),  r_j = theta_doc_j (Dirichlet)",
+  "lr": 0.005,
+  "model": "joint-slda-pyramidal",
+  "observation_counts": {
+    "BUZZ": 64834,
+    "CENSORED": 437024,
+    "NO-BUZZ": 4524
+  },
+  "players": 1791,
+  "split": "year_2025",
+  "steps": 5000,
+  "topic_concentration": 1.0,
+  "tossups": 1350,
+  "tournament": "",
+  "vocab_size": 2000
+}
+```
+
+### holdout/synergy
+
+```json
+{
+  "bonus_part_observations": 181362,
+  "bonus_parts": 4716,
+  "bonuses": 1572,
+  "bow_weight": 1.0,
+  "calibrate_correctness": true,
+  "correctness_bias": -0.1328699290752411,
+  "correctness_scale": 1.9177942276000977,
+  "final_loss": 280709.54237276316,
+  "formula": "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * difficulty_beta_bk,  r_b = theta_doc_b (Dirichlet, sLDA)",
+  "lr": 0.005,
+  "mean_synergy_contribution": 0.26986294984817505,
+  "median_synergy_contribution": 0.2739505171775818,
+  "model": "joint-slda-compositional",
+  "negative_synergy_fraction": 0.23058854666357892,
+  "player_skills": "results/compirt/holdout-learned-topic-all2024-cal-splitclean/holdout/pyramidal/players.csv",
+  "positive_synergy_fraction": 0.7464353061832136,
+  "saved_synergy_details": true,
+  "skill_dimensions": 5,
+  "split": "year_2025",
+  "steps": 3000,
+  "synergy_dimensions": 3,
+  "tau": 0.530950665473938,
+  "topic_concentration": 1.0,
+  "topic_model_dir": "results/compirt/holdout-learned-topic-all2024-cal-splitclean/train/pyramidal",
+  "tournament": "",
+  "use_synergy": true,
+  "vocab_size": 2000
+}
+```
+
+### train/pyramidal
+
+```json
+{
+  "bonuses": 1295,
+  "bow_weight": 1.0,
+  "calibrate_correctness": true,
+  "dimensions": 5,
+  "events": 48612,
+  "final_loss": 693310.8611011505,
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t)),  r_j = theta_doc_j (Dirichlet)",
+  "lr": 0.005,
+  "model": "joint-slda-pyramidal",
+  "observation_counts": {
+    "BUZZ": 47914,
+    "CENSORED": 341490,
+    "NO-BUZZ": 5620
+  },
+  "players": 1486,
+  "split": "year_2024",
+  "steps": 5000,
+  "topic_concentration": 1.0,
+  "tossups": 1260,
+  "tournament": "",
+  "vocab_size": 2000
+}
+```

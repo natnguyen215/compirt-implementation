@@ -1,0 +1,23 @@
+{
+  "model": "joint-slda-compositional",
+  "formula": "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * difficulty_beta_bk,  r_b = theta_doc_b (Dirichlet, sLDA)",
+  "topic_model_dir": "results/compirt/in_sample/learned-topic-all2024/pyramidal",
+  "player_skills": "results/compirt/in_sample/learned-topic-all2024/pyramidal/players.csv",
+  "split": "year_2024",
+  "tournament": "",
+  "skill_dimensions": 5,
+  "vocab_size": 2000,
+  "bow_weight": 1.0,
+  "topic_concentration": 1.0,
+  "steps": 3000,
+  "lr": 0.005,
+  "final_loss": 228408.36344063282,
+  "use_synergy": false,
+  "synergy_dimensions": 0,
+  "saved_synergy_details": false,
+  "calibrate_correctness": false,
+  "bonus_part_observations": 133461,
+  "bonus_parts": 3768,
+  "bonuses": 1256,
+  "tau": 0.01755593530833721
+}

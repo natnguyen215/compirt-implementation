@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from compirt_eval.eval_docs import markdown_table, write_eval_docs_summary
+
 
 LOWER_IS_BETTER = {
     "log_loss",
@@ -17,6 +19,29 @@ LOWER_IS_BETTER = {
     "per_bonus_points_mae",
     "ppb_mae",
 }
+LEGACY_METRIC_NAMES = {
+    "exact_score_accuracy": "rounded_score_accuracy",
+}
+
+
+def resolve_metrics_path(path: Path) -> Path:
+    """Return the requested metrics file, accepting the legacy flat eval layout."""
+    if path.exists():
+        return path
+    nested = path.parent / "csvs" / path.name
+    if nested.exists():
+        return nested
+    return path
+
+
+def evaluation_dir_from_metrics_path(path: Path) -> Path | None:
+    """Infer an evaluation directory from a bonus_metrics.csv path."""
+    resolved = resolve_metrics_path(path)
+    if not resolved.exists():
+        return None
+    if resolved.parent.name == "csvs":
+        return resolved.parent.parent
+    return resolved.parent
 
 
 def comparison_plot(comparison, output_dir):
@@ -69,10 +94,16 @@ def comparison_plot(comparison, output_dir):
     plt.close(fig)
 
 
+def normalize_metric_names(row: pd.Series) -> pd.Series:
+    """Return a metrics row using current metric names where legacy CSVs differ."""
+    renamed = row.rename(index=LEGACY_METRIC_NAMES)
+    return renamed[~renamed.index.duplicated(keep="first")]
+
+
 def main():
     """Diff two saved bonus-metric CSVs and write a comparison CSV, figure, and report.
 
-    Reads the ``bonus_metrics.csv`` from a no-synergy and a synergy evaluation
+    Reads the 'bonus_metrics.csv' from a no-synergy and a synergy evaluation
     run, aligns their shared metrics, and records which variant wins each one
     in-sample. The result is diagnostic only -- both runs are scored on their
     training observations, so it does not show that synergy generalizes.
@@ -83,8 +114,12 @@ def main():
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
 
-    compositional = pd.read_csv(args.compositional_metrics).iloc[0]
-    synergy = pd.read_csv(args.synergy_metrics).iloc[0]
+    compositional = pd.read_csv(
+        resolve_metrics_path(args.compositional_metrics)
+    ).iloc[0]
+    synergy = pd.read_csv(resolve_metrics_path(args.synergy_metrics)).iloc[0]
+    compositional = normalize_metric_names(compositional)
+    synergy = normalize_metric_names(synergy)
     common_metrics = [metric for metric in compositional.index if metric in synergy.index]
 
     rows = []
@@ -118,12 +153,17 @@ def main():
     comparison_plot(comparison, args.output_dir)
     report = (
         "# CompIRT Bonus Model Comparison\n\n"
-        + comparison.to_markdown(index=False)
+        + markdown_table(comparison)
         + "\n\nThese metrics use the same observations for training and evaluation. "
         "They diagnose fit but do not establish that synergy generalizes to "
         "unseen team compositions.\n"
     )
     (args.output_dir / "bonus_model_comparison.md").write_text(report, encoding="utf-8")
+    comparison_csv = args.output_dir / "bonus_model_comparison.csv"
+    for metrics_path_arg in (args.compositional_metrics, args.synergy_metrics):
+        evaluation_dir = evaluation_dir_from_metrics_path(metrics_path_arg)
+        if evaluation_dir is not None:
+            write_eval_docs_summary(evaluation_dir, comparison_csv)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,13 @@
-#!/usr/bin/env python3
-"""Validate the generated local quizbowl IRT Hugging Face dataset."""
+"""Validate a built quizbowl IRT dataset against its schema and source database.
+
+'validate_dataset' is the entry point (also called automatically at the end
+of 'build_dataset_directory' before a new build replaces the old one, so a
+broken build never gets published). It re-derives everything it can from the
+saved tables themselves rather than trusting 'build_records'' output, so a
+bug introduced in 'dataset.py' is caught here rather than shipped silently.
+Checks run cheapest/most-structural first (schema, primary keys) before the
+data-integrity checks that require re-joining every table.
+"""
 
 from __future__ import annotations
 
@@ -13,10 +21,21 @@ from typing import Any
 import pandas as pd
 from datasets import DatasetDict, load_from_disk
 
-from data_pipeline.dataset import PRIMARY_KEYS, TABLE_FEATURES
+from data_pipeline.schema import PRIMARY_KEYS, TABLE_FEATURES
 
 
-def _expected_year_ids(table_name: str, all_rows: list[dict[str, Any]], tables: dict[str, list[dict[str, Any]]]) -> dict[int, set[str]]:
+def _expected_year_ids(
+    table_name: str, all_rows: list[dict[str, Any]], tables: dict[str, list[dict[str, Any]]]
+) -> dict[int, set[str]]:
+    """Return which primary IDs *should* appear in each table's year splits.
+
+    Most tables have their own explicit year (tournaments, tossups, bonuses,
+    irt_responses), but teams/games/players don't carry a year field
+    directly -- their year is inherited from the tournament they belong to
+    (and, for players, every tournament they've played in, since one player
+    can span multiple years). This mirrors that inheritance independently of
+    'write_datasets'' own year-assignment logic, so the two can be diffed.
+    """
     pk = PRIMARY_KEYS[table_name]
     tournament_year = {row["tournament_id"]: int(row["year"]) for row in tables["tournaments"]}
     game_year = {
@@ -25,6 +44,8 @@ def _expected_year_ids(table_name: str, all_rows: list[dict[str, Any]], tables: 
     team_year = {
         row["team_id"]: tournament_year[row["tournament_id"]] for row in tables["teams"]
     }
+    # A player can appear on rosters across multiple tournaments/years, so
+    # they may legitimately belong to more than one year split.
     player_years: dict[str, set[int]] = defaultdict(set)
     for team in tables["teams"]:
         for player_id in team["player_ids"]:
@@ -41,10 +62,13 @@ def _expected_year_ids(table_name: str, all_rows: list[dict[str, Any]], tables: 
         elif table_name == "games":
             years = {game_year[row["game_id"]]}
         elif table_name in {"tossups", "bonuses"}:
+            # question_set_event_id starts with the 4-digit year, e.g.
+            # "2024-acf-regionals::...".
             years = {int(row["question_set_event_id"][:4])}
         elif table_name == "irt_responses":
             years = {int(row["tossup_id"][:4])}
         else:
+            # tossup_buzzes / bonus_responses: inherit the game's year.
             years = {game_year[row["game_id"]]}
         for year in years:
             if year in result:
@@ -57,9 +81,22 @@ def validate_dataset(
     db_path: Path | None = None,
     response_matrix_path: Path | None = None,
 ) -> dict[str, Any]:
+    """Run every structural and data-integrity check against a built dataset.
+
+    'db_path' and 'response_matrix_path' are optional: when omitted, the
+    corresponding source-count and response-matrix checks are skipped (this
+    lets the dataset be re-validated later without keeping the raw SQLite
+    export around). Raises 'ValueError' listing every failure found (capped
+    at 50 in the message) rather than stopping at the first one, so a single
+    validation run surfaces the full scope of a regression.
+    """
     errors: list[str] = []
     tables: dict[str, list[dict[str, Any]]] = {}
     splits: dict[str, DatasetDict] = {}
+
+    # --- Schema: every table present, with the expected splits and feature
+    # types (paper-thin check, but catches a stale/partial build directory
+    # before the slower row-level checks below waste time on bad data). -----
     for table_name, expected_features in TABLE_FEATURES.items():
         table_path = data_dir / table_name
         if not table_path.is_dir():
@@ -74,9 +111,13 @@ def validate_dataset(
                 errors.append(f"{table_name}/{split_name}: feature schema mismatch")
         tables[table_name] = [dict(row) for row in dataset["all"]]
 
+    # Every remaining check assumes the schema above is intact, so stop here
+    # if it isn't rather than raising confusing downstream KeyErrors.
     if errors:
         raise ValueError("\n".join(errors))
 
+    # --- Primary keys unique, and year splits match the "all" split exactly
+    # (no row missing from its expected year, no row leaked into the wrong one). ---
     for table_name, rows in tables.items():
         pk = PRIMARY_KEYS[table_name]
         ids = [row[pk] for row in rows]
@@ -90,6 +131,7 @@ def validate_dataset(
                     f"{table_name}/year_{year}: expected {len(expected_ids)} IDs, found {len(actual_ids)}"
                 )
 
+    # --- Foreign keys: every cross-table reference resolves to a real row. ---
     tournament_ids = {row["tournament_id"] for row in tables["tournaments"]}
     player_ids = {row["player_id"] for row in tables["players"]}
     team_ids = {row["team_id"] for row in tables["teams"]}
@@ -132,6 +174,12 @@ def validate_dataset(
         if int(response["response"]) not in {0, 1}:
             errors.append(f"irt_responses: non-binary response on {response['response_id']}")
 
+    # --- irt_responses derivation: re-derive the full response matrix from
+    # tossup_buzzes/teams (every rostered player x every tossup their team
+    # saw) and check it matches the saved table exactly. This mirrors the
+    # derivation in dataset.py's build_records independently, so a bug there
+    # (e.g. missing a roster member, or crediting the wrong player) shows up
+    # as a mismatch here rather than propagating silently into training. ----
     actual_irt = {
         (row["player_id"], row["tossup_id"]): int(row["response"])
         for row in tables["irt_responses"]
@@ -157,6 +205,12 @@ def validate_dataset(
             f"found {len(actual_irt)}"
         )
 
+    # --- Score timelines: replay each game's buzzes/bonus responses in
+    # order and check every event's recorded team_score/opponent_score
+    # matches the running total *at that point*, and that the accumulated
+    # total matches the game's saved final_scores. This is the same replay
+    # dataset.py performs to derive those scores in the first place, done
+    # again here purely from the saved tables as an independent check. ------
     buzzes_by_game: dict[str, list[dict[str, Any]]] = defaultdict(list)
     responses_by_game: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for buzz in tables["tossup_buzzes"]:
@@ -174,6 +228,9 @@ def validate_dataset(
             events[int(response["question_number_in_game"])]["responses"].append(response)
 
         for question_number in sorted(events):
+            # Within a question, buzzes are ordered by token position (then
+            # buzz_id as a stable tiebreaker) to replay them in the order
+            # they actually happened.
             for buzz in sorted(
                 events[question_number]["buzzes"],
                 key=lambda row: (int(row["token_position"]), int(row["buzz_id"].rsplit("-", 1)[1])),
@@ -198,6 +255,10 @@ def validate_dataset(
         if reconstructed != game["final_scores"]:
             errors.append(f"games: final score mismatch on {game['game_id']}")
 
+    # --- Source row counts: every output table has exactly as many rows as
+    # its corresponding source query, so nothing was silently dropped or
+    # duplicated while reshaping the raw SQLite export. Optional: only runs
+    # when the raw database is available alongside the built dataset. -------
     if db_path is not None:
         connection = sqlite3.connect(f"file:{db_path.resolve().as_posix()}?mode=ro", uri=True)
         try:
@@ -229,6 +290,8 @@ def validate_dataset(
         finally:
             connection.close()
 
+    # --- Response matrix: the saved wide CSV matches a matrix pivoted fresh
+    # from irt_responses. Optional: only runs when a matrix path is given. --
     if response_matrix_path is not None:
         actual_matrix = pd.read_csv(response_matrix_path, index_col=0)
         actual_matrix.columns = actual_matrix.columns.astype(str)

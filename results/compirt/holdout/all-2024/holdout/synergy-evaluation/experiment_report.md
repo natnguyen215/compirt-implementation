@@ -1,0 +1,15 @@
+# CompIRT Experiment Report
+
+## Tossup Metrics
+
+| auc | log_loss | ece | accuracy | buzz_position_mae | buzz_position_median_absolute_error |
+| --- | --- | --- | --- | --- | --- |
+| 0.683961 | 0.59377 | 0.152617 | 0.698538 | 0.14333 | 0.123803 |
+
+## Bonus Metrics
+
+| auc | log_loss | ece | accuracy | part_accuracy | exact_acc | rounded_score_accuracy | per_bonus_points_mae | ppb_mae |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.938785 | 0.325077 | 0.0365809 | 0.859629 | 0.859629 | 0.627419 | 0.624955 | 4.55836 | 1.68455 |
+
+Generated figures include aggregate and buzz-position-stratified reliability, tossup difficulty over empirical buzz locations, per-dimension difficulty overlays for multidim fits, predicted-versus-empirical buzz timing, bonus PPB predictions, and player, tossup, bonus-part, and optional synergy parameter distributions and cross-run player-stability diagnostics.

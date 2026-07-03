@@ -1,0 +1,160 @@
+# CompIRT Run Log
+
+Generated: 2026-07-03T07:23:05-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- BONUS_STEPS: 2000
+- CALIBRATE_CORRECTNESS: 0
+- DATABASE: unknown
+- DEVICE: cuda
+- DIMENSIONS: 5
+- GPU: 0
+- HOLDOUT_COMPARISON_OUTPUT: results/compirt/holdout/multidim-all2024/holdout/comparison
+- HOLDOUT_COMPOSITIONAL_OUTPUT: results/compirt/holdout/multidim-all2024/holdout/compositional
+- HOLDOUT_EVALUATION_OUTPUT: results/compirt/holdout/multidim-all2024/holdout/evaluation
+- HOLDOUT_PYRAMIDAL_OUTPUT: results/compirt/holdout/multidim-all2024/holdout/pyramidal
+- HOLDOUT_SYNERGY_EVALUATION_OUTPUT: results/compirt/holdout/multidim-all2024/holdout/synergy-evaluation
+- HOLDOUT_SYNERGY_OUTPUT: results/compirt/holdout/multidim-all2024/holdout/synergy
+- LR: 0.01
+- MODEL: multidim
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- NEW_PLAYER_PRIOR: tier
+- PREDICT_BUZZ_POSITIONS: 1
+- PYRAMIDAL_STEPS: 3000
+- PYTHON: .venv/bin/python
+- ROOT: results/compirt/holdout/multidim-all2024
+- RUNNER: run_scripts/run_compirt_holdout.py
+- RUN_SYNERGY: 1
+- SAVE_SYNERGY_DETAILS: 1
+- SYNERGY_DIMENSIONS: 3
+- TEST_SPLIT: year_2025
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: <all>
+- TRAIN_PYRAMIDAL_OUTPUT: results/compirt/holdout/multidim-all2024/train/pyramidal
+- TRAIN_SPLIT: year_2024
+
++ .venv/bin/python -m multidim_mirt.train_pyramidal --split year_2024 --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-all2024/train/pyramidal --dimensions 5 --predict-buzz-positions
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,995,598.7
+step  100  ELBO loss: 554,219.5
+step  200  ELBO loss: 480,764.4
+step  300  ELBO loss: 445,356.8
+step  400  ELBO loss: 412,304.1
+step  500  ELBO loss: 389,472.8
+step  600  ELBO loss: 377,899.7
+step  700  ELBO loss: 372,418.4
+step  800  ELBO loss: 369,529.8
+step  900  ELBO loss: 367,177.2
+step 1000  ELBO loss: 366,498.4
+step 1100  ELBO loss: 365,415.9
+step 1200  ELBO loss: 364,103.6
+step 1300  ELBO loss: 363,504.0
+step 1400  ELBO loss: 363,689.4
+step 1500  ELBO loss: 362,796.6
+step 1600  ELBO loss: 362,431.7
+step 1700  ELBO loss: 362,124.9
+step 1800  ELBO loss: 361,962.7
+step 1900  ELBO loss: 361,590.6
+step 2000  ELBO loss: 360,997.2
+step 2100  ELBO loss: 360,395.4
+step 2200  ELBO loss: 360,811.9
+step 2300  ELBO loss: 360,689.5
+step 2400  ELBO loss: 360,399.0
+step 2500  ELBO loss: 360,388.8
+step 2600  ELBO loss: 359,923.5
+step 2700  ELBO loss: 360,285.2
+step 2800  ELBO loss: 359,691.0
+step 2900  ELBO loss: 360,228.0
++ .venv/bin/python -m multidim_mirt.train_pyramidal --split year_2025 --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-all2024/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-all2024/holdout/pyramidal --dimensions 5 --predict-buzz-positions
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 27,620,387.7
+step  100  ELBO loss: 1,155,374.6
+step  200  ELBO loss: 828,217.0
+step  300  ELBO loss: 663,912.7
+step  400  ELBO loss: 562,379.3
+step  500  ELBO loss: 507,089.1
+step  600  ELBO loss: 486,749.7
+step  700  ELBO loss: 481,226.0
+step  800  ELBO loss: 478,089.3
+step  900  ELBO loss: 476,187.1
+step 1000  ELBO loss: 474,930.8
+step 1100  ELBO loss: 474,015.1
+step 1200  ELBO loss: 473,050.9
+step 1300  ELBO loss: 472,363.6
+step 1400  ELBO loss: 471,814.9
+step 1500  ELBO loss: 471,294.0
+step 1600  ELBO loss: 470,708.5
+step 1700  ELBO loss: 470,125.8
+step 1800  ELBO loss: 470,620.1
+step 1900  ELBO loss: 470,075.9
+step 2000  ELBO loss: 470,070.6
+step 2100  ELBO loss: 469,383.5
+step 2200  ELBO loss: 469,186.5
+step 2300  ELBO loss: 469,494.0
+step 2400  ELBO loss: 469,359.2
+step 2500  ELBO loss: 469,239.6
+step 2600  ELBO loss: 468,665.8
+step 2700  ELBO loss: 468,383.2
+step 2800  ELBO loss: 468,253.4
+step 2900  ELBO loss: 468,546.3
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-all2024/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-all2024/holdout/compositional
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 199,797.7
+step  100  ELBO loss: 113,574.6
+step  200  ELBO loss: 93,264.7
+step  300  ELBO loss: 88,020.1
+step  400  ELBO loss: 86,712.3
+step  500  ELBO loss: 86,417.3
+step  600  ELBO loss: 86,420.0
+step  700  ELBO loss: 86,374.1
+step  800  ELBO loss: 86,552.3
+step  900  ELBO loss: 86,336.5
+step 1000  ELBO loss: 86,328.7
+step 1100  ELBO loss: 86,464.9
+step 1200  ELBO loss: 86,307.8
+step 1300  ELBO loss: 86,312.5
+step 1400  ELBO loss: 86,311.3
+step 1500  ELBO loss: 86,326.6
+step 1600  ELBO loss: 86,139.3
+step 1700  ELBO loss: 86,266.1
+step 1800  ELBO loss: 86,564.7
+step 1900  ELBO loss: 86,332.5
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-all2024/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-all2024/holdout/synergy --use-synergy --synergy-dimensions 3 --save-synergy-details
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 202,625.2
+step  100  ELBO loss: 112,578.2
+step  200  ELBO loss: 92,681.2
+step  300  ELBO loss: 87,588.3
+step  400  ELBO loss: 86,463.3
+step  500  ELBO loss: 85,957.2
+step  600  ELBO loss: 85,836.6
+step  700  ELBO loss: 85,529.9
+step  800  ELBO loss: 85,554.7
+step  900  ELBO loss: 85,702.7
+step 1000  ELBO loss: 85,812.5
+step 1100  ELBO loss: 85,559.8
+step 1200  ELBO loss: 85,664.5
+step 1300  ELBO loss: 85,552.9
+step 1400  ELBO loss: 85,387.7
+step 1500  ELBO loss: 85,712.1
+step 1600  ELBO loss: 85,615.2
+step 1700  ELBO loss: 85,593.7
+step 1800  ELBO loss: 85,764.9
+step 1900  ELBO loss: 85,507.7
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-all2024/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-all2024/holdout/compositional --output-dir results/compirt/holdout/multidim-all2024/holdout/evaluation
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-all2024/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-all2024/holdout/synergy --output-dir results/compirt/holdout/multidim-all2024/holdout/synergy-evaluation
++ .venv/bin/python -m compare_compirt --compositional-metrics results/compirt/holdout/multidim-all2024/holdout/evaluation/csvs/bonus_metrics.csv --synergy-metrics results/compirt/holdout/multidim-all2024/holdout/synergy-evaluation/csvs/bonus_metrics.csv --output-dir results/compirt/holdout/multidim-all2024/holdout/comparison
+Finished held-out multidim run. Scenario A/B metrics in results/compirt/holdout/multidim-all2024/holdout/evaluation.
+Synergy metrics in results/compirt/holdout/multidim-all2024/holdout/synergy-evaluation.

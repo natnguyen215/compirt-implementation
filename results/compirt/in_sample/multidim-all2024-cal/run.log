@@ -1,0 +1,120 @@
+# CompIRT Run Log
+
+Generated: 2026-07-03T07:35:26-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- BONUS_STEPS: 2000
+- CALIBRATE_CORRECTNESS: 1
+- COMPARISON_OUTPUT: results/compirt/in_sample/multidim-all2024-cal/comparison
+- COMPOSITIONAL_OUTPUT: results/compirt/in_sample/multidim-all2024-cal/compositional
+- DEVICE: cuda
+- DIMENSIONS: 5
+- EVALUATION_OUTPUT: results/compirt/in_sample/multidim-all2024-cal/evaluation
+- GPU: 0
+- LR: 0.01
+- MODEL: multidim
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- PREDICT_BUZZ_POSITIONS: 1
+- PYRAMIDAL_OUTPUT: results/compirt/in_sample/multidim-all2024-cal/pyramidal
+- PYRAMIDAL_STEPS: 3000
+- PYTHON: .venv/bin/python
+- PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+- ROOT: results/compirt/in_sample/multidim-all2024-cal
+- RUNNER: run_scripts/run_multidim_compirt.py
+- RUN_SYNERGY: 1
+- SAVE_SYNERGY_DETAILS: 1
+- SPLIT: year_2024
+- SYNERGY_DIMENSIONS: 3
+- SYNERGY_EVALUATION_OUTPUT: results/compirt/in_sample/multidim-all2024-cal/synergy-evaluation
+- SYNERGY_OUTPUT: results/compirt/in_sample/multidim-all2024-cal/synergy
+- TOURNAMENT: <all>
+
++ .venv/bin/python -c 'import torch; assert torch.cuda.is_available(), '"'"'CUDA is unavailable'"'"'; print(torch.cuda.get_device_name(0))'
+NVIDIA GeForce RTX 4090
++ .venv/bin/python multidim_mirt/train_pyramidal.py --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/in_sample/multidim-all2024-cal/pyramidal --predict-buzz-positions --calibrate-correctness
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,174,043.6
+step  100  ELBO loss: 438,484.7
+step  200  ELBO loss: 383,009.5
+step  300  ELBO loss: 375,209.5
+step  400  ELBO loss: 370,678.2
+step  500  ELBO loss: 366,411.3
+step  600  ELBO loss: 359,353.4
+step  700  ELBO loss: 355,938.9
+step  800  ELBO loss: 352,942.6
+step  900  ELBO loss: 351,065.1
+step 1000  ELBO loss: 349,550.1
+step 1100  ELBO loss: 348,408.8
+step 1200  ELBO loss: 347,758.0
+step 1300  ELBO loss: 347,126.6
+step 1400  ELBO loss: 346,384.1
+step 1500  ELBO loss: 346,362.7
+step 1600  ELBO loss: 345,988.8
+step 1700  ELBO loss: 345,613.5
+step 1800  ELBO loss: 344,785.8
+step 1900  ELBO loss: 343,987.9
+step 2000  ELBO loss: 344,481.1
+step 2100  ELBO loss: 343,405.3
+step 2200  ELBO loss: 343,235.1
+step 2300  ELBO loss: 343,394.6
+step 2400  ELBO loss: 343,125.2
+step 2500  ELBO loss: 342,546.6
+step 2600  ELBO loss: 342,346.3
+step 2700  ELBO loss: 342,657.4
+step 2800  ELBO loss: 342,637.3
+step 2900  ELBO loss: 341,901.1
++ .venv/bin/python train_compositional.py --split year_2024 --player-skills results/compirt/in_sample/multidim-all2024-cal/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --output-dir results/compirt/in_sample/multidim-all2024-cal/compositional --calibrate-correctness
+Bonus part rows: 133,461  Parts: 3,768
+step    0  ELBO loss: 180,291.9
+step  100  ELBO loss: 76,968.1
+step  200  ELBO loss: 66,900.9
+step  300  ELBO loss: 64,390.5
+step  400  ELBO loss: 63,793.7
+step  500  ELBO loss: 63,357.4
+step  600  ELBO loss: 63,184.3
+step  700  ELBO loss: 63,091.5
+step  800  ELBO loss: 63,019.7
+step  900  ELBO loss: 63,046.6
+step 1000  ELBO loss: 63,083.4
+step 1100  ELBO loss: 63,151.5
+step 1200  ELBO loss: 62,900.0
+step 1300  ELBO loss: 62,907.2
+step 1400  ELBO loss: 63,082.9
+step 1500  ELBO loss: 62,926.3
+step 1600  ELBO loss: 63,097.4
+step 1700  ELBO loss: 63,085.3
+step 1800  ELBO loss: 62,994.5
+step 1900  ELBO loss: 63,071.3
++ .venv/bin/python train_compositional.py --split year_2024 --player-skills results/compirt/in_sample/multidim-all2024-cal/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --output-dir results/compirt/in_sample/multidim-all2024-cal/synergy --use-synergy --synergy-dimensions 3 --save-synergy-details --calibrate-correctness
+Bonus part rows: 133,461  Parts: 3,768
+step    0  ELBO loss: 158,162.8
+step  100  ELBO loss: 79,352.2
+step  200  ELBO loss: 68,961.9
+step  300  ELBO loss: 65,988.2
+step  400  ELBO loss: 64,995.1
+step  500  ELBO loss: 64,987.3
+step  600  ELBO loss: 64,474.1
+step  700  ELBO loss: 64,247.5
+step  800  ELBO loss: 64,446.9
+step  900  ELBO loss: 64,185.7
+step 1000  ELBO loss: 64,394.2
+step 1100  ELBO loss: 64,274.0
+step 1200  ELBO loss: 64,536.6
+step 1300  ELBO loss: 64,343.0
+step 1400  ELBO loss: 64,332.6
+step 1500  ELBO loss: 64,321.0
+step 1600  ELBO loss: 64,371.4
+step 1700  ELBO loss: 64,240.1
+step 1800  ELBO loss: 64,374.1
+step 1900  ELBO loss: 64,409.0
++ .venv/bin/python evaluate_compirt.py --pyramidal-results results/compirt/in_sample/multidim-all2024-cal/pyramidal --compositional-results results/compirt/in_sample/multidim-all2024-cal/compositional --output-dir results/compirt/in_sample/multidim-all2024-cal/evaluation
++ .venv/bin/python evaluate_compirt.py --pyramidal-results results/compirt/in_sample/multidim-all2024-cal/pyramidal --compositional-results results/compirt/in_sample/multidim-all2024-cal/synergy --output-dir results/compirt/in_sample/multidim-all2024-cal/synergy-evaluation
++ .venv/bin/python compare_compirt.py --compositional-metrics results/compirt/in_sample/multidim-all2024-cal/evaluation/csvs/bonus_metrics.csv --synergy-metrics results/compirt/in_sample/multidim-all2024-cal/synergy-evaluation/csvs/bonus_metrics.csv --output-dir results/compirt/in_sample/multidim-all2024-cal/comparison
+Finished. Inspect results/compirt/in_sample/multidim-all2024-cal/synergy-evaluation/experiment_report.md

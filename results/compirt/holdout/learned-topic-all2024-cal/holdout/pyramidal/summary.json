@@ -1,0 +1,23 @@
+{
+  "model": "joint-slda-pyramidal",
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t)),  r_j = theta_doc_j (Dirichlet)",
+  "split": "year_2025",
+  "tournament": "",
+  "dimensions": 5,
+  "vocab_size": 2000,
+  "bow_weight": 1.0,
+  "topic_concentration": 1.0,
+  "steps": 5000,
+  "lr": 0.005,
+  "final_loss": 845199.774338007,
+  "calibrate_correctness": true,
+  "players": 1755,
+  "tossups": 1350,
+  "bonuses": 1640,
+  "events": 65443,
+  "observation_counts": {
+    "CENSORED": 400683,
+    "BUZZ": 64834,
+    "NO-BUZZ": 4098
+  }
+}

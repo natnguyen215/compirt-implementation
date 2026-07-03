@@ -3,6 +3,7 @@ __pycache__/
 .pytest_cache/
 .venv/
 .project-context.md
+logs/
 
 # Tests must use synthetic in-memory data or temporary directories.
 .test-output/
@@ -11,6 +12,8 @@ __pycache__/
 data/database.db
 data/response_matrix.csv
 data/hf/
+# Inferred per-game lineup cache (rebuild with `python lineup.py --rebuild`).
+data/lineups/
 
 # Prevent old manual smoke/inspection artifacts from being tracked again.
 results/compirt/*smoke*/

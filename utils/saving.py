@@ -2,7 +2,7 @@
 
 These functions only convert fitted tensors to arrays and write result files
 (CSV summaries and the loss plot). Model definitions, the SVI training loop, and
-the per-script ``run_experiment`` orchestration deliberately live in the
+the per-script 'run_experiment' orchestration deliberately live in the
 individual training scripts, not here.
 """
 
@@ -60,6 +60,40 @@ def save_parameters(output_dir, data, posterior):
             posterior["alpha"][:, dimension]
         )
     pd.DataFrame(tossups).to_csv(output_dir / "tossups.csv", index=False)
+
+
+def player_posterior_frame(player_ids, guide, tier_map=None):
+    """Extract per-player theta/c variational posterior (loc + scale).
+
+    The held-out evaluation reuses the training posterior as the prior on
+    returning players (paper Section 4.2 / Appendix B): for an 'AutoNormal'
+    guide the per-site loc is the posterior mean and the scale is its standard
+    deviation, so saving both lets a later run reconstruct N(loc, scale) priors.
+    'tier_map' (player_id -> tier) is recorded so a later run can build the
+    tier-conditioned prior for new players from this training set.
+    """
+    # '_get_loc_and_scale' is AutoNormal's per-site accessor (private but stable
+    # across Pyro 1.x); it returns the mean-field loc and constrained scale.
+    theta_loc, theta_scale = guide._get_loc_and_scale("theta")
+    c_loc, c_scale = guide._get_loc_and_scale("c")
+    theta_loc = tensor_values(theta_loc)
+    theta_scale = tensor_values(theta_scale)
+    frame = {"player_id": player_ids}
+    for dimension in range(theta_loc.shape[1]):
+        frame[f"theta_{dimension + 1}_loc"] = theta_loc[:, dimension]
+        frame[f"theta_{dimension + 1}_scale"] = theta_scale[:, dimension]
+    frame["c_loc"] = tensor_values(c_loc)
+    frame["c_scale"] = tensor_values(c_scale)
+    if tier_map is not None:
+        frame["tier"] = [tier_map.get(str(player_id)) for player_id in player_ids]
+    return pd.DataFrame(frame)
+
+
+def save_player_posterior(output_dir, player_ids, guide, tier_map=None):
+    """Write the per-player theta/c posterior (loc + scale) for held-out priors."""
+    player_posterior_frame(player_ids, guide, tier_map).to_csv(
+        output_dir / "player_posterior.csv", index=False
+    )
 
 
 def save_player_rankings(output_dir, predictions):

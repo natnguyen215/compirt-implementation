@@ -202,7 +202,7 @@ def build_response_matrix(
     )
     matrix.index.name   = "player_slug"
     matrix.columns.name = "tossup_id"
-    matrix = matrix.dropna(axis=1, how="all") 
+    matrix = matrix.dropna(axis=1, how="all")
     return matrix
 
 

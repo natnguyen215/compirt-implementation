@@ -1,0 +1,160 @@
+# CompIRT Run Log
+
+Generated: 2026-07-03T05:27:39-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- RUNNER: topic/fixed/run_topic_compirt.sh
+- ROOT: results/compirt/in_sample/category-all2024-cal
+- MODEL: topic-weighted
+- SPLIT: year_2024
+- TOURNAMENT: <all>
+- DEVICE: cuda
+- GPU: 0
+- DIMENSIONS: 13
+- PYRAMIDAL_STEPS: 5000
+- BONUS_STEPS: 3000
+- LR: 0.005
+- RUN_PLDA: 0
+- PLDA_OUTPUT_DIR: topic/fixed/outputs/plda
+- TOPIC_VECTORS: topic/fixed/outputs/category/document_latent_vectors.csv
+- TOPIC_NAMES: topic/fixed/outputs/category/category_index.csv
+- RUN_SYNERGY: 1
+- SYNERGY_DIMENSIONS: 3
+- SAVE_SYNERGY_DETAILS: 1
+- CALIBRATE_CORRECTNESS: 1
+- PREDICT_BUZZ_POSITIONS: 1
+- EVALUATE: 1
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- PYRAMIDAL_OUTPUT: results/compirt/in_sample/category-all2024-cal/pyramidal
+- COMPOSITIONAL_OUTPUT: results/compirt/in_sample/category-all2024-cal/compositional
+- SYNERGY_OUTPUT: results/compirt/in_sample/category-all2024-cal/synergy
+- SYNERGY_EVALUATION_OUTPUT: results/compirt/in_sample/category-all2024-cal/synergy-evaluation
+- EVALUATION_OUTPUT: results/compirt/in_sample/category-all2024-cal/evaluation
+
+NVIDIA GeForce RTX 4090
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Topic dimensions: 13
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,819,906.6
+step  100  ELBO loss: 7,585,207.9
+step  200  ELBO loss: 2,258,988.7
+step  300  ELBO loss: 758,734.6
+step  400  ELBO loss: 459,362.8
+step  500  ELBO loss: 413,014.9
+step  600  ELBO loss: 392,667.2
+step  700  ELBO loss: 379,888.1
+step  800  ELBO loss: 372,963.3
+step  900  ELBO loss: 368,032.2
+step 1000  ELBO loss: 363,926.2
+step 1100  ELBO loss: 360,772.9
+step 1200  ELBO loss: 358,099.4
+step 1300  ELBO loss: 355,907.3
+step 1400  ELBO loss: 354,040.7
+step 1500  ELBO loss: 352,539.3
+step 1600  ELBO loss: 351,218.4
+step 1700  ELBO loss: 350,378.0
+step 1800  ELBO loss: 349,536.0
+step 1900  ELBO loss: 349,021.0
+step 2000  ELBO loss: 348,540.2
+step 2100  ELBO loss: 348,355.4
+step 2200  ELBO loss: 347,960.6
+step 2300  ELBO loss: 348,031.1
+step 2400  ELBO loss: 347,921.9
+step 2500  ELBO loss: 347,784.1
+step 2600  ELBO loss: 347,751.7
+step 2700  ELBO loss: 347,664.1
+step 2800  ELBO loss: 347,624.5
+step 2900  ELBO loss: 347,604.9
+step 3000  ELBO loss: 347,572.8
+step 3100  ELBO loss: 347,613.3
+step 3200  ELBO loss: 347,485.1
+step 3300  ELBO loss: 347,538.6
+step 3400  ELBO loss: 347,401.3
+step 3500  ELBO loss: 347,503.3
+step 3600  ELBO loss: 347,467.9
+step 3700  ELBO loss: 347,456.4
+step 3800  ELBO loss: 347,576.2
+step 3900  ELBO loss: 347,557.1
+step 4000  ELBO loss: 347,484.6
+step 4100  ELBO loss: 347,486.3
+step 4200  ELBO loss: 347,585.0
+step 4300  ELBO loss: 347,537.3
+step 4400  ELBO loss: 347,461.9
+step 4500  ELBO loss: 347,600.0
+step 4600  ELBO loss: 347,637.8
+step 4700  ELBO loss: 347,478.7
+step 4800  ELBO loss: 347,405.5
+step 4900  ELBO loss: 347,428.9
+Bonus part rows: 133,461  Parts: 3,768  Topic dimensions: 13
+step    0  ELBO loss: 186,474.7
+step  100  ELBO loss: 144,197.3
+step  200  ELBO loss: 110,561.0
+step  300  ELBO loss: 87,966.2
+step  400  ELBO loss: 74,348.1
+step  500  ELBO loss: 66,023.9
+step  600  ELBO loss: 61,750.4
+step  700  ELBO loss: 59,911.3
+step  800  ELBO loss: 59,219.7
+step  900  ELBO loss: 59,021.7
+step 1000  ELBO loss: 58,909.6
+step 1100  ELBO loss: 58,859.2
+step 1200  ELBO loss: 58,852.1
+step 1300  ELBO loss: 58,829.9
+step 1400  ELBO loss: 58,829.3
+step 1500  ELBO loss: 58,806.7
+step 1600  ELBO loss: 58,848.1
+step 1700  ELBO loss: 58,801.6
+step 1800  ELBO loss: 58,783.4
+step 1900  ELBO loss: 58,799.5
+step 2000  ELBO loss: 58,809.0
+step 2100  ELBO loss: 58,803.2
+step 2200  ELBO loss: 58,799.8
+step 2300  ELBO loss: 58,781.5
+step 2400  ELBO loss: 58,804.4
+step 2500  ELBO loss: 58,789.5
+step 2600  ELBO loss: 58,807.7
+step 2700  ELBO loss: 58,805.1
+step 2800  ELBO loss: 58,813.6
+step 2900  ELBO loss: 58,786.2
+Bonus part rows: 133,461  Parts: 3,768  Topic dimensions: 13
+step    0  ELBO loss: 205,634.1
+step  100  ELBO loss: 148,659.8
+step  200  ELBO loss: 111,408.2
+step  300  ELBO loss: 90,042.5
+step  400  ELBO loss: 76,421.5
+step  500  ELBO loss: 68,039.5
+step  600  ELBO loss: 63,861.1
+step  700  ELBO loss: 61,786.4
+step  800  ELBO loss: 61,008.3
+step  900  ELBO loss: 60,895.2
+step 1000  ELBO loss: 60,730.8
+step 1100  ELBO loss: 60,751.1
+step 1200  ELBO loss: 60,556.5
+step 1300  ELBO loss: 60,579.1
+step 1400  ELBO loss: 60,622.4
+step 1500  ELBO loss: 60,402.6
+step 1600  ELBO loss: 60,505.2
+step 1700  ELBO loss: 60,592.6
+step 1800  ELBO loss: 60,572.0
+step 1900  ELBO loss: 60,671.3
+step 2000  ELBO loss: 60,438.0
+step 2100  ELBO loss: 60,626.8
+step 2200  ELBO loss: 60,532.9
+step 2300  ELBO loss: 60,390.1
+step 2400  ELBO loss: 60,450.6
+step 2500  ELBO loss: 60,574.6
+step 2600  ELBO loss: 60,759.6
+step 2700  ELBO loss: 60,482.2
+step 2800  ELBO loss: 60,613.7
+step 2900  ELBO loss: 60,592.4
+Finished topic-weighted CompIRT.
+Pyramidal results:      results/compirt/in_sample/category-all2024-cal/pyramidal
+Compositional results:  results/compirt/in_sample/category-all2024-cal/compositional
+Evaluation results:     results/compirt/in_sample/category-all2024-cal/evaluation
+Synergy results:        results/compirt/in_sample/category-all2024-cal/synergy
+Synergy evaluation:     results/compirt/in_sample/category-all2024-cal/synergy-evaluation

@@ -1,0 +1,115 @@
+# CompIRT Run Log
+
+Generated: 2026-07-02T14:08:53-07:00
+Placeholder: yes
+Captured stdout/stderr: unavailable
+Note: this log was reconstructed from saved result artifacts; historical command output was not captured.
+
+## Run Variables
+
+- BONUS_STEPS: 3000
+- CALIBRATE_CORRECTNESS: False
+- DEVICE: unknown
+- DIMENSIONS: 5
+- GPU: unknown
+- LR: unknown
+- MODEL: joint-slda-compositional, joint-slda-pyramidal
+- PYRAMIDAL_STEPS: 5000
+- ROOT: results/compirt/in_sample/learned-topic-all2024
+- RUN_LOG_KIND: placeholder
+- SPLIT: unknown
+- SYNERGY_DIMENSIONS: 0, 3
+- TEST_SPLIT: unknown
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: unknown
+- TRAIN_SPLIT: unknown
+
+## Recovered Stage Summaries
+
+### compositional
+
+```json
+{
+  "bonus_part_observations": 133461,
+  "bonus_parts": 3768,
+  "bonuses": 1256,
+  "bow_weight": 1.0,
+  "calibrate_correctness": false,
+  "final_loss": 225766.7491862774,
+  "formula": "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * beta_bk,  r_b = theta_doc_b (Dirichlet, sLDA)",
+  "lr": 0.005,
+  "model": "joint-slda-compositional",
+  "player_skills": "results/compirt/learned-topic-all2024/pyramidal/players.csv",
+  "saved_synergy_details": false,
+  "skill_dimensions": 5,
+  "split": "year_2024",
+  "steps": 3000,
+  "synergy_dimensions": 0,
+  "tau": 0.021491210907697678,
+  "topic_concentration": 1.0,
+  "topic_model_dir": "results/compirt/learned-topic-all2024/pyramidal",
+  "tournament": "",
+  "use_synergy": false,
+  "vocab_size": 2000
+}
+```
+
+### pyramidal
+
+```json
+{
+  "bonuses": 2935,
+  "bow_weight": 1.0,
+  "calibrate_correctness": false,
+  "dimensions": 5,
+  "events": 48612,
+  "final_loss": 911126.7965698242,
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t)),  r_j = theta_doc_j (Dirichlet)",
+  "lr": 0.005,
+  "model": "joint-slda-pyramidal",
+  "observation_counts": {
+    "BUZZ": 47914,
+    "CENSORED": 341490,
+    "NO-BUZZ": 5620
+  },
+  "players": 1486,
+  "split": "year_2024",
+  "steps": 5000,
+  "topic_concentration": 1.0,
+  "tossups": 1260,
+  "tournament": "",
+  "vocab_size": 2000
+}
+```
+
+### synergy
+
+```json
+{
+  "bonus_part_observations": 133461,
+  "bonus_parts": 3768,
+  "bonuses": 1256,
+  "bow_weight": 1.0,
+  "calibrate_correctness": false,
+  "final_loss": 224236.62049889565,
+  "formula": "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * beta_bk,  r_b = theta_doc_b (Dirichlet, sLDA)",
+  "lr": 0.005,
+  "mean_synergy_contribution": -0.8325980305671692,
+  "median_synergy_contribution": -0.7217254638671875,
+  "model": "joint-slda-compositional",
+  "negative_synergy_fraction": 0.8636905163306134,
+  "player_skills": "results/compirt/learned-topic-all2024/pyramidal/players.csv",
+  "positive_synergy_fraction": 0.10639063097084542,
+  "saved_synergy_details": true,
+  "skill_dimensions": 5,
+  "split": "year_2024",
+  "steps": 3000,
+  "synergy_dimensions": 3,
+  "tau": 0.2840326428413391,
+  "topic_concentration": 1.0,
+  "topic_model_dir": "results/compirt/learned-topic-all2024/pyramidal",
+  "tournament": "",
+  "use_synergy": true,
+  "vocab_size": 2000
+}
+```

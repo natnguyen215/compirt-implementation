@@ -1,0 +1,95 @@
+# CompIRT Run Log
+
+Generated: 2026-07-02T14:08:53-07:00
+Placeholder: yes
+Captured stdout/stderr: unavailable
+Note: this log was reconstructed from saved result artifacts; historical command output was not captured.
+
+## Run Variables
+
+- BONUS_STEPS: 2000
+- CALIBRATE_CORRECTNESS: False
+- DEVICE: unknown
+- DIMENSIONS: 1
+- GPU: unknown
+- LR: unknown
+- MODEL: multidimensional-difficulty-competing-risks
+- PYRAMIDAL_STEPS: 3000
+- ROOT: results/compirt/holdout/multidim-ablation/dim_1
+- RUN_LOG_KIND: placeholder
+- SPLIT: unknown
+- SYNERGY_DIMENSIONS: 3
+- TEST_SPLIT: unknown
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: unknown
+- TRAIN_SPLIT: unknown
+
+## Recovered Stage Summaries
+
+### holdout/pyramidal
+
+```json
+{
+  "calibrate_correctness": false,
+  "dimensions": 1,
+  "events": 65443,
+  "final_loss": 477137.31454467773,
+  "formula": "logit_ij(t) = sum_k alpha_jk * (theta_ik - d_jk(t))",
+  "model": "multidimensional-difficulty-competing-risks",
+  "observation_counts": {
+    "BUZZ": 64834,
+    "CENSORED": 437024,
+    "NO-BUZZ": 4524
+  },
+  "players": 1791,
+  "predicted_buzz_positions": true,
+  "steps": 3000,
+  "tossups": 1350,
+  "tournament": ""
+}
+```
+
+### holdout/synergy
+
+```json
+{
+  "bonus_part_observations": 181362,
+  "bonus_parts": 4716,
+  "calibrate_correctness": false,
+  "final_loss": 84184.27060768008,
+  "mean_synergy_contribution": 0.1922474056482315,
+  "median_synergy_contribution": 0.04606352001428604,
+  "negative_synergy_fraction": 0.398832169914315,
+  "positive_synergy_fraction": 0.5781916829324776,
+  "saved_synergy_details": false,
+  "skill_dimensions": 1,
+  "steps": 2000,
+  "synergy_dimensions": 3,
+  "tau": 0.0067484937608242035,
+  "tournament": "",
+  "use_synergy": true
+}
+```
+
+### train/pyramidal
+
+```json
+{
+  "calibrate_correctness": false,
+  "dimensions": 1,
+  "events": 48612,
+  "final_loss": 365021.5986633301,
+  "formula": "logit_ij(t) = sum_k alpha_jk * (theta_ik - d_jk(t))",
+  "model": "multidimensional-difficulty-competing-risks",
+  "observation_counts": {
+    "BUZZ": 47914,
+    "CENSORED": 341490,
+    "NO-BUZZ": 5620
+  },
+  "players": 1486,
+  "predicted_buzz_positions": true,
+  "steps": 3000,
+  "tossups": 1260,
+  "tournament": ""
+}
+```

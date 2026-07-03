@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Build and validate the local quizbowl IRT Hugging Face dataset."""
+"""CLI entry point: build and validate the local quizbowl IRT dataset.
+
+Thin wrapper around 'data_pipeline.dataset.build_dataset_directory', which
+does the actual reading (SQLite -> 'BuiltRecords'), writing (HuggingFace
+tables + response matrix CSV), and validation. See that module's docstring
+for the pipeline overview.
+"""
 
 from __future__ import annotations
 

@@ -1,0 +1,35 @@
+{
+  "model": "topic-weighted-pyramidal",
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))",
+  "topic_vectors": "topic/fixed/outputs/category/document_latent_vectors.csv",
+  "topic_dimensions": 13,
+  "topic_columns": [
+    "latent_topic_00",
+    "latent_topic_01",
+    "latent_topic_02",
+    "latent_topic_03",
+    "latent_topic_04",
+    "latent_topic_05",
+    "latent_topic_06",
+    "latent_topic_07",
+    "latent_topic_08",
+    "latent_topic_09",
+    "latent_topic_10",
+    "latent_topic_11",
+    "latent_topic_12"
+  ],
+  "tournament": "",
+  "dimensions": 13,
+  "steps": 5000,
+  "final_loss": 363535.2807006836,
+  "calibrate_correctness": false,
+  "players": 1455,
+  "tossups": 1260,
+  "events": 48612,
+  "predicted_buzz_positions": true,
+  "observation_counts": {
+    "CENSORED": 295555,
+    "BUZZ": 47914,
+    "NO-BUZZ": 4935
+  }
+}

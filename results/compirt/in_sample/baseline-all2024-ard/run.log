@@ -1,0 +1,81 @@
+# CompIRT Run Log
+
+Generated: 2026-07-02T14:08:53-07:00
+Placeholder: yes
+Captured stdout/stderr: unavailable
+Note: this log was reconstructed from saved result artifacts; historical command output was not captured.
+
+## Run Variables
+
+- BONUS_STEPS: 3000
+- CALIBRATE_CORRECTNESS: unknown
+- DEVICE: unknown
+- DIMENSIONS: 5
+- GPU: unknown
+- LR: unknown
+- MODEL: baseline-all2024-ard
+- PYRAMIDAL_STEPS: unknown
+- ROOT: results/compirt/in_sample/baseline-all2024-ard
+- RUN_LOG_KIND: placeholder
+- SPLIT: unknown
+- SYNERGY_DIMENSIONS: 0, 3
+- TEST_SPLIT: unknown
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: unknown
+- TRAIN_SPLIT: unknown
+
+## Recovered Stage Summaries
+
+### compositional
+
+```json
+{
+  "alpha_scale": [
+    0.2571176588535309,
+    0.22462978959083557,
+    0.36642178893089294,
+    0.2583441138267517,
+    0.3258799910545349
+  ],
+  "bonus_part_observations": 133461,
+  "bonus_parts": 3768,
+  "final_loss": 63388.23012435436,
+  "saved_synergy_details": false,
+  "skill_dimensions": 5,
+  "steps": 3000,
+  "synergy_dimensions": 0,
+  "tau": 0.13141828775405884,
+  "tournament": "",
+  "use_ard": true,
+  "use_synergy": false
+}
+```
+
+### synergy
+
+```json
+{
+  "alpha_scale": [
+    0.23945119976997375,
+    0.2248232215642929,
+    0.23521541059017181,
+    0.22541038691997528,
+    0.23457081615924835
+  ],
+  "bonus_part_observations": 133461,
+  "bonus_parts": 3768,
+  "final_loss": 63519.53564321995,
+  "mean_synergy_contribution": 0.02798203006386757,
+  "median_synergy_contribution": 0.0,
+  "negative_synergy_fraction": 0.48758064153572955,
+  "positive_synergy_fraction": 0.48250050576572934,
+  "saved_synergy_details": true,
+  "skill_dimensions": 5,
+  "steps": 3000,
+  "synergy_dimensions": 3,
+  "tau": 0.1365278661251068,
+  "tournament": "",
+  "use_ard": true,
+  "use_synergy": true
+}
+```

@@ -1,6 +1,6 @@
 """Train the CompIRT pyramidal tossup model and save reusable result files.
 
-Start reading at ``run_experiment`` near the bottom. It coordinates the full
+Start reading at 'run_experiment' near the bottom. It coordinates the full
 workflow:
 
     load tables -> build observations -> make tensors -> train model
@@ -36,16 +36,24 @@ from compirt_data import (
 from utils.saving import (
     save_loss_plot,
     save_parameters,
+    save_player_posterior,
     save_player_rankings,
     tensor_values,
 )
+from holdout.player_priors import attach_player_priors, player_tier_map
 
 
 ROOT = Path(__file__).parent
 DEFAULT_OUTPUT_DIR = ROOT / "results" / "compirt" / "pyramidal"
 
 
-def train_model(data, n_dimensions=1, n_steps=1000, lr=0.02):
+def train_model(
+    data,
+    n_dimensions=1,
+    n_steps=1000,
+    lr=0.02,
+    calibrate_correctness=False,
+):
     """Fit the competing-risks model and return medians plus its loss curve."""
     # Clear the global param store so a previous run cannot leak in.
     pyro.clear_param_store()
@@ -55,12 +63,17 @@ def train_model(data, n_dimensions=1, n_steps=1000, lr=0.02):
     )
     losses = []
     for step in range(n_steps):
-        loss = svi.step(data, n_dimensions)
+        loss = svi.step(data, n_dimensions, calibrate_correctness)
         losses.append(float(loss))
         if step % 100 == 0:
             print(f"step {step:4d}  ELBO loss: {loss:,.1f}")
-    # Collapse each posterior to its median for CSV output and prediction.
-    return guide.median(data, n_dimensions), losses
+    # Collapse each posterior to its median for CSV output and prediction. The
+    # guide is returned too so callers can save the full theta/c posterior.
+    return (
+        guide.median(data, n_dimensions, calibrate_correctness),
+        guide,
+        losses,
+    )
 
 
 def run_experiment(args):
@@ -81,13 +94,40 @@ def run_experiment(args):
         f"Tossups: {len(data['tossup_ids']):,}"
     )
     print(observations["z"].value_counts().to_string())
-    posterior, losses = train_model(data, args.dimensions, args.steps, args.lr)
+    # Each player's tier is used both to build new-player priors (when running
+    # held-out) and to label the saved posterior; compute it once and share it.
+    tier_map = player_tier_map(tables)
+    # Held-out evaluation: attach informative player priors (training posterior
+    # for returning players, tier-conditioned for new players) before fitting.
+    if args.train_posterior:
+        prior_summary = attach_player_priors(
+            data,
+            tables,
+            args.train_posterior,
+            args.new_player_prior,
+            args.device,
+            n_dimensions=args.dimensions,
+            tier_map=tier_map,
+        )
+        print(f"Held-out player priors: {prior_summary}")
+    posterior, guide, losses = train_model(
+        data,
+        args.dimensions,
+        args.steps,
+        args.lr,
+        args.calibrate_correctness,
+    )
 
     save_parameters(output_dir, data, posterior)
+    # Save the full theta/c posterior (loc + scale) plus each player's tier so a
+    # later held-out run can rebuild returning-player and tier-conditioned priors.
+    save_player_posterior(output_dir, data["player_ids"], guide, tier_map)
     save_loss_plot(output_dir, losses, "Pyramidal IRT training loss")
     # Attach fitted predictions back onto the readable observation rows.
     predictions = observations.copy()
-    correct, hazard, survival = posterior_row_predictions(data, posterior)
+    correct, hazard, survival = posterior_row_predictions(
+        data, posterior, args.calibrate_correctness
+    )
     predictions["predicted_correct"] = tensor_values(correct)
     predictions["predicted_hazard"] = tensor_values(hazard)
     predictions["predicted_survival"] = tensor_values(survival)
@@ -116,8 +156,16 @@ def run_experiment(args):
         "tossups": len(data["tossup_ids"]),
         "events": len(data["event_ids"]),
         "predicted_buzz_positions": args.predict_buzz_positions,
+        "calibrate_correctness": args.calibrate_correctness,
         "observation_counts": observations["z"].value_counts().to_dict(),
     }
+    if args.calibrate_correctness and "correctness_scale" in posterior:
+        summary["correctness_scale"] = float(
+            posterior["correctness_scale"].detach().cpu()
+        )
+        summary["correctness_bias"] = float(
+            posterior["correctness_bias"].detach().cpu()
+        )
     (output_dir / "summary.json").write_text(
         json.dumps(summary, indent=2), encoding="utf-8"
     )
@@ -134,6 +182,20 @@ def parse_args():
     parser.add_argument("--lr", type=float, default=0.02)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     parser.add_argument("--predict-buzz-positions", action="store_true")
+    parser.add_argument("--calibrate-correctness", action="store_true")
+    parser.add_argument(
+        "--train-posterior",
+        type=Path,
+        help="player_posterior.csv from a training run; enables the held-out "
+        "transductive pass with informative player priors",
+    )
+    parser.add_argument(
+        "--new-player-prior",
+        choices=("tier", "flat"),
+        default="tier",
+        help="prior for players unseen in training: tier-conditioned (paper "
+        "default) or flat N(0, I) (ablation)",
+    )
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     return parser.parse_args()
 

@@ -1,0 +1,161 @@
+# CompIRT Run Log
+
+Generated: 2026-07-02T14:08:53-07:00
+Placeholder: yes
+Captured stdout/stderr: unavailable
+Note: this log was reconstructed from saved result artifacts; historical command output was not captured.
+
+## Run Variables
+
+- BONUS_STEPS: 3000
+- CALIBRATE_CORRECTNESS: True
+- DEVICE: unknown
+- DIMENSIONS: 5
+- GPU: unknown
+- LR: unknown
+- MODEL: topic-weighted-compositional, topic-weighted-pyramidal
+- PYRAMIDAL_STEPS: 5000
+- ROOT: results/compirt/holdout/lda-all2024-cal
+- RUN_LOG_KIND: placeholder
+- SPLIT: unknown
+- SYNERGY_DIMENSIONS: 0, 3
+- TEST_SPLIT: unknown
+- TOPIC_VECTORS: topic/topic-modeling/outputs/lda/document_latent_vectors.csv
+- TOURNAMENT: unknown
+- TRAIN_SPLIT: unknown
+
+## Recovered Stage Summaries
+
+### holdout/compositional
+
+```json
+{
+  "bonus_part_observations": 181362,
+  "bonus_parts": 4716,
+  "calibrate_correctness": true,
+  "correctness_bias": 0.18323811888694763,
+  "correctness_scale": 1.9326215982437134,
+  "final_loss": 79855.1737600267,
+  "formula": "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * beta_bk",
+  "model": "topic-weighted-compositional",
+  "saved_synergy_details": false,
+  "skill_dimensions": 5,
+  "steps": 3000,
+  "synergy_dimensions": 0,
+  "tau": 0.6467841267585754,
+  "topic_columns": [
+    "latent_topic_00",
+    "latent_topic_01",
+    "latent_topic_02",
+    "latent_topic_03",
+    "latent_topic_04"
+  ],
+  "topic_dimensions": 5,
+  "topic_vectors": "topic/topic-modeling/outputs/lda/document_latent_vectors.csv",
+  "tournament": "",
+  "use_synergy": false
+}
+```
+
+### holdout/pyramidal
+
+```json
+{
+  "calibrate_correctness": true,
+  "correctness_bias": 1.7950944900512695,
+  "correctness_scale": 0.27303388714790344,
+  "dimensions": 5,
+  "events": 65443,
+  "final_loss": 462877.4138985872,
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))",
+  "model": "topic-weighted-pyramidal",
+  "observation_counts": {
+    "BUZZ": 64834,
+    "CENSORED": 437024,
+    "NO-BUZZ": 4524
+  },
+  "players": 1791,
+  "predicted_buzz_positions": true,
+  "steps": 5000,
+  "topic_columns": [
+    "latent_topic_00",
+    "latent_topic_01",
+    "latent_topic_02",
+    "latent_topic_03",
+    "latent_topic_04"
+  ],
+  "topic_dimensions": 5,
+  "topic_vectors": "topic/topic-modeling/outputs/lda/document_latent_vectors.csv",
+  "tossups": 1350,
+  "tournament": ""
+}
+```
+
+### holdout/synergy
+
+```json
+{
+  "bonus_part_observations": 181362,
+  "bonus_parts": 4716,
+  "calibrate_correctness": true,
+  "correctness_bias": -0.17356739938259125,
+  "correctness_scale": 1.7676520347595215,
+  "final_loss": 82422.16786757112,
+  "formula": "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * beta_bk",
+  "mean_synergy_contribution": 0.22599142789840698,
+  "median_synergy_contribution": 0.21342730522155762,
+  "model": "topic-weighted-compositional",
+  "negative_synergy_fraction": 0.2797168094749727,
+  "positive_synergy_fraction": 0.6973070433718199,
+  "saved_synergy_details": true,
+  "skill_dimensions": 5,
+  "steps": 3000,
+  "synergy_dimensions": 3,
+  "tau": 0.6530572772026062,
+  "topic_columns": [
+    "latent_topic_00",
+    "latent_topic_01",
+    "latent_topic_02",
+    "latent_topic_03",
+    "latent_topic_04"
+  ],
+  "topic_dimensions": 5,
+  "topic_vectors": "topic/topic-modeling/outputs/lda/document_latent_vectors.csv",
+  "tournament": "",
+  "use_synergy": true
+}
+```
+
+### train/pyramidal
+
+```json
+{
+  "calibrate_correctness": true,
+  "correctness_bias": 1.9424302577972412,
+  "correctness_scale": 0.3762671947479248,
+  "dimensions": 5,
+  "events": 48612,
+  "final_loss": 358793.1049101949,
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))",
+  "model": "topic-weighted-pyramidal",
+  "observation_counts": {
+    "BUZZ": 47914,
+    "CENSORED": 341490,
+    "NO-BUZZ": 5620
+  },
+  "players": 1486,
+  "predicted_buzz_positions": true,
+  "steps": 5000,
+  "topic_columns": [
+    "latent_topic_00",
+    "latent_topic_01",
+    "latent_topic_02",
+    "latent_topic_03",
+    "latent_topic_04"
+  ],
+  "topic_dimensions": 5,
+  "topic_vectors": "topic/topic-modeling/outputs/lda/document_latent_vectors.csv",
+  "tossups": 1260,
+  "tournament": ""
+}
+```

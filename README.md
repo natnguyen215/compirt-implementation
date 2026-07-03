@@ -13,17 +13,25 @@ The root CompIRT files are separated by responsibility through their names:
 - `train_pyramidal.py` and `train_compositional.py`: experiment training.
 - `evaluate_compirt.py` and the `compirt_eval/` package: the executed evaluation code
    plus its metrics, figures, and per-scenario (tossup/bonus) modules.
-- `data_pipeline/`: source-database to Hugging Face dataset builder and validater.
+- `data_pipeline/`: source-database to Hugging Face dataset builder and validator.
 - `run_scripts/run_compirt.sh` / `run_scripts/run_compirt.py`: end to end configurable
-  experiment (train, evaluate, and compare in one pass). Both python and bash versions. 
+  experiment (train, evaluate, and compare in one pass). Both python and bash versions.
 - `run_scripts/run_compirt_2024.sh` / `run_scripts/run_compirt_2024.py`:
   full-2024 reproducibility wrapper. It runs dataset validation, then calls the
   configurable runner with all-2024 defaults.
+- `topic/`: topic-model experiments — `topic/fixed/` (topics fit upstream via
+  LDA/PLDA/categories and fed in as fixed weights), `topic/learned/` (topics
+  learned jointly with the IRT model), and shared topic helpers in `topic/utils/`.
+- `tfidf/`: the isolated TF-IDF clue-step baseline.
+- `multidim_mirt/`: the multidimensional-skill pyramidal variant.
+
+Variant scripts run as modules from the repo root, e.g.
+`.venv/bin/python -m topic.fixed.train_topic_pyramidal --help`.
 
 See `docs/compirt-experiments.md` for setup, commands, assumptions, and
-limitations. 
+limitations.
 
-# CompIRT Paper Implementation 
+# CompIRT Paper Implementation
 
 Each file has a module docstring and per-function paper-equation references; the smaller
 helper functions sit above the `run_experiment`/`main` entry point that ties
@@ -42,7 +50,7 @@ them together.
    `run_experiment`.
 6. `evaluate_compirt.py`: turns saved predictions into metrics and figures; start
    at `main`, which calls the two scenario modules in `compirt_eval/`
-   (`tossups.py` is paper Scenario A, `bonuses.py` is Scenario B; `metrics.py`
+   (`tossups/` is paper Scenario A, `bonuses.py` is Scenario B; `metrics.py`
    and `figures.py` hold the shared math and plotting helpers).
 
 
@@ -71,7 +79,10 @@ The full table schema is documented in `docs/dataset-schema.md`.
 
 - Eq. 9 (Noisy-OR) not implemented
 - Neg handling/bounce back not implemented
-- Registered rosters stand in for game-specific four-player lineups since I was unable to recreate lineups.
-   - Full registered roster is used for every bonus.
+- Game-specific lineups are inferred from buzz evidence (`lineup.py`, cached under
+  `data/lineups/`) rather than taken from the full registered roster, so the tossup
+  competing-risks population and the bonus aggregation/synergy run over the ~4 players
+  who plausibly played each game. Games with no buzz evidence fall back to the full
+  roster. Each bonus reuses the inferred lineup of the tossup in the same cycle.
 - SVI used instead of MCMC
 - Current local data covers 2024-2025 and links players by exact raw slug, not the paper's proposed 2023-2025 fuzzy/manual linking procedure.
