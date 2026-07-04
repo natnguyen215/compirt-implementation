@@ -109,10 +109,14 @@ def compositional_model(
     vector_one = theta.new_ones(n_dimensions)
 
     # Eq. 14 bonus-part priors:
-    # alpha_b ~ N(0, I), beta_b ~ N(0, 1).
+    # alpha_b ~ Gamma(2, 2), beta_b ~ N(0, 1).
     # Dimensions: alpha: (n_parts, n_dimensions), beta: (n_parts,).
     with pyro.plate("bonus_parts", n_parts):
-        alpha = pyro.sample("alpha", dist.Normal(vector_zero, vector_one).to_event(1))
+        # Non-negative loadings, matching the tossup model's alpha, so a given
+        # theta dimension always means "more of this skill helps" in both stages.
+        alpha = pyro.sample(
+            "alpha", dist.Gamma(2.0 * vector_one, 2.0 * vector_one).to_event(1)
+        )
         # .to_event forces Pyro to treat the whole discrimination vector as one bonus part's latent vector
         beta = pyro.sample("beta", dist.Normal(zero, one))
 
