@@ -35,7 +35,12 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from utils.run_logging import format_run_log_header, run_logged, tee_run_output
+from utils.run_logging import (
+    format_run_log_header,
+    resolve_result_root,
+    run_logged,
+    tee_run_output,
+)
 
 PYTHON = Path(
     os.environ.get("PYTHON", str(REPO_ROOT / ".venv" / "bin" / "python"))
@@ -141,7 +146,9 @@ def main() -> None:
     gpu = env_default("GPU", "0")
     split = env_default("SPLIT", "year_2024")
     tournament = env_unset_only("TOURNAMENT", "")
-    output_root = env_default("ROOT", "results/compirt/in_sample/embedding-all2024")
+    output_root = resolve_result_root(
+        env_default("ROOT", "results/compirt/in_sample/embedding-all2024"), "in_sample"
+    )
     # Steps/LR match the repo's topic-family convention (embedding_mirt is the
     # neural-embedding sibling of topic/fixed's frozen-vector 'r'), not
     # multidim_mirt's freely-learned-alpha convention.

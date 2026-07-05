@@ -18,3 +18,6 @@ data/lineups/
 # Prevent old manual smoke/inspection artifacts from being tracked again.
 results/compirt/*smoke*/
 results/compirt/*inspection*/
+
+# Local Claude Code guidance files (kept out of version control).
+CLAUDE.md

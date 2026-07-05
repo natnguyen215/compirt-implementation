@@ -23,7 +23,12 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from utils.run_logging import format_run_log_header, run_logged, tee_run_output
+from utils.run_logging import (
+    format_run_log_header,
+    resolve_result_root,
+    run_logged,
+    tee_run_output,
+)
 
 PYTHON = REPO_ROOT / ".venv" / "bin" / "python"
 
@@ -100,8 +105,9 @@ def main() -> None:
     gpu = env_default("GPU", "0")
     split = env_default("SPLIT", "year_2024")
     tournament = env_default_unset_only("TOURNAMENT", "2024-acf-regionals")
-    output_root = env_default(
-        "ROOT", "results/compirt/in_sample/cuda-regionals-2024"
+    output_root = resolve_result_root(
+        env_default("ROOT", "results/compirt/in_sample/cuda-regionals-2024"),
+        "in_sample",
     )
     pyramidal_steps = env_default("PYRAMIDAL_STEPS", "3000")
     bonus_steps = env_default("BONUS_STEPS", "2000")

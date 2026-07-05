@@ -7,6 +7,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
+source "$REPO_ROOT/run_scripts/lib/result_root.sh"
 
 # Set TOURNAMENT="" to include every tournament in the split.
 GPU="${GPU:-0}"
@@ -19,7 +20,7 @@ if [[ "$CALIBRATE_CORRECTNESS" == "1" ]]; then
 else
   DEFAULT_ROOT="results/compirt/in_sample/tfidf-all2024"
 fi
-OUTPUT_ROOT="${ROOT:-$DEFAULT_ROOT}"
+OUTPUT_ROOT="$(resolve_result_root "${ROOT:-$DEFAULT_ROOT}" in_sample)"
 
 PYRAMIDAL_STEPS="${PYRAMIDAL_STEPS:-5000}"
 BONUS_STEPS="${BONUS_STEPS:-3000}"

@@ -6,6 +6,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
+source "$REPO_ROOT/run_scripts/lib/result_root.sh"
 TOPIC_FIXED_DIR="topic/fixed"
 
 PYTHON="${PYTHON:-.venv/bin/python}"
@@ -13,7 +14,7 @@ PYTHON="${PYTHON:-.venv/bin/python}"
 # Set TOURNAMENT="" to include every tournament in the selected split.
 SPLIT="${SPLIT:-year_2024}"
 TOURNAMENT="${TOURNAMENT-2024-acf-regionals}"
-OUTPUT_ROOT="${ROOT:-results/compirt/in_sample/topic_compirt}"
+OUTPUT_ROOT="$(resolve_result_root "${ROOT:-results/compirt/in_sample/topic_compirt}" in_sample)"
 DEVICE="${DEVICE:-cuda}"
 GPU="${GPU:-0}"
 DIMENSIONS="${DIMENSIONS:-10}"

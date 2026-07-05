@@ -3,6 +3,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
+source "$REPO_ROOT/run_scripts/lib/result_root.sh"
 
 PYTHON="${PYTHON:-.venv/bin/python}"
 GPU="${GPU:-0}"
@@ -20,10 +21,10 @@ TRAIN_SPLIT="${TRAIN_SPLIT:-year_2024}"
 TEST_SPLIT="${TEST_SPLIT:-year_2025}"
 NEW_PLAYER_PRIOR="${NEW_PLAYER_PRIOR:-tier}"
 
-INSAMPLE_NO_CAL_ROOT="${INSAMPLE_NO_CAL_ROOT:-results/compirt/in_sample/multidim-all2024}"
-INSAMPLE_CAL_ROOT="${INSAMPLE_CAL_ROOT:-results/compirt/in_sample/multidim-all2024-cal}"
-HOLDOUT_NO_CAL_ROOT="${HOLDOUT_NO_CAL_ROOT:-results/compirt/holdout/multidim-all2024}"
-HOLDOUT_CAL_ROOT="${HOLDOUT_CAL_ROOT:-results/compirt/holdout/multidim-all2024-cal}"
+INSAMPLE_NO_CAL_ROOT="$(resolve_result_root "${INSAMPLE_NO_CAL_ROOT:-results/compirt/in_sample/multidim-all2024}" in_sample)"
+INSAMPLE_CAL_ROOT="$(resolve_result_root "${INSAMPLE_CAL_ROOT:-results/compirt/in_sample/multidim-all2024-cal}" in_sample)"
+HOLDOUT_NO_CAL_ROOT="$(resolve_result_root "${HOLDOUT_NO_CAL_ROOT:-results/compirt/holdout/multidim-all2024}" holdout)"
+HOLDOUT_CAL_ROOT="$(resolve_result_root "${HOLDOUT_CAL_ROOT:-results/compirt/holdout/multidim-all2024-cal}" holdout)"
 
 export PYTHON
 export GPU

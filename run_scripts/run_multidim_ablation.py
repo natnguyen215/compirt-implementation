@@ -28,7 +28,12 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from compirt_eval.outputs import csv_path, graph_path, metrics_path
-from utils.run_logging import format_run_log_header, run_logged, tee_run_output
+from utils.run_logging import (
+    format_run_log_header,
+    resolve_result_root,
+    run_logged,
+    tee_run_output,
+)
 
 DEFAULT_ROOT = Path("results/compirt/holdout/multidim-ablation")
 DEFAULT_DIMENSIONS = (11, 12, 13, 14, 15)
@@ -415,7 +420,7 @@ def parse_args() -> argparse.Namespace:
         help="Only rebuild the aggregate CSV and graphs from existing run folders.",
     )
     args = parser.parse_args()
-    args.root = repo_path(args.root)
+    args.root = Path(resolve_result_root(repo_path(args.root), "holdout"))
     args.data_dir = repo_path(args.data_dir)
     if any(dimension < 1 for dimension in args.dimensions):
         raise ValueError("--dimensions values must all be at least 1")

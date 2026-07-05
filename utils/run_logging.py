@@ -14,6 +14,46 @@ from typing import Mapping
 
 _ACTIVE_LOG_HANDLES = []
 
+_RESULT_MARKER = "results/compirt/"
+_RESULT_TIERS = ("in_sample", "holdout")
+
+
+def resolve_result_root(candidate, tier: str) -> str:
+    """Keep experiment outputs under ``results/compirt/{in_sample,holdout}/``.
+
+    Run roots are supplied by hand through the ``ROOT`` env var, and dropping the
+    ``in_sample/``/``holdout/`` segment used to scatter full runs directly under
+    ``results/compirt/``. This normalizes them:
+
+    * a root already under a tier is returned unchanged;
+    * a bare ``results/compirt/<name>`` is redirected into ``<tier>/<name>`` with
+      a warning;
+    * a path that is not under ``results/compirt/`` (tests, custom dirs) is left
+      untouched.
+
+    Keys on the ``results/compirt/`` marker so it works for both repo-relative
+    and absolute paths, and is idempotent (safe to apply more than once).
+    """
+    if tier not in _RESULT_TIERS:
+        raise ValueError(f"tier must be one of {_RESULT_TIERS}, got {tier!r}")
+    text = str(candidate).rstrip("/")
+    index = text.find(_RESULT_MARKER)
+    if index == -1:
+        return text
+    prefix = text[:index]
+    rest = text[index + len(_RESULT_MARKER) :]
+    if not rest:
+        return text
+    if rest.split("/", 1)[0] in _RESULT_TIERS:
+        return text
+    fixed = f"{prefix}{_RESULT_MARKER}{tier}/{rest}"
+    print(
+        f"note: run ROOT {text!r} is missing the {tier!r} tier; "
+        f"redirecting outputs to {fixed!r}",
+        file=sys.stderr,
+    )
+    return fixed
+
 
 class TeeStream:
     """Write every message to the original stream and a log file."""

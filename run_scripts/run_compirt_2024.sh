@@ -4,12 +4,13 @@ set -euo pipefail
 # This script lives in run_scripts/, so the repo root is one directory up.
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
+source "$REPO_ROOT/run_scripts/lib/result_root.sh"
 
 # Full 2024 experiment: validate the dataset, then train and evaluate the
 # no-synergy and synergy variants. By default, it includes every 2024 tournament.
 export SPLIT="${SPLIT:-year_2024}"
 export TOURNAMENT="${TOURNAMENT-}"
-export ROOT="${ROOT:-results/compirt/in_sample/cuda-all-2024}"
+export ROOT="$(resolve_result_root "${ROOT:-results/compirt/in_sample/cuda-all-2024}" in_sample)"
 export PYRAMIDAL_STEPS="${PYRAMIDAL_STEPS:-5000}"
 export BONUS_STEPS="${BONUS_STEPS:-3000}"
 export DIMENSIONS="${DIMENSIONS:-5}"

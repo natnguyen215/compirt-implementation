@@ -4,12 +4,13 @@ set -euo pipefail
 # This script lives in run_scripts/, so the repo root is one directory up.
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
+source "$REPO_ROOT/run_scripts/lib/result_root.sh"
 
 # Configuration. Set TOURNAMENT="" to include every tournament in the split.
 GPU="${GPU:-0}"
 SPLIT="${SPLIT:-year_2024}"
 TOURNAMENT="${TOURNAMENT-2024-acf-regionals}"
-OUTPUT_ROOT="${ROOT:-results/compirt/in_sample/cuda-regionals-2024}"
+OUTPUT_ROOT="$(resolve_result_root "${ROOT:-results/compirt/in_sample/cuda-regionals-2024}" in_sample)"
 PYRAMIDAL_STEPS="${PYRAMIDAL_STEPS:-3000}"
 BONUS_STEPS="${BONUS_STEPS:-2000}"
 DIMENSIONS="${DIMENSIONS:-3}"

@@ -3,6 +3,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
+source "$REPO_ROOT/run_scripts/lib/result_root.sh"
 
 PYTHON="${PYTHON:-.venv/bin/python}"
 GPU="${GPU:-0}"
@@ -17,8 +18,8 @@ DEVICE="${DEVICE:-cuda}"
 EMBED_DEVICE="${EMBED_DEVICE:-$DEVICE}"
 PREDICT_BUZZ_POSITIONS="${PREDICT_BUZZ_POSITIONS:-1}"
 SAVE_SYNERGY_DETAILS="${SAVE_SYNERGY_DETAILS:-0}"
-NO_CAL_ROOT="${NO_CAL_ROOT:-results/compirt/in_sample/embedding-all2024}"
-CAL_ROOT="${CAL_ROOT:-results/compirt/in_sample/embedding-all2024-cal}"
+NO_CAL_ROOT="$(resolve_result_root "${NO_CAL_ROOT:-results/compirt/in_sample/embedding-all2024}" in_sample)"
+CAL_ROOT="$(resolve_result_root "${CAL_ROOT:-results/compirt/in_sample/embedding-all2024-cal}" in_sample)"
 
 run_one () {
   local root="$1"
