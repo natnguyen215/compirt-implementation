@@ -3,5 +3,6 @@ matplotlib
 pandas
 pyro-ppl==1.9.1
 scikit-learn
+sentence-transformers
 tabulate
 torch

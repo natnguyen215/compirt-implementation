@@ -39,11 +39,6 @@ from compirt_data import (
     load_hf_tables,
     tossup_tensors,
 )
-from topic.fixed.topic_compirt.common import (
-    add_numbered_tensor_columns,
-    fit_svi,
-    tensor_values,
-)
 from topic.fixed.topic_compirt.pyramidal import (
     expected_first_buzz_positions,
     posterior_row_predictions,
@@ -56,10 +51,14 @@ from topic.utils.outputs import (
     document_vector_row,
 )
 from utils.saving import (
+    add_numbered_tensor_columns,
     save_loss_plot,
     save_player_posterior,
-    save_player_rankings,
+    save_tossup_predictions,
+    tensor_values,
+    write_summary,
 )
+from utils.training import fit_svi, require_device
 from holdout.player_priors import attach_player_priors, player_tier_map
 
 
@@ -159,8 +158,7 @@ def write_document_vectors(output_dir, documents_by_id, ordered_ids, weights, di
 def run_experiment(args):
     """Run the complete joint supervised-LDA + pyramidal pipeline."""
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    if args.device == "cuda" and not torch.cuda.is_available():
-        raise RuntimeError("CUDA requested, but no CUDA device is available")
+    require_device(args.device)
     pyro.set_rng_seed(args.seed)
 
     # Tossup observations and training tensors.
@@ -246,23 +244,17 @@ def run_experiment(args):
     save_loss_plot(args.output_dir, losses, "Joint supervised-LDA + pyramidal training loss")
 
     # Replay per-row predictions at the fitted medians.
-    predictions = observations.copy()
     correct, hazard, survival = posterior_row_predictions(
         data, posterior, args.calibrate_correctness
     )
-    predictions["predicted_correct"] = tensor_values(correct)
-    predictions["predicted_hazard"] = tensor_values(hazard)
-    predictions["predicted_survival"] = tensor_values(survival)
-    predictions.to_csv(args.output_dir / "tossup_predictions.csv", index=False)
-    save_player_rankings(args.output_dir, predictions)
-
-    if args.predict_buzz_positions:
-        expected = expected_first_buzz_positions(data, posterior)
-        buzz_events = predictions[predictions["z"] == "BUZZ"][
-            ["event_id", "relative_position"]
-        ].rename(columns={"relative_position": "observed_relative_position"})
-        buzz_events["predicted_relative_position"] = buzz_events["event_id"].map(expected)
-        buzz_events.to_csv(args.output_dir / "buzz_event_predictions.csv", index=False)
+    buzz_expected = (
+        expected_first_buzz_positions(data, posterior)
+        if args.predict_buzz_positions
+        else None
+    )
+    save_tossup_predictions(
+        args.output_dir, observations, correct, hazard, survival, buzz_expected=buzz_expected
+    )
 
     summary = {
         "model": "joint-slda-pyramidal",
@@ -283,7 +275,7 @@ def run_experiment(args):
         "events": len(data["event_ids"]),
         "observation_counts": observations["z"].value_counts().to_dict(),
     }
-    (args.output_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    write_summary(args.output_dir, summary, posterior)
     return summary
 
 

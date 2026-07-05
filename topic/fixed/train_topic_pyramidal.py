@@ -14,12 +14,10 @@ workflow:
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import torch
 
 from compirt_data import (
     DEFAULT_DATA_DIR,
@@ -28,24 +26,22 @@ from compirt_data import (
     load_hf_tables,
     tossup_tensors,
 )
-from topic.fixed.topic_compirt.common import (
-    DEFAULT_TOPIC_VECTORS,
-    REPO_ROOT,
-    add_numbered_tensor_columns,
-    fit_svi,
-    tensor_values,
-)
 from topic.fixed.topic_compirt.pyramidal import (
     competing_risks_model,
     expected_first_buzz_positions,
     posterior_row_predictions,
 )
 from topic.fixed.topic_compirt.topics import align_tossup_topic_weights
+from topic.utils.outputs import DEFAULT_TOPIC_VECTORS, REPO_ROOT
 from utils.saving import (
+    add_numbered_tensor_columns,
     save_loss_plot,
     save_player_posterior,
-    save_player_rankings,
+    save_tossup_predictions,
+    tensor_values,
+    write_summary,
 )
+from utils.training import fit_svi, require_device
 from holdout.player_priors import attach_player_priors, player_tier_map
 
 
@@ -93,8 +89,7 @@ def run_experiment(args):
     """Run the complete isolated topic-weighted pyramidal pipeline."""
     # Set up the output directory and validate the requested device.
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    if args.device == "cuda" and not torch.cuda.is_available():
-        raise RuntimeError("CUDA requested, but no CUDA device is available")
+    require_device(args.device)
 
     # Prepare tossup observations and build the training tensors.
     tables = filter_tournament(load_hf_tables(args.data_dir, args.split), args.tournament)
@@ -144,26 +139,17 @@ def run_experiment(args):
     save_loss_plot(args.output_dir, losses, "Topic-weighted pyramidal IRT training loss")
 
     # Replay per-row predictions at the fitted medians and save them with rankings.
-    predictions = observations.copy()
     correct, hazard, survival = posterior_row_predictions(
         data, posterior, args.calibrate_correctness
     )
-    predictions["predicted_correct"] = tensor_values(correct)
-    predictions["predicted_hazard"] = tensor_values(hazard)
-    predictions["predicted_survival"] = tensor_values(survival)
-    predictions.to_csv(args.output_dir / "tossup_predictions.csv", index=False)
-    save_player_rankings(args.output_dir, predictions)
-
-    # Optionally simulate and save expected first-buzz positions per event.
-    if args.predict_buzz_positions:
-        expected = expected_first_buzz_positions(data, posterior)
-        buzz_events = predictions[predictions["z"] == "BUZZ"][
-            ["event_id", "relative_position"]
-        ].rename(columns={"relative_position": "observed_relative_position"})
-        buzz_events["predicted_relative_position"] = buzz_events["event_id"].map(
-            expected
-        )
-        buzz_events.to_csv(args.output_dir / "buzz_event_predictions.csv", index=False)
+    buzz_expected = (
+        expected_first_buzz_positions(data, posterior)
+        if args.predict_buzz_positions
+        else None
+    )
+    save_tossup_predictions(
+        args.output_dir, observations, correct, hazard, survival, buzz_expected=buzz_expected
+    )
 
     # Build the run summary.
     summary = {
@@ -183,17 +169,8 @@ def run_experiment(args):
         "predicted_buzz_positions": args.predict_buzz_positions,
         "observation_counts": observations["z"].value_counts().to_dict(),
     }
-    if args.calibrate_correctness and "correctness_scale" in posterior:
-        summary["correctness_scale"] = float(
-            posterior["correctness_scale"].detach().cpu()
-        )
-        summary["correctness_bias"] = float(
-            posterior["correctness_bias"].detach().cpu()
-        )
     # Save the run summary to disk and return it to the caller.
-    (args.output_dir / "summary.json").write_text(
-        json.dumps(summary, indent=2), encoding="utf-8"
-    )
+    write_summary(args.output_dir, summary, posterior)
     return summary
 
 

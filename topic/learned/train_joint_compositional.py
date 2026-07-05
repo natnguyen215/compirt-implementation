@@ -44,11 +44,6 @@ from compirt_data import (
     filter_tournament,
     load_hf_tables,
 )
-from topic.fixed.topic_compirt.common import (
-    add_numbered_tensor_columns,
-    fit_svi,
-    tensor_values,
-)
 from topic.fixed.topic_compirt.topics import bonus_id_from_part_id
 from topic.utils.corpus import load_documents
 from topic.utils.outputs import (
@@ -58,7 +53,15 @@ from topic.utils.outputs import (
     document_vector_row,
 )
 from train_compositional import load_player_skills
-from utils.saving import save_loss_plot, save_synergy_outputs
+from utils.saving import (
+    add_numbered_tensor_columns,
+    save_bonus_predictions,
+    save_loss_plot,
+    save_synergy_outputs,
+    tensor_values,
+    write_summary,
+)
+from utils.training import fit_svi, require_device
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -132,16 +135,10 @@ def write_document_vectors(output_dir, documents_by_id, ordered_ids, weights, di
             writer.writerow(document_vector_row(documents_by_id[identifier], vector.tolist()))
 
 
-def expected_bonus_points(part_probabilities):
-    """Convert three part-correct probabilities into expected bonus points."""
-    return 10 * part_probabilities.sum()
-
-
 def run_experiment(args):
     """Run the complete joint supervised-LDA + compositional bonus pipeline."""
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    if args.device == "cuda" and not torch.cuda.is_available():
-        raise RuntimeError("CUDA requested, but no CUDA device is available")
+    require_device(args.device)
     pyro.set_rng_seed(args.seed)
 
     # Fixed inputs from the pyramidal stage: player skills and the topic axes.
@@ -217,18 +214,9 @@ def run_experiment(args):
     )
 
     # Save per-part predictions, then aggregate to expected per-team bonus points.
-    predictions = observations.copy()
-    predictions["predicted_correct"] = tensor_values(probabilities)
-    predictions["aggregate"] = tensor_values(aggregates)
-    predictions["synergy_contribution"] = tensor_values(synergy)
-    predictions.to_csv(args.output_dir / "bonus_part_predictions.csv", index=False)
-    team_predictions = predictions.groupby("response_id", as_index=False).agg(
-        game_id=("game_id", "first"),
-        team_id=("team_id", "first"),
-        total_points=("total_points", "first"),
-        predicted_points=("predicted_correct", expected_bonus_points),
+    save_bonus_predictions(
+        args.output_dir, observations, probabilities, aggregates, synergy
     )
-    team_predictions.to_csv(args.output_dir / "team_predictions.csv", index=False)
 
     save_loss_plot(
         args.output_dir, losses, "Joint supervised-LDA + compositional training loss"
@@ -261,9 +249,6 @@ def run_experiment(args):
         "bonuses": len(ordered_bonus_ids),
         "tau": float(posterior["tau"].detach().cpu()),
     }
-    if args.calibrate_correctness and "correctness_scale" in posterior:
-        summary["correctness_scale"] = float(posterior["correctness_scale"].detach().cpu())
-        summary["correctness_bias"] = float(posterior["correctness_bias"].detach().cpu())
     if args.use_synergy:
         synergy_array = tensor_values(synergy)
         summary.update(
@@ -274,9 +259,7 @@ def run_experiment(args):
                 "positive_synergy_fraction": float((synergy_array > 0).mean()),
             }
         )
-    (args.output_dir / "summary.json").write_text(
-        json.dumps(summary, indent=2), encoding="utf-8"
-    )
+    write_summary(args.output_dir, summary, posterior)
     return summary
 
 

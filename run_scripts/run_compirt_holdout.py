@@ -102,7 +102,7 @@ MODELS = {
         "evaluate": "evaluate_compirt",
     },
     "multidim": {
-        "pyramidal": "multidim_mirt.train_pyramidal",
+        "pyramidal": "multidimensional.multidim_mirt.train_pyramidal",
         "compositional": "train_compositional",
         "evaluate": "evaluate_compirt",
     },

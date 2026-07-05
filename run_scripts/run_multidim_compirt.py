@@ -193,7 +193,7 @@ def main() -> None:
 
     pyramidal_args = [
         PYTHON,
-        "multidim_mirt/train_pyramidal.py",
+        "multidimensional/multidim_mirt/train_pyramidal.py",
         "--split",
         split,
         *tournament_args(tournament),

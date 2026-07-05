@@ -12,14 +12,7 @@ The smaller functions above it each implement one step of that workflow.
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
-
-import pyro
-import torch
-from pyro.infer import SVI, Trace_ELBO
-from pyro.infer.autoguide import AutoNormal
-from pyro.optim import ClippedAdam
 
 from pyramidal_model import (
     competing_risks_model,
@@ -37,9 +30,10 @@ from utils.saving import (
     save_loss_plot,
     save_parameters,
     save_player_posterior,
-    save_player_rankings,
-    tensor_values,
+    save_tossup_predictions,
+    write_summary,
 )
+from utils.training import fit_svi, require_device
 from holdout.player_priors import attach_player_priors, player_tier_map
 
 
@@ -54,25 +48,13 @@ def train_model(
     lr=0.02,
     calibrate_correctness=False,
 ):
-    """Fit the competing-risks model and return medians plus its loss curve."""
-    # Clear the global param store so a previous run cannot leak in.
-    pyro.clear_param_store()
-    guide = AutoNormal(competing_risks_model)
-    svi = SVI(
-        competing_risks_model, guide, ClippedAdam({"lr": lr}), loss=Trace_ELBO()
-    )
-    losses = []
-    for step in range(n_steps):
-        loss = svi.step(data, n_dimensions, calibrate_correctness)
-        losses.append(float(loss))
-        if step % 100 == 0:
-            print(f"step {step:4d}  ELBO loss: {loss:,.1f}")
-    # Collapse each posterior to its median for CSV output and prediction. The
-    # guide is returned too so callers can save the full theta/c posterior.
-    return (
-        guide.median(data, n_dimensions, calibrate_correctness),
-        guide,
-        losses,
+    """Fit the competing-risks model and return medians, guide, and loss curve."""
+    return fit_svi(
+        competing_risks_model,
+        (data, n_dimensions, calibrate_correctness),
+        n_steps,
+        lr,
+        return_guide=True,
     )
 
 
@@ -80,8 +62,7 @@ def run_experiment(args):
     """Run the complete pyramidal training and output pipeline."""
     output_dir = args.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
-    if args.device == "cuda" and not torch.cuda.is_available():
-        raise RuntimeError("CUDA requested, but no CUDA device is available")
+    require_device(args.device)
     # Load tables -> build BUZZ/CENSORED/NO-BUZZ rows -> index into tensors.
     tables = filter_tournament(load_hf_tables(args.data_dir, args.split), args.tournament)
     observations = build_tossup_observations(tables)
@@ -124,26 +105,18 @@ def run_experiment(args):
     save_player_posterior(output_dir, data["player_ids"], guide, tier_map)
     save_loss_plot(output_dir, losses, "Pyramidal IRT training loss")
     # Attach fitted predictions back onto the readable observation rows.
-    predictions = observations.copy()
     correct, hazard, survival = posterior_row_predictions(
         data, posterior, args.calibrate_correctness
     )
-    predictions["predicted_correct"] = tensor_values(correct)
-    predictions["predicted_hazard"] = tensor_values(hazard)
-    predictions["predicted_survival"] = tensor_values(survival)
-    predictions.to_csv(output_dir / "tossup_predictions.csv", index=False)
-    save_player_rankings(output_dir, predictions)
-
-    if args.predict_buzz_positions:
-        # One expected first-buzz position per event from the row-level hazards.
-        expected = expected_first_buzz_positions(data, posterior)
-        buzz_events = predictions[predictions["z"] == "BUZZ"][
-            ["event_id", "relative_position"]
-        ].rename(columns={"relative_position": "observed_relative_position"})
-        buzz_events["predicted_relative_position"] = buzz_events["event_id"].map(
-            expected
-        )
-        buzz_events.to_csv(output_dir / "buzz_event_predictions.csv", index=False)
+    # One expected first-buzz position per event from the row-level hazards.
+    buzz_expected = (
+        expected_first_buzz_positions(data, posterior)
+        if args.predict_buzz_positions
+        else None
+    )
+    save_tossup_predictions(
+        output_dir, observations, correct, hazard, survival, buzz_expected=buzz_expected
+    )
 
     # summary.json records run configuration and dataset size at a glance.
     summary = {
@@ -159,16 +132,7 @@ def run_experiment(args):
         "calibrate_correctness": args.calibrate_correctness,
         "observation_counts": observations["z"].value_counts().to_dict(),
     }
-    if args.calibrate_correctness and "correctness_scale" in posterior:
-        summary["correctness_scale"] = float(
-            posterior["correctness_scale"].detach().cpu()
-        )
-        summary["correctness_bias"] = float(
-            posterior["correctness_bias"].detach().cpu()
-        )
-    (output_dir / "summary.json").write_text(
-        json.dumps(summary, indent=2), encoding="utf-8"
-    )
+    write_summary(output_dir, summary, posterior)
     return summary
 
 

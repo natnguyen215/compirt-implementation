@@ -1,0 +1,23 @@
+{
+  "model": "embedding-relevance-compositional",
+  "formula": "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * beta_bk",
+  "embeddings": "/teapot/students/natnguyen/CompIRT-Implementation/embedding_mirt/outputs/bonus_embeddings.npz",
+  "projection": "results/compirt/in_sample/embedding-all2024-cal/pyramidal/r_projection.npz",
+  "tournament": "",
+  "steps": 3000,
+  "final_loss": 61073.2743524909,
+  "use_synergy": true,
+  "synergy_dimensions": 3,
+  "saved_synergy_details": false,
+  "calibrate_correctness": true,
+  "skill_dimensions": 5,
+  "bonus_part_observations": 133461,
+  "bonus_parts": 3768,
+  "tau": 0.23365052044391632,
+  "correctness_scale": 1.6234238147735596,
+  "correctness_bias": 1.7988256216049194,
+  "mean_synergy_contribution": 0.2069559246301651,
+  "median_synergy_contribution": 0.14169034361839294,
+  "negative_synergy_fraction": 0.32114999887607615,
+  "positive_synergy_fraction": 0.6474475689527278
+}

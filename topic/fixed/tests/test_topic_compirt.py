@@ -16,7 +16,7 @@ from topic.fixed.topic_compirt.compositional import (
     topic_weighted_member_abilities,
     topic_weighted_part_difficulty,
 )
-from topic.fixed.topic_compirt.common import fit_svi
+from utils.training import fit_svi
 from topic.fixed.topic_compirt.evaluation import (
     _topic_difficulty_components,
     topic_difficulty_components_plot,

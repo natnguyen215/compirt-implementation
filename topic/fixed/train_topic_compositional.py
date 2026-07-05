@@ -13,12 +13,10 @@ load -> build -> train -> predict -> save workflow.
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import torch
 
 from compirt_data import (
     DEFAULT_DATA_DIR,
@@ -27,17 +25,19 @@ from compirt_data import (
     filter_tournament,
     load_hf_tables,
 )
-from topic.fixed.topic_compirt.common import (
-    DEFAULT_TOPIC_VECTORS,
-    REPO_ROOT,
-    add_numbered_tensor_columns,
-    fit_svi,
-    tensor_values,
-)
 from topic.fixed.topic_compirt.compositional import compositional_model, posterior_predictions
 from topic.fixed.topic_compirt.topics import align_bonus_topic_weights
+from topic.utils.outputs import DEFAULT_TOPIC_VECTORS, REPO_ROOT
 from train_compositional import load_player_skills
-from utils.saving import save_loss_plot, save_synergy_outputs
+from utils.saving import (
+    add_numbered_tensor_columns,
+    save_bonus_predictions,
+    save_loss_plot,
+    save_synergy_outputs,
+    tensor_values,
+    write_summary,
+)
+from utils.training import fit_svi, require_device
 
 
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "results" / "compirt" / "topic-compositional"
@@ -57,11 +57,6 @@ def train_model(
     )
 
 
-def expected_bonus_points(part_probabilities):
-    """Convert three part-correct probabilities into expected bonus points."""
-    return 10 * part_probabilities.sum()
-
-
 def save_bonus_part_parameters(output_dir, data, posterior):
     """Write bonus-part parameters, including fixed topic weights."""
     part_parameters = {"bonus_part_id": data["part_ids"]}
@@ -74,8 +69,7 @@ def run_experiment(args):
     """Run the complete isolated topic-weighted compositional pipeline."""
     # Set up the output directory and validate the requested device.
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    if args.device == "cuda" and not torch.cuda.is_available():
-        raise RuntimeError("CUDA requested, but no CUDA device is available")
+    require_device(args.device)
 
     # Load the fixed player skills (theta) learned by the pyramidal stage.
     player_ids, theta = load_player_skills(args.player_skills, args.device)
@@ -127,18 +121,9 @@ def run_experiment(args):
     )
 
     # Save per-part predictions, then aggregate to expected per-team bonus points.
-    predictions = observations.copy()
-    predictions["predicted_correct"] = tensor_values(probabilities)
-    predictions["aggregate"] = tensor_values(aggregates)
-    predictions["synergy_contribution"] = tensor_values(synergy)
-    predictions.to_csv(args.output_dir / "bonus_part_predictions.csv", index=False)
-    team_predictions = predictions.groupby("response_id", as_index=False).agg(
-        game_id=("game_id", "first"),
-        team_id=("team_id", "first"),
-        total_points=("total_points", "first"),
-        predicted_points=("predicted_correct", expected_bonus_points),
+    save_bonus_predictions(
+        args.output_dir, observations, probabilities, aggregates, synergy
     )
-    team_predictions.to_csv(args.output_dir / "team_predictions.csv", index=False)
 
     # Save the training-loss plot, plus optional per-player synergy details.
     save_loss_plot(
@@ -172,13 +157,6 @@ def run_experiment(args):
         "bonus_parts": len(data["part_ids"]),
         "tau": float(posterior["tau"].detach().cpu()),
     }
-    if args.calibrate_correctness and "correctness_scale" in posterior:
-        summary["correctness_scale"] = float(
-            posterior["correctness_scale"].detach().cpu()
-        )
-        summary["correctness_bias"] = float(
-            posterior["correctness_bias"].detach().cpu()
-        )
     if args.use_synergy:
         synergy_array = tensor_values(synergy)
         summary.update(
@@ -190,9 +168,7 @@ def run_experiment(args):
             }
         )
     # Save the run summary to disk and return it to the caller.
-    (args.output_dir / "summary.json").write_text(
-        json.dumps(summary, indent=2), encoding="utf-8"
-    )
+    write_summary(args.output_dir, summary, posterior)
     return summary
 
 

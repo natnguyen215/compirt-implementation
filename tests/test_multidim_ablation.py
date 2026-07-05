@@ -44,8 +44,8 @@ class CommandConstructionTests(unittest.TestCase):
             ["train-pyramidal", "holdout-pyramidal", "synergy", "synergy-evaluation"],
         )
         commands = [" ".join(stage.command) for stage in stages]
-        self.assertEqual(commands[0].count("multidim_mirt.train_pyramidal"), 1)
-        self.assertEqual(commands[1].count("multidim_mirt.train_pyramidal"), 1)
+        self.assertEqual(commands[0].count("multidimensional.multidim_mirt.train_pyramidal"), 1)
+        self.assertEqual(commands[1].count("multidimensional.multidim_mirt.train_pyramidal"), 1)
         self.assertIn("train_compositional", commands[2])
         self.assertIn("--use-synergy", commands[2])
         self.assertIn("--synergy-dimensions 3", commands[2])

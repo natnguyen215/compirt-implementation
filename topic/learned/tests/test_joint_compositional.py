@@ -12,7 +12,7 @@ from topic.learned.joint_compositional import (
     joint_posterior_predictions,
 )
 from topic.learned.train_joint_compositional import build_part_doc_index
-from topic.fixed.topic_compirt.common import fit_svi
+from utils.training import fit_svi
 
 
 class PartDocIndexTests(unittest.TestCase):

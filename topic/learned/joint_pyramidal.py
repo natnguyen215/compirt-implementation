@@ -17,7 +17,7 @@ weights the skill dimensions -- a deliberate, less-trodden joint fusion.
 No encoder/decoder networks: 'theta_doc' is a per-document latent and the
 topic-word matrix 'topic_word' is a point-estimated parameter (the variational-EM
 M-step). One 'AutoNormal' guide therefore covers every latent, so training
-reuses 'topic_compirt.common.fit_svi'.
+reuses 'utils.training.fit_svi'.
 
 The competing-risks math is reused unchanged from 'topic_compirt.pyramidal';
 only the source of 'topic_weight' differs (a learned latent vs. a fixed CSV).

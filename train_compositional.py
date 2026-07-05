@@ -10,16 +10,11 @@ Start reading at 'run_experiment' to see the complete workflow.
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import pyro
 import torch
-from pyro.infer import SVI, Trace_ELBO
-from pyro.infer.autoguide import AutoNormal
-from pyro.optim import ClippedAdam
 
 from compirt_data import (
     DEFAULT_DATA_DIR,
@@ -29,7 +24,15 @@ from compirt_data import (
     load_hf_tables,
 )
 from compositional_model import compositional_model, posterior_predictions
-from utils.saving import save_loss_plot, save_synergy_outputs, tensor_values
+from utils.saving import (
+    add_numbered_tensor_columns,
+    save_bonus_predictions,
+    save_loss_plot,
+    save_synergy_outputs,
+    tensor_values,
+    write_summary,
+)
+from utils.training import fit_svi, require_device
 
 
 ROOT = Path(__file__).parent
@@ -63,33 +66,18 @@ def train_model(
     data, theta, use_synergy, synergy_dimensions, n_steps, lr, calibrate_correctness=False
 ):
     """Fit bonus-part parameters while treating 'theta' as fixed input."""
-    pyro.clear_param_store()
-    # The guide only learns alpha, beta, tau, and optional psi.
-    guide = AutoNormal(compositional_model)
-    svi = SVI(compositional_model, guide, ClippedAdam({"lr": lr}), loss=Trace_ELBO())
-    losses = []
-    for step in range(n_steps):
-        loss = svi.step(
-            data, theta, use_synergy, synergy_dimensions, calibrate_correctness
-        )
-        losses.append(float(loss))
-        if step % 100 == 0:
-            print(f"step {step:4d}  ELBO loss: {loss:,.1f}")
-    return guide.median(
-        data, theta, use_synergy, synergy_dimensions, calibrate_correctness
-    ), losses
-
-
-def expected_bonus_points(part_probabilities):
-    """Convert three part-correct probabilities into expected bonus points."""
-    return 10 * part_probabilities.sum()
+    return fit_svi(
+        compositional_model,
+        (data, theta, use_synergy, synergy_dimensions, calibrate_correctness),
+        n_steps,
+        lr,
+    )
 
 
 def run_experiment(args):
     """Run the complete compositional bonus training and output pipeline."""
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    if args.device == "cuda" and not torch.cuda.is_available():
-        raise RuntimeError("CUDA requested, but no CUDA device is available")
+    require_device(args.device)
     # Load and freeze player skills from tossups, then build bonus-part rows.
     player_ids, theta = load_player_skills(args.player_skills, args.device)
     tables = filter_tournament(
@@ -135,10 +123,7 @@ def run_experiment(args):
         "bonus_part_id": data["part_ids"],
         "beta": tensor_values(posterior["beta"]),
     }
-    for dimension in range(posterior["alpha"].shape[1]):
-        part_parameters[f"alpha_{dimension + 1}"] = tensor_values(
-            posterior["alpha"][:, dimension]
-        )
+    add_numbered_tensor_columns(part_parameters, "alpha", posterior["alpha"])
     pd.DataFrame(part_parameters).to_csv(
         args.output_dir / "bonus_parts.csv", index=False
     )
@@ -146,19 +131,9 @@ def run_experiment(args):
         f"{float(posterior['tau'].detach().cpu()):.8f}\n", encoding="utf-8"
     )
 
-    predictions = observations.copy()
-    predictions["predicted_correct"] = tensor_values(probabilities)
-    predictions["aggregate"] = tensor_values(aggregates)
-    predictions["synergy_contribution"] = tensor_values(synergy)
-    predictions.to_csv(args.output_dir / "bonus_part_predictions.csv", index=False)
-    # Expected points equal 10 times the sum of the three part probabilities.
-    team_predictions = predictions.groupby("response_id", as_index=False).agg(
-        game_id=("game_id", "first"),
-        team_id=("team_id", "first"),
-        total_points=("total_points", "first"),
-        predicted_points=("predicted_correct", expected_bonus_points),
+    save_bonus_predictions(
+        args.output_dir, observations, probabilities, aggregates, synergy
     )
-    team_predictions.to_csv(args.output_dir / "team_predictions.csv", index=False)
 
     save_loss_plot(args.output_dir, losses, "Compositional IRT training loss")
     if args.use_synergy and args.save_synergy_details:
@@ -183,13 +158,6 @@ def run_experiment(args):
         "bonus_parts": len(data["part_ids"]),
         "tau": float(posterior["tau"].detach().cpu()),
     }
-    if args.calibrate_correctness and "correctness_scale" in posterior:
-        summary["correctness_scale"] = float(
-            posterior["correctness_scale"].detach().cpu()
-        )
-        summary["correctness_bias"] = float(
-            posterior["correctness_bias"].detach().cpu()
-        )
     if args.use_synergy:
         synergy_array = tensor_values(synergy)
         summary.update(
@@ -200,9 +168,7 @@ def run_experiment(args):
                 "positive_synergy_fraction": float((synergy_array > 0).mean()),
             }
         )
-    (args.output_dir / "summary.json").write_text(
-        json.dumps(summary, indent=2), encoding="utf-8"
-    )
+    write_summary(args.output_dir, summary, posterior)
     return summary
 
 

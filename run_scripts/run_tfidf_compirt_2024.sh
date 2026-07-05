@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Full-2024 TF-IDF CompIRT experiment. This mirrors run_compirt_2024.sh /
 # run_compirt.sh, but swaps the Stage 1 pyramidal trainer for the isolated
-# TF-IDF clue-step trainer in tfidf/.
+# TF-IDF-adjusted trainer in tfidf/.
 
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
@@ -15,9 +15,9 @@ TOURNAMENT="${TOURNAMENT-}"
 CALIBRATE_CORRECTNESS="${CALIBRATE_CORRECTNESS:-0}"
 
 if [[ "$CALIBRATE_CORRECTNESS" == "1" ]]; then
-  DEFAULT_ROOT="results/compirt/in_sample/tfidf-cluestep-all2024-cal"
+  DEFAULT_ROOT="results/compirt/in_sample/tfidf-all2024-cal"
 else
-  DEFAULT_ROOT="results/compirt/in_sample/tfidf-cluestep-all2024"
+  DEFAULT_ROOT="results/compirt/in_sample/tfidf-all2024"
 fi
 OUTPUT_ROOT="${ROOT:-$DEFAULT_ROOT}"
 
@@ -33,8 +33,6 @@ RUN_VALIDATION="${RUN_VALIDATION:-1}"
 TFIDF_PLOT_COUNT="${TFIDF_PLOT_COUNT:-6}"
 
 TFIDF_EFFECT_PRIOR_SCALE="${TFIDF_EFFECT_PRIOR_SCALE:-1.0}"
-TFIDF_SPIKE_WINDOW="${TFIDF_SPIKE_WINDOW:-7}"
-TFIDF_SPIKE_QUANTILE="${TFIDF_SPIKE_QUANTILE:-0.85}"
 NO_NORMALIZE_TFIDF="${NO_NORMALIZE_TFIDF:-0}"
 
 export CUDA_VISIBLE_DEVICES="$GPU"
@@ -61,7 +59,7 @@ echo "## Run Variables"
 echo
 echo "- RUNNER: run_scripts/run_tfidf_compirt_2024.sh"
 echo "- ROOT: $OUTPUT_ROOT"
-echo "- MODEL: tfidf-cluestep"
+echo "- MODEL: tfidf-baseline-pyramidal"
 echo "- SPLIT: $SPLIT"
 echo "- TOURNAMENT: ${TOURNAMENT:-<all>}"
 echo "- DEVICE: cuda"
@@ -77,8 +75,6 @@ echo "- CALIBRATE_CORRECTNESS: $CALIBRATE_CORRECTNESS"
 echo "- PREDICT_BUZZ_POSITIONS: $PREDICT_BUZZ_POSITIONS"
 echo "- RUN_VALIDATION: $RUN_VALIDATION"
 echo "- TFIDF_EFFECT_PRIOR_SCALE: $TFIDF_EFFECT_PRIOR_SCALE"
-echo "- TFIDF_SPIKE_WINDOW: $TFIDF_SPIKE_WINDOW"
-echo "- TFIDF_SPIKE_QUANTILE: $TFIDF_SPIKE_QUANTILE"
 echo "- NO_NORMALIZE_TFIDF: $NO_NORMALIZE_TFIDF"
 echo "- MPLCONFIGDIR: $MPLCONFIGDIR"
 echo "- PYRAMIDAL_OUTPUT: $OUTPUT_ROOT/pyramidal"
@@ -142,8 +138,6 @@ pyramidal_args=(
   --lr "$LR"
   --device cuda
   --tfidf-effect-prior-scale "$TFIDF_EFFECT_PRIOR_SCALE"
-  --tfidf-spike-window "$TFIDF_SPIKE_WINDOW"
-  --tfidf-spike-quantile "$TFIDF_SPIKE_QUANTILE"
   --output-dir "$OUTPUT_ROOT/pyramidal"
 )
 if [[ "$PREDICT_BUZZ_POSITIONS" == "1" ]]; then

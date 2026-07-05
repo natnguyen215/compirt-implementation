@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import atexit
+import codecs
 import json
 import subprocess
 import sys
@@ -131,13 +132,25 @@ def run_logged(args: list[str], *, cwd: Path | None = None) -> None:
         cwd=cwd,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1,
+        bufsize=0,
     )
     assert process.stdout is not None
-    for line in process.stdout:
-        sys.stdout.write(line)
+    # Read raw bytes rather than iterating "lines": text-mode iteration applies
+    # universal-newline translation, which treats a bare '\r' (how tqdm redraws
+    # a progress bar in place) as a line terminator. That turns every tqdm
+    # refresh into its own logged line instead of one line that updates in
+    # place, so read a fixed chunk size and decode incrementally (chunk
+    # boundaries can split a multi-byte UTF-8 character), writing through
+    # 'sys.stdout.write' -- not '.buffer.write' -- so a 'TeeStream' installed by
+    # 'tee_run_output' still mirrors the bytes to the log file.
+    decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
+    while True:
+        chunk = process.stdout.read(4096)
+        if not chunk:
+            break
+        sys.stdout.write(decoder.decode(chunk))
         sys.stdout.flush()
+    sys.stdout.write(decoder.decode(b"", final=True))
     return_code = process.wait()
     if return_code:
         raise subprocess.CalledProcessError(return_code, printable)

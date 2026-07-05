@@ -23,7 +23,7 @@ from lineup import LineupIndex
 from compirt_eval.tossups import multidim_difficulty_components_plot
 from compositional_model import lse_aggregation, posterior_predictions, synergy_contribution
 from evaluate_compirt import bonus_metrics, density_estimate, first_buzz_distribution
-from multidim_mirt.pyramidal_model import (
+from multidimensional.multidim_mirt.pyramidal_model import (
     competing_risks_model as multidim_competing_risks_model,
     correctness_logit as multidim_correctness_logit,
     difficulty_curve as multidim_difficulty_curve,

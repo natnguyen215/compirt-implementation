@@ -23,16 +23,19 @@ column.
 | `lda-all2024` | synergy | LDA 5d | ✗ | 0.9154 | 0.3865 | 0.0589 | 0.8361 | 0.5739 | 0.5770 | 1.8686 |
 | `lda-all2024-cal` | synergy | LDA 5d | ✓ | 0.9194 | 0.3618 | 0.0174 | 0.8390 | 0.5783 | 0.5907 | 1.7401 |
 | `category-all2024` | synergy | one-hot category 13d | ✗ | 0.9181 | 0.3712 | 0.0367 | 0.8373 | 0.5767 | 0.5813 | 1.8409 |
-| `category-all2024-cal` | synergy | one-hot category 13d | ✓ | 0.9196 | 0.3605 | **0.0112** | 0.8386 | 0.5795 | 0.5908 | 1.7532 |
+| `category-all2024-cal` | synergy | one-hot category 13d | ✓ | 0.9196 | 0.3605 | 0.0112 | 0.8386 | 0.5795 | 0.5908 | 1.7532 |
 | `learned-topic-all2024` | synergy | learned topic 5d | ✗ | 0.9161 | 0.3818 | 0.0526 | 0.8360 | 0.5731 | 0.5801 | 1.8602 |
 | `learned-topic-all2024-cal` | synergy | learned topic 5d | ✓ | 0.9218 | 0.3558 | 0.0134 | 0.8410 | 0.5828 | 0.5956 | **1.7138** |
+| `embedding-all2024` | synergy | embedding relevance 5d | ✗ | 0.9132 | 0.3808 | 0.0356 | 0.8305 | 0.5608 | 0.5667 | 1.9067 |
+| `embedding-all2024-cal` | synergy | embedding relevance 5d | ✓ | 0.9171 | 0.3652 | **0.0112** | 0.8345 | 0.5697 | 0.5800 | 1.7317 |
 | `multidim-all2024` | synergy | multidim MIRT 5d | ✗ | 0.9361 | 0.3351 | 0.0434 | 0.8546 | 0.6154 | 0.6151 | 1.7864 |
 | `multidim-all2024-cal` | synergy | multidim MIRT 5d | ✓ | 0.9370 | 0.3289 | 0.0372 | 0.8568 | 0.6226 | 0.6197 | 1.7463 |
 
 The uncalibrated no-topic baseline is strongest on in-sample bonus
 classification metrics: AUC, log loss, part accuracy, strict exact accuracy,
 and score accuracy. Calibrated learned-topic has the best PPB MAE, and
-calibrated category has the best ECE.
+calibrated embedding-relevance has the best ECE by a very small margin over
+calibrated category at full precision.
 
 ## In-Sample Tossup Stage Metrics (Stage 1)
 
@@ -48,6 +51,8 @@ calibrated category has the best ECE.
 | `category-all2024-cal` | one-hot category 13d | ✓ | 0.6139 | 0.5275 | **0.0054** | 0.7675 |
 | `learned-topic-all2024` | learned topic 5d | ✗ | 0.6734 | 0.6085 | 0.1771 | 0.6817 |
 | `learned-topic-all2024-cal` | learned topic 5d | ✓ | 0.6306 | 0.5229 | 0.0104 | 0.7680 |
+| `embedding-all2024` | embedding relevance 5d | ✗ | 0.6534 | 0.6188 | 0.1620 | 0.6800 |
+| `embedding-all2024-cal` | embedding relevance 5d | ✓ | 0.6519 | 0.5152 | 0.0117 | 0.7713 |
 | `multidim-all2024` | multidim MIRT 5d | ✗ | 0.7025 | 0.5754 | 0.1282 | 0.7171 |
 | `multidim-all2024-cal` | multidim MIRT 5d | ✓ | 0.6572 | 0.5134 | 0.0080 | **0.7714** |
 
@@ -55,7 +60,9 @@ Calibration sharply reduces tossup ECE and log loss in every family, but because
 the model is reoptimized with the calibration parameters, AUC can move too. The
 uncalibrated baseline keeps the best in-sample tossup AUC; calibrated baseline
 has the best log loss, category-calibrated has the best ECE, and calibrated
-multidim ties the top accuracy after rounding to four decimals.
+multidim ties the top accuracy after rounding to four decimals. The
+embedding-relevance rows follow the broader calibrated pattern: calibration
+substantially improves log loss, ECE, and accuracy, while AUC is roughly flat.
 
 ## Holdout Results (2024 -> 2025)
 
@@ -161,8 +168,9 @@ accuracy, and the learned synergy contribution.
 The effect on the synergy term is large. In-sample baseline mean synergy
 contribution moves from **-0.7585** without calibration (83.5% of rows negative)
 to **+0.2200** with calibration (38.2% negative, 58.7% positive). PLDA moves from
-**-0.8482** to **+0.0640**. On the holdout baseline, the calibrated synergy run
-has mean contribution **+0.4065**.
+**-0.8482** to **+0.0640**. Embedding-relevance moves from **-1.0022** to
+**+0.2070**. On the holdout baseline, the calibrated synergy run has mean
+contribution **+0.4065**.
 
 ## Metrics
 

@@ -105,7 +105,7 @@ def build_stages(args: argparse.Namespace, dimension: int) -> list[Stage]:
             [
                 python,
                 "-m",
-                "multidim_mirt.train_pyramidal",
+                "multidimensional.multidim_mirt.train_pyramidal",
                 "--split",
                 args.train_split,
                 *train_filter_args,
@@ -129,7 +129,7 @@ def build_stages(args: argparse.Namespace, dimension: int) -> list[Stage]:
             [
                 python,
                 "-m",
-                "multidim_mirt.train_pyramidal",
+                "multidimensional.multidim_mirt.train_pyramidal",
                 "--split",
                 args.test_split,
                 *train_filter_args,

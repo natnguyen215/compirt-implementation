@@ -1,0 +1,196 @@
+"""Plot TF-IDF-adjusted effective difficulty curves for a fitted run.
+
+The shared CompIRT evaluator only knows how to redraw the saved base
+'beta/gamma/mu' sigmoid from 'tossups.csv'. This diagnostic recomputes the
+TF-IDF features and overlays the effective difficulty actually used by the
+TF-IDF experiment:
+
+    d'_j(t) = d_j(t) - lambda_tfidf * tfidf_prefix_j(t)
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import math
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+from compirt_data import (
+    DEFAULT_DATA_DIR,
+    build_tossup_observations,
+    filter_tournament,
+    load_hf_tables,
+    tossup_tensors,
+)
+from compirt_eval.figures import short_id
+from compirt_eval.metrics import difficulty_curve
+from compirt_eval.tossups.difficulty import selected_tossups
+from tfidf.pyramidal_tfidf_model import tfidf_score_at
+from tfidf.tfidf_features import attach_tfidf_prefix_scores
+
+
+def load_run_context(results_dir: Path, data_dir: Path):
+    """Load saved run outputs and recompute aligned TF-IDF feature matrices."""
+    summary_path = results_dir / "summary.json"
+    if not summary_path.exists():
+        raise FileNotFoundError(f"Missing summary: {summary_path}")
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+
+    split = summary.get("split", "all")
+    tournament = summary.get("tournament") or None
+    tables = filter_tournament(load_hf_tables(data_dir, split), tournament)
+    observations = build_tossup_observations(tables)
+    data = tossup_tensors(observations)
+    tfidf_feature_summary = summary.get("tfidf_features", {})
+    attach_tfidf_prefix_scores(
+        data,
+        tables,
+        normalize=tfidf_feature_summary.get("normalized", True),
+    )
+    return summary, data
+
+
+def effective_curve(row, features, summary, relative_positions):
+    """Return base curve, TF-IDF adjustment, effective curve, and TF-IDF score."""
+    token_positions = np.maximum(
+        1, np.rint(relative_positions * features["T"]).astype(int)
+    )
+    token_positions = np.minimum(token_positions, features["T"])
+    t = features["prefix"].new_tensor(token_positions)
+    base = difficulty_curve(row.beta, row.gamma, row.mu, relative_positions)
+    tfidf_score = tfidf_score_at(features["prefix"], t).detach().cpu().numpy()
+    adjustment = float(summary["tfidf_clue_effect"]) * tfidf_score
+    return base, adjustment, base - adjustment, tfidf_score
+
+
+def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int):
+    """Write TF-IDF-adjusted difficulty diagnostic plots."""
+    summary, data = load_run_context(results_dir, data_dir)
+    parameters = pd.read_csv(results_dir / "tossups.csv").set_index("tossup_id")
+    predictions = pd.read_csv(results_dir / "tossup_predictions.csv")
+    tossup_index = {tossup_id: index for index, tossup_id in enumerate(data["tossup_ids"])}
+
+    selected = [
+        tossup_id
+        for tossup_id in selected_tossups(predictions, count=count)
+        if tossup_id in parameters.index and tossup_id in tossup_index
+    ]
+    if not selected:
+        raise ValueError("No tossups available for TF-IDF difficulty plotting")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    columns = 2
+    rows = math.ceil(len(selected) / columns)
+    fig, axes = plt.subplots(rows, columns, figsize=(13, 4.3 * rows), squeeze=False)
+    positions = np.linspace(0.0, 1.0, 160)
+
+    for ax, tossup_id in zip(axes.flat, selected):
+        row = parameters.loc[tossup_id]
+        index = tossup_index[tossup_id]
+        T = int(predictions.loc[predictions["tossup_id"] == tossup_id, "T_j"].iloc[0])
+        features = {
+            "T": T,
+            "prefix": data["tfidf_prefix"][index],
+        }
+        base, adjustment, effective, tfidf_score = effective_curve(
+            row, features, summary, positions
+        )
+
+        buzz_positions = predictions.loc[
+            (predictions["tossup_id"] == tossup_id) & (predictions["z"] == "BUZZ"),
+            "relative_position",
+        ]
+        ax.hist(
+            buzz_positions,
+            bins=np.linspace(0, 1, 11),
+            color="tab:orange",
+            alpha=0.22,
+            label=f"Observed buzzes (n={len(buzz_positions)})",
+        )
+        curve_ax = ax.twinx()
+        curve_ax.plot(
+            positions,
+            base,
+            color="tab:blue",
+            linewidth=1.5,
+            alpha=0.65,
+            label="Base sigmoid d(t)",
+        )
+        curve_ax.plot(
+            positions,
+            effective,
+            color="black",
+            linewidth=2.2,
+            label="TF-IDF effective d'(t)",
+        )
+        curve_ax.plot(
+            positions,
+            adjustment,
+            color="tab:green",
+            linewidth=1.4,
+            linestyle="--",
+            label="TF-IDF adjustment",
+        )
+        score_ax = ax.twinx()
+        score_ax.spines["right"].set_position(("axes", 1.09))
+        score_ax.plot(
+            positions,
+            tfidf_score,
+            color="tab:red",
+            linewidth=1.0,
+            alpha=0.6,
+            label="tfidf_prefix",
+        )
+        score_ax.set_ylim(-0.03, 1.03)
+        score_ax.set_yticks([])
+
+        ax.set(
+            title=short_id(tossup_id),
+            xlabel="Relative position",
+            ylabel="Buzz count",
+            xlim=(0, 1),
+        )
+        curve_ax.set_ylabel("Difficulty / adjustment")
+        ax.grid(alpha=0.2)
+        handles, labels = ax.get_legend_handles_labels()
+        curve_handles, curve_labels = curve_ax.get_legend_handles_labels()
+        score_handles, score_labels = score_ax.get_legend_handles_labels()
+        ax.legend(
+            handles + curve_handles + score_handles,
+            labels + curve_labels + score_labels,
+            fontsize=6.5,
+            loc="upper right",
+        )
+
+    for ax in axes.flat[len(selected):]:
+        ax.set_visible(False)
+    fig.suptitle("TF-IDF-adjusted effective difficulty and empirical buzz locations")
+    fig.tight_layout()
+    output_path = output_dir / "tfidf_effective_difficulty_curves.png"
+    fig.savefig(output_path, dpi=160)
+    plt.close(fig)
+    return output_path
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--results-dir", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path)
+    parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
+    parser.add_argument("--count", type=int, default=6)
+    args = parser.parse_args()
+    if args.count < 1:
+        raise ValueError("--count must be at least 1")
+    if args.output_dir is None:
+        args.output_dir = args.results_dir.parent / "evaluation" / "graphs"
+    return args
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    path = plot_curves(args.results_dir, args.output_dir, args.data_dir, args.count)
+    print(path)

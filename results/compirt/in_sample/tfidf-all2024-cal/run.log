@@ -1,0 +1,109 @@
+# CompIRT Run Log
+
+Generated: 2026-07-02T14:08:53-07:00
+Placeholder: yes
+Captured stdout/stderr: unavailable
+Note: this log was reconstructed from saved result artifacts; historical command output was not captured.
+
+## Run Variables
+
+- BONUS_STEPS: 3000
+- CALIBRATE_CORRECTNESS: True
+- DEVICE: unknown
+- DIMENSIONS: 5
+- GPU: unknown
+- LR: unknown
+- MODEL: tfidf-baseline-pyramidal
+- PYRAMIDAL_STEPS: 5000
+- ROOT: results/compirt/in_sample/tfidf-all2024-cal
+- RUN_LOG_KIND: placeholder
+- SPLIT: unknown
+- SYNERGY_DIMENSIONS: 0, 3
+- TEST_SPLIT: unknown
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: unknown
+- TRAIN_SPLIT: unknown
+
+## Recovered Stage Summaries
+
+### compositional
+
+```json
+{
+  "bonus_part_observations": 133461,
+  "bonus_parts": 3768,
+  "calibrate_correctness": true,
+  "correctness_bias": -0.46433335542678833,
+  "correctness_scale": 0.8194124698638916,
+  "final_loss": 63113.42649555206,
+  "saved_synergy_details": false,
+  "skill_dimensions": 5,
+  "steps": 3000,
+  "synergy_dimensions": 0,
+  "tau": 0.6543582677841187,
+  "tournament": "",
+  "use_synergy": false
+}
+```
+
+### pyramidal
+
+```json
+{
+  "calibrate_correctness": true,
+  "correctness_bias": 2.2362310886383057,
+  "correctness_scale": 0.31751126050949097,
+  "dimensions": 5,
+  "events": 48612,
+  "final_loss": 344781.51325297356,
+  "formula": "logit_ij(t) = theta_i^T alpha_j - d_j(t) + lambda_tfidf * tfidf_prefix_j(t)",
+  "lr": 0.01,
+  "model": "tfidf-baseline-pyramidal",
+  "observation_counts": {
+    "BUZZ": 47914,
+    "CENSORED": 341490,
+    "NO-BUZZ": 5620
+  },
+  "players": 1486,
+  "predicted_buzz_positions": true,
+  "seed": 42,
+  "split": "year_2024",
+  "steps": 5000,
+  "tfidf_clue_effect": 2.035099744796753,
+  "tfidf_effect_prior_scale": 1.0,
+  "tfidf_features": {
+    "max_length": 168,
+    "mean_raw_final_score": 7.136513117515272,
+    "nonempty_tossups": 1260,
+    "normalized": true,
+    "tossups": 1260,
+    "vocabulary_size": 26222
+  },
+  "tossups": 1260,
+  "tournament": ""
+}
+```
+
+### synergy
+
+```json
+{
+  "bonus_part_observations": 133461,
+  "bonus_parts": 3768,
+  "calibrate_correctness": true,
+  "correctness_bias": -1.0660793781280518,
+  "correctness_scale": 0.620638906955719,
+  "final_loss": 64011.81230953336,
+  "mean_synergy_contribution": 0.501230001449585,
+  "median_synergy_contribution": 0.42588961124420166,
+  "negative_synergy_fraction": 0.3101580236923146,
+  "positive_synergy_fraction": 0.6599231236091443,
+  "saved_synergy_details": true,
+  "skill_dimensions": 5,
+  "steps": 3000,
+  "synergy_dimensions": 3,
+  "tau": 0.6118307709693909,
+  "tournament": "",
+  "use_synergy": true
+}
+```
