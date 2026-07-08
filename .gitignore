@@ -21,3 +21,5 @@ results/compirt/*inspection*/
 
 # Local Claude Code guidance files (kept out of version control).
 CLAUDE.md
+results/compirt/**/tossup_predictions.csv
+results/compirt/**/bonus_part_predictions.csv
