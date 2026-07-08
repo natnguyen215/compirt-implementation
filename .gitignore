@@ -15,11 +15,10 @@ data/hf/
 # Inferred per-game lineup cache (rebuild with `python lineup.py --rebuild`).
 data/lineups/
 
-# Prevent old manual smoke/inspection artifacts from being tracked again.
-results/compirt/*smoke*/
-results/compirt/*inspection*/
 
-# Local Claude Code guidance files (kept out of version control).
-CLAUDE.md
+
 results/compirt/**/tossup_predictions.csv
 results/compirt/**/bonus_part_predictions.csv
+
+# Source paper PDFs and other binaries — kept out of version control.
+*.pdf
