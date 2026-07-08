@@ -1,0 +1,161 @@
+# CompIRT Run Log
+
+Generated: 2026-07-03T19:59:36-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- BONUS_STEPS: 3000
+- CALIBRATE_CORRECTNESS: 1
+- COMPARISON_OUTPUT: results/compirt/in_sample/embedding-all2024-cal/comparison
+- COMPOSITIONAL_OUTPUT: results/compirt/in_sample/embedding-all2024-cal/compositional
+- DEVICE: cuda
+- DIMENSIONS: 5
+- EVALUATION_OUTPUT: results/compirt/in_sample/embedding-all2024-cal/evaluation
+- GPU: 0
+- LR: 0.005
+- MODEL: embedding
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- PREDICT_BUZZ_POSITIONS: 1
+- PYRAMIDAL_OUTPUT: results/compirt/in_sample/embedding-all2024-cal/pyramidal
+- PYRAMIDAL_STEPS: 5000
+- PYTHON: /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python
+- PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+- ROOT: results/compirt/in_sample/embedding-all2024-cal
+- RUNNER: run_scripts/run_embedding_compirt.py
+- RUN_SYNERGY: 1
+- SAVE_SYNERGY_DETAILS: 0
+- SPLIT: year_2024
+- SYNERGY_DIMENSIONS: 3
+- SYNERGY_EVALUATION_OUTPUT: results/compirt/in_sample/embedding-all2024-cal/synergy-evaluation
+- SYNERGY_OUTPUT: results/compirt/in_sample/embedding-all2024-cal/synergy
+- TOURNAMENT: <all>
+
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -c 'import torch; assert torch.cuda.is_available(), '"'"'CUDA is unavailable'"'"'; print(torch.cuda.get_device_name(0))'
+NVIDIA GeForce RTX 4090
+Skipping embed step; cache found at /teapot/students/natnguyen/CompIRT-Implementation/embedding_mirt/outputs/tossup_embeddings.npz
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m embedding_mirt.train_pyramidal --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --device cuda --output-dir results/compirt/in_sample/embedding-all2024-cal/pyramidal --predict-buzz-positions --calibrate-correctness
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Embedding dim: 4,096
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,891,283.8
+step  100  ELBO loss: 7,419,349.2
+step  200  ELBO loss: 2,175,596.7
+step  300  ELBO loss: 710,160.3
+step  400  ELBO loss: 440,751.6
+step  500  ELBO loss: 408,745.2
+step  600  ELBO loss: 395,679.0
+step  700  ELBO loss: 386,558.9
+step  800  ELBO loss: 380,622.3
+step  900  ELBO loss: 375,612.6
+step 1000  ELBO loss: 371,745.3
+step 1100  ELBO loss: 368,204.7
+step 1200  ELBO loss: 365,293.6
+step 1300  ELBO loss: 362,327.3
+step 1400  ELBO loss: 360,160.5
+step 1500  ELBO loss: 358,146.5
+step 1600  ELBO loss: 356,196.8
+step 1700  ELBO loss: 354,802.4
+step 1800  ELBO loss: 353,756.6
+step 1900  ELBO loss: 352,616.6
+step 2000  ELBO loss: 351,846.7
+step 2100  ELBO loss: 351,388.9
+step 2200  ELBO loss: 350,845.2
+step 2300  ELBO loss: 350,486.8
+step 2400  ELBO loss: 350,120.2
+step 2500  ELBO loss: 350,095.3
+step 2600  ELBO loss: 349,974.5
+step 2700  ELBO loss: 349,793.5
+step 2800  ELBO loss: 349,756.2
+step 2900  ELBO loss: 349,606.5
+step 3000  ELBO loss: 349,732.2
+step 3100  ELBO loss: 349,685.1
+step 3200  ELBO loss: 349,703.2
+step 3300  ELBO loss: 349,712.0
+step 3400  ELBO loss: 349,632.1
+step 3500  ELBO loss: 349,614.0
+step 3600  ELBO loss: 349,730.3
+step 3700  ELBO loss: 349,719.8
+step 3800  ELBO loss: 349,661.1
+step 3900  ELBO loss: 349,733.8
+step 4000  ELBO loss: 349,629.7
+step 4100  ELBO loss: 349,757.8
+step 4200  ELBO loss: 349,672.1
+step 4300  ELBO loss: 349,694.3
+step 4400  ELBO loss: 349,707.2
+step 4500  ELBO loss: 349,601.8
+step 4600  ELBO loss: 349,674.1
+step 4700  ELBO loss: 349,670.1
+step 4800  ELBO loss: 349,618.8
+step 4900  ELBO loss: 349,710.1
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m embedding_mirt.train_compositional --split year_2024 --player-skills results/compirt/in_sample/embedding-all2024-cal/pyramidal/players.csv --projection results/compirt/in_sample/embedding-all2024-cal/pyramidal/r_projection.npz --steps 3000 --lr 0.005 --device cuda --output-dir results/compirt/in_sample/embedding-all2024-cal/compositional --calibrate-correctness
+Bonus part rows: 133,461  Parts: 3,768  Relevance dimensions: 5
+step    0  ELBO loss: 137,970.2
+step  100  ELBO loss: 103,414.1
+step  200  ELBO loss: 81,673.8
+step  300  ELBO loss: 71,081.8
+step  400  ELBO loss: 65,365.4
+step  500  ELBO loss: 61,825.1
+step  600  ELBO loss: 60,128.6
+step  700  ELBO loss: 59,247.9
+step  800  ELBO loss: 59,023.8
+step  900  ELBO loss: 58,904.5
+step 1000  ELBO loss: 58,837.0
+step 1100  ELBO loss: 58,835.0
+step 1200  ELBO loss: 58,814.9
+step 1300  ELBO loss: 58,787.2
+step 1400  ELBO loss: 58,802.6
+step 1500  ELBO loss: 58,807.4
+step 1600  ELBO loss: 58,826.7
+step 1700  ELBO loss: 58,814.5
+step 1800  ELBO loss: 58,790.5
+step 1900  ELBO loss: 58,805.8
+step 2000  ELBO loss: 58,801.3
+step 2100  ELBO loss: 58,797.8
+step 2200  ELBO loss: 58,829.9
+step 2300  ELBO loss: 58,809.2
+step 2400  ELBO loss: 58,804.1
+step 2500  ELBO loss: 58,805.2
+step 2600  ELBO loss: 58,826.8
+step 2700  ELBO loss: 58,789.4
+step 2800  ELBO loss: 58,807.6
+step 2900  ELBO loss: 58,784.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m embedding_mirt.train_compositional --split year_2024 --player-skills results/compirt/in_sample/embedding-all2024-cal/pyramidal/players.csv --projection results/compirt/in_sample/embedding-all2024-cal/pyramidal/r_projection.npz --steps 3000 --lr 0.005 --device cuda --output-dir results/compirt/in_sample/embedding-all2024-cal/synergy --use-synergy --synergy-dimensions 3 --calibrate-correctness
+Bonus part rows: 133,461  Parts: 3,768  Relevance dimensions: 5
+step    0  ELBO loss: 144,962.9
+step  100  ELBO loss: 107,870.8
+step  200  ELBO loss: 83,341.2
+step  300  ELBO loss: 73,998.5
+step  400  ELBO loss: 67,954.3
+step  500  ELBO loss: 64,702.4
+step  600  ELBO loss: 63,024.4
+step  700  ELBO loss: 61,978.9
+step  800  ELBO loss: 61,659.3
+step  900  ELBO loss: 61,218.7
+step 1000  ELBO loss: 61,213.8
+step 1100  ELBO loss: 61,212.8
+step 1200  ELBO loss: 60,961.8
+step 1300  ELBO loss: 61,034.9
+step 1400  ELBO loss: 61,151.6
+step 1500  ELBO loss: 61,113.5
+step 1600  ELBO loss: 60,960.7
+step 1700  ELBO loss: 61,081.2
+step 1800  ELBO loss: 61,103.8
+step 1900  ELBO loss: 60,866.3
+step 2000  ELBO loss: 61,107.2
+step 2100  ELBO loss: 61,327.4
+step 2200  ELBO loss: 61,219.0
+step 2300  ELBO loss: 61,256.7
+step 2400  ELBO loss: 61,159.4
+step 2500  ELBO loss: 61,126.2
+step 2600  ELBO loss: 60,965.4
+step 2700  ELBO loss: 61,258.9
+step 2800  ELBO loss: 60,874.7
+step 2900  ELBO loss: 60,835.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python evaluate_compirt.py --pyramidal-results results/compirt/in_sample/embedding-all2024-cal/pyramidal --compositional-results results/compirt/in_sample/embedding-all2024-cal/compositional --output-dir results/compirt/in_sample/embedding-all2024-cal/evaluation
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python evaluate_compirt.py --pyramidal-results results/compirt/in_sample/embedding-all2024-cal/pyramidal --compositional-results results/compirt/in_sample/embedding-all2024-cal/synergy --output-dir results/compirt/in_sample/embedding-all2024-cal/synergy-evaluation
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python compare_compirt.py --compositional-metrics results/compirt/in_sample/embedding-all2024-cal/evaluation/csvs/bonus_metrics.csv --synergy-metrics results/compirt/in_sample/embedding-all2024-cal/synergy-evaluation/csvs/bonus_metrics.csv --output-dir results/compirt/in_sample/embedding-all2024-cal/comparison
+Finished. Inspect results/compirt/in_sample/embedding-all2024-cal/synergy-evaluation/experiment_report.md

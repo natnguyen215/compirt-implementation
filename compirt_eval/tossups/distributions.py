@@ -25,6 +25,7 @@ from compirt_eval.tossups.parameters import (
     _parameter_columns,
     _positive_log_series,
     _validate_tossup_multidim_dimensions,
+    _vector_weight_name,
     difficulty_adjustment_at,
     load_difficulty_adjustment_curves,
 )
@@ -70,6 +71,8 @@ def _pyramidal_tossup_panels(tossups, alpha_columns):
     """Build the density panels for fitted tossup parameters (beta, gamma, mu, alpha)."""
     panels = []
     columns = _parameter_columns(tossups)
+    weight_name = _vector_weight_name(alpha_columns)
+    norm_column = f"{weight_name}_norm"
     for column, title, xlabel, zero_line in (
         ("beta", "Difficulty amplitude", "beta", True),
         ("mu", "Difficulty transition location", "relative position mu", False),
@@ -129,20 +132,30 @@ def _pyramidal_tossup_panels(tossups, alpha_columns):
             }
         )
     if alpha_columns:
+        weight_title = (
+            "Tossup relevance coordinates"
+            if weight_name == "r"
+            else "Tossup discrimination coordinates"
+        )
+        norm_title = (
+            "Tossup relevance magnitude"
+            if weight_name == "r"
+            else "Tossup discrimination magnitude"
+        )
         panels.append(
             {
                 "series": {column: tossups[column] for column in alpha_columns},
-                "title": "Tossup discrimination coordinates",
-                "xlabel": "alpha",
+                "title": weight_title,
+                "xlabel": weight_name,
                 "zero_line": True,
                 "bounds": None,
             }
         )
         panels.append(
             {
-                "series": {"alpha_norm": tossups["alpha_norm"]},
-                "title": "Tossup discrimination magnitude",
-                "xlabel": "alpha norm",
+                "series": {norm_column: tossups[norm_column]},
+                "title": norm_title,
+                "xlabel": f"{weight_name} norm",
                 "zero_line": False,
                 "bounds": (0, None),
             }
@@ -153,8 +166,8 @@ def _pyramidal_tossup_panels(tossups, alpha_columns):
 def _difficulty_curve_distribution_plot(tossups, output_dir, adjustments=None):
     """Plot percentile bands across every learned tossup difficulty curve (Eq. 3).
 
-    'adjustments' (saved TF-IDF adjustment curves) shifts each tossup's curve
-    to the effective difficulty 'd'' the model actually used.
+    'adjustments' (saved signed TF-IDF difficulty deltas) shifts each tossup's
+    curve to the effective difficulty 'd'' the model actually used.
     """
     positions = np.linspace(0, 1, 150)
     if {"beta", "gamma", "mu"}.issubset(tossups):
@@ -181,13 +194,14 @@ def _difficulty_curve_distribution_plot(tossups, output_dir, adjustments=None):
             positions[None, None, :],
         )
         curves = (alpha * per_dimension).sum(axis=1)
-        label = "Median alpha-weighted difficulty"
-        ylabel = "Estimated alpha-weighted difficulty"
+        weight_name = _vector_weight_name(columns["alpha"])
+        label = f"Median {weight_name}-weighted difficulty"
+        ylabel = f"Estimated {weight_name}-weighted difficulty"
     if adjustments is not None and "tossup_id" in tossups:
         for index, tossup_id in enumerate(tossups["tossup_id"].astype(str)):
             adjustment = difficulty_adjustment_at(adjustments, tossup_id, positions)
             if adjustment is not None:
-                curves[index] = curves[index] - adjustment
+                curves[index] = curves[index] + adjustment
         label = f"{label} (TF-IDF effective d')"
     percentiles = np.percentile(curves, [5, 25, 50, 75, 95], axis=0)
     fig, ax = plt.subplots(figsize=(8, 5.5))
@@ -235,14 +249,16 @@ def pyramidal_parameter_distribution_plots(results_dir, output_dir):
     players = pd.read_csv(player_path)
     tossups = pd.read_csv(tossup_path)
     theta_columns = numeric_columns(players, "theta_")
-    alpha_columns = numeric_columns(tossups, "alpha_")
     tossup_columns = _parameter_columns(tossups)
+    alpha_columns = tossup_columns["alpha"]
+    weight_name = _vector_weight_name(alpha_columns)
+    norm_column = f"{weight_name}_norm"
     if "theta_norm" not in players and theta_columns:
         players["theta_norm"] = np.linalg.norm(
             players[theta_columns].to_numpy(dtype=float), axis=1
         )
     if alpha_columns:
-        tossups["alpha_norm"] = np.linalg.norm(
+        tossups[norm_column] = np.linalg.norm(
             tossups[alpha_columns].to_numpy(dtype=float), axis=1
         )
 
@@ -280,7 +296,7 @@ def pyramidal_parameter_distribution_plots(results_dir, output_dir):
                 *tossup_columns["gamma"],
                 *tossup_columns["mu"],
                 *alpha_columns,
-                "alpha_norm",
+                norm_column,
             ],
         ),
     ):

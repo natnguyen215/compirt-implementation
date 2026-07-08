@@ -1,1 +1,1 @@
-"""Isolated TF-IDF clue-adjusted baseline pyramidal experiment."""
+"""Isolated TF-IDF-aware pyramidal tossup variants."""

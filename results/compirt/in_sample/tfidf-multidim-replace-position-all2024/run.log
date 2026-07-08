@@ -1,0 +1,190 @@
+# CompIRT Run Log
+
+Generated: 2026-07-06T21:38:53-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- RUNNER: run_scripts/run_tfidf_multidim_compirt_2024.sh
+- ROOT: results/compirt/in_sample/tfidf-multidim-replace-position-all2024
+- MODEL: tfidf-multidim-replace-position-pyramidal
+- TFIDF_VARIANT: replace-position
+- SPLIT: year_2024
+- TOURNAMENT: <all>
+- DEVICE: cuda
+- GPU: 0
+- DIMENSIONS: 5
+- PYRAMIDAL_STEPS: 5000
+- BONUS_STEPS: 3000
+- LR: 0.005
+- RUN_SYNERGY: 1
+- SYNERGY_DIMENSIONS: 3
+- SAVE_SYNERGY_DETAILS: 1
+- CALIBRATE_CORRECTNESS: 0
+- PREDICT_BUZZ_POSITIONS: 1
+- RUN_VALIDATION: 1
+- TFIDF_EFFECT_PRIOR_SCALE: 1.0
+- NO_NORMALIZE_TFIDF: 0
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- PYRAMIDAL_OUTPUT: results/compirt/in_sample/tfidf-multidim-replace-position-all2024/pyramidal
+- COMPOSITIONAL_OUTPUT: results/compirt/in_sample/tfidf-multidim-replace-position-all2024/compositional
+- SYNERGY_OUTPUT: results/compirt/in_sample/tfidf-multidim-replace-position-all2024/synergy
+- SYNERGY_EVALUATION_OUTPUT: results/compirt/in_sample/tfidf-multidim-replace-position-all2024/synergy-evaluation
+- COMPARISON_OUTPUT: results/compirt/in_sample/tfidf-multidim-replace-position-all2024/comparison
+- EVALUATION_OUTPUT: results/compirt/in_sample/tfidf-multidim-replace-position-all2024/evaluation
+
+NVIDIA GeForce RTX 4090
+{
+  "checks": [
+    "schemas",
+    "primary_ids",
+    "year_splits",
+    "foreign_keys",
+    "three_part_bonuses",
+    "intermediate_score_timelines",
+    "reconstructed_final_scores",
+    "source_counts",
+    "irt_response_derivation",
+    "response_matrix"
+  ],
+  "counts": {
+    "bonus_responses": 104941,
+    "bonuses": 2935,
+    "games": 5704,
+    "irt_responses": 888338,
+    "players": 2661,
+    "teams": 1054,
+    "tossup_buzzes": 136586,
+    "tossups": 2686,
+    "tournaments": 68
+  },
+  "status": "ok"
+}
+Tossup rows: 348,404  events: 48,612
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+Bonus part rows: 133,461
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Dimensions: 5  Variant: replace-position  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,920,258.3
+step  100  ELBO loss: 596,269.5
+step  200  ELBO loss: 544,063.2
+step  300  ELBO loss: 502,619.8
+step  400  ELBO loss: 477,990.4
+step  500  ELBO loss: 459,924.9
+step  600  ELBO loss: 443,752.0
+step  700  ELBO loss: 427,976.1
+step  800  ELBO loss: 410,271.1
+step  900  ELBO loss: 396,370.5
+step 1000  ELBO loss: 388,016.4
+step 1100  ELBO loss: 382,040.1
+step 1200  ELBO loss: 377,624.0
+step 1300  ELBO loss: 374,690.5
+step 1400  ELBO loss: 372,573.8
+step 1500  ELBO loss: 370,525.8
+step 1600  ELBO loss: 369,035.6
+step 1700  ELBO loss: 368,033.9
+step 1800  ELBO loss: 367,165.3
+step 1900  ELBO loss: 366,871.5
+step 2000  ELBO loss: 366,352.1
+step 2100  ELBO loss: 365,186.6
+step 2200  ELBO loss: 365,211.7
+step 2300  ELBO loss: 364,447.9
+step 2400  ELBO loss: 363,912.4
+step 2500  ELBO loss: 363,829.6
+step 2600  ELBO loss: 364,457.2
+step 2700  ELBO loss: 363,292.7
+step 2800  ELBO loss: 363,029.5
+step 2900  ELBO loss: 363,190.2
+step 3000  ELBO loss: 362,689.4
+step 3100  ELBO loss: 362,447.9
+step 3200  ELBO loss: 362,396.6
+step 3300  ELBO loss: 361,771.2
+step 3400  ELBO loss: 362,126.0
+step 3500  ELBO loss: 361,870.9
+step 3600  ELBO loss: 361,955.1
+step 3700  ELBO loss: 361,292.0
+step 3800  ELBO loss: 361,555.5
+step 3900  ELBO loss: 361,577.9
+step 4000  ELBO loss: 361,112.9
+step 4100  ELBO loss: 361,499.7
+step 4200  ELBO loss: 361,327.4
+step 4300  ELBO loss: 361,017.9
+step 4400  ELBO loss: 360,919.8
+step 4500  ELBO loss: 361,246.6
+step 4600  ELBO loss: 360,467.7
+step 4700  ELBO loss: 360,676.1
+step 4800  ELBO loss: 360,587.4
+step 4900  ELBO loss: 360,700.5
+Bonus part rows: 133,461  Parts: 3,768
+step    0  ELBO loss: 218,433.3
+step  100  ELBO loss: 136,820.0
+step  200  ELBO loss: 99,902.3
+step  300  ELBO loss: 81,902.9
+step  400  ELBO loss: 74,474.9
+step  500  ELBO loss: 70,988.3
+step  600  ELBO loss: 69,517.3
+step  700  ELBO loss: 68,781.7
+step  800  ELBO loss: 68,366.9
+step  900  ELBO loss: 68,234.8
+step 1000  ELBO loss: 68,098.0
+step 1100  ELBO loss: 68,074.5
+step 1200  ELBO loss: 68,012.7
+step 1300  ELBO loss: 68,031.4
+step 1400  ELBO loss: 68,029.5
+step 1500  ELBO loss: 68,083.7
+step 1600  ELBO loss: 67,837.3
+step 1700  ELBO loss: 67,909.1
+step 1800  ELBO loss: 67,942.1
+step 1900  ELBO loss: 67,954.8
+step 2000  ELBO loss: 67,986.1
+step 2100  ELBO loss: 67,881.3
+step 2200  ELBO loss: 67,869.2
+step 2300  ELBO loss: 67,925.2
+step 2400  ELBO loss: 67,905.7
+step 2500  ELBO loss: 67,848.2
+step 2600  ELBO loss: 68,040.5
+step 2700  ELBO loss: 67,916.6
+step 2800  ELBO loss: 67,898.8
+step 2900  ELBO loss: 67,942.6
+Bonus part rows: 133,461  Parts: 3,768
+step    0  ELBO loss: 216,161.0
+step  100  ELBO loss: 136,189.5
+step  200  ELBO loss: 90,021.1
+step  300  ELBO loss: 76,082.9
+step  400  ELBO loss: 71,199.6
+step  500  ELBO loss: 69,056.3
+step  600  ELBO loss: 68,276.6
+step  700  ELBO loss: 67,882.1
+step  800  ELBO loss: 67,432.2
+step  900  ELBO loss: 67,129.6
+step 1000  ELBO loss: 67,123.9
+step 1100  ELBO loss: 67,063.4
+step 1200  ELBO loss: 67,080.3
+step 1300  ELBO loss: 66,776.1
+step 1400  ELBO loss: 67,003.2
+step 1500  ELBO loss: 66,608.2
+step 1600  ELBO loss: 66,893.0
+step 1700  ELBO loss: 67,007.6
+step 1800  ELBO loss: 66,623.7
+step 1900  ELBO loss: 66,843.6
+step 2000  ELBO loss: 66,856.3
+step 2100  ELBO loss: 66,934.7
+step 2200  ELBO loss: 66,857.8
+step 2300  ELBO loss: 66,848.8
+step 2400  ELBO loss: 66,860.2
+step 2500  ELBO loss: 66,882.5
+step 2600  ELBO loss: 66,864.6
+step 2700  ELBO loss: 66,780.0
+step 2800  ELBO loss: 66,933.7
+step 2900  ELBO loss: 66,632.2
+results/compirt/in_sample/tfidf-multidim-replace-position-all2024/evaluation/graphs/tfidf_effective_difficulty_curves.png
+Finished. Inspect results/compirt/in_sample/tfidf-multidim-replace-position-all2024/evaluation/experiment_report.md
+Compare it with results/compirt/in_sample/tfidf-multidim-replace-position-all2024/synergy-evaluation/experiment_report.md
+Direct comparison: results/compirt/in_sample/tfidf-multidim-replace-position-all2024/comparison/bonus_model_comparison.md

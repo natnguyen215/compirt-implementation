@@ -23,6 +23,7 @@ from compirt_eval.tossups.parameters import (
     _parameter_columns,
     _saved_difficulty_curve,
     _validate_tossup_multidim_dimensions,
+    _vector_weight_name,
     difficulty_adjustment_at,
     load_difficulty_adjustment_curves,
 )
@@ -70,9 +71,9 @@ def selected_tossups(predictions, count=6):
 def difficulty_plot(results_dir, output_dir):
     """Plot learned difficulty curves over empirical first-buzz locations.
 
-    When the run saved TF-IDF adjustment curves, the plotted difficulty is the
-    effective 'd'_j(t) = d_j(t) - A_j(t)' the model actually used, with the
-    base sigmoid kept as a dashed reference.
+    When the run saved TF-IDF adjustment curves, they are signed additive
+    difficulty deltas, so the plotted curve is 'd'_j(t) = d_j(t) + delta_j(t)'.
+    The base sigmoid is kept as a dashed reference.
     """
     parameters = pd.read_csv(results_dir / "tossups.csv").set_index("tossup_id")
     predictions = pd.read_csv(results_dir / "tossup_predictions.csv")
@@ -118,7 +119,7 @@ def difficulty_plot(results_dir, output_dir):
             )
             curve_ax.plot(
                 positions,
-                difficulty - adjustment,
+                difficulty + adjustment,
                 color="black",
                 linewidth=2,
                 label="Effective difficulty d'(t)",
@@ -157,8 +158,9 @@ def difficulty_plot(results_dir, output_dir):
 
 def _multidim_curve_label(alpha_column, alpha_value):
     """Return a readable label for one multidim difficulty coordinate."""
-    dimension = int(alpha_column.removeprefix("alpha_"))
-    return f"Dimension {dimension} (alpha={alpha_value:.2f})"
+    dimension = int(alpha_column.rsplit("_", 1)[1])
+    name = _vector_weight_name([alpha_column])
+    return f"Dimension {dimension} ({name}={alpha_value:.2f})"
 
 
 def multidim_difficulty_components_plot(results_dir, output_dir):
@@ -248,7 +250,8 @@ def multidim_difficulty_components_plot(results_dir, output_dir):
         )
     for ax in axes.flat[len(selected):]:
         ax.set_visible(False)
-    fig.suptitle("Per-dimension difficulty curves and alpha-weighted difficulty")
+    weight_name = _vector_weight_name(columns["alpha"])
+    fig.suptitle(f"Per-dimension difficulty curves and {weight_name}-weighted difficulty")
     fig.tight_layout()
     fig.savefig(
         graph_path(output_dir, "tossup_difficulty_curves_by_dimension.png"), dpi=160

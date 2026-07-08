@@ -45,8 +45,7 @@ from compirt_data import DEFAULT_DATA_DIR, filter_tournament, load_hf_tables
 
 DEFAULT_MODEL = "Qwen/Qwen3-Embedding-8B"
 DEFAULT_INSTRUCTION = (
-    "Represent this quizbowl question to predict its difficulty and the "
-    "skills it rewards"
+    "Embed the difficulty of this question"
 )
 DEFAULT_OUTPUT_DIR = EMBEDDING_MIRT_DIR / "outputs"
 
@@ -73,7 +72,7 @@ def build_documents(tables) -> tuple[list[str], list[str], list[str], list[str]]
 
 
 def embed_texts(model, texts: list[str], instruction: str, batch_size: int) -> np.ndarray:
-    """Embed 'texts' with the Qwen3 instruction format, batched."""
+    """Embed 'texts' with the Qwen3 instruction format, batched.f"""
     prompted = [f"Instruct: {instruction}\nQuery: {text}" for text in texts]
     embeddings = model.encode(
         prompted,

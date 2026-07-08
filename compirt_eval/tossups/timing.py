@@ -44,9 +44,12 @@ def first_buzz_distribution(event, players, tossups, n_bins=12, adjustments=None
     tossup = tossups.loc[tossup_id]
     roster = players.loc[event["player_id"].astype(str)]
     theta_columns = numeric_columns(players, "theta_")
-    alpha_columns = numeric_columns(tossups, "alpha_")
+    columns = _parameter_columns(tossups)
+    alpha_columns = columns["alpha"]
     if not theta_columns or len(theta_columns) != len(alpha_columns):
-        raise ValueError("Saved theta and alpha dimensions must be present and match")
+        raise ValueError(
+            "Saved theta and discrimination/relevance dimensions must be present and match"
+        )
 
     total_tokens = int(event["T_j"].iloc[0])
     positions = np.arange(1, total_tokens + 1, dtype=float)
@@ -59,7 +62,6 @@ def first_buzz_distribution(event, players, tossups, n_bins=12, adjustments=None
             relative,
         )
     else:
-        columns = _parameter_columns(tossups)
         _validate_multidim_dimensions(
             theta_columns,
             alpha_columns,
@@ -71,7 +73,7 @@ def first_buzz_distribution(event, players, tossups, n_bins=12, adjustments=None
     adjustment = difficulty_adjustment_at(adjustments, tossup_id, relative)
     if adjustment is not None:
         # TF-IDF runs: replay the effective difficulty d' the model trained on.
-        difficulty = difficulty - adjustment
+        difficulty = difficulty + adjustment
     skill = (
         roster[theta_columns].to_numpy(dtype=float)
         @ tossup[alpha_columns].to_numpy(dtype=float)

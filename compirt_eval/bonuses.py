@@ -21,9 +21,27 @@ from compirt_eval.metrics import bonus_metrics
 from compirt_eval.outputs import csv_path, graph_path
 
 
-def _bonus_part_panels_and_summary(parts, alpha_columns):
+def _vector_weight_columns(frame):
+    """Return bonus-part vector weights, accepting alpha_* or embedding r_*."""
+    alpha_columns = numeric_columns(frame, "alpha_")
+    relevance_columns = numeric_columns(frame, "r_")
+    if alpha_columns and relevance_columns:
+        raise ValueError("Saved vector weights must use either alpha_* or r_*, not both")
+    return alpha_columns or relevance_columns
+
+
+def _vector_weight_name(columns):
+    """Return the saved coordinate name for labels and derived norm columns."""
+    if columns and columns[0].startswith("r_"):
+        return "r"
+    return "alpha"
+
+
+def _bonus_part_panels_and_summary(parts, beta_columns, alpha_columns):
     """Build bonus-part density panels and their distribution-summary rows."""
     panels = []
+    weight_name = _vector_weight_name(alpha_columns)
+    norm_column = f"{weight_name}_norm"
     if "beta" in parts:
         panels.append(
             {
@@ -34,27 +52,50 @@ def _bonus_part_panels_and_summary(parts, alpha_columns):
                 "bounds": None,
             }
         )
+    if beta_columns:
+        panels.append(
+            {
+                "series": {column: parts[column] for column in beta_columns},
+                "title": "Bonus-part difficulty coordinates",
+                "xlabel": "beta",
+                "zero_line": True,
+                "bounds": None,
+            }
+        )
     if alpha_columns:
+        weight_title = (
+            "Bonus relevance coordinates"
+            if weight_name == "r"
+            else "Bonus discrimination coordinates"
+        )
+        norm_title = (
+            "Bonus relevance magnitude"
+            if weight_name == "r"
+            else "Bonus discrimination magnitude"
+        )
         panels.extend(
             [
                 {
                     "series": {column: parts[column] for column in alpha_columns},
-                    "title": "Bonus discrimination coordinates",
-                    "xlabel": "alpha",
+                    "title": weight_title,
+                    "xlabel": weight_name,
                     "zero_line": True,
                     "bounds": None,
                 },
                 {
-                    "series": {"alpha_norm": parts["alpha_norm"]},
-                    "title": "Bonus discrimination magnitude",
-                    "xlabel": "alpha norm",
+                    "series": {norm_column: parts[norm_column]},
+                    "title": norm_title,
+                    "xlabel": f"{weight_name} norm",
                     "zero_line": False,
                     "bounds": (0, None),
                 },
             ]
         )
     rows = []
-    for column in ["beta", *alpha_columns, "alpha_norm"]:
+    summary_columns = ["beta", *beta_columns, *alpha_columns]
+    if alpha_columns:
+        summary_columns.append(norm_column)
+    for column in summary_columns:
         if column in parts:
             summary = distribution_summary("bonus_part", column, parts[column])
             if summary:
@@ -144,13 +185,18 @@ def bonus_parameter_distribution_plots(results_dir, output_dir):
     if not part_path.exists():
         return
     parts = pd.read_csv(part_path)
-    alpha_columns = numeric_columns(parts, "alpha_")
+    beta_columns = numeric_columns(parts, "beta_")
+    alpha_columns = _vector_weight_columns(parts)
+    weight_name = _vector_weight_name(alpha_columns)
+    norm_column = f"{weight_name}_norm"
     if alpha_columns:
-        parts["alpha_norm"] = np.linalg.norm(
+        parts[norm_column] = np.linalg.norm(
             parts[alpha_columns].to_numpy(dtype=float), axis=1
         )
 
-    part_panels, rows = _bonus_part_panels_and_summary(parts, alpha_columns)
+    part_panels, rows = _bonus_part_panels_and_summary(
+        parts, beta_columns, alpha_columns
+    )
     if part_panels:
         distribution_dashboard(
             part_panels,

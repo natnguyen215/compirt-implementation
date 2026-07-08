@@ -8,7 +8,7 @@ topic CSV. The member score inside the Eq. 8 aggregation is:
     embedding CompIRT: sum_k r_bk * theta_pk
 
 'r_b' is computed once in 'train_compositional.py' from each bonus's frozen
-embedding and the pyramidal run's fitted 'W_R'/'b_R' -- it is passed into this
+embedding and the pyramidal run's fitted projection -- it is passed into this
 model as a fixed tensor, not sampled or re-fit here. Bonus-part difficulty
 becomes a per-dimension vector 'difficulty_beta_bk', shared by all three parts
 of a bonus like the topic variant.

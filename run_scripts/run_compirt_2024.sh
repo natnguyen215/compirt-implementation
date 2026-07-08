@@ -21,7 +21,7 @@ export RUN_SYNERGY=1
 export SAVE_SYNERGY_DETAILS="${SAVE_SYNERGY_DETAILS:-1}"
 export MPLCONFIGDIR="${MPLCONFIGDIR:-/tmp/matplotlib-compirt}"
 
-PYTHON=".venv/bin/python"
+export PYTHON="${PYTHON:-.venv/bin/python}"
 
 mkdir -p "$ROOT"
 LOG_PATH="$ROOT/run.log"

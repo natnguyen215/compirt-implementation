@@ -20,7 +20,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import pyro
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
@@ -36,11 +35,14 @@ from compirt_data import (
 from holdout.player_priors import attach_player_priors, player_tier_map
 from multidimensional.embedding_mirt.embeddings import (
     align_tossup_embeddings,
+    center_embeddings,
     save_projection,
 )
 from multidimensional.embedding_mirt.pyramidal_model import (
+    DEFAULT_PROJECTION_HIDDEN_DIM,
     competing_risks_model,
     expected_first_buzz_positions,
+    fitted_projection,
     posterior_row_predictions,
     project_relevance,
 )
@@ -59,7 +61,10 @@ DEFAULT_OUTPUT_DIR = REPO_ROOT / "results" / "compirt" / "embedding-pyramidal"
 DEFAULT_EMBEDDINGS = (
     REPO_ROOT / "multidimensional" / "embedding_mirt" / "outputs" / "tossup_embeddings.npz"
 )
-FORMULA = "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t)), r_j = softmax(W_R @ e_j + b_R)"
+FORMULA = (
+    "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t)), "
+    "r_j = softmax(W2 gelu(W1 @ (e_j - mean_e) + b1) + b2)"
+)
 
 
 def save_embedding_parameters(output_dir, data, posterior):
@@ -89,8 +94,10 @@ def train_model(
     n_steps=1000,
     lr=0.02,
     calibrate_correctness=False,
+    projection_hidden_dim=DEFAULT_PROJECTION_HIDDEN_DIM,
 ):
     """Fit the model and return posterior medians (plus fitted 'r'), guide, and losses."""
+    data["projection_hidden_dim"] = projection_hidden_dim
     posterior, guide, losses = fit_svi(
         competing_risks_model,
         (data, n_dimensions, calibrate_correctness),
@@ -100,12 +107,11 @@ def train_model(
     )
     # 'r' is a deterministic function of the fixed embedding and the
     # point-estimated projection, not a pyro.sample site, so it does not appear
-    # in guide.median(); pull the fitted W_R/b_R from the param store directly
+    # in guide.median(); pull the fitted FFN from the param store directly
     # (same pattern as topic/learned/joint_pyramidal.py's topic_word_distributions).
-    weight = pyro.param("r_projection_weight").detach()
-    bias = pyro.param("r_projection_bias").detach()
-    posterior["r"] = project_relevance(data["embedding"], weight, bias)
-    return posterior, guide, losses, weight, bias
+    projection = fitted_projection()
+    posterior["r"] = project_relevance(data["embedding"], projection)
+    return posterior, guide, losses, projection
 
 
 def run_experiment(args):
@@ -119,6 +125,8 @@ def run_experiment(args):
         raise ValueError("No tossup observations matched the requested data selection")
     data = tossup_tensors(observations, args.device)
     data["embedding"] = align_tossup_embeddings(data, args.embeddings)
+    embedding_mean = data["embedding"].mean(dim=0)
+    data["embedding"] = center_embeddings(data["embedding"], embedding_mean)
     print(
         f"Rows: {len(observations):,}  "
         f"Players: {len(data['player_ids']):,}  "
@@ -140,16 +148,21 @@ def run_experiment(args):
         )
         print(f"Held-out player priors: {prior_summary}")
 
-    posterior, guide, losses, weight, bias = train_model(
+    posterior, guide, losses, projection = train_model(
         data,
         args.dimensions,
         args.steps,
         args.lr,
         args.calibrate_correctness,
+        args.projection_hidden_dim,
     )
 
     save_embedding_parameters(args.output_dir, data, posterior)
-    save_projection(args.output_dir / "r_projection.npz", weight, bias)
+    save_projection(
+        args.output_dir / "r_projection.npz",
+        projection,
+        embedding_mean=embedding_mean,
+    )
     save_player_posterior(args.output_dir, data["player_ids"], guide, tier_map)
     save_loss_plot(
         args.output_dir, losses, "Embedding-relevance IRT training loss"
@@ -173,6 +186,10 @@ def run_experiment(args):
         "embeddings": str(args.embeddings),
         "tournament": args.tournament or "",
         "dimensions": args.dimensions,
+        "projection": "ffn",
+        "projection_hidden_dim": args.projection_hidden_dim,
+        "centered_embeddings": True,
+        "embedding_mean_norm": float(embedding_mean.norm().detach().cpu()),
         "steps": args.steps,
         "final_loss": losses[-1],
         "players": len(data["player_ids"]),
@@ -193,6 +210,12 @@ def parse_args():
     parser.add_argument("--tournament")
     parser.add_argument("--embeddings", type=Path, default=DEFAULT_EMBEDDINGS)
     parser.add_argument("--dimensions", type=int, default=5)
+    parser.add_argument(
+        "--projection-hidden-dim",
+        type=int,
+        default=DEFAULT_PROJECTION_HIDDEN_DIM,
+        help="Hidden width for the embedding-to-r FFN projection",
+    )
     parser.add_argument("--steps", type=int, default=1000)
     parser.add_argument("--lr", type=float, default=0.02)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
@@ -213,6 +236,8 @@ def parse_args():
     args = parser.parse_args()
     if args.dimensions < 1:
         raise ValueError("--dimensions must be at least 1")
+    if args.projection_hidden_dim < 1:
+        raise ValueError("--projection-hidden-dim must be at least 1")
     if args.steps < 1:
         raise ValueError("--steps must be at least 1")
     return args

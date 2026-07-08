@@ -1,16 +1,17 @@
 """Embedding-based multidimensional pyramidal tossup model.
 
-This is a sibling of 'multidimensional/multidim_mirt/pyramidal_model.py' that replaces its
-freely learned, positive tossup discrimination 'alpha ~ Gamma(2, 2)' with a
-content-aware relevance vector computed from a frozen text embedding, following
-CAIMIRA (docs/2410.06524v1.pdf, Eq. 5/7):
+This is a sibling of 'multidimensional/multidim_mirt/pyramidal_model.py' that
+replaces its freely learned, positive tossup discrimination 'alpha ~ Gamma(2,
+2)' with a content-aware relevance vector computed from a frozen text
+embedding. CAIMIRA (docs/2410.06524v1.pdf, Eq. 5/7) uses a linear map; this
+variant uses a small feed-forward projection:
 
-    r_j = softmax(W_R @ e_j + b_R)
+    r_j = softmax(W_2 gelu(W_1 @ centered(e_j) + b_1) + b_2)
 
 'e_j' is a frozen Qwen3-Embedding-8B vector of the tossup's question text
-(precomputed by 'embed_questions.py'); 'W_R' and 'b_R' are the only new latent
-parameters, point-estimated jointly with 'theta'/'beta'/'gamma'/'mu' via the
-same AutoNormal SVI loop the rest of CompIRT uses (mirrors how
+(precomputed by 'embed_questions.py'); the FFN weights are the only new latent
+parameters, point-estimated jointly with 'theta'/'beta'/'gamma'/'mu' via the same
+AutoNormal SVI loop the rest of CompIRT uses (mirrors how
 'topic/learned/joint_pyramidal.py' point-estimates its topic-word matrix).
 
 Only 'sample_parameters' and 'competing_risks_model' differ from
@@ -34,6 +35,8 @@ between the two packages -- this is CAIMIRA's design, not a bug.
 
 from __future__ import annotations
 
+import math
+
 import torch
 import torch.nn.functional as F
 
@@ -55,7 +58,9 @@ from multidimensional.multidim_mirt.pyramidal_model import (
 )
 
 __all__ = [
+    "DEFAULT_PROJECTION_HIDDEN_DIM",
     "correctness_logit",
+    "fitted_projection",
     "hazard_logit",
     "log_survival",
     "row_parameters",
@@ -67,16 +72,62 @@ __all__ = [
     "expected_first_buzz_positions",
 ]
 
+DEFAULT_PROJECTION_HIDDEN_DIM = 128
 
-def project_relevance(embedding, weight, bias):
-    """Return 'r_j = softmax(W_R @ e_j + b_R)' (CAIMIRA Eq. 5/7).
 
-    'embedding' has shape '(n_tossups, embed_dim)', 'weight' has shape
-    '(embed_dim, n_dimensions)', and 'bias' has shape '(n_dimensions,)'. The
-    softmax makes 'r_j' a relevance distribution over the latent dimensions,
-    matching the paper and the repo's existing topic-weight convention.
+def _xavier_normal(reference: torch.Tensor, shape: tuple[int, int]) -> torch.Tensor:
+    """Return a Xavier-style normal init with the same device/dtype as 'reference'."""
+    fan_in, fan_out = shape
+    std = math.sqrt(2.0 / float(fan_in + fan_out))
+    return reference.new_empty(shape).normal_(0.0, std)
+
+
+def _ffn_logits(embedding, projection):
+    hidden = F.gelu(embedding @ projection["input_weight"] + projection["hidden_bias"])
+    return hidden @ projection["output_weight"] + projection["output_bias"]
+
+
+def projection_logits(embedding, projection, bias=None):
+    """Return relevance logits from either a saved FFN projection or old linear args."""
+    if isinstance(projection, dict):
+        kind = projection.get("kind", "linear")
+        if kind == "ffn":
+            return _ffn_logits(embedding, projection)
+        if kind == "linear":
+            return embedding @ projection["weight"] + projection["bias"]
+        raise ValueError(f"Unknown relevance projection kind: {kind}")
+    if bias is None:
+        raise TypeError("Linear project_relevance calls must pass both weight and bias")
+    return embedding @ projection + bias
+
+
+def project_relevance(embedding, projection, bias=None):
+    """Return a softmax relevance distribution from an embedding projection.
+
+    New embedding runs use an FFN projection,
+    'softmax(W_2 gelu(W_1 @ e_j + b_1) + b_2)'. The old three-argument linear
+    call, 'project_relevance(embedding, weight, bias)', is still accepted so
+    existing tests and saved linear projections remain readable.
     """
-    return F.softmax(embedding @ weight + bias, dim=-1)
+    return F.softmax(projection_logits(embedding, projection, bias), dim=-1)
+
+
+def fitted_projection() -> dict[str, torch.Tensor | str]:
+    """Return the fitted relevance projection from Pyro's param store."""
+    store = pyro.get_param_store()
+    if "r_projection_input_weight" in store:
+        return {
+            "kind": "ffn",
+            "input_weight": pyro.param("r_projection_input_weight").detach(),
+            "hidden_bias": pyro.param("r_projection_hidden_bias").detach(),
+            "output_weight": pyro.param("r_projection_output_weight").detach(),
+            "output_bias": pyro.param("r_projection_output_bias").detach(),
+        }
+    return {
+        "kind": "linear",
+        "weight": pyro.param("r_projection_weight").detach(),
+        "bias": pyro.param("r_projection_bias").detach(),
+    }
 
 
 def sample_parameters(data, n_dimensions):
@@ -85,7 +136,7 @@ def sample_parameters(data, n_dimensions):
     Player and difficulty priors are identical to
     'multidimensional.multidim_mirt.pyramidal_model.sample_parameters'. There is no sampled
     'alpha' -- 'r' is a deterministic function of the fixed 'data["embedding"]'
-    and the point-estimated projection 'W_R'/'b_R'.
+    and the point-estimated FFN projection.
     """
     n_players = len(data["player_ids"])
     n_tossups = len(data["tossup_ids"])
@@ -113,19 +164,39 @@ def sample_parameters(data, n_dimensions):
             ).to_event(1),
         )
 
-    # r_j = softmax(W_R @ e_j + b_R): point-estimated projection of the frozen
-    # embedding, not a sampled site (matches CAIMIRA's MAP-fit W_R/b_R).
+    # r_j = softmax(FFN(e_j)): point-estimated projection of the frozen
+    # embedding, not a sampled site.
     embedding = data["embedding"]
     embed_dim = embedding.shape[1]
-    weight = pyro.param(
-        "r_projection_weight",
-        lambda: 0.01 * torch.randn(embed_dim, n_dimensions, device=embedding.device),
+    hidden_dim = int(data.get("projection_hidden_dim", DEFAULT_PROJECTION_HIDDEN_DIM))
+    if hidden_dim < 1:
+        raise ValueError("projection_hidden_dim must be at least 1")
+    input_weight = pyro.param(
+        "r_projection_input_weight",
+        lambda: _xavier_normal(embedding, (embed_dim, hidden_dim)),
     )
-    bias = pyro.param(
-        "r_projection_bias",
+    hidden_bias = pyro.param(
+        "r_projection_hidden_bias",
+        lambda: embedding.new_zeros(hidden_dim),
+    )
+    output_weight = pyro.param(
+        "r_projection_output_weight",
+        lambda: _xavier_normal(embedding, (hidden_dim, n_dimensions)),
+    )
+    output_bias = pyro.param(
+        "r_projection_output_bias",
         lambda: embedding.new_zeros(n_dimensions),
     )
-    r = project_relevance(embedding, weight, bias)
+    r = project_relevance(
+        embedding,
+        {
+            "kind": "ffn",
+            "input_weight": input_weight,
+            "hidden_bias": hidden_bias,
+            "output_weight": output_weight,
+            "output_bias": output_bias,
+        },
+    )
     return theta, c, r, beta, gamma, mu
 
 

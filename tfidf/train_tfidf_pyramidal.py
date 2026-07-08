@@ -1,12 +1,8 @@
-"""Train the isolated TF-IDF clue-adjusted baseline pyramidal model.
+"""Train one of the isolated TF-IDF-aware pyramidal tossup variants.
 
-This mirrors the root 'train_pyramidal.py' workflow but attaches precomputed
-TF-IDF clue features to the tensor dict and fits 'tfidf.pyramidal_tfidf_model'.
-Start reading at 'run_experiment' near the bottom; it coordinates the full
-pipeline:
-
-    load tables -> build observations -> make tensors -> attach TF-IDF features
-        -> train model -> compute predictions -> save CSVs, plots, and summary
+This mirrors the root ``train_pyramidal.py`` workflow but attaches precomputed
+IDF clue features to the tensor dict and fits ``tfidf.pyramidal_tfidf_model``.
+The root baseline model remains untouched.
 """
 
 from __future__ import annotations
@@ -26,36 +22,70 @@ from compirt_data import (
     tossup_tensors,
 )
 from tfidf.pyramidal_tfidf_model import (
+    CUMULATIVE_DIFFICULTY,
+    HAZARD_SPIKE,
+    REPLACE_POSITION,
+    TFIDF_VARIANTS,
     competing_risks_model,
     expected_first_buzz_positions,
     posterior_row_predictions,
+    uses_tfidf_effect,
 )
 from tfidf.tfidf_features import attach_tfidf_prefix_scores
 from utils.saving import (
     save_loss_plot,
     save_parameters,
+    save_player_posterior,
     save_tossup_predictions,
     write_summary,
 )
 from utils.training import fit_svi, require_device
+from holdout.player_priors import attach_player_priors, player_tier_map
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_OUTPUT_PARENT = REPO_ROOT / "results" / "compirt"
+FORMULAS = {
+    REPLACE_POSITION: (
+        "d_j(t) = beta_j * sigmoid(gamma_j * (mu_j - tfidf_prefix_j(t))); "
+        "hazard_ij(t) = theta_i^T alpha_j - d_j(t) - c_i"
+    ),
+    CUMULATIVE_DIFFICULTY: (
+        "d'_j(t) = d_j(t) - lambda_tfidf * tfidf_prefix_j(t); "
+        "hazard_ij(t) = theta_i^T alpha_j - d'_j(t) - c_i"
+    ),
+    HAZARD_SPIKE: (
+        "correctness_ij(t) = theta_i^T alpha_j - d_j(t); "
+        "hazard_ij(t) = correctness_ij(t) - c_i + eta_tfidf * tfidf(w_j,t)"
+    ),
+}
 
 
-DEFAULT_OUTPUT_DIR = REPO_ROOT / "results" / "compirt" / "tfidf-baseline-pyramidal"
-FORMULA = (
-    "logit_ij(t) = theta_i^T alpha_j - d_j(t) + lambda_tfidf * tfidf_prefix_j(t)"
-)
+def default_output_dir(tfidf_variant: str) -> Path:
+    """Return a variant-specific default output directory."""
+    return DEFAULT_OUTPUT_PARENT / f"tfidf-{tfidf_variant}-pyramidal"
 
 
-def save_tfidf_adjustment_curves(output_dir, data, observations, posterior, n_points=201):
-    """Persist per-tossup TF-IDF difficulty adjustments on a relative-position grid.
+def save_tfidf_adjustment_curves(
+    output_dir,
+    data,
+    observations,
+    posterior,
+    tfidf_variant,
+    n_points=201,
+):
+    """Persist signed per-tossup difficulty deltas for Option B only.
 
-    The shared evaluator reconstructs difficulty curves from saved CSVs only,
-    so it cannot recompute text features. This file lets it draw the effective
-    difficulty 'd'_j(r) = d_j(r) - A_j(r)' the model actually used.
+    For ``cumulative-difficulty`` the effective difficulty is:
+
+        d'_j(t) = d_j(t) - lambda_tfidf * p_j(t)
+
+    The saved adjustment is therefore negative. Evaluators add it to the base
+    difficulty curve to replay the effective curve.
     """
+    if tfidf_variant != CUMULATIVE_DIFFICULTY:
+        return
+
     lambda_tfidf = float(posterior["tfidf_clue_effect"].detach().cpu())
     prefix = data["tfidf_prefix"].detach().cpu().numpy()
     tossup_T = observations.groupby("tossup_id")["T_j"].first()
@@ -64,7 +94,7 @@ def save_tfidf_adjustment_curves(output_dir, data, observations, posterior, n_po
     for index, tossup_id in enumerate(data["tossup_ids"]):
         T = int(tossup_T[tossup_id])
         token = np.clip(np.rint(grid * T).astype(int), 1, min(T, prefix.shape[1]))
-        values[index] = lambda_tfidf * prefix[index, token - 1]
+        values[index] = -lambda_tfidf * prefix[index, token - 1]
     frame = pd.DataFrame(
         values, columns=[f"adjustment_{point:03d}" for point in range(n_points)]
     )
@@ -79,29 +109,35 @@ def train_model(
     lr=0.02,
     calibrate_correctness=False,
     tfidf_effect_prior_scale=1.0,
+    tfidf_variant=REPLACE_POSITION,
 ):
-    """Fit the TF-IDF clue-adjusted competing-risks model, return medians + loss."""
+    """Fit the selected TF-IDF competing-risks model."""
     return fit_svi(
         competing_risks_model,
-        (data, n_dimensions, calibrate_correctness, tfidf_effect_prior_scale),
+        (
+            data,
+            n_dimensions,
+            calibrate_correctness,
+            tfidf_effect_prior_scale,
+            tfidf_variant,
+        ),
         n_steps,
         lr,
+        return_guide=True,
     )
 
 
 def run_experiment(args):
-    """Run the full isolated TF-IDF baseline pyramidal pipeline."""
+    """Run the full isolated TF-IDF pyramidal pipeline."""
     args.output_dir.mkdir(parents=True, exist_ok=True)
     require_device(args.device)
     pyro.set_rng_seed(args.seed)
 
-    # Load tables -> build BUZZ/CENSORED/NO-BUZZ rows -> index into tensors.
     tables = filter_tournament(load_hf_tables(args.data_dir, args.split), args.tournament)
     observations = build_tossup_observations(tables)
     if observations.empty:
         raise ValueError("No tossup observations matched the requested data selection")
     data = tossup_tensors(observations, args.device)
-    # Compute TF-IDF clue features from tossup text and attach them onto 'data'.
     tfidf_summary = attach_tfidf_prefix_scores(
         data,
         tables,
@@ -113,34 +149,57 @@ def run_experiment(args):
         f"Rows: {len(observations):,}  "
         f"Players: {len(data['player_ids']):,}  "
         f"Tossups: {len(data['tossup_ids']):,}  "
-        f"TF-IDF vocab: {tfidf_summary['vocabulary_size']:,}"
+        f"Variant: {args.tfidf_variant}  "
+        f"IDF vocab: {tfidf_summary['vocabulary_size']:,}"
     )
     print(observations["z"].value_counts().to_string())
 
-    posterior, losses = train_model(
+    tier_map = player_tier_map(tables)
+    prior_summary = None
+    if args.train_posterior:
+        prior_summary = attach_player_priors(
+            data,
+            tables,
+            args.train_posterior,
+            args.new_player_prior,
+            args.device,
+            n_dimensions=args.dimensions,
+            tier_map=tier_map,
+        )
+        print(f"Held-out player priors: {prior_summary}")
+
+    posterior, guide, losses = train_model(
         data,
         args.dimensions,
         args.steps,
         args.lr,
         args.calibrate_correctness,
         args.tfidf_effect_prior_scale,
+        args.tfidf_variant,
     )
 
     save_parameters(args.output_dir, data, posterior)
-    # Persist the effective-difficulty adjustment so the shared evaluator can
-    # redraw d'(t) without recomputing text features.
-    save_tfidf_adjustment_curves(args.output_dir, data, observations, posterior)
-    save_loss_plot(args.output_dir, losses, "TF-IDF baseline pyramidal training loss")
+    save_player_posterior(args.output_dir, data["player_ids"], guide, tier_map)
+    save_tfidf_adjustment_curves(
+        args.output_dir, data, observations, posterior, args.tfidf_variant
+    )
+    save_loss_plot(
+        args.output_dir,
+        losses,
+        f"TF-IDF {args.tfidf_variant} pyramidal training loss",
+    )
 
-    # Attach fitted predictions and TF-IDF features onto the observation rows.
-    correct, hazard, survival, tfidf_score = posterior_row_predictions(
-        data, posterior, args.calibrate_correctness
+    correct, hazard, survival, prefix_score, token_score = posterior_row_predictions(
+        data, posterior, args.calibrate_correctness, args.tfidf_variant
     )
     buzz_expected = (
-        expected_first_buzz_positions(data, posterior)
+        expected_first_buzz_positions(data, posterior, args.tfidf_variant)
         if args.predict_buzz_positions
         else None
     )
+    extra_columns = {"tfidf_prefix_score": prefix_score}
+    if args.tfidf_variant == HAZARD_SPIKE:
+        extra_columns["tfidf_token_score"] = token_score
     save_tossup_predictions(
         args.output_dir,
         observations,
@@ -148,12 +207,13 @@ def run_experiment(args):
         hazard,
         survival,
         buzz_expected=buzz_expected,
-        extra_columns={"tfidf_prefix_score": tfidf_score},
+        extra_columns=extra_columns,
     )
 
     summary = {
-        "model": "tfidf-baseline-pyramidal",
-        "formula": FORMULA,
+        "model": f"tfidf-{args.tfidf_variant}-pyramidal",
+        "tfidf_variant": args.tfidf_variant,
+        "formula": FORMULAS[args.tfidf_variant],
         "split": args.split,
         "tournament": args.tournament or "",
         "dimensions": args.dimensions,
@@ -162,10 +222,6 @@ def run_experiment(args):
         "seed": args.seed,
         "final_loss": losses[-1],
         "calibrate_correctness": args.calibrate_correctness,
-        "tfidf_effect_prior_scale": args.tfidf_effect_prior_scale,
-        "tfidf_clue_effect": float(
-            posterior["tfidf_clue_effect"].detach().cpu()
-        ),
         "tfidf_features": tfidf_summary,
         "players": len(data["player_ids"]),
         "tossups": len(data["tossup_ids"]),
@@ -173,6 +229,20 @@ def run_experiment(args):
         "predicted_buzz_positions": args.predict_buzz_positions,
         "observation_counts": observations["z"].value_counts().to_dict(),
     }
+    if args.train_posterior:
+        summary["train_posterior"] = str(args.train_posterior)
+        summary["new_player_prior"] = args.new_player_prior
+        summary["heldout_prior_summary"] = prior_summary
+    if uses_tfidf_effect(args.tfidf_variant):
+        summary["tfidf_effect_prior_scale"] = args.tfidf_effect_prior_scale
+    if args.tfidf_variant == CUMULATIVE_DIFFICULTY:
+        summary["tfidf_clue_effect"] = float(
+            posterior["tfidf_clue_effect"].detach().cpu()
+        )
+    if args.tfidf_variant == HAZARD_SPIKE:
+        summary["tfidf_hazard_effect"] = float(
+            posterior["tfidf_hazard_effect"].detach().cpu()
+        )
     write_summary(args.output_dir, summary, posterior)
     return summary
 
@@ -190,18 +260,37 @@ def parse_args():
     parser.add_argument("--predict-buzz-positions", action="store_true")
     parser.add_argument("--calibrate-correctness", action="store_true")
     parser.add_argument(
+        "--tfidf-variant",
+        choices=TFIDF_VARIANTS,
+        default=REPLACE_POSITION,
+        help="Which requested TF-IDF formulation to train",
+    )
+    parser.add_argument(
         "--tfidf-effect-prior-scale",
         type=float,
         default=1.0,
-        help="HalfNormal prior scale for learned nonnegative TF-IDF effects",
+        help="HalfNormal prior scale for Option B/C learned TF-IDF effects",
     )
     parser.add_argument(
         "--no-normalize-tfidf",
         action="store_true",
         help="Use raw cumulative TF-IDF mass instead of scaling each tossup to end at 1",
     )
-    parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument(
+        "--train-posterior",
+        type=Path,
+        help="player_posterior.csv from a training run; enables held-out priors",
+    )
+    parser.add_argument(
+        "--new-player-prior",
+        choices=("tier", "flat"),
+        default="tier",
+        help="prior for players unseen in training",
+    )
+    parser.add_argument("--output-dir", type=Path)
     args = parser.parse_args()
+    if args.output_dir is None:
+        args.output_dir = default_output_dir(args.tfidf_variant)
     if args.dimensions < 1:
         raise ValueError("--dimensions must be at least 1")
     if args.steps < 1:

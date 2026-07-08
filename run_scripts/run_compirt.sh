@@ -26,7 +26,7 @@ export PYTHONUNBUFFERED=1
 export MPLCONFIGDIR="${MPLCONFIGDIR:-/tmp/matplotlib-compirt}"
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 
-PYTHON=".venv/bin/python"
+PYTHON="${PYTHON:-.venv/bin/python}"
 
 mkdir -p "$OUTPUT_ROOT"
 LOG_PATH="$OUTPUT_ROOT/run.log"

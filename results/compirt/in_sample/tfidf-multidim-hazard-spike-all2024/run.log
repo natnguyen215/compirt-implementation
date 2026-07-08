@@ -1,0 +1,190 @@
+# CompIRT Run Log
+
+Generated: 2026-07-06T22:20:43-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- RUNNER: run_scripts/run_tfidf_multidim_compirt_2024.sh
+- ROOT: results/compirt/in_sample/tfidf-multidim-hazard-spike-all2024
+- MODEL: tfidf-multidim-hazard-spike-pyramidal
+- TFIDF_VARIANT: hazard-spike
+- SPLIT: year_2024
+- TOURNAMENT: <all>
+- DEVICE: cuda
+- GPU: 0
+- DIMENSIONS: 5
+- PYRAMIDAL_STEPS: 5000
+- BONUS_STEPS: 3000
+- LR: 0.005
+- RUN_SYNERGY: 1
+- SYNERGY_DIMENSIONS: 3
+- SAVE_SYNERGY_DETAILS: 1
+- CALIBRATE_CORRECTNESS: 0
+- PREDICT_BUZZ_POSITIONS: 1
+- RUN_VALIDATION: 1
+- TFIDF_EFFECT_PRIOR_SCALE: 1.0
+- NO_NORMALIZE_TFIDF: 0
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- PYRAMIDAL_OUTPUT: results/compirt/in_sample/tfidf-multidim-hazard-spike-all2024/pyramidal
+- COMPOSITIONAL_OUTPUT: results/compirt/in_sample/tfidf-multidim-hazard-spike-all2024/compositional
+- SYNERGY_OUTPUT: results/compirt/in_sample/tfidf-multidim-hazard-spike-all2024/synergy
+- SYNERGY_EVALUATION_OUTPUT: results/compirt/in_sample/tfidf-multidim-hazard-spike-all2024/synergy-evaluation
+- COMPARISON_OUTPUT: results/compirt/in_sample/tfidf-multidim-hazard-spike-all2024/comparison
+- EVALUATION_OUTPUT: results/compirt/in_sample/tfidf-multidim-hazard-spike-all2024/evaluation
+
+NVIDIA GeForce RTX 4090
+{
+  "checks": [
+    "schemas",
+    "primary_ids",
+    "year_splits",
+    "foreign_keys",
+    "three_part_bonuses",
+    "intermediate_score_timelines",
+    "reconstructed_final_scores",
+    "source_counts",
+    "irt_response_derivation",
+    "response_matrix"
+  ],
+  "counts": {
+    "bonus_responses": 104941,
+    "bonuses": 2935,
+    "games": 5704,
+    "irt_responses": 888338,
+    "players": 2661,
+    "teams": 1054,
+    "tossup_buzzes": 136586,
+    "tossups": 2686,
+    "tournaments": 68
+  },
+  "status": "ok"
+}
+Tossup rows: 348,404  events: 48,612
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+Bonus part rows: 133,461
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Dimensions: 5  Variant: hazard-spike  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,735,776.3
+step  100  ELBO loss: 598,108.5
+step  200  ELBO loss: 548,015.2
+step  300  ELBO loss: 504,971.3
+step  400  ELBO loss: 477,187.6
+step  500  ELBO loss: 458,682.9
+step  600  ELBO loss: 442,633.1
+step  700  ELBO loss: 427,311.8
+step  800  ELBO loss: 410,861.9
+step  900  ELBO loss: 398,288.9
+step 1000  ELBO loss: 389,643.6
+step 1100  ELBO loss: 382,652.1
+step 1200  ELBO loss: 378,532.5
+step 1300  ELBO loss: 375,208.8
+step 1400  ELBO loss: 372,517.7
+step 1500  ELBO loss: 370,957.9
+step 1600  ELBO loss: 369,491.0
+step 1700  ELBO loss: 368,488.1
+step 1800  ELBO loss: 368,598.6
+step 1900  ELBO loss: 367,479.7
+step 2000  ELBO loss: 366,960.6
+step 2100  ELBO loss: 365,939.5
+step 2200  ELBO loss: 365,578.2
+step 2300  ELBO loss: 365,046.4
+step 2400  ELBO loss: 364,285.3
+step 2500  ELBO loss: 364,659.9
+step 2600  ELBO loss: 363,962.4
+step 2700  ELBO loss: 364,157.0
+step 2800  ELBO loss: 363,737.4
+step 2900  ELBO loss: 363,405.6
+step 3000  ELBO loss: 362,808.3
+step 3100  ELBO loss: 362,777.5
+step 3200  ELBO loss: 362,485.9
+step 3300  ELBO loss: 362,660.0
+step 3400  ELBO loss: 362,199.0
+step 3500  ELBO loss: 362,156.0
+step 3600  ELBO loss: 361,670.6
+step 3700  ELBO loss: 362,002.7
+step 3800  ELBO loss: 361,429.4
+step 3900  ELBO loss: 361,264.1
+step 4000  ELBO loss: 361,381.1
+step 4100  ELBO loss: 361,205.0
+step 4200  ELBO loss: 361,120.4
+step 4300  ELBO loss: 360,855.8
+step 4400  ELBO loss: 360,971.2
+step 4500  ELBO loss: 360,514.3
+step 4600  ELBO loss: 360,699.3
+step 4700  ELBO loss: 360,882.0
+step 4800  ELBO loss: 360,528.1
+step 4900  ELBO loss: 360,559.3
+Bonus part rows: 133,461  Parts: 3,768
+step    0  ELBO loss: 217,221.1
+step  100  ELBO loss: 141,862.3
+step  200  ELBO loss: 100,171.7
+step  300  ELBO loss: 83,580.2
+step  400  ELBO loss: 75,311.5
+step  500  ELBO loss: 71,618.3
+step  600  ELBO loss: 70,096.8
+step  700  ELBO loss: 69,402.1
+step  800  ELBO loss: 68,858.6
+step  900  ELBO loss: 68,740.0
+step 1000  ELBO loss: 68,615.7
+step 1100  ELBO loss: 68,381.9
+step 1200  ELBO loss: 68,459.8
+step 1300  ELBO loss: 68,519.5
+step 1400  ELBO loss: 68,747.1
+step 1500  ELBO loss: 68,571.8
+step 1600  ELBO loss: 68,429.9
+step 1700  ELBO loss: 68,368.9
+step 1800  ELBO loss: 68,616.7
+step 1900  ELBO loss: 68,348.2
+step 2000  ELBO loss: 68,643.6
+step 2100  ELBO loss: 68,215.7
+step 2200  ELBO loss: 68,472.8
+step 2300  ELBO loss: 68,484.9
+step 2400  ELBO loss: 68,474.8
+step 2500  ELBO loss: 68,570.9
+step 2600  ELBO loss: 68,211.9
+step 2700  ELBO loss: 68,505.9
+step 2800  ELBO loss: 68,379.1
+step 2900  ELBO loss: 68,387.6
+Bonus part rows: 133,461  Parts: 3,768
+step    0  ELBO loss: 219,905.9
+step  100  ELBO loss: 141,239.4
+step  200  ELBO loss: 90,655.0
+step  300  ELBO loss: 77,035.4
+step  400  ELBO loss: 71,714.6
+step  500  ELBO loss: 69,577.7
+step  600  ELBO loss: 68,529.4
+step  700  ELBO loss: 68,069.3
+step  800  ELBO loss: 67,787.4
+step  900  ELBO loss: 67,150.3
+step 1000  ELBO loss: 67,644.0
+step 1100  ELBO loss: 66,899.2
+step 1200  ELBO loss: 67,147.9
+step 1300  ELBO loss: 67,433.2
+step 1400  ELBO loss: 67,341.3
+step 1500  ELBO loss: 67,154.2
+step 1600  ELBO loss: 67,022.3
+step 1700  ELBO loss: 67,026.1
+step 1800  ELBO loss: 67,436.0
+step 1900  ELBO loss: 67,098.0
+step 2000  ELBO loss: 67,533.3
+step 2100  ELBO loss: 67,079.1
+step 2200  ELBO loss: 66,902.1
+step 2300  ELBO loss: 67,172.9
+step 2400  ELBO loss: 66,954.0
+step 2500  ELBO loss: 67,284.2
+step 2600  ELBO loss: 66,975.9
+step 2700  ELBO loss: 66,997.0
+step 2800  ELBO loss: 67,038.0
+step 2900  ELBO loss: 67,002.7
+results/compirt/in_sample/tfidf-multidim-hazard-spike-all2024/evaluation/graphs/tfidf_effective_difficulty_curves.png
+Finished. Inspect results/compirt/in_sample/tfidf-multidim-hazard-spike-all2024/evaluation/experiment_report.md
+Compare it with results/compirt/in_sample/tfidf-multidim-hazard-spike-all2024/synergy-evaluation/experiment_report.md
+Direct comparison: results/compirt/in_sample/tfidf-multidim-hazard-spike-all2024/comparison/bonus_model_comparison.md

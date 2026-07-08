@@ -40,8 +40,9 @@ from multidimensional.embedding_mirt.compositional_model import (
 )
 from multidimensional.embedding_mirt.embeddings import (
     align_bonus_embeddings,
+    center_embeddings,
     check_projection_shapes,
-    load_projection,
+    load_projection_state,
 )
 from multidimensional.embedding_mirt.pyramidal_model import project_relevance
 from train_compositional import load_player_skills
@@ -109,20 +110,22 @@ def run_experiment(args):
         )
 
     data = bonus_tensors(observations, player_ids, args.device)
-    # Frozen projection from the paired pyramidal run: this stage reuses W_R/b_R
-    # exactly as fit on tossups, it does not learn its own.
-    weight, bias = load_projection(args.projection, args.device)
+    # Frozen projection from the paired pyramidal run: this stage reuses the
+    # embedding-to-r FFN exactly as fit on tossups, it does not learn its own.
+    projection, embedding_mean = load_projection_state(args.projection, args.device)
     embedding = align_bonus_embeddings(data, args.embeddings)
     check_projection_shapes(
-        weight,
+        projection,
         embedding,
         theta,
         projection_path=args.projection,
         embeddings_path=args.embeddings,
         player_skills_path=args.player_skills,
+        embedding_mean=embedding_mean,
     )
+    embedding = center_embeddings(embedding, embedding_mean)
     with torch.no_grad():
-        r = project_relevance(embedding, weight, bias)
+        r = project_relevance(embedding, projection)
     print(
         f"Bonus part rows: {len(observations):,}  "
         f"Parts: {len(data['part_ids']):,}  "
@@ -163,6 +166,8 @@ def run_experiment(args):
         "formula": FORMULA,
         "embeddings": str(args.embeddings),
         "projection": str(args.projection),
+        "projection_kind": projection["kind"],
+        "centered_embeddings": embedding_mean is not None,
         "tournament": args.tournament or "",
         "steps": args.steps,
         "final_loss": losses[-1],

@@ -1,0 +1,190 @@
+# CompIRT Run Log
+
+Generated: 2026-07-06T22:12:16-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- RUNNER: run_scripts/run_tfidf_compirt_2024.sh
+- ROOT: results/compirt/in_sample/tfidf-hazard-spike-all2024
+- MODEL: tfidf-hazard-spike-pyramidal
+- TFIDF_VARIANT: hazard-spike
+- SPLIT: year_2024
+- TOURNAMENT: <all>
+- DEVICE: cuda
+- GPU: 0
+- DIMENSIONS: 5
+- PYRAMIDAL_STEPS: 5000
+- BONUS_STEPS: 3000
+- LR: 0.005
+- RUN_SYNERGY: 1
+- SYNERGY_DIMENSIONS: 3
+- SAVE_SYNERGY_DETAILS: 1
+- CALIBRATE_CORRECTNESS: 0
+- PREDICT_BUZZ_POSITIONS: 1
+- RUN_VALIDATION: 1
+- TFIDF_EFFECT_PRIOR_SCALE: 1.0
+- NO_NORMALIZE_TFIDF: 0
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- PYRAMIDAL_OUTPUT: results/compirt/in_sample/tfidf-hazard-spike-all2024/pyramidal
+- COMPOSITIONAL_OUTPUT: results/compirt/in_sample/tfidf-hazard-spike-all2024/compositional
+- SYNERGY_OUTPUT: results/compirt/in_sample/tfidf-hazard-spike-all2024/synergy
+- SYNERGY_EVALUATION_OUTPUT: results/compirt/in_sample/tfidf-hazard-spike-all2024/synergy-evaluation
+- COMPARISON_OUTPUT: results/compirt/in_sample/tfidf-hazard-spike-all2024/comparison
+- EVALUATION_OUTPUT: results/compirt/in_sample/tfidf-hazard-spike-all2024/evaluation
+
+NVIDIA GeForce RTX 4090
+{
+  "checks": [
+    "schemas",
+    "primary_ids",
+    "year_splits",
+    "foreign_keys",
+    "three_part_bonuses",
+    "intermediate_score_timelines",
+    "reconstructed_final_scores",
+    "source_counts",
+    "irt_response_derivation",
+    "response_matrix"
+  ],
+  "counts": {
+    "bonus_responses": 104941,
+    "bonuses": 2935,
+    "games": 5704,
+    "irt_responses": 888338,
+    "players": 2661,
+    "teams": 1054,
+    "tossup_buzzes": 136586,
+    "tossups": 2686,
+    "tournaments": 68
+  },
+  "status": "ok"
+}
+Tossup rows: 348,404  events: 48,612
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+Bonus part rows: 133,461
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Variant: hazard-spike  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,340,564.1
+step  100  ELBO loss: 5,887,989.4
+step  200  ELBO loss: 816,712.2
+step  300  ELBO loss: 529,114.0
+step  400  ELBO loss: 487,884.3
+step  500  ELBO loss: 453,756.2
+step  600  ELBO loss: 427,257.7
+step  700  ELBO loss: 406,360.1
+step  800  ELBO loss: 392,421.7
+step  900  ELBO loss: 382,955.7
+step 1000  ELBO loss: 376,741.5
+step 1100  ELBO loss: 372,820.6
+step 1200  ELBO loss: 370,225.6
+step 1300  ELBO loss: 368,487.3
+step 1400  ELBO loss: 367,516.3
+step 1500  ELBO loss: 366,730.3
+step 1600  ELBO loss: 365,909.7
+step 1700  ELBO loss: 365,604.4
+step 1800  ELBO loss: 365,120.4
+step 1900  ELBO loss: 364,895.7
+step 2000  ELBO loss: 364,808.2
+step 2100  ELBO loss: 364,654.7
+step 2200  ELBO loss: 364,401.0
+step 2300  ELBO loss: 364,492.6
+step 2400  ELBO loss: 364,310.7
+step 2500  ELBO loss: 364,188.1
+step 2600  ELBO loss: 364,163.6
+step 2700  ELBO loss: 364,125.2
+step 2800  ELBO loss: 363,929.9
+step 2900  ELBO loss: 363,927.6
+step 3000  ELBO loss: 364,061.7
+step 3100  ELBO loss: 363,995.5
+step 3200  ELBO loss: 364,001.2
+step 3300  ELBO loss: 363,747.3
+step 3400  ELBO loss: 363,720.6
+step 3500  ELBO loss: 363,780.8
+step 3600  ELBO loss: 363,684.4
+step 3700  ELBO loss: 363,727.4
+step 3800  ELBO loss: 363,569.1
+step 3900  ELBO loss: 363,600.1
+step 4000  ELBO loss: 363,562.1
+step 4100  ELBO loss: 363,429.0
+step 4200  ELBO loss: 363,348.0
+step 4300  ELBO loss: 363,308.4
+step 4400  ELBO loss: 363,449.0
+step 4500  ELBO loss: 363,394.3
+step 4600  ELBO loss: 363,442.8
+step 4700  ELBO loss: 363,169.0
+step 4800  ELBO loss: 363,434.8
+step 4900  ELBO loss: 363,107.4
+Bonus part rows: 133,461  Parts: 3,768
+step    0  ELBO loss: 195,895.9
+step  100  ELBO loss: 125,028.4
+step  200  ELBO loss: 96,316.9
+step  300  ELBO loss: 81,613.7
+step  400  ELBO loss: 74,987.5
+step  500  ELBO loss: 71,993.5
+step  600  ELBO loss: 70,558.7
+step  700  ELBO loss: 69,811.9
+step  800  ELBO loss: 69,464.8
+step  900  ELBO loss: 69,399.9
+step 1000  ELBO loss: 69,160.8
+step 1100  ELBO loss: 69,010.6
+step 1200  ELBO loss: 69,215.3
+step 1300  ELBO loss: 69,023.8
+step 1400  ELBO loss: 68,969.2
+step 1500  ELBO loss: 68,952.9
+step 1600  ELBO loss: 68,927.6
+step 1700  ELBO loss: 69,045.2
+step 1800  ELBO loss: 68,855.8
+step 1900  ELBO loss: 69,133.3
+step 2000  ELBO loss: 69,078.5
+step 2100  ELBO loss: 68,961.0
+step 2200  ELBO loss: 68,967.0
+step 2300  ELBO loss: 69,051.4
+step 2400  ELBO loss: 69,164.7
+step 2500  ELBO loss: 69,024.3
+step 2600  ELBO loss: 68,988.6
+step 2700  ELBO loss: 68,953.8
+step 2800  ELBO loss: 69,060.8
+step 2900  ELBO loss: 69,050.5
+Bonus part rows: 133,461  Parts: 3,768
+step    0  ELBO loss: 200,251.9
+step  100  ELBO loss: 129,008.0
+step  200  ELBO loss: 88,637.0
+step  300  ELBO loss: 75,766.0
+step  400  ELBO loss: 71,057.9
+step  500  ELBO loss: 68,971.0
+step  600  ELBO loss: 68,086.8
+step  700  ELBO loss: 67,373.5
+step  800  ELBO loss: 67,180.8
+step  900  ELBO loss: 66,918.9
+step 1000  ELBO loss: 66,829.5
+step 1100  ELBO loss: 66,932.9
+step 1200  ELBO loss: 67,077.5
+step 1300  ELBO loss: 66,923.3
+step 1400  ELBO loss: 66,674.7
+step 1500  ELBO loss: 66,465.4
+step 1600  ELBO loss: 66,890.2
+step 1700  ELBO loss: 66,678.8
+step 1800  ELBO loss: 66,458.5
+step 1900  ELBO loss: 66,722.8
+step 2000  ELBO loss: 67,246.3
+step 2100  ELBO loss: 66,730.5
+step 2200  ELBO loss: 66,734.5
+step 2300  ELBO loss: 67,177.9
+step 2400  ELBO loss: 66,694.7
+step 2500  ELBO loss: 66,432.4
+step 2600  ELBO loss: 66,831.0
+step 2700  ELBO loss: 66,576.5
+step 2800  ELBO loss: 66,995.7
+step 2900  ELBO loss: 66,750.2
+results/compirt/in_sample/tfidf-hazard-spike-all2024/evaluation/graphs/tfidf_effective_difficulty_curves.png
+Finished. Inspect results/compirt/in_sample/tfidf-hazard-spike-all2024/evaluation/experiment_report.md
+Compare it with results/compirt/in_sample/tfidf-hazard-spike-all2024/synergy-evaluation/experiment_report.md
+Direct comparison: results/compirt/in_sample/tfidf-hazard-spike-all2024/comparison/bonus_model_comparison.md

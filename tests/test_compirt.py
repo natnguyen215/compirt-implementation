@@ -20,7 +20,13 @@ from compirt_data import (
     tossup_tensors,
 )
 from lineup import LineupIndex
-from compirt_eval.tossups import multidim_difficulty_components_plot
+from compirt_eval.bonuses import bonus_parameter_distribution_plots
+from compirt_eval.tossups import (
+    buzz_density_fit_plot,
+    difficulty_plot,
+    multidim_difficulty_components_plot,
+    pyramidal_parameter_distribution_plots,
+)
 from compositional_model import lse_aggregation, posterior_predictions, synergy_contribution
 from evaluate_compirt import bonus_metrics, density_estimate, first_buzz_distribution
 from multidimensional.multidim_mirt.pyramidal_model import (
@@ -495,6 +501,102 @@ class ModelTests(unittest.TestCase):
             graph = output_dir / "graphs" / "tossup_difficulty_curves_by_dimension.png"
             self.assertTrue(graph.exists())
             self.assertGreater(graph.stat().st_size, 0)
+
+    def test_embedding_relevance_columns_enable_tossup_diagnostics(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            results_dir = root / "pyramidal"
+            output_dir = root / "evaluation"
+            results_dir.mkdir()
+            pd.DataFrame(
+                {
+                    "player_id": ["p1", "p2"],
+                    "c": [0.0, 0.25],
+                    "theta_1": [1.0, 0.5],
+                    "theta_2": [0.0, 1.0],
+                    "theta_norm": [1.0, math.sqrt(1.25)],
+                }
+            ).to_csv(results_dir / "players.csv", index=False)
+            pd.DataFrame(
+                {
+                    "tossup_id": ["q1", "q2"],
+                    "r_1": [0.25, 0.75],
+                    "r_2": [0.75, 0.25],
+                    "beta_1": [2.0, 3.0],
+                    "beta_2": [4.0, 1.5],
+                    "gamma_1": [3.0, 2.0],
+                    "gamma_2": [5.0, 4.0],
+                    "mu_1": [0.35, 0.45],
+                    "mu_2": [0.7, 0.65],
+                }
+            ).to_csv(results_dir / "tossups.csv", index=False)
+            pd.DataFrame(
+                [
+                    {
+                        "event_id": "e1",
+                        "player_id": "p1",
+                        "tossup_id": "q1",
+                        "z": "BUZZ",
+                        "relative_position": 0.25,
+                        "T_j": 10,
+                    },
+                    {
+                        "event_id": "e2",
+                        "player_id": "p2",
+                        "tossup_id": "q1",
+                        "z": "BUZZ",
+                        "relative_position": 0.75,
+                        "T_j": 10,
+                    },
+                    {
+                        "event_id": "e3",
+                        "player_id": "p1",
+                        "tossup_id": "q2",
+                        "z": "BUZZ",
+                        "relative_position": 0.5,
+                        "T_j": 10,
+                    },
+                ]
+            ).to_csv(results_dir / "tossup_predictions.csv", index=False)
+
+            difficulty_plot(results_dir, output_dir)
+            multidim_difficulty_components_plot(results_dir, output_dir)
+            buzz_density_fit_plot(results_dir, output_dir)
+            pyramidal_parameter_distribution_plots(results_dir, output_dir)
+
+            for filename in [
+                "tossup_difficulty_curves.png",
+                "tossup_difficulty_curves_by_dimension.png",
+                "tossup_buzz_density_fit.png",
+                "pyramidal_difficulty_curve_distribution.png",
+            ]:
+                graph = output_dir / "graphs" / filename
+                self.assertTrue(graph.exists(), filename)
+                self.assertGreater(graph.stat().st_size, 0, filename)
+
+    def test_embedding_relevance_columns_enable_bonus_parameter_diagnostics(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            results_dir = root / "compositional"
+            output_dir = root / "evaluation"
+            results_dir.mkdir()
+            pd.DataFrame(
+                {
+                    "bonus_part_id": ["b1::part-1", "b1::part-2"],
+                    "beta_1": [0.5, -0.25],
+                    "beta_2": [1.5, 0.75],
+                    "r_1": [0.25, 0.75],
+                    "r_2": [0.75, 0.25],
+                }
+            ).to_csv(results_dir / "bonus_parts.csv", index=False)
+
+            bonus_parameter_distribution_plots(results_dir, output_dir)
+
+            graph = output_dir / "graphs" / "bonus_part_parameter_distributions.png"
+            summary = output_dir / "csvs" / "bonus_parameter_distribution_summary.csv"
+            self.assertTrue(graph.exists())
+            self.assertGreater(graph.stat().st_size, 0)
+            self.assertIn("r_norm", pd.read_csv(summary)["parameter"].tolist())
 
     def test_density_estimate_respects_parameter_bounds(self):
         grid, density = density_estimate([0.1, 0.2, 0.3], bounds=(0, 1))

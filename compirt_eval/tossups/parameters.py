@@ -2,12 +2,13 @@
 
 Stage 1 training ('train_pyramidal.py') can save tossup difficulty either
 as a single scalar curve ('beta'/'gamma'/'mu' columns, one per tossup)
-or, for multidimensional-difficulty fits, as one curve per skill dimension
+or, for vector-weighted fits, as one curve per skill dimension
 ('beta_1'/'gamma_1'/'mu_1', 'beta_2'/... alongside a matching
-'alpha_1'/'alpha_2'/... discrimination vector). Every other tossup
+'alpha_1'/'alpha_2'/... discrimination vector or embedding-run
+'r_1'/'r_2'/... relevance vector). Every other tossup
 evaluation module needs to read whichever form is present and, for the
 multidimensional case, combine the per-dimension curves into the single
-alpha-weighted effective difficulty the model actually uses (Eq. 3-4). This
+weighted effective difficulty the model actually uses (Eq. 3-4). This
 module is the shared place that knows how to do both.
 """
 
@@ -37,10 +38,26 @@ def _numbered_labels(frame, prefix):
     )
 
 
+def _discrimination_columns(frame):
+    """Return vector-weight columns, accepting either alpha_* or embedding r_*."""
+    alpha_columns = _numbered_labels(frame, "alpha_")
+    relevance_columns = _numbered_labels(frame, "r_")
+    if alpha_columns and relevance_columns:
+        raise ValueError("Saved vector weights must use either alpha_* or r_*, not both")
+    return alpha_columns or relevance_columns
+
+
+def _vector_weight_name(columns):
+    """Return the saved coordinate name for labels and derived norm columns."""
+    if columns and columns[0].startswith("r_"):
+        return "r"
+    return "alpha"
+
+
 def _parameter_columns(frame):
     """Return saved numbered tossup parameter columns in dimension order."""
     return {
-        "alpha": _numbered_labels(frame, "alpha_"),
+        "alpha": _discrimination_columns(frame),
         "beta": _numbered_labels(frame, "beta_"),
         "gamma": _numbered_labels(frame, "gamma_"),
         "mu": _numbered_labels(frame, "mu_"),
@@ -130,11 +147,11 @@ def _multidim_difficulty_components(tossup, columns, positions):
 def load_difficulty_adjustment_curves(results_dir):
     """Load optional saved effective-difficulty adjustments, if the run has them.
 
-    TF-IDF runs save 'tfidf_adjustment_curves.csv': one row per tossup with
-    the text-conditioned adjustment 'A_j(r)' sampled on an evenly spaced
-    relative-position grid, so the evaluator can draw the effective difficulty
-    'd'_j(r) = d_j(r) - A_j(r)' without recomputing text features. Returns
-    'None' when the run has no such file (every non-TF-IDF model), otherwise
+    TF-IDF cumulative-difficulty runs save 'tfidf_adjustment_curves.csv': one row
+    per tossup with the signed text-conditioned difficulty delta sampled on an
+    evenly spaced relative-position grid. The evaluator adds that delta to the
+    base curve to draw 'd'_j(r) = d_j(r) + delta_j(r)' without recomputing text
+    features. Returns 'None' when the run has no such file, otherwise
     '(values_by_tossup, grid)'.
     """
     path = Path(results_dir) / "tfidf_adjustment_curves.csv"
@@ -197,13 +214,13 @@ def _saved_effective_mu(tossup):
 def _supports_first_buzz_reconstruction(players, tossups):
     """Return whether saved files have enough parameters for timing replay."""
     theta_columns = numeric_columns(players, "theta_")
-    alpha_columns = numeric_columns(tossups, "alpha_")
+    columns = _parameter_columns(tossups)
+    alpha_columns = columns["alpha"]
     if not theta_columns or len(theta_columns) != len(alpha_columns):
         return False
     if {"beta", "gamma", "mu"}.issubset(tossups.columns):
         return True
     try:
-        columns = _parameter_columns(tossups)
         _validate_tossup_multidim_dimensions(
             alpha_columns,
             columns["beta"],

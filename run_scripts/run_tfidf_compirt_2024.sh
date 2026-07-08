@@ -14,11 +14,12 @@ GPU="${GPU:-0}"
 SPLIT="${SPLIT:-year_2024}"
 TOURNAMENT="${TOURNAMENT-}"
 CALIBRATE_CORRECTNESS="${CALIBRATE_CORRECTNESS:-0}"
+TFIDF_VARIANT="${TFIDF_VARIANT:-replace-position}"
 
 if [[ "$CALIBRATE_CORRECTNESS" == "1" ]]; then
-  DEFAULT_ROOT="results/compirt/in_sample/tfidf-all2024-cal"
+  DEFAULT_ROOT="results/compirt/in_sample/tfidf-${TFIDF_VARIANT}-all2024-cal"
 else
-  DEFAULT_ROOT="results/compirt/in_sample/tfidf-all2024"
+  DEFAULT_ROOT="results/compirt/in_sample/tfidf-${TFIDF_VARIANT}-all2024"
 fi
 OUTPUT_ROOT="$(resolve_result_root "${ROOT:-$DEFAULT_ROOT}" in_sample)"
 
@@ -41,7 +42,7 @@ export PYTHONUNBUFFERED=1
 export MPLCONFIGDIR="${MPLCONFIGDIR:-/tmp/matplotlib-compirt}"
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 
-PYTHON=".venv/bin/python"
+PYTHON="${PYTHON:-.venv/bin/python}"
 
 mkdir -p "$OUTPUT_ROOT"
 LOG_PATH="$OUTPUT_ROOT/run.log"
@@ -60,7 +61,8 @@ echo "## Run Variables"
 echo
 echo "- RUNNER: run_scripts/run_tfidf_compirt_2024.sh"
 echo "- ROOT: $OUTPUT_ROOT"
-echo "- MODEL: tfidf-baseline-pyramidal"
+echo "- MODEL: tfidf-$TFIDF_VARIANT-pyramidal"
+echo "- TFIDF_VARIANT: $TFIDF_VARIANT"
 echo "- SPLIT: $SPLIT"
 echo "- TOURNAMENT: ${TOURNAMENT:-<all>}"
 echo "- DEVICE: cuda"
@@ -138,6 +140,7 @@ pyramidal_args=(
   --steps "$PYRAMIDAL_STEPS"
   --lr "$LR"
   --device cuda
+  --tfidf-variant "$TFIDF_VARIANT"
   --tfidf-effect-prior-scale "$TFIDF_EFFECT_PRIOR_SCALE"
   --output-dir "$OUTPUT_ROOT/pyramidal"
 )

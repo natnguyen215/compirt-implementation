@@ -28,9 +28,11 @@ from multidimensional.embedding_mirt.compositional_model import (
 from multidimensional.embedding_mirt.embeddings import (
     align_bonus_embeddings,
     align_tossup_embeddings,
+    center_embeddings,
     check_projection_shapes,
     load_embedding_cache,
     load_projection,
+    load_projection_state,
     save_projection,
 )
 from multidimensional.embedding_mirt.pyramidal_model import (
@@ -58,6 +60,22 @@ class ProjectRelevanceTests(unittest.TestCase):
         bias = torch.randn(5)
 
         r = project_relevance(embedding, weight, bias)
+
+        self.assertEqual(tuple(r.shape), (4, 5))
+        self.assertTrue(torch.allclose(r.sum(-1), torch.ones(4), atol=1e-5))
+        self.assertTrue((r >= 0).all())
+
+    def test_ffn_projection_output_is_a_relevance_distribution(self):
+        embedding = torch.randn(4, 8)
+        projection = {
+            "kind": "ffn",
+            "input_weight": torch.randn(8, 3),
+            "hidden_bias": torch.randn(3),
+            "output_weight": torch.randn(3, 5),
+            "output_bias": torch.randn(5),
+        }
+
+        r = project_relevance(embedding, projection)
 
         self.assertEqual(tuple(r.shape), (4, 5))
         self.assertTrue(torch.allclose(r.sum(-1), torch.ones(4), atol=1e-5))
@@ -136,6 +154,37 @@ class EmbeddingCacheTests(unittest.TestCase):
         self.assertTrue(torch.allclose(loaded_weight, weight))
         self.assertTrue(torch.allclose(loaded_bias, bias))
 
+    def test_save_and_load_ffn_projection_state_round_trips(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        path = Path(directory.name) / "r_projection.npz"
+        projection = {
+            "kind": "ffn",
+            "input_weight": torch.randn(8, 3),
+            "hidden_bias": torch.randn(3),
+            "output_weight": torch.randn(3, 5),
+            "output_bias": torch.randn(5),
+        }
+        embedding_mean = torch.randn(8)
+
+        save_projection(path, projection, embedding_mean=embedding_mean)
+        loaded_projection, loaded_mean = load_projection_state(path)
+
+        self.assertEqual(loaded_projection["kind"], "ffn")
+        self.assertTrue(torch.allclose(loaded_projection["input_weight"], projection["input_weight"]))
+        self.assertTrue(torch.allclose(loaded_projection["hidden_bias"], projection["hidden_bias"]))
+        self.assertTrue(torch.allclose(loaded_projection["output_weight"], projection["output_weight"]))
+        self.assertTrue(torch.allclose(loaded_projection["output_bias"], projection["output_bias"]))
+        self.assertTrue(torch.allclose(loaded_mean, embedding_mean))
+
+    def test_center_embeddings_subtracts_saved_mean(self):
+        embedding = torch.tensor([[3.0, 5.0], [7.0, 11.0]])
+        embedding_mean = torch.tensor([1.0, 2.0])
+
+        centered = center_embeddings(embedding, embedding_mean)
+
+        self.assertTrue(torch.allclose(centered, torch.tensor([[2.0, 3.0], [6.0, 9.0]])))
+
 
 class CheckProjectionShapesTests(unittest.TestCase):
     def test_matching_shapes_pass(self):
@@ -150,6 +199,27 @@ class CheckProjectionShapesTests(unittest.TestCase):
             projection_path="r_projection.npz",
             embeddings_path="bonus_embeddings.npz",
             player_skills_path="players.csv",
+        )
+
+    def test_matching_ffn_shapes_pass(self):
+        projection = {
+            "kind": "ffn",
+            "input_weight": torch.randn(8, 3),
+            "hidden_bias": torch.randn(3),
+            "output_weight": torch.randn(3, 5),
+            "output_bias": torch.randn(5),
+        }
+        embedding = torch.randn(3, 8)
+        theta = torch.randn(4, 5)
+
+        check_projection_shapes(
+            projection,
+            embedding,
+            theta,
+            projection_path="r_projection.npz",
+            embeddings_path="bonus_embeddings.npz",
+            player_skills_path="players.csv",
+            embedding_mean=torch.randn(8),
         )
 
     def test_embed_dim_mismatch_is_an_error(self):
@@ -194,6 +264,7 @@ class PyramidalSviTests(unittest.TestCase):
             "y": torch.tensor([1.0]),
             "is_buzz": torch.tensor([True]),
             "embedding": torch.randn(1, 8),
+            "projection_hidden_dim": 3,
             "player_ids": ["p1"],
             "tossup_ids": ["q1"],
             "event_ids": ["e1"],
@@ -204,8 +275,10 @@ class PyramidalSviTests(unittest.TestCase):
         self.assertNotIn("alpha", posterior)
         self.assertNotIn("r", posterior)
         self.assertEqual(tuple(posterior["beta"].shape), (1, 2))
-        self.assertEqual(tuple(pyro.param("r_projection_weight").shape), (8, 2))
-        self.assertEqual(tuple(pyro.param("r_projection_bias").shape), (2,))
+        self.assertEqual(tuple(pyro.param("r_projection_input_weight").shape), (8, 3))
+        self.assertEqual(tuple(pyro.param("r_projection_hidden_bias").shape), (3,))
+        self.assertEqual(tuple(pyro.param("r_projection_output_weight").shape), (3, 2))
+        self.assertEqual(tuple(pyro.param("r_projection_output_bias").shape), (2,))
 
 
 class CompositionalTests(unittest.TestCase):

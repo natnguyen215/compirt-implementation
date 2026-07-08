@@ -1,12 +1,4 @@
-"""Plot TF-IDF-adjusted effective difficulty curves for a fitted run.
-
-The shared CompIRT evaluator only knows how to redraw the saved base
-'beta/gamma/mu' sigmoid from 'tossups.csv'. This diagnostic recomputes the
-TF-IDF features and overlays the effective difficulty actually used by the
-TF-IDF experiment:
-
-    d'_j(t) = d_j(t) - lambda_tfidf * tfidf_prefix_j(t)
-"""
+"""Plot TF-IDF-aware difficulty and hazard diagnostics for a fitted TF-IDF run."""
 
 from __future__ import annotations
 
@@ -29,7 +21,12 @@ from compirt_data import (
 from compirt_eval.figures import short_id
 from compirt_eval.metrics import difficulty_curve
 from compirt_eval.tossups.difficulty import selected_tossups
-from tfidf.pyramidal_tfidf_model import tfidf_score_at
+from tfidf.pyramidal_tfidf_model import (
+    CUMULATIVE_DIFFICULTY,
+    HAZARD_SPIKE,
+    REPLACE_POSITION,
+    tfidf_score_at,
+)
 from tfidf.tfidf_features import attach_tfidf_prefix_scores
 
 
@@ -54,21 +51,106 @@ def load_run_context(results_dir: Path, data_dir: Path):
     return summary, data
 
 
-def effective_curve(row, features, summary, relative_positions):
-    """Return base curve, TF-IDF adjustment, effective curve, and TF-IDF score."""
+def _numbered_labels(row, prefix):
+    return sorted(
+        (
+            label
+            for label in row.index
+            if isinstance(label, str)
+            and label.startswith(prefix)
+            and label.removeprefix(prefix).isdigit()
+        ),
+        key=lambda label: int(label.removeprefix(prefix)),
+    )
+
+
+def _multidim_columns(row):
+    return {
+        "alpha": _numbered_labels(row, "alpha_"),
+        "beta": _numbered_labels(row, "beta_"),
+        "gamma": _numbered_labels(row, "gamma_"),
+        "mu": _numbered_labels(row, "mu_"),
+    }
+
+
+def _saved_difficulty(row, positions):
+    """Return scalar or alpha-weighted multidim difficulty over ``positions``."""
+    positions = np.asarray(positions, dtype=float)
+    if {"beta", "gamma", "mu"}.issubset(row.index):
+        return difficulty_curve(row.beta, row.gamma, row.mu, positions)
+
+    columns = _multidim_columns(row)
+    if not all(columns[name] for name in ("alpha", "beta", "gamma", "mu")):
+        raise ValueError("TF-IDF plot requires scalar or multidim difficulty columns")
+    dimensions = {len(columns[name]) for name in ("alpha", "beta", "gamma", "mu")}
+    if len(dimensions) != 1:
+        raise ValueError("Multidim TF-IDF difficulty columns must have matching widths")
+
+    alpha = row[columns["alpha"]].to_numpy(dtype=float)
+    per_dimension = difficulty_curve(
+        row[columns["beta"]].to_numpy(dtype=float)[:, None],
+        row[columns["gamma"]].to_numpy(dtype=float)[:, None],
+        row[columns["mu"]].to_numpy(dtype=float)[:, None],
+        positions[None, :],
+    )
+    return alpha @ per_dimension
+
+
+def _alpha_mass(row):
+    """Return sum_k alpha_jk for multidim rows, or 1.0 for scalar rows."""
+    columns = _multidim_columns(row)
+    if columns["alpha"] and not {"beta", "gamma", "mu"}.issubset(row.index):
+        return float(row[columns["alpha"]].to_numpy(dtype=float).sum())
+    return 1.0
+
+
+def curve_components(row, features, summary, relative_positions):
+    """Return base/effective curves plus the TF-IDF diagnostic series."""
     token_positions = np.maximum(
         1, np.rint(relative_positions * features["T"]).astype(int)
     )
     token_positions = np.minimum(token_positions, features["T"])
     t = features["prefix"].new_tensor(token_positions)
-    base = difficulty_curve(row.beta, row.gamma, row.mu, relative_positions)
-    tfidf_score = tfidf_score_at(features["prefix"], t).detach().cpu().numpy()
-    adjustment = float(summary["tfidf_clue_effect"]) * tfidf_score
-    return base, adjustment, base - adjustment, tfidf_score
+    base = _saved_difficulty(row, relative_positions)
+    prefix = tfidf_score_at(features["prefix"], t).detach().cpu().numpy()
+    token = tfidf_score_at(features["token"], t).detach().cpu().numpy()
+
+    variant = summary.get("tfidf_variant", REPLACE_POSITION)
+    if variant == REPLACE_POSITION:
+        effective = _saved_difficulty(row, prefix)
+        return {
+            "base": base,
+            "effective": effective,
+            "delta": effective - base,
+            "delta_label": "Position-replacement delta",
+            "score": prefix,
+            "score_label": "idf_prefix",
+        }
+    if variant == CUMULATIVE_DIFFICULTY:
+        adjustment = -float(summary["tfidf_clue_effect"]) * prefix * _alpha_mass(row)
+        return {
+            "base": base,
+            "effective": base + adjustment,
+            "delta": adjustment,
+            "delta_label": "Difficulty reduction",
+            "score": prefix,
+            "score_label": "idf_prefix",
+        }
+    if variant == HAZARD_SPIKE:
+        boost = float(summary["tfidf_hazard_effect"]) * token
+        return {
+            "base": base,
+            "effective": base,
+            "delta": boost,
+            "delta_label": "Hazard logit boost",
+            "score": token,
+            "score_label": "token_idf",
+        }
+    raise ValueError(f"Unknown TF-IDF variant in summary: {variant}")
 
 
 def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int):
-    """Write TF-IDF-adjusted difficulty diagnostic plots."""
+    """Write TF-IDF variant diagnostic plots."""
     summary, data = load_run_context(results_dir, data_dir)
     parameters = pd.read_csv(results_dir / "tossups.csv").set_index("tossup_id")
     predictions = pd.read_csv(results_dir / "tossup_predictions.csv")
@@ -80,13 +162,14 @@ def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int)
         if tossup_id in parameters.index and tossup_id in tossup_index
     ]
     if not selected:
-        raise ValueError("No tossups available for TF-IDF difficulty plotting")
+        raise ValueError("No tossups available for TF-IDF plotting")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     columns = 2
     rows = math.ceil(len(selected) / columns)
     fig, axes = plt.subplots(rows, columns, figsize=(13, 4.3 * rows), squeeze=False)
     positions = np.linspace(0.0, 1.0, 160)
+    variant = summary.get("tfidf_variant", REPLACE_POSITION)
 
     for ax, tossup_id in zip(axes.flat, selected):
         row = parameters.loc[tossup_id]
@@ -95,10 +178,9 @@ def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int)
         features = {
             "T": T,
             "prefix": data["tfidf_prefix"][index],
+            "token": data["tfidf_token"][index],
         }
-        base, adjustment, effective, tfidf_score = effective_curve(
-            row, features, summary, positions
-        )
+        curves = curve_components(row, features, summary, positions)
 
         buzz_positions = predictions.loc[
             (predictions["tossup_id"] == tossup_id) & (predictions["z"] == "BUZZ"),
@@ -114,38 +196,40 @@ def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int)
         curve_ax = ax.twinx()
         curve_ax.plot(
             positions,
-            base,
+            curves["base"],
             color="tab:blue",
             linewidth=1.5,
             alpha=0.65,
-            label="Base sigmoid d(t)",
+            label="Base difficulty d(t)",
         )
+        if variant != HAZARD_SPIKE:
+            curve_ax.plot(
+                positions,
+                curves["effective"],
+                color="black",
+                linewidth=2.2,
+                label="Effective difficulty d'(t)",
+            )
         curve_ax.plot(
             positions,
-            effective,
-            color="black",
-            linewidth=2.2,
-            label="TF-IDF effective d'(t)",
-        )
-        curve_ax.plot(
-            positions,
-            adjustment,
+            curves["delta"],
             color="tab:green",
             linewidth=1.4,
             linestyle="--",
-            label="TF-IDF adjustment",
+            label=curves["delta_label"],
         )
         score_ax = ax.twinx()
         score_ax.spines["right"].set_position(("axes", 1.09))
         score_ax.plot(
             positions,
-            tfidf_score,
+            curves["score"],
             color="tab:red",
             linewidth=1.0,
             alpha=0.6,
-            label="tfidf_prefix",
+            label=curves["score_label"],
         )
-        score_ax.set_ylim(-0.03, 1.03)
+        if curves["score_label"] == "idf_prefix":
+            score_ax.set_ylim(-0.03, 1.03)
         score_ax.set_yticks([])
 
         ax.set(
@@ -154,7 +238,7 @@ def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int)
             ylabel="Buzz count",
             xlim=(0, 1),
         )
-        curve_ax.set_ylabel("Difficulty / adjustment")
+        curve_ax.set_ylabel("Difficulty / logit delta")
         ax.grid(alpha=0.2)
         handles, labels = ax.get_legend_handles_labels()
         curve_handles, curve_labels = curve_ax.get_legend_handles_labels()
@@ -168,7 +252,7 @@ def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int)
 
     for ax in axes.flat[len(selected):]:
         ax.set_visible(False)
-    fig.suptitle("TF-IDF-adjusted effective difficulty and empirical buzz locations")
+    fig.suptitle(f"TF-IDF {variant} diagnostics and empirical buzz locations")
     fig.tight_layout()
     output_path = output_dir / "tfidf_effective_difficulty_curves.png"
     fig.savefig(output_path, dpi=160)

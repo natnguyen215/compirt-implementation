@@ -12,8 +12,8 @@ Environment variables:
 
 * 'SPLIT' / 'TOURNAMENT' select data; 'TOURNAMENT=""' means whole split.
 * 'ROOT' chooses the output root.
-* 'DIMENSIONS', 'PYRAMIDAL_STEPS', 'BONUS_STEPS', 'LR', and 'DEVICE'
-  control fitting.
+* 'DIMENSIONS', 'PROJECTION_HIDDEN_DIM', 'PYRAMIDAL_STEPS', 'BONUS_STEPS',
+  'LR', and 'DEVICE' control fitting.
 * 'CALIBRATE_CORRECTNESS=1' enables correctness-only calibration in both
   stages.
 * 'SYNERGY_DIMENSIONS' controls the always-on synergy branch.
@@ -155,6 +155,7 @@ def main() -> None:
     pyramidal_steps = env_default("PYRAMIDAL_STEPS", "5000")
     bonus_steps = env_default("BONUS_STEPS", "3000")
     dimensions = env_default("DIMENSIONS", "5")
+    projection_hidden_dim = env_default("PROJECTION_HIDDEN_DIM", "128")
     synergy_dimensions = env_default("SYNERGY_DIMENSIONS", "3")
     lr = env_default("LR", "0.005")
     device = env_default("DEVICE", "cuda")
@@ -190,6 +191,7 @@ def main() -> None:
                 "DEVICE": device,
                 "GPU": gpu,
                 "DIMENSIONS": dimensions,
+                "PROJECTION_HIDDEN_DIM": projection_hidden_dim,
                 "PYRAMIDAL_STEPS": pyramidal_steps,
                 "BONUS_STEPS": bonus_steps,
                 "LR": lr,
@@ -234,6 +236,8 @@ def main() -> None:
         *tournament_args(tournament),
         "--dimensions",
         dimensions,
+        "--projection-hidden-dim",
+        projection_hidden_dim,
         "--steps",
         pyramidal_steps,
         "--lr",

@@ -22,6 +22,9 @@ LOWER_IS_BETTER = {
 LEGACY_METRIC_NAMES = {
     "exact_score_accuracy": "rounded_score_accuracy",
 }
+EXCLUDED_COMPARISON_METRICS = {
+    "rounded_score_accuracy",
+}
 
 
 def resolve_metrics_path(path: Path) -> Path:
@@ -120,7 +123,11 @@ def main():
     synergy = pd.read_csv(resolve_metrics_path(args.synergy_metrics)).iloc[0]
     compositional = normalize_metric_names(compositional)
     synergy = normalize_metric_names(synergy)
-    common_metrics = [metric for metric in compositional.index if metric in synergy.index]
+    common_metrics = [
+        metric
+        for metric in compositional.index
+        if metric in synergy.index and metric not in EXCLUDED_COMPARISON_METRICS
+    ]
 
     rows = []
     for metric in common_metrics:
