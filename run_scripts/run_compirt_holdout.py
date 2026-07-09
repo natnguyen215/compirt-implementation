@@ -16,7 +16,8 @@ Per variant the flow is:
 
 Environment variables:
 
-* 'MODEL'           baseline | multidim | topic | learned | tfidf  (default baseline)
+* 'MODEL'           baseline | multidim | topic | learned | tfidf | tfidf_multidim
+                    (default baseline)
 * 'TRAIN_SPLIT' / 'TEST_SPLIT'                    (default year_2024 / year_2025)
 * 'NEW_PLAYER_PRIOR' tier | flat                    (default tier)
 * 'ROOT'            output root                      (default results/compirt/holdout/<MODEL>)
@@ -129,6 +130,11 @@ MODELS = {
         "compositional": "train_compositional",
         "evaluate": "evaluate_compirt",
     },
+    "tfidf_multidim": {
+        "pyramidal": "tfidf.multidim.train_pyramidal",
+        "compositional": "train_compositional",
+        "evaluate": "evaluate_compirt",
+    },
 }
 
 
@@ -151,7 +157,10 @@ def main() -> None:
     lr = env_default("LR", "0.01")
     device = env_default("DEVICE", "cpu")
     calibrate_correctness = env_default("CALIBRATE_CORRECTNESS", "0")
-    run_synergy = env_default("RUN_SYNERGY", "1" if model == "multidim" else "0")
+    run_synergy = env_default(
+        "RUN_SYNERGY",
+        "1" if model in ("multidim", "tfidf_multidim") else "0",
+    )
     synergy_dimensions = env_default("SYNERGY_DIMENSIONS", "3")
     save_synergy_details = env_default("SAVE_SYNERGY_DETAILS", "0")
     predict_buzz_positions = env_default("PREDICT_BUZZ_POSITIONS", "1")
@@ -202,14 +211,18 @@ def main() -> None:
                 "PREDICT_BUZZ_POSITIONS": predict_buzz_positions,
                 "TOPIC_VECTORS": topic_vectors or "",
                 "DATABASE": database or "",
-                "TFIDF_VARIANT": tfidf_variant if model == "tfidf" else "",
+                "TFIDF_VARIANT": tfidf_variant
+                if model in ("tfidf", "tfidf_multidim")
+                else "",
                 "TFIDF_EFFECT_PRIOR_SCALE": tfidf_effect_prior_scale
-                if model == "tfidf"
+                if model in ("tfidf", "tfidf_multidim")
                 else "",
                 "NO_NORMALIZE_TFIDF": no_normalize_tfidf
-                if model == "tfidf"
+                if model in ("tfidf", "tfidf_multidim")
                 else "",
-                "TFIDF_PLOT_COUNT": tfidf_plot_count if model == "tfidf" else "",
+                "TFIDF_PLOT_COUNT": tfidf_plot_count
+                if model in ("tfidf", "tfidf_multidim")
+                else "",
                 "MPLCONFIGDIR": mplconfigdir,
                 "PYTHON": PYTHON,
                 "TRAIN_PYRAMIDAL_OUTPUT": train_pyr,
@@ -239,7 +252,7 @@ def main() -> None:
     #           topic-word matrix, so it is passed to every stage.
     pyr_extra: list[str] = []
     comp_extra: list[str] = []
-    if model in ("baseline", "multidim", "tfidf"):
+    if model in ("baseline", "multidim", "tfidf", "tfidf_multidim"):
         pyr_extra += ["--dimensions", dimensions]
     elif model == "topic":
         if topic_vectors:
@@ -252,7 +265,7 @@ def main() -> None:
             comp_extra += ["--database", database]
         # Bonus stage reuses the frozen topics from the TRAINING pyramidal run.
         comp_extra += ["--topic-model-dir", train_pyr]
-    if model == "tfidf":
+    if model in ("tfidf", "tfidf_multidim"):
         pyr_extra += [
             "--tfidf-variant",
             tfidf_variant,
@@ -331,7 +344,7 @@ def main() -> None:
         "--output-dir", holdout_eval,
     ])
 
-    if model == "tfidf":
+    if model in ("tfidf", "tfidf_multidim"):
         run([
             PYTHON, "-m", "tfidf.plot_tfidf_difficulty_curves",
             "--results-dir", holdout_pyr,

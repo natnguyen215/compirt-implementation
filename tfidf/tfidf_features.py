@@ -63,9 +63,9 @@ def _ordered_tossup_tokens(tossups, tossup_ids: Sequence[str]) -> list[list[str]
 def _document_idf(ordered_tokens: Sequence[Sequence[str]]) -> dict[str, float]:
     """Return inverse document frequency for every observed token.
 
-    IDF is ``log((1 + N) / (1 + df(w)))`` over the selected question corpus. No
-    ``+1`` floor is added, so ubiquitous words (``df == N``) collapse to ~0 and
-    the cumulative reveal jumps only at informative clues. The ``1 +`` terms
+    IDF is 'log((1 + N) / (1 + df(w)))' over the selected question corpus. No
+    '+1' floor is added, so ubiquitous words ('df == N') collapse to ~0 and
+    the cumulative reveal jumps only at informative clues. The '1 +' terms
     inside the log guard the denominator.
     """
     document_frequency: Counter[str] = Counter()
@@ -117,12 +117,14 @@ def build_tfidf_feature_matrices(
 ) -> tuple[torch.Tensor, torch.Tensor, dict[str, object]]:
     """Return cumulative and local TF-IDF clue matrices aligned to tossup ids.
 
-    Returns ``(prefix, token, summary)``:
+    Returns '(prefix, token, summary)':
 
-    * ``prefix[j, t]`` is cumulative TF-IDF revealed through token ``t``. With
-      ``normalize=True`` each nonempty tossup ends at 1.0.
-    * ``token[j, t]`` is the TF-IDF weight of the token at position ``t`` and is
+    * 'prefix[j, t]' is cumulative TF-IDF revealed through token 't'. With
+      'normalize=True' each nonempty tossup ends at 1.0.
+    * 'token[j, t]' is the TF-IDF weight of the token at position 't' and is
       zero after the tossup ends. It is used by the hazard-spike variant.
+
+    Both matrices have shape '(len(tossup_ids), max_length)'.
     """
     if max_length < 1:
         raise ValueError("max_length must be at least 1")

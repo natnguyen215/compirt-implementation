@@ -19,19 +19,19 @@ _RESULT_TIERS = ("in_sample", "holdout")
 
 
 def resolve_result_root(candidate, tier: str) -> str:
-    """Keep experiment outputs under ``results/compirt/{in_sample,holdout}/``.
+    """Keep experiment outputs under 'results/compirt/{in_sample,holdout}/'.
 
-    Run roots are supplied by hand through the ``ROOT`` env var, and dropping the
-    ``in_sample/``/``holdout/`` segment used to scatter full runs directly under
-    ``results/compirt/``. This normalizes them:
+    Run roots are supplied by hand through the 'ROOT' env var, and dropping the
+    'in_sample/'/'holdout/' segment used to scatter full runs directly under
+    'results/compirt/'. This normalizes them:
 
     * a root already under a tier is returned unchanged;
-    * a bare ``results/compirt/<name>`` is redirected into ``<tier>/<name>`` with
+    * a bare 'results/compirt/<name>' is redirected into '<tier>/<name>' with
       a warning;
-    * a path that is not under ``results/compirt/`` (tests, custom dirs) is left
+    * a path that is not under 'results/compirt/' (tests, custom dirs) is left
       untouched.
 
-    Keys on the ``results/compirt/`` marker so it works for both repo-relative
+    Keys on the 'results/compirt/' marker so it works for both repo-relative
     and absolute paths, and is idempotent (safe to apply more than once).
     """
     if tier not in _RESULT_TIERS:
@@ -140,7 +140,7 @@ def format_run_log_header(
 
 
 def tee_run_output(log_path: Path, *, append: bool = False):
-    """Duplicate stdout/stderr to ``log_path`` for the rest of the process."""
+    """Duplicate stdout/stderr to 'log_path' for the rest of the process."""
     log_path = Path(log_path)
     log_path.parent.mkdir(parents=True, exist_ok=True)
     handle = log_path.open("a" if append else "w", encoding="utf-8")

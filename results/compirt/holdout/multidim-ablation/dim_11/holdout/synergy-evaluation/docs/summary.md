@@ -52,6 +52,7 @@ This file consolidates the metric CSVs, bonus-model comparison deltas, and fitte
 | auc | 0.699714 |
 | log_loss | 0.576774 |
 | ece | 0.129742 |
+| accuracy | 0.718512 |
 | buzz_position_mae | 0.128273 |
 | buzz_position_median_absolute_error | 0.10635 |
 

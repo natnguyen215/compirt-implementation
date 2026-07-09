@@ -5,6 +5,12 @@ __pycache__/
 .project-context.md
 logs/
 
+# Local docs and agent context notes.
+/docs/
+CLAUDE.md
+CONTEXT.md
+NATHAN_READ.md
+
 # Tests must use synthetic in-memory data or temporary directories.
 .test-output/
 
@@ -19,6 +25,7 @@ data/lineups/
 
 results/compirt/**/tossup_predictions.csv
 results/compirt/**/bonus_part_predictions.csv
+results/**/*.csv
 
 # Source paper PDFs and other binaries — kept out of version control.
 *.pdf

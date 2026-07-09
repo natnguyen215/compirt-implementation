@@ -9,30 +9,30 @@ from who actually buzzed, splitting a game into halves when a mid-game
 substitution is evidenced.
 
 The inferred lineups are the model's data-stage roster. The same lineup assigned
-to a tossup is reused for the bonus in the same cycle (see ``roster_for``): a
-bonus in cycle ``q`` uses the lineup of the tossup in cycle ``q`` by construction.
+to a tossup is reused for the bonus in the same cycle (see 'roster_for'): a
+bonus in cycle 'q' uses the lineup of the tossup in cycle 'q' by construction.
 
-Resolution per ``(game_id, team_id)`` (``buzzers`` = distinct players who buzzed
+Resolution per '(game_id, team_id)' ('buzzers' = distinct players who buzzed
 that game for that team, partitioned into first half question_num <= 10 and
 second half question_num >= 11):
 
-1. ``roster_size <= 4``            -> whole roster (short-handed if < 4).
-2. ``roster > 4`` & 4 buzzers      -> those four buzzers.
-3. ``roster > 4`` & 1-3 buzzers    -> those buzzers only (short-handed, no fill).
-4. ``roster > 4`` & 0 buzzers      -> whole roster (no evidence to infer from).
-5. ``roster > 4`` & >= 5 buzzers   -> substitution: infer each half separately.
+1. 'roster_size <= 4'            -> whole roster (short-handed if < 4).
+2. 'roster > 4' & 4 buzzers      -> those four buzzers.
+3. 'roster > 4' & 1-3 buzzers    -> those buzzers only (short-handed, no fill).
+4. 'roster > 4' & 0 buzzers      -> whole roster (no evidence to infer from).
+5. 'roster > 4' & >= 5 buzzers   -> substitution: infer each half separately.
    A half short of four is filled from the *other* half's buzzers (the players
    known to have played that game), keeping cross-half players consistent. A
    half with more than four buzzers keeps them all. With >= 5 distinct game
    buzzers the two half-buzzer sets always union to >= 4, so no roster fill or
    removal is ever needed.
 
-Random fills use ``random.Random`` seeded from a SHA-256 hash of
-``(game_id, team_id, segment)`` so the same database always yields the same
-lineups (Python's builtin ``hash`` is per-process salted and must not be used).
+Random fills use 'random.Random' seeded from a SHA-256 hash of
+'(game_id, team_id, segment)' so the same database always yields the same
+lineups (Python's builtin 'hash' is per-process salted and must not be used).
 
-Lineups are cached to ``data/lineups/lineup_segments.csv`` and reused by every
-training run; ``python lineup.py --rebuild`` regenerates the cache.
+Lineups are cached to 'data/lineups/lineup_segments.csv' and reused by every
+training run; 'python lineup.py --rebuild' regenerates the cache.
 """
 
 from __future__ import annotations
@@ -192,11 +192,11 @@ def _resolve_team_game(game_id, team_id, roster, first_buzzers, second_buzzers):
 
 
 def _buzzers_by_game_team(tables):
-    """Map ``(game_id, team_id)`` to (first-half, second-half) buzzer sets.
+    """Map '(game_id, team_id)' to (first-half, second-half) buzzer sets.
 
     Each buzz is attributed to a team by roster membership and to a half by the
-    packet ``question_num`` of the tossup it landed on (<= 10 first, >= 11
-    second). ``question_num`` equals ``question_number_in_game`` and is always
+    packet 'question_num' of the tossup it landed on (<= 10 first, >= 11
+    second). 'question_num' equals 'question_number_in_game' and is always
     present, so this does not depend on the buzz-level game-position column.
     """
     rosters = tables["teams"].set_index("team_id")["player_ids"].to_dict()
@@ -227,8 +227,8 @@ def _buzzers_by_game_team(tables):
 def build_lineup_segments(tables) -> pd.DataFrame:
     """Infer lineup segments for every team in every game.
 
-    Returns one row per ``(game_id, team_id, segment)``; ``segment`` is
-    ``whole_game`` or the pair ``first_half``/``second_half`` when a
+    Returns one row per '(game_id, team_id, segment)'; 'segment' is
+    'whole_game' or the pair 'first_half'/'second_half' when a
     substitution is detected.
     """
     rosters = tables["teams"].set_index("team_id")["player_ids"].to_dict()
@@ -258,7 +258,7 @@ class LineupIndex:
         """Return the active lineup for a team at a given question number.
 
         The bonus in a cycle reuses its tossup's lineup because both resolve
-        through the same ``(game, team, question -> segment)`` mapping.
+        through the same '(game, team, question -> segment)' mapping.
         """
         segments = self._by_key.get((game_id, team_id))
         if not segments:
@@ -293,7 +293,7 @@ class LineupIndex:
     def load_or_build(cls, tables, cache_path=DEFAULT_CACHE, rebuild=False):
         """Load the persisted lineup cache, building and writing it if absent.
 
-        On a cache hit that is missing some games in ``tables`` (e.g. a stale or
+        On a cache hit that is missing some games in 'tables' (e.g. a stale or
         partial cache), the missing games are inferred on the fly without
         rewriting the cache.
         """

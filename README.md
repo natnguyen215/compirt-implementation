@@ -22,8 +22,15 @@ The root CompIRT files are separated by responsibility through their names:
 - `topic/`: topic-model experiments — `topic/fixed/` (topics fit upstream via
   LDA/PLDA/categories and fed in as fixed weights), `topic/learned/` (topics
   learned jointly with the IRT model), and shared topic helpers in `topic/utils/`.
-- `tfidf/`: the isolated TF-IDF clue-step baseline.
-- `multidim_mirt/`: the multidimensional-skill pyramidal variant.
+- `tfidf/`: isolated IDF-aware pyramidal variants for clue timing.
+- `multidimensional/`: multidimensional-difficulty experiments —
+  `multidimensional/multidim_mirt/` (the multidimensional-skill pyramidal
+  variant, with a free learned discrimination vector `alpha`),
+  `multidimensional/embedding_mirt/` (sibling that replaces `alpha` with a
+  CAIMIRA-style relevance vector `r` computed from a frozen Qwen3-Embedding-8B
+  vector of the question text through a learned linear projection). The
+  embedding variant reuses `multidim_mirt`'s tossup math and the root
+  `compositional_model.py` rather than duplicating them.
 
 Variant scripts run as modules from the repo root, e.g.
 `.venv/bin/python -m topic.fixed.train_topic_pyramidal --help`.

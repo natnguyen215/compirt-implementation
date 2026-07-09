@@ -52,7 +52,7 @@ directory, use this map first:
 - The topic-word matrix `topic_word` is a point-estimated parameter (the variational-EM
   M-step). Because there is no amortizing encoder, **one `AutoNormal` guide**
   covers every latent (including `theta_doc`), so training reuses the existing
-  `topic_compirt.common.fit_svi`.
+  `utils.training.fit_svi`.
 
 The competing-risks math is reused unchanged from
 `topic/fixed/topic_compirt/pyramidal.py`; only the source of the topic weight

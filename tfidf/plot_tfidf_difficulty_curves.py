@@ -74,7 +74,12 @@ def _multidim_columns(row):
 
 
 def _saved_difficulty(row, positions):
-    """Return scalar or alpha-weighted multidim difficulty over ``positions``."""
+    """Return scalar or alpha-weighted multidim difficulty over 'positions'.
+
+    Scalar runs save 'beta'/'gamma'/'mu' columns; multidim runs save numbered
+    'alpha_K'/'beta_K'/'gamma_K'/'mu_K' columns, which are collapsed with the
+    same 'sum_k alpha_jk * d_jk(t)' weighting the model uses.
+    """
     positions = np.asarray(positions, dtype=float)
     if {"beta", "gamma", "mu"}.issubset(row.index):
         return difficulty_curve(row.beta, row.gamma, row.mu, positions)

@@ -271,7 +271,7 @@ def write_eval_docs_summary(
     evaluation_dir: Path,
     comparison_csv: Path | None = None,
 ) -> Path:
-    """Create ``docs/summary.md`` for one evaluation or synergy-evaluation folder."""
+    """Create 'docs/summary.md' for one evaluation or synergy-evaluation folder."""
     evaluation_dir = Path(evaluation_dir)
     if comparison_csv is None:
         candidate = comparison_path_for_evaluation(evaluation_dir)

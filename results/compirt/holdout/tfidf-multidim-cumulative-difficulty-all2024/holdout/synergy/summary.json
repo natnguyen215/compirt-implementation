@@ -1,0 +1,17 @@
+{
+  "tournament": "",
+  "steps": 2000,
+  "final_loss": 87807.06297838688,
+  "use_synergy": true,
+  "synergy_dimensions": 3,
+  "saved_synergy_details": true,
+  "calibrate_correctness": false,
+  "skill_dimensions": 5,
+  "bonus_part_observations": 181362,
+  "bonus_parts": 4716,
+  "tau": 0.22548799216747284,
+  "mean_synergy_contribution": -0.9121237993240356,
+  "median_synergy_contribution": -0.9003974795341492,
+  "negative_synergy_fraction": 0.8498031561187018,
+  "positive_synergy_fraction": 0.12581466900453236
+}

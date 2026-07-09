@@ -322,7 +322,7 @@ by gradient ascent.
 - **Why one guide suffices.** There is **no amortizing encoder** (no neural net
   mapping a document to its `θ`). Each document simply has its own variational
   parameters. That's what lets us reuse the project's existing
-  `topic_compirt.common.fit_svi` verbatim. (Dropping the encoder is the
+  `utils.training.fit_svi` verbatim. (Dropping the encoder is the
   deliberate "supervised-LDA, not a neural topic model" choice; the cost is in
   §6.)
 - **The topic-word matrix `topic_word` (`φ`).** A point-estimated `pyro.param`

@@ -1,18 +1,29 @@
 """Train one of the isolated TF-IDF-aware pyramidal tossup variants.
 
-This mirrors the root ``train_pyramidal.py`` workflow but attaches precomputed
-IDF clue features to the tensor dict and fits ``tfidf.pyramidal_tfidf_model``.
-The root baseline model remains untouched.
+This mirrors the root 'train_pyramidal.py' but attaches precomputed TF-IDF clue
+features to the tensor dict and fits 'tfidf.pyramidal_tfidf_model'. The root
+baseline model remains untouched.
+
+Start reading at 'run_experiment' near the bottom; it coordinates the same
+load -> build -> tensors -> train -> predict -> save workflow as the root
+script, plus the TF-IDF feature attachment and the 'cumulative-difficulty'
+adjustment-curve export. The saved 'players.csv' remains compatible with the
+root 'train_compositional.py'.
 """
 
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import pyro
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from compirt_data import (
     DEFAULT_DATA_DIR,
@@ -43,7 +54,6 @@ from utils.training import fit_svi, require_device
 from holdout.player_priors import attach_player_priors, player_tier_map
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_PARENT = REPO_ROOT / "results" / "compirt"
 FORMULAS = {
     REPLACE_POSITION: (
@@ -74,14 +84,16 @@ def save_tfidf_adjustment_curves(
     tfidf_variant,
     n_points=201,
 ):
-    """Persist signed per-tossup difficulty deltas for Option B only.
+    """Persist signed per-tossup difficulty deltas for 'cumulative-difficulty'.
 
-    For ``cumulative-difficulty`` the effective difficulty is:
+    For 'cumulative-difficulty' the effective difficulty is:
 
         d'_j(t) = d_j(t) - lambda_tfidf * p_j(t)
 
     The saved adjustment is therefore negative. Evaluators add it to the base
-    difficulty curve to replay the effective curve.
+    difficulty curve to replay the effective curve. The other variants change
+    no difficulty term ('hazard-spike') or need no delta ('replace-position'),
+    so nothing is written for them.
     """
     if tfidf_variant != CUMULATIVE_DIFFICULTY:
         return
@@ -133,6 +145,8 @@ def run_experiment(args):
     require_device(args.device)
     pyro.set_rng_seed(args.seed)
 
+    # Load tables -> build BUZZ/CENSORED/NO-BUZZ rows -> index into tensors,
+    # then attach the precomputed TF-IDF prefix/token feature matrices.
     tables = filter_tournament(load_hf_tables(args.data_dir, args.split), args.tournament)
     observations = build_tossup_observations(tables)
     if observations.empty:
@@ -154,7 +168,9 @@ def run_experiment(args):
     )
     print(observations["z"].value_counts().to_string())
 
+    # Each player's tier labels the saved posterior and builds new-player priors.
     tier_map = player_tier_map(tables)
+    # Held-out evaluation: attach informative player priors before fitting.
     prior_summary = None
     if args.train_posterior:
         prior_summary = attach_player_priors(
@@ -179,6 +195,8 @@ def run_experiment(args):
     )
 
     save_parameters(args.output_dir, data, posterior)
+    # Save the full theta/c posterior plus tiers so a later held-out run can
+    # rebuild returning-player and tier-conditioned priors.
     save_player_posterior(args.output_dir, data["player_ids"], guide, tier_map)
     save_tfidf_adjustment_curves(
         args.output_dir, data, observations, posterior, args.tfidf_variant
@@ -189,6 +207,8 @@ def run_experiment(args):
         f"TF-IDF {args.tfidf_variant} pyramidal training loss",
     )
 
+    # Attach fitted predictions back onto the readable observation rows; the
+    # TF-IDF scores at each row's 't_star' ride along as diagnostics.
     correct, hazard, survival, prefix_score, token_score = posterior_row_predictions(
         data, posterior, args.calibrate_correctness, args.tfidf_variant
     )
@@ -269,7 +289,7 @@ def parse_args():
         "--tfidf-effect-prior-scale",
         type=float,
         default=1.0,
-        help="HalfNormal prior scale for Option B/C learned TF-IDF effects",
+        help="HalfNormal prior scale for cumulative/hazard TF-IDF effects",
     )
     parser.add_argument(
         "--no-normalize-tfidf",

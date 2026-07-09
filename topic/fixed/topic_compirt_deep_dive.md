@@ -51,15 +51,16 @@ components down by responsibility rather than run order.
 | --- | --- | --- |
 | Topic vectors | `run_plda.py`, `run_lda.py`, `build_category_vectors.py`, `topic/utils/` | Produce `document_latent_vectors.csv` = the fixed $r$ |
 | Vector plumbing | `topic_compirt/topics.py` | Load / normalize / align $r$ onto model tensors |
-| Shared infra | `topic_compirt/common.py`, root `compirt_data.py` | SVI loop; observation/tensor builders (reused from root) |
+| Shared infra | `utils/training.py`, `utils/saving.py`, root `compirt_data.py` | `fit_svi` SVI loop; CSV/tensor helpers; observation/tensor builders (reused from root) |
 | Stage 1 | `train_topic_pyramidal.py` + `topic_compirt/pyramidal.py` | Tossup competing-risks buzz model → player skill $\theta$ |
 | Stage 2 | `train_topic_compositional.py` + `topic_compirt/compositional.py` | Bonus-part model on fixed $\theta$ |
 | Evaluation | `evaluate_topic_compirt.py` + `topic_compirt/evaluation.py` | Metrics, reliability/timing/parameter plots, report |
 | Orchestration | `run_topic_compirt.sh` | One-pass driver reading env vars |
 
-The package `topic_compirt/` itself is only five modules:
+The package `topic_compirt/` itself is only four modules:
 `topics.py` (data plumbing), `pyramidal.py` (Stage 1 model), `compositional.py`
-(Stage 2 model), `evaluation.py` (plots/metrics), `common.py` (SVI + helpers).
+(Stage 2 model), and `evaluation.py` (plots/metrics). The SVI loop and CSV
+helpers it used to keep in `common.py` now live in the shared `utils/` package.
 
 ---
 
@@ -167,21 +168,25 @@ The output tensor is stored as `data["topic_weight"]` and indexed *by tossup* or
 
 ## 4. Shared infrastructure
 
-### 4a. `topic_compirt/common.py`
+### 4a. Shared `utils/` helpers
 
-- **`add_repo_root_to_path()`** inserts the repo root on `sys.path` so the
-  topic-side scripts can `import compirt_data`, `compositional_model`, etc. from
-  the root project. (This is why the training scripts call it before their
-  root imports.)
-- **`fit_svi(model, model_args, n_steps, lr)`** is the standard training loop
-  used by both stages: clears the Pyro param store, builds an **`AutoNormal`**
-  mean-field guide, runs **`SVI`** with **`ClippedAdam`** against **`Trace_ELBO`**,
-  logs ELBO every 100 steps, and returns **`guide.median(*model_args)`** (the
-  posterior point estimates) plus the loss trace. Both stages get their
-  "posterior" from this single function.
-- **`tensor_values`** / **`add_numbered_tensor_columns`** — detach→CPU→NumPy and
-  expand a $(\text{rows}, \text{dims})$ tensor into columns like
-  `theta_1, theta_2, …` for CSV output.
+These live in the repo-root `utils/` package and are shared by every model
+family (the topic pipeline no longer has its own `topic_compirt/common.py`;
+those helpers were promoted into `utils/` in the shared-utils refactor). The
+scripts run as modules from the repo root (`python -m topic.fixed...`), so there
+is no longer an `add_repo_root_to_path()` `sys.path` shim.
+
+- **`utils/training.py`** — **`fit_svi(model, model_args, n_steps, lr)`** is the
+  standard training loop used by both stages: clears the Pyro param store, builds
+  an **`AutoNormal`** mean-field guide, runs **`SVI`** with **`ClippedAdam`**
+  against **`Trace_ELBO`**, logs ELBO periodically, and returns
+  **`guide.median(*model_args)`** (the posterior point estimates) plus the loss
+  trace. Both stages get their "posterior" from this single function.
+  `require_device` also lives here.
+- **`utils/saving.py`** — **`tensor_values`** / **`add_numbered_tensor_columns`**
+  detach→CPU→NumPy and expand a $(\text{rows}, \text{dims})$ tensor into columns
+  like `theta_1, theta_2, …` for CSV output, alongside the parameter/ranking/loss
+  writers.
 
 ### 4b. Reused root data builders — `compirt_data.py`
 

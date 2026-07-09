@@ -9,10 +9,10 @@ from lineup import LineupIndex, build_lineup_segments
 
 
 def make_tables(roster, buzzes, opponent=("opp1",), bonus_questions=()):
-    """Build the smallest linked tables for one game of team ``A``.
+    """Build the smallest linked tables for one game of team 'A'.
 
-    ``roster`` is team A's registered players; ``buzzes`` is a list of
-    ``(player_id, question_num)`` buzzes by team A; ``bonus_questions`` adds a
+    'roster' is team A's registered players; 'buzzes' is a list of
+    '(player_id, question_num)' buzzes by team A; 'bonus_questions' adds a
     team-A bonus response at each listed question number.
     """
     question_nums = sorted({q for _, q in buzzes} | set(bonus_questions)) or [1]

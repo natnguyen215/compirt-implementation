@@ -8,7 +8,6 @@
 | accuracy | 0.850018 | 0.854396 | 0.00437798 | synergy |
 | part_accuracy | 0.850018 | 0.854396 | 0.00437798 | synergy |
 | exact_acc | 0.604112 | 0.614401 | 0.0102888 | synergy |
-| rounded_score_accuracy | 0.599729 | 0.614219 | 0.0144904 | synergy |
 | per_bonus_points_mae | 4.87328 | 4.66279 | -0.210484 | synergy |
 | ppb_mae | 2.17029 | 1.67029 | -0.499999 | synergy |
 
