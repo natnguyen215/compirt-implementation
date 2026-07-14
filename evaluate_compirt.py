@@ -13,10 +13,12 @@ Shared building blocks live in 'compirt_eval.metrics' (metric/curve math) and
 'compirt_eval.figures' (plotting primitives).
 
 Important: these functions are model-agnostic and simply consume the saved
-prediction CSVs. When fed a single-split run they report in-sample fit (useful for
-optimization checks and model inspection); when fed the predictions from a held-out
-pass ('run_scripts/run_compirt_holdout.py', which trains on one split and predicts
-the next) the same metrics are genuine held-out Scenario A/B estimates.
+prediction CSVs. When fed a single-split run they report in-sample fit (useful
+for optimization checks and model inspection). The temporal test runner uses
+training posteriors as returning-player priors, then co-estimates test-player
+and test-item parameters transductively as specified in paper Section 4.2. Its
+metrics therefore measure a future tournament split under transductive
+psychometric estimation, not fully inductive prediction of unseen questions.
 """
 
 from __future__ import annotations

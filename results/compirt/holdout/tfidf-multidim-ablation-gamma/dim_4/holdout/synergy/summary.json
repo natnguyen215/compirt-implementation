@@ -1,0 +1,21 @@
+{
+  "split": "year_2025",
+  "tournament": "",
+  "steps": 2000,
+  "lr": 0.01,
+  "seed": 42,
+  "final_loss": 83940.81754529476,
+  "use_synergy": true,
+  "synergy_dimensions": 1,
+  "saved_synergy_details": false,
+  "calibrate_correctness": false,
+  "alpha_prior": "gamma",
+  "skill_dimensions": 4,
+  "bonus_part_observations": 181362,
+  "bonus_parts": 4716,
+  "tau": 0.21920739114284515,
+  "mean_synergy_contribution": -0.7787938714027405,
+  "median_synergy_contribution": -0.737216055393219,
+  "negative_synergy_fraction": 0.8563205081549607,
+  "positive_synergy_fraction": 0.11929731696827339
+}

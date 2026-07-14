@@ -114,7 +114,10 @@ def log_survival(theta, alpha, beta, gamma, mu, c, t_star, T_j):
     # Build one shared token-position grid: [1, 2, ..., max_t].
     max_t = int(t_star.max().item())
     positions = torch.arange(1, max_t + 1, device=t_star.device).unsqueeze(0)
-    # 'before_stop' is True only for positions that count for each row.
+    # Paper Eq. 6 defines S(t) strictly before t, and Eq. 13 assigns a dead
+    # tossup S(T_j). Thus a NO-BUZZ row intentionally includes positions
+    # 1 through T_j - 1 under the paper's indexing convention. Making this mask
+    # inclusive would change the published likelihood.
     # Shape: '(n_rows, max_t)' after broadcasting.
     before_stop = positions < t_star.unsqueeze(1)
 

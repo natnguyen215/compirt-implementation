@@ -99,14 +99,6 @@ def _normalized_cumulative(values: Sequence[float], max_length: int) -> list[flo
     return prefix
 
 
-def _padded_token_scores(values: Sequence[float], max_length: int) -> list[float]:
-    """Return per-token values padded with zeros after the tossup ends."""
-    return [
-        float(values[position]) if position < len(values) else 0.0
-        for position in range(max_length)
-    ]
-
-
 def build_tfidf_feature_matrices(
     tossups,
     tossup_ids: Sequence[str],
@@ -114,17 +106,15 @@ def build_tfidf_feature_matrices(
     max_length: int,
     normalize: bool = True,
     device: str | torch.device = "cpu",
-) -> tuple[torch.Tensor, torch.Tensor, dict[str, object]]:
-    """Return cumulative and local TF-IDF clue matrices aligned to tossup ids.
+) -> tuple[torch.Tensor, dict[str, object]]:
+    """Return cumulative TF-IDF clue matrices aligned to tossup ids.
 
-    Returns '(prefix, token, summary)':
+    Returns '(prefix, summary)':
 
     * 'prefix[j, t]' is cumulative TF-IDF revealed through token 't'. With
       'normalize=True' each nonempty tossup ends at 1.0.
-    * 'token[j, t]' is the TF-IDF weight of the token at position 't' and is
-      zero after the tossup ends. It is used by the hazard-spike variant.
 
-    Both matrices have shape '(len(tossup_ids), max_length)'.
+    The matrix has shape '(len(tossup_ids), max_length)'.
     """
     if max_length < 1:
         raise ValueError("max_length must be at least 1")
@@ -135,7 +125,6 @@ def build_tfidf_feature_matrices(
     prefix = torch.zeros(
         (len(tossup_ids), max_length), dtype=torch.float32, device=device
     )
-    token_matrix = torch.zeros_like(prefix)
     raw_final_scores: list[float] = []
     for row, tokens in enumerate(ordered_tokens):
         counts = Counter(tokens)
@@ -149,12 +138,7 @@ def build_tfidf_feature_matrices(
             if normalize
             else _padded_cumulative(token_scores, max_length)
         )
-        token_values = _padded_token_scores(token_scores, max_length)
-
         prefix[row] = torch.tensor(prefix_values, dtype=torch.float32, device=device)
-        token_matrix[row] = torch.tensor(
-            token_values, dtype=torch.float32, device=device
-        )
 
     nonempty = [score for score in raw_final_scores if score > 0.0]
     summary = {
@@ -166,7 +150,7 @@ def build_tfidf_feature_matrices(
         "nonempty_tossups": len(nonempty),
         "mean_raw_final_tfidf": sum(nonempty) / len(nonempty) if nonempty else 0.0,
     }
-    return prefix, token_matrix, summary
+    return prefix, summary
 
 
 def attach_tfidf_prefix_scores(
@@ -176,8 +160,8 @@ def attach_tfidf_prefix_scores(
     normalize: bool = True,
     device: str | torch.device = "cpu",
 ) -> dict[str, object]:
-    """Attach TF-IDF prefix/token feature matrices and return feature metadata."""
-    prefix, token_matrix, summary = build_tfidf_feature_matrices(
+    """Attach cumulative TF-IDF prefix features and return feature metadata."""
+    prefix, summary = build_tfidf_feature_matrices(
         tables["tossups"],
         data["tossup_ids"],
         max_length=int(data["T_j"].max().item()),
@@ -185,5 +169,4 @@ def attach_tfidf_prefix_scores(
         device=device,
     )
     data["tfidf_prefix"] = prefix
-    data["tfidf_token"] = token_matrix
     return summary

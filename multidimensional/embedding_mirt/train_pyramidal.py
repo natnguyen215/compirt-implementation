@@ -3,7 +3,7 @@
 This mirrors 'multidimensional/multidim_mirt/train_pyramidal.py' but imports
 'multidimensional.embedding_mirt.pyramidal_model' and attaches each tossup's frozen Qwen3
 embedding (from 'embed_questions.py') so 'r' is computed from question content
-instead of sampled as a free 'alpha'. In addition to the usual player/tossup
+instead of sampled as a free Gamma vector. In addition to the usual player/tossup
 CSVs, it saves the fitted 'r' projection ('r_projection.npz') so
 'train_compositional.py' can reuse the exact same transform on bonus text.
 

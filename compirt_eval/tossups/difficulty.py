@@ -26,6 +26,7 @@ from compirt_eval.tossups.parameters import (
     _vector_weight_name,
     difficulty_adjustment_at,
     load_difficulty_adjustment_curves,
+    load_difficulty_link,
 )
 
 
@@ -78,12 +79,14 @@ def difficulty_plot(results_dir, output_dir):
     parameters = pd.read_csv(results_dir / "tossups.csv").set_index("tossup_id")
     predictions = pd.read_csv(results_dir / "tossup_predictions.csv")
     adjustments = load_difficulty_adjustment_curves(results_dir)
+    link = load_difficulty_link(results_dir)
     positions = np.linspace(0.0, 1.0, 200)
     selected = [
         tossup_id
         for tossup_id in selected_tossups(predictions)
         if tossup_id in parameters.index
-        and _saved_difficulty_curve(parameters.loc[tossup_id], positions) is not None
+        and _saved_difficulty_curve(parameters.loc[tossup_id], positions, link)
+        is not None
     ]
 
     if not selected:
@@ -93,7 +96,7 @@ def difficulty_plot(results_dir, output_dir):
     fig, axes = plt.subplots(rows, columns, figsize=(12, 3.7 * rows), squeeze=False)
     for ax, tossup_id in zip(axes.flat, selected):
         row = parameters.loc[tossup_id]
-        difficulty = _saved_difficulty_curve(row, positions)
+        difficulty = _saved_difficulty_curve(row, positions, link)
         buzz_positions = predictions.loc[
             (predictions["tossup_id"] == tossup_id) & (predictions["z"] == "BUZZ"),
             "relative_position",
@@ -173,6 +176,7 @@ def multidim_difficulty_components_plot(results_dir, output_dir):
         return
     parameters = pd.read_csv(required[0]).set_index("tossup_id")
     predictions = pd.read_csv(required[1])
+    link = load_difficulty_link(results_dir)
     columns = _parameter_columns(parameters)
     if not all(columns[name] for name in ("alpha", "beta", "gamma", "mu")):
         return
@@ -196,7 +200,7 @@ def multidim_difficulty_components_plot(results_dir, output_dir):
     for ax, tossup_id in zip(axes.flat, selected):
         row = parameters.loc[tossup_id]
         per_dimension, difficulty = _multidim_difficulty_components(
-            row, columns, positions
+            row, columns, positions, link
         )
         alpha = row[columns["alpha"]].to_numpy(dtype=float)
         buzz_positions = predictions.loc[

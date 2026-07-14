@@ -8,8 +8,8 @@
 
 ## Bonus Metrics
 
-| auc | log_loss | ece | accuracy | part_accuracy | exact_acc | rounded_score_accuracy | per_bonus_points_mae | ppb_mae |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0.912869 | 0.390657 | 0.0609813 | 0.833841 | 0.833841 | 0.566348 | 0.569507 | 5.07282 | 1.81531 |
+| auc | log_loss | ece | accuracy | part_accuracy | exact_acc | per_bonus_points_mae | ppb_mae |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.912869 | 0.390657 | 0.0609813 | 0.833841 | 0.833841 | 0.566348 | 5.07282 | 1.81531 |
 
 Generated figures match the standard CompIRT evaluation set. The first-buzz timing replay uses the CAIMIRA topic-gap formula `sum_k r_jk * (theta_ik - d_jk(t))`.

@@ -36,7 +36,6 @@ This file consolidates the metric CSVs, bonus-model comparison deltas, and fitte
 | ece | 0.0588322 |
 | part_accuracy | 0.825327 |
 | exact_score_accuracy | 0.546217 |
-| rounded_score_accuracy | 0.549409 |
 | per_bonus_points_mae | 5.25443 |
 | ppb_mae | 2.49759 |
 | accuracy | 0.825327 |

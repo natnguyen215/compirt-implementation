@@ -1,0 +1,13 @@
+{
+  "tournament": "2024-acf-nationals",
+  "actual_players_after_floor": 187,
+  "actual_rank_mode": "ppg",
+  "actual_rank_metric": "actual_ppg",
+  "min_games": 1,
+  "min_tuh": 1,
+  "min_game_tossups": 20,
+  "tournament_model_matches": 184,
+  "tournament_rank_correlation": 0.4548673626203167,
+  "actual_top_20_in_tournament_model_rank_top_20": "4/20",
+  "actual_top_50_in_tournament_model_rank_top_50": "18/50"
+}

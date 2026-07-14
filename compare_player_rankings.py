@@ -1,9 +1,9 @@
 """Compare fitted player rankings to tournament individual scoring.
 
 The fitted 'top_players.csv' ranks players by mean predicted correctness on
-their observed buzzes. Public quizbowl standings usually rank by scoring volume
-or points per tossup heard, so this script joins both views for a named
-tournament and writes a compact audit report.
+their observed buzzes. The public 2024 ACF Nationals player standings are
+ordered by points per game (PPG), so that is the default real-world comparator.
+Points per 20 tossups heard (PP20) remains available for analyses that need it.
 """
 
 from __future__ import annotations
@@ -25,6 +25,7 @@ DEFAULT_PREDICTIONS = (
     ROOT / "results" / "cuda-all-2024" / "pyramidal" / "tossup_predictions.csv"
 )
 DEFAULT_OUTPUT_DIR = ROOT / "results" / "cuda-all-2024" / "ranking_comparison"
+ACTUAL_RANK_MODES = ("ppg", "pp20")
 
 
 def read_global_model(path: Path) -> dict[str, dict[str, float | int]]:
@@ -90,10 +91,25 @@ def read_tournament_model(path: Path, tournament: str) -> dict[str, dict[str, fl
 
 
 def actual_tournament_stats(
-    database: Path, tournament: str, min_games: int, min_tuh: int
+    database: Path,
+    tournament: str,
+    min_games: int,
+    min_tuh: int,
+    rank_mode: str = "ppg",
+    min_game_tossups: int = 1,
 ) -> list[dict[str, float | int | str]]:
-    """Return tournament individual scoring from the source SQLite database."""
-    query = """
+    """Return tournament individual scoring ranked by the selected public metric."""
+    rank_expressions = {
+        "ppg": "actual_points / nullif(games, 0)",
+        "pp20": "20.0 * actual_points / nullif(tuh, 0)",
+    }
+    try:
+        rank_expression = rank_expressions[rank_mode]
+    except KeyError as error:
+        choices = ", ".join(ACTUAL_RANK_MODES)
+        raise ValueError(f"Unknown rank mode {rank_mode!r}; choose one of: {choices}") from error
+
+    query = f"""
     with eligible_games as (
       select g.id, g.tossups_read, g.team_one_id, g.team_two_id
       from game g
@@ -101,7 +117,9 @@ def actual_tournament_stats(
       join tournament t on t.id = r.tournament_id
       where t.slug = ?
         and coalesce(r.exclude_from_individual, 0) = 0
-        and g.tossups_read > 0
+        -- The Nationals batch uses 20 here to exclude its local 12-tossup
+        -- Team 1/Team 2 test game; this is game validation, not player eligibility.
+        and g.tossups_read >= ?
     ),
     game_totals as (
       select p.id as player_db_id, p.name, p.slug as player_id, tm.name as team_name,
@@ -128,11 +146,12 @@ def actual_tournament_stats(
     ),
     ranked as (
       select row_number() over (
-               order by 20.0 * actual_points / nullif(tuh, 0) desc,
+               order by {rank_expression} desc,
                         actual_points desc,
                         player_id
              ) as actual_rank,
              name, player_id, team_name, games, tuh, actual_points, gets, negs,
+             actual_points / nullif(games, 0) as actual_ppg,
              20.0 * actual_points / nullif(tuh, 0) as actual_pp20
       from player_totals
     )
@@ -141,7 +160,12 @@ def actual_tournament_stats(
     connection = sqlite3.connect(database)
     connection.row_factory = sqlite3.Row
     try:
-        return [dict(row) for row in connection.execute(query, (tournament, min_games, min_tuh))]
+        return [
+            dict(row)
+            for row in connection.execute(
+                query, (tournament, min_game_tossups, min_games, min_tuh)
+            )
+        ]
     finally:
         connection.close()
 
@@ -184,6 +208,18 @@ def overlap_count(
     return len(actual & model)
 
 
+def tournament_overlap_summary(
+    rows: list[dict[str, object]], *, cutoffs: tuple[int, ...] = (20, 50)
+) -> dict[str, str]:
+    """Return only like-for-like actual/model tournament-rank overlaps."""
+    return {
+        f"actual_top_{cutoff}_in_tournament_model_rank_top_{cutoff}": (
+            f"{overlap_count(rows, cutoff, 'tournament_model_rank', cutoff)}/{cutoff}"
+        )
+        for cutoff in dict.fromkeys(cutoffs)
+    }
+
+
 def format_value(value: object) -> str:
     """Render values for Markdown tables."""
     if value is None:
@@ -221,6 +257,7 @@ def write_outputs(
         "actual_points",
         "gets",
         "negs",
+        "actual_ppg",
         "actual_pp20",
         "global_model_rank",
         "global_fitted_correctness",
@@ -246,6 +283,7 @@ def write_outputs(
         "actual_rank",
         "name",
         "team_name",
+        "actual_ppg",
         "actual_pp20",
         "actual_points",
         "global_model_rank",
@@ -258,18 +296,45 @@ def write_outputs(
         [row for row in rows if row.get("tournament_model_rank") not in (None, "")],
         key=lambda row: int(row["tournament_model_rank"]),
     )[:25]
+    rank_mode = str(summary["actual_rank_mode"])
+    min_game_tossups = int(summary["min_game_tossups"])
+    if rank_mode == "ppg":
+        ranking_method = (
+            "This report uses `actual_ppg` (`actual_points / games`) as its real "
+            "rank metric."
+        )
+    else:
+        ranking_method = (
+            "This report uses `actual_pp20` (`20 * actual_points / tossups_heard`) "
+            "as its real rank metric."
+        )
+    if min_game_tossups > 1:
+        game_filter_note = (
+            f"Only games with at least `{min_game_tossups}` tossups are included "
+            "as a source-data integrity filter; this is separate from player "
+            "eligibility."
+        )
+    else:
+        game_filter_note = "All recorded games with at least one tossup are included."
     report = [
         f"# Player Ranking Comparison: {summary['tournament']}",
         "",
         "The real-world comparator here is tournament individual scoring from "
-        "the source database, ranked by points per 20 tossups heard. The fitted "
+        "the source database. The default `ppg` mode follows the public "
+        "[2024 ACF Nationals player standings](https://quizbowlstats.com/tournaments/2045), "
+        "which are ordered by points per game and do not state a minimum-games "
+        "or minimum-TUH eligibility floor. The fitted "
         "model ranks players by mean predicted correctness on observed buzzes, "
         "so it rewards accuracy more than scoring volume.",
         "",
+        ranking_method,
+        "",
+        game_filter_note,
+        "",
         "Caveat: the source database does not include game-specific lineups, so "
-        "tossups heard are inferred from registered rosters. That matches the "
-        "modeling assumption used by this project, but it can blur players who "
-        "did not play every game for their listed team.",
+        "games played and tossups heard are inferred from registered rosters. "
+        "That matches the modeling assumption used by this project, but can "
+        "blur players who did not play every game for their listed team.",
         "",
         "## Summary",
         "",
@@ -303,15 +368,51 @@ def main() -> None:
     parser.add_argument("--top-players", type=Path, default=DEFAULT_TOP_PLAYERS)
     parser.add_argument("--predictions", type=Path, default=DEFAULT_PREDICTIONS)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
-    parser.add_argument("--min-games", type=int, default=8)
-    parser.add_argument("--min-tuh", type=int, default=160)
+    parser.add_argument(
+        "--actual-rank-mode",
+        choices=ACTUAL_RANK_MODES,
+        default="ppg",
+        help="Real-ranking metric: public-standings PPG (default) or PP20",
+    )
+    parser.add_argument(
+        "--min-games",
+        type=int,
+        default=1,
+        help="Optional eligibility floor; public 2024 standings state no floor",
+    )
+    parser.add_argument(
+        "--min-tuh",
+        type=int,
+        default=1,
+        help="Optional eligibility floor; public 2024 standings state no floor",
+    )
+    parser.add_argument(
+        "--min-game-tossups",
+        type=int,
+        default=1,
+        help="Exclude incomplete games below this tossup count (default: include all)",
+    )
     parser.add_argument("--actual-top", type=int, default=20)
     args = parser.parse_args()
+    if (
+        args.min_games < 0
+        or args.min_tuh < 0
+        or args.min_game_tossups < 1
+        or args.actual_top < 1
+    ):
+        raise ValueError(
+            "Player thresholds must be non-negative, min-game-tossups and actual-top positive"
+        )
 
     global_model = read_global_model(args.top_players)
     tournament_model = read_tournament_model(args.predictions, args.tournament)
     actual = actual_tournament_stats(
-        args.database, args.tournament, args.min_games, args.min_tuh
+        args.database,
+        args.tournament,
+        args.min_games,
+        args.min_tuh,
+        args.actual_rank_mode,
+        args.min_game_tossups,
     )
     if not actual:
         raise ValueError(f"No actual scoring rows found for {args.tournament!r}")
@@ -320,26 +421,26 @@ def main() -> None:
         row.update(global_model.get(str(row["player_id"]), {}))
         row.update(tournament_model.get(str(row["player_id"]), {}))
 
-    global_matches = sum("global_model_rank" in row for row in actual)
     tournament_matches = sum("tournament_model_rank" in row for row in actual)
     summary: dict[str, object] = {
         "tournament": args.tournament,
         "actual_players_after_floor": len(actual),
+        "actual_rank_mode": args.actual_rank_mode,
+        "actual_rank_metric": "actual_ppg"
+        if args.actual_rank_mode == "ppg"
+        else "actual_pp20",
         "min_games": args.min_games,
         "min_tuh": args.min_tuh,
-        "global_model_matches": global_matches,
+        "min_game_tossups": args.min_game_tossups,
         "tournament_model_matches": tournament_matches,
-        "global_rank_correlation": rank_correlation(actual, "global_model_rank"),
         "tournament_rank_correlation": rank_correlation(
             actual, "tournament_model_rank"
         ),
     }
-    for model_key in ("global_model_rank", "tournament_model_rank"):
-        for model_top in (20, 50, 100, 200):
-            summary[f"actual_top_{args.actual_top}_in_{model_key}_top_{model_top}"] = (
-                f"{overlap_count(actual, args.actual_top, model_key, model_top)}/"
-                f"{args.actual_top}"
-            )
+    # Global and tournament ranks are identical for these single-tournament
+    # in-sample runs. Keep only like-for-like tournament overlaps; cross-cutoff
+    # values such as actual top 20 in model top 200 are not informative.
+    summary.update(tournament_overlap_summary(actual, cutoffs=(args.actual_top, 50)))
 
     output_dir = args.output_dir / args.tournament
     write_outputs(actual, summary, output_dir)

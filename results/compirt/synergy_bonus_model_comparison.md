@@ -15,8 +15,8 @@ best value in each metric column.
 
 | Run | Bonus model | Topic/source | `cal` | AUC ↑ | log_loss ↓ | ECE ↓ | part_acc ↑ | exact_acc ↑ | PPB MAE ↓ |
 |---|---|---|:--:|--:|--:|--:|--:|--:|--:|
-| `all-2024` | synergy | none | ✗ | **0.9391** | **0.3285** | 0.0448 | **0.8587** | **0.6265** | 1.7620 |
-| `baseline-all2024-cal` | synergy | none | ✓ | 0.9327 | 0.3380 | 0.0341 | 0.8513 | 0.6089 | 1.7583 |
+| `all-2024` | synergy | none | ✗ | **0.9392** | **0.3278** | 0.0436 | **0.8590** | **0.6270** | 1.7408 |
+| `baseline-all2024-cal` | synergy | none | ✓ | 0.9332 | 0.3377 | 0.0363 | 0.8519 | 0.6100 | 1.7655 |
 | `plda-all2024` | synergy | PLDA 5d | ✗ | 0.9135 | 0.3937 | 0.0647 | 0.8340 | 0.5681 | 1.8853 |
 | `plda-all2024-cal` | synergy | PLDA 5d | ✓ | 0.9182 | 0.3645 | 0.0178 | 0.8381 | 0.5767 | 1.7387 |
 | `lda-all2024` | synergy | LDA 5d | ✗ | 0.9154 | 0.3865 | 0.0589 | 0.8361 | 0.5739 | 1.8686 |
@@ -25,8 +25,10 @@ best value in each metric column.
 | `category-all2024-cal` | synergy | one-hot category 13d | ✓ | 0.9196 | 0.3605 | 0.0112 | 0.8386 | 0.5795 | 1.7532 |
 | `learned-topic-all2024` | synergy | learned topic 5d | ✗ | 0.9161 | 0.3818 | 0.0526 | 0.8360 | 0.5731 | 1.8602 |
 | `learned-topic-all2024-cal` | synergy | learned topic 5d | ✓ | 0.9218 | 0.3558 | 0.0134 | 0.8410 | 0.5828 | 1.7138 |
-| `embedding-all2024` | synergy | embedding relevance 5d | ✗ | 0.9132 | 0.3808 | 0.0356 | 0.8305 | 0.5608 | 1.9067 |
-| `embedding-all2024-cal` | synergy | embedding relevance 5d | ✓ | 0.9171 | 0.3652 | **0.0112** | 0.8345 | 0.5697 | 1.7317 |
+| `learned-topic-tfidf-all2024` | synergy | learned topic + TF-IDF 5d | ✗ | 0.9193 | 0.3774 | 0.0566 | 0.8397 | 0.5808 | 1.7593 |
+| `learned-topic-tfidf-all2024-cal` | synergy | learned topic + TF-IDF 5d | ✓ | 0.9216 | 0.3564 | 0.0138 | 0.8412 | 0.5829 | 1.7238 |
+| `embedding-all2024-projection` | synergy | embedding relevance 5d | ✗ | 0.9132 | 0.3808 | 0.0356 | 0.8305 | 0.5608 | 1.9067 |
+| `embedding-all2024-cal-projection` | synergy | embedding relevance 5d | ✓ | 0.9171 | 0.3652 | **0.0112** | 0.8345 | 0.5697 | 1.7317 |
 | `multidim-all2024` | synergy | multidim MIRT 5d | ✗ | 0.9361 | 0.3351 | 0.0434 | 0.8546 | 0.6154 | 1.7864 |
 | `multidim-all2024-cal` | synergy | multidim MIRT 5d | ✓ | 0.9370 | 0.3289 | 0.0372 | 0.8568 | 0.6226 | 1.7463 |
 | `tfidf-cumulative-difficulty-all2024` | synergy | TF-IDF cumulative difficulty 5d | ✗ | 0.9326 | 0.3395 | 0.0355 | 0.8520 | 0.6095 | 1.6889 |
@@ -38,16 +40,19 @@ The uncalibrated no-topic baseline is strongest on in-sample bonus
 classification metrics: AUC, log loss, part accuracy, and strict exact accuracy.
 Calibrated multidim TF-IDF cumulative difficulty has the best PPB MAE, and
 calibrated embedding-relevance has the best ECE by a very small margin over
-calibrated category at full precision. The TF-IDF cumulative rows improve on
-many structured-topic rows, but neither displaces baseline or calibrated
-multidim on the classification metrics.
+calibrated category at full precision. The learned-topic TF-IDF rows are broadly
+comparable to their learned-topic counterparts: the uncalibrated version
+improves several classification metrics but not ECE, while calibration preserves
+similar classification quality. The scalar TF-IDF cumulative rows improve on
+many structured-topic rows, but neither TF-IDF family displaces baseline or
+calibrated multidim on the classification metrics.
 
 ## In-Sample Tossup Stage Metrics (Stage 1)
 
 | Run | Topic/source | `cal` | AUC ↑ | log_loss ↓ | ECE ↓ | acc ↑ | buzz MAE ↓ |
 |---|---|:--:|--:|--:|--:|--:|--:|
-| `all-2024` | none | ✗ | **0.7037** | 0.5804 | 0.1515 | 0.7059 | 0.1388 |
-| `baseline-all2024-cal` | none | ✓ | 0.6698 | **0.5092** | 0.0101 | **0.7714** | 0.1332 |
+| `all-2024` | none | ✗ | 0.7014 | 0.5796 | 0.1491 | 0.7060 | 0.1390 |
+| `baseline-all2024-cal` | none | ✓ | 0.6699 | **0.5089** | 0.0066 | **0.7723** | 0.1328 |
 | `plda-all2024` | PLDA 5d | ✗ | 0.6631 | 0.6118 | 0.1817 | 0.6762 | 0.1609 |
 | `plda-all2024-cal` | PLDA 5d | ✓ | 0.6315 | 0.5229 | 0.0116 | 0.7679 | 0.1555 |
 | `lda-all2024` | LDA 5d | ✗ | 0.6657 | 0.6083 | 0.1768 | 0.6806 | 0.1577 |
@@ -56,10 +61,12 @@ multidim on the classification metrics.
 | `category-all2024-cal` | one-hot category 13d | ✓ | 0.6139 | 0.5275 | **0.0054** | 0.7675 | 0.1416 |
 | `learned-topic-all2024` | learned topic 5d | ✗ | 0.6734 | 0.6085 | 0.1771 | 0.6817 | 0.1519 |
 | `learned-topic-all2024-cal` | learned topic 5d | ✓ | 0.6306 | 0.5229 | 0.0104 | 0.7680 | 0.1447 |
-| `embedding-all2024` | embedding relevance 5d | ✗ | 0.6534 | 0.6188 | 0.1620 | 0.6800 | 0.1514 |
-| `embedding-all2024-cal` | embedding relevance 5d | ✓ | 0.6519 | 0.5152 | 0.0117 | 0.7713 | 0.1456 |
-| `multidim-all2024` | multidim MIRT 5d | ✗ | 0.7025 | 0.5754 | 0.1282 | 0.7171 | 0.1288 |
-| `multidim-all2024-cal` | multidim MIRT 5d | ✓ | 0.6572 | 0.5134 | 0.0080 | **0.7714** | 0.1248 |
+| `learned-topic-tfidf-all2024` | learned topic + TF-IDF 5d | ✗ | 0.6723 | 0.5549 | 0.1056 | 0.7258 | 0.1443 |
+| `learned-topic-tfidf-all2024-cal` | learned topic + TF-IDF 5d | ✓ | 0.6223 | 0.5252 | 0.0041 | 0.7675 | 0.1437 |
+| `embedding-all2024-projection` | embedding relevance 5d | ✗ | 0.6534 | 0.6188 | 0.1620 | 0.6800 | 0.1514 |
+| `embedding-all2024-cal-projection` | embedding relevance 5d | ✓ | 0.6519 | 0.5152 | 0.0117 | 0.7713 | 0.1456 |
+| `multidim-all2024` | multidim MIRT 5d | ✗ | **0.7025** | 0.5754 | 0.1282 | 0.7171 | 0.1288 |
+| `multidim-all2024-cal` | multidim MIRT 5d | ✓ | 0.6572 | 0.5134 | 0.0080 | 0.7714 | 0.1248 |
 | `tfidf-cumulative-difficulty-all2024` | TF-IDF cumulative difficulty 5d | ✗ | 0.6972 | 0.5563 | 0.1108 | 0.7258 | 0.1318 |
 | `tfidf-cumulative-difficulty-all2024-cal` | TF-IDF cumulative difficulty 5d | ✓ | 0.6484 | 0.5169 | 0.0092 | 0.7697 | 0.1301 |
 | `tfidf-multidim-cumulative-difficulty-all2024` | TF-IDF multidim cumulative difficulty 5d | ✗ | 0.7006 | 0.5742 | 0.1280 | 0.7169 | 0.1290 |
@@ -67,12 +74,14 @@ multidim on the classification metrics.
 
 Calibration sharply reduces tossup ECE and log loss in every family, but because
 the model is reoptimized with the calibration parameters, AUC can move too. The
-uncalibrated baseline keeps the best in-sample tossup AUC; calibrated baseline
-has the best log loss, category-calibrated has the best ECE, calibrated
-multidim ties the top accuracy after rounding to four decimals, and calibrated
-multidim TF-IDF cumulative has the best buzz MAE. The embedding-relevance rows
+uncalibrated multidim keeps the best in-sample tossup AUC; calibrated baseline
+has the best log loss and accuracy, category-calibrated has the best ECE, and
+calibrated multidim TF-IDF cumulative has the best buzz MAE. The embedding-relevance rows
 follow the broader calibrated pattern: calibration substantially improves log
 loss, ECE, and accuracy, while AUC is roughly flat.
+The learned-topic TF-IDF run improves uncalibrated learned-topic log loss, ECE,
+accuracy, and buzz timing. Its calibrated fit trades lower ECE and slightly
+better buzz timing for worse AUC, log loss, and accuracy than learned-topic-cal.
 The TF-IDF cumulative rows do not change the in-sample tossup-stage leaders
 except on buzz-position error.
 
@@ -89,8 +98,8 @@ matching the psychometric holdout setup used by the runners.
 
 | Run | Bonus model | Topic/source | `cal` | AUC ↑ | log_loss ↓ | ECE ↓ | part_acc ↑ | exact_acc ↑ | PPB MAE ↓ |
 |---|---|---|:--:|--:|--:|--:|--:|--:|--:|
-| `holdout-all-2024` | synergy | none | ✗ | **0.9388** | **0.3251** | 0.0366 | **0.8596** | **0.6274** | 1.6846 |
-| `holdout-all2024-cal` | synergy | none | ✓ | 0.9333 | 0.3334 | 0.0270 | 0.8544 | 0.6144 | 1.6703 |
+| `holdout-all-2024` | synergy | none | ✗ | **0.9384** | **0.3256** | 0.0358 | **0.8587** | **0.6241** | **1.6573** |
+| `holdout-all2024-cal` | synergy | none | ✓ | 0.9326 | 0.3359 | 0.0286 | 0.8529 | 0.6113 | 1.7030 |
 | `holdout-plda-all2024` | synergy | PLDA 5d | ✗ | 0.9129 | 0.3907 | 0.0610 | 0.8338 | 0.5663 | 1.8153 |
 | `holdout-plda-all2024-cal` | synergy | PLDA 5d | ✓ | 0.9188 | 0.3622 | 0.0158 | 0.8378 | 0.5741 | 1.6959 |
 | `holdout-lda-all2024` | synergy | LDA 5d | ✗ | 0.9174 | 0.3791 | 0.0556 | 0.8380 | 0.5754 | 1.7856 |
@@ -98,7 +107,9 @@ matching the psychometric holdout setup used by the runners.
 | `holdout-category-all2024` | synergy | one-hot category 13d | ✗ | 0.9218 | 0.3626 | 0.0385 | 0.8412 | 0.5816 | 1.7288 |
 | `holdout-category-all2024-cal` | synergy | one-hot category 13d | ✓ | 0.9238 | 0.3505 | **0.0116** | 0.8430 | 0.5863 | 1.6719 |
 | `holdout-learned-topic-all2024` | synergy | learned topic 5d | ✗ | 0.9179 | 0.3769 | 0.0527 | 0.8385 | 0.5762 | 1.7833 |
-| `holdout-learned-topic-all2024-cal` | synergy | learned topic 5d | ✓ | 0.9244 | 0.3493 | 0.0134 | 0.8447 | 0.5892 | **1.6658** |
+| `holdout-learned-topic-all2024-cal` | synergy | learned topic 5d | ✓ | 0.9244 | 0.3493 | 0.0134 | 0.8447 | 0.5892 | 1.6658 |
+| `holdout-learned-topic-tfidf-all2024` | synergy | learned topic + TF-IDF 5d | ✗ | 0.9206 | 0.3726 | 0.0560 | 0.8420 | 0.5837 | 1.6915 |
+| `holdout-learned-topic-tfidf-all2024-cal` | synergy | learned topic + TF-IDF 5d | ✓ | 0.9245 | 0.3490 | 0.0138 | 0.8440 | 0.5881 | **1.6549** |
 | `holdout-multidim-all2024` | synergy | multidim MIRT 5d | ✗ | 0.9358 | 0.3338 | 0.0400 | 0.8561 | 0.6178 | 1.7291 |
 | `holdout-multidim-all2024-cal` | synergy | multidim MIRT 5d | ✓ | 0.9361 | 0.3290 | 0.0315 | 0.8574 | 0.6218 | 1.7182 |
 | `holdout-tfidf-cumulative-difficulty-all2024` | synergy | TF-IDF cumulative difficulty 5d | ✗ | 0.9307 | 0.3400 | 0.0277 | 0.8503 | 0.6055 | 1.6691 |
@@ -106,20 +117,20 @@ matching the psychometric holdout setup used by the runners.
 
 The calibrated baseline holdout row is now a synergy run, not a no-synergy
 baseline. The uncalibrated baseline synergy run remains strongest on holdout
-bonus AUC, log loss, part accuracy, and exact accuracy. Among structured rows,
-calibrated multidim is closest to baseline on the classification metrics,
-calibrated learned-topic has the best PPB MAE, and calibrated category has the
-best ECE. The scalar TF-IDF cumulative holdout rows are competitive with the
-stronger structured variants: the uncalibrated row is close to learned-topic-cal
-on PPB MAE, while the calibrated row improves ECE but gives back a little
-discrimination and PPB accuracy.
+bonus AUC, log loss, part accuracy, and exact accuracy. The calibrated
+learned-topic TF-IDF run has the best PPB MAE. Among the other structured rows,
+calibrated multidim is closest to baseline on the classification metrics and
+calibrated category has the best ECE. The scalar TF-IDF cumulative holdout rows
+are competitive with the stronger structured variants: the uncalibrated row is
+close to learned-topic-cal on PPB MAE, while the calibrated row improves ECE
+but gives back a little discrimination and PPB accuracy.
 
 ### Holdout Tossup Stage Metrics (Stage 1)
 
 | Run | Topic/source | `cal` | AUC ↑ | log_loss ↓ | ECE ↓ | acc ↑ | buzz MAE ↓ | buzz MedAE ↓ |
 |---|---|:--:|--:|--:|--:|--:|--:|--:|
-| `holdout-all-2024` | none | ✗ | **0.6840** | 0.5938 | 0.1526 | 0.6985 | 0.1433 | 0.1238 |
-| `holdout-all2024-cal` | none | ✓ | 0.6351 | **0.5187** | 0.0099 | **0.7715** | 0.1368 | 0.1176 |
+| `holdout-all-2024` | none | ✗ | **0.6838** | 0.5913 | 0.1493 | 0.7011 | 0.1432 | 0.1236 |
+| `holdout-all2024-cal` | none | ✓ | 0.6306 | **0.5200** | 0.0119 | **0.7711** | 0.1373 | 0.1181 |
 | `holdout-plda-all2024` | PLDA 5d | ✗ | 0.6445 | 0.6291 | 0.1911 | 0.6641 | 0.1623 | 0.1446 |
 | `holdout-plda-all2024-cal` | PLDA 5d | ✓ | 0.5899 | 0.5296 | 0.0041 | 0.7703 | 0.1568 | 0.1403 |
 | `holdout-lda-all2024` | LDA 5d | ✗ | 0.6501 | 0.6208 | 0.1816 | 0.6729 | 0.1581 | 0.1403 |
@@ -128,6 +139,8 @@ discrimination and PPB accuracy.
 | `holdout-category-all2024-cal` | one-hot category 13d | ✓ | 0.5801 | 0.5312 | 0.0084 | 0.7704 | 0.1449 | 0.1276 |
 | `holdout-learned-topic-all2024` | learned topic 5d | ✗ | 0.6558 | 0.6212 | 0.1824 | 0.6732 | 0.1540 | 0.1358 |
 | `holdout-learned-topic-all2024-cal` | learned topic 5d | ✓ | 0.5973 | 0.5277 | **0.0024** | 0.7704 | 0.1470 | 0.1293 |
+| `holdout-learned-topic-tfidf-all2024` | learned topic + TF-IDF 5d | ✗ | 0.6449 | 0.5756 | 0.1164 | 0.7128 | 0.1466 | 0.1287 |
+| `holdout-learned-topic-tfidf-all2024-cal` | learned topic + TF-IDF 5d | ✓ | 0.5833 | 0.5307 | 0.0103 | 0.7704 | 0.1460 | 0.1282 |
 | `holdout-multidim-all2024` | multidim MIRT 5d | ✗ | 0.6742 | 0.5989 | 0.1401 | 0.7037 | 0.1345 | 0.1121 |
 | `holdout-multidim-all2024-cal` | multidim MIRT 5d | ✓ | 0.6245 | 0.5212 | 0.0064 | 0.7710 | **0.1309** | **0.1079** |
 | `holdout-tfidf-cumulative-difficulty-all2024` | TF-IDF cumulative difficulty 5d | ✗ | 0.6679 | 0.5851 | 0.1294 | 0.7094 | 0.1385 | 0.1193 |
@@ -148,8 +161,8 @@ only for AUC; negative is better for log loss, ECE, and PPB MAE.
 
 | Run | Topic/source | `cal` | ΔAUC ↑ | Δlog_loss ↓ | ΔECE ↓ | ΔPPB MAE ↓ |
 |---|---|:--:|--:|--:|--:|--:|
-| `holdout-all-2024` | none | ✗ | +0.0053 | -0.0125 | -0.0004 | -0.3948 |
-| `holdout-all2024-cal` | none | ✓ | +0.0024 | -0.0045 | +0.0016 | -0.5000 |
+| `holdout-all-2024` | none | ✗ | +0.0060 | -0.0144 | -0.0012 | -0.4656 |
+| `holdout-all2024-cal` | none | ✓ | +0.0031 | -0.0056 | +0.0018 | -0.4848 |
 | `holdout-plda-all2024` | PLDA 5d | ✗ | +0.0082 | -0.0189 | -0.0097 | -0.8635 |
 | `holdout-plda-all2024-cal` | PLDA 5d | ✓ | +0.0117 | -0.0223 | +0.0058 | -0.8303 |
 | `holdout-lda-all2024` | LDA 5d | ✗ | +0.0074 | -0.0175 | -0.0085 | -0.7770 |
@@ -158,18 +171,20 @@ only for AUC; negative is better for log loss, ECE, and PPB MAE.
 | `holdout-category-all2024-cal` | one-hot category 13d | ✓ | +0.0116 | -0.0229 | +0.0059 | -0.8127 |
 | `holdout-learned-topic-all2024` | learned topic 5d | ✗ | +0.0065 | -0.0148 | -0.0062 | -0.7143 |
 | `holdout-learned-topic-all2024-cal` | learned topic 5d | ✓ | +0.0088 | -0.0179 | +0.0047 | -0.6905 |
+| `holdout-learned-topic-tfidf-all2024` | learned topic + TF-IDF 5d | ✗ | +0.0049 | -0.0113 | -0.0005 | -0.4552 |
+| `holdout-learned-topic-tfidf-all2024-cal` | learned topic + TF-IDF 5d | ✓ | +0.0090 | -0.0180 | +0.0046 | -0.6986 |
 | `holdout-multidim-all2024` | multidim MIRT 5d | ✗ | +0.0090 | -0.0193 | +0.0016 | -0.6056 |
 | `holdout-multidim-all2024-cal` | multidim MIRT 5d | ✓ | +0.0018 | -0.0022 | +0.0028 | -0.4177 |
 | `holdout-tfidf-cumulative-difficulty-all2024` | TF-IDF cumulative difficulty 5d | ✗ | +0.0195 | -0.0383 | +0.0091 | -1.1474 |
 | `holdout-tfidf-cumulative-difficulty-all2024-cal` | TF-IDF cumulative difficulty 5d | ✓ | +0.0149 | -0.0305 | +0.0034 | -0.9564 |
 
 The synergy term improves holdout AUC, log loss, and PPB MAE for every run,
-including the newly available calibrated baseline and scalar TF-IDF cumulative
-holdouts. The TF-IDF cumulative runs show the largest synergy gains in AUC,
-log loss, and PPB MAE among the rows shown. The effect on ECE is mixed:
-uncalibrated rows often improve ECE, while calibrated rows and both scalar
-TF-IDF cumulative rows trade a small ECE increase for better discrimination,
-log loss, and PPB.
+including the calibrated baseline, scalar TF-IDF cumulative, and learned-topic
+TF-IDF holdouts. The scalar TF-IDF cumulative runs show the largest synergy
+gains in AUC, log loss, and PPB MAE among the rows shown. The effect on ECE is
+mixed: uncalibrated rows often improve ECE, while calibrated rows and both
+TF-IDF families can trade a small ECE increase for better discrimination, log
+loss, and PPB.
 
 ## What the `cal` Flag Does
 
@@ -193,11 +208,12 @@ the model, so calibration can change more than ECE; it can also move AUC,
 accuracy, and the learned synergy contribution.
 
 The effect on the synergy term is large. In-sample baseline mean synergy
-contribution moves from **-0.7585** without calibration (83.5% of rows negative)
-to **+0.2200** with calibration (38.2% negative, 58.7% positive). PLDA moves from
-**-0.8482** to **+0.0640**. Embedding-relevance moves from **-1.0022** to
-**+0.2070**. On the holdout baseline, the calibrated synergy run has mean
-contribution **+0.4065**.
+contribution moves from **-0.7388** without calibration (81.1% of rows negative)
+to **+0.2136** with calibration (36.7% negative, 60.2% positive). PLDA moves from
+**-0.8482** to **+0.0640**. Embedding-relevance (non-projection FFN variant;
+`embedding-all2024-projection` has no saved per-team synergy contributions)
+moves from **-0.9413** to **+0.1089**. On the holdout baseline, the calibrated
+synergy run has mean contribution **+0.3924**.
 
 ## Metrics
 

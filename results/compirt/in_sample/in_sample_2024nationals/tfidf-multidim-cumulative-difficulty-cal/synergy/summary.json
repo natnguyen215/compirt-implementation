@@ -1,0 +1,19 @@
+{
+  "tournament": "2024-acf-nationals",
+  "steps": 3000,
+  "final_loss": 10878.220886975527,
+  "use_synergy": true,
+  "synergy_dimensions": 3,
+  "saved_synergy_details": true,
+  "calibrate_correctness": true,
+  "skill_dimensions": 5,
+  "bonus_part_observations": 21051,
+  "bonus_parts": 1071,
+  "tau": 0.510719358921051,
+  "mean_synergy_contribution": 1.5111786127090454,
+  "median_synergy_contribution": 1.5289021730422974,
+  "negative_synergy_fraction": 0.0,
+  "positive_synergy_fraction": 0.9991449337323642,
+  "correctness_scale": 1.1866573095321655,
+  "correctness_bias": -0.4698871076107025
+}

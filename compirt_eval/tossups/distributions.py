@@ -28,6 +28,7 @@ from compirt_eval.tossups.parameters import (
     _vector_weight_name,
     difficulty_adjustment_at,
     load_difficulty_adjustment_curves,
+    load_difficulty_link,
 )
 
 
@@ -163,7 +164,7 @@ def _pyramidal_tossup_panels(tossups, alpha_columns):
     return panels
 
 
-def _difficulty_curve_distribution_plot(tossups, output_dir, adjustments=None):
+def _difficulty_curve_distribution_plot(tossups, output_dir, adjustments=None, link="sigmoid"):
     """Plot percentile bands across every learned tossup difficulty curve (Eq. 3).
 
     'adjustments' (saved signed TF-IDF difficulty deltas) shifts each tossup's
@@ -176,6 +177,7 @@ def _difficulty_curve_distribution_plot(tossups, output_dir, adjustments=None):
             tossups["gamma"].to_numpy()[:, None],
             tossups["mu"].to_numpy()[:, None],
             positions[None, :],
+            link,
         )
         label = "Median difficulty"
         ylabel = "Estimated difficulty"
@@ -192,6 +194,7 @@ def _difficulty_curve_distribution_plot(tossups, output_dir, adjustments=None):
             tossups[columns["gamma"]].to_numpy(dtype=float)[:, :, None],
             tossups[columns["mu"]].to_numpy(dtype=float)[:, :, None],
             positions[None, None, :],
+            link,
         )
         curves = (alpha * per_dimension).sum(axis=1)
         weight_name = _vector_weight_name(columns["alpha"])
@@ -279,7 +282,10 @@ def pyramidal_parameter_distribution_plots(results_dir, output_dir):
         )
 
     _difficulty_curve_distribution_plot(
-        tossups, output_dir, load_difficulty_adjustment_curves(results_dir)
+        tossups,
+        output_dir,
+        load_difficulty_adjustment_curves(results_dir),
+        load_difficulty_link(results_dir),
     )
 
     rows = []

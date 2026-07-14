@@ -208,6 +208,20 @@ class Determinism(unittest.TestCase):
 
 
 class ReuseAndInvariants(unittest.TestCase):
+    def test_metadata_lookup_uses_same_segment_as_roster_lookup(self):
+        tables = make_tables(
+            ["p1", "p2", "p3", "p4", "p5", "p6"],
+            [("p1", 1), ("p2", 2), ("p3", 11), ("p4", 12), ("p5", 13)],
+        )
+        index = LineupIndex.from_tables(tables)
+        record = index.record_for("g1", "A", 13)
+
+        self.assertIsNotNone(record)
+        self.assertEqual(record.segment, "second_half")
+        self.assertEqual(list(record.player_ids), index.roster_for("g1", "A", 13))
+        self.assertEqual(record.resolution_rule, "half_substitution")
+        self.assertEqual(record.distinct_game_buzzers, 5)
+
     def test_bonus_reuses_tossup_lineup(self):
         # Second-half bonus (q15) must match team A's second-half tossup lineup.
         tables = make_tables(

@@ -1,9 +1,12 @@
 {
   "model": "competing-risks",
+  "split": "year_2025",
   "tournament": "",
   "dimensions": 5,
   "steps": 5000,
-  "final_loss": 452589.64703023434,
+  "lr": 0.005,
+  "seed": 42,
+  "final_loss": 453235.5986264944,
   "players": 1755,
   "tossups": 1350,
   "events": 65443,
@@ -14,6 +17,6 @@
     "BUZZ": 64834,
     "NO-BUZZ": 4098
   },
-  "correctness_scale": 0.3059740662574768,
-  "correctness_bias": 2.3043668270111084
+  "correctness_scale": 0.29192373156547546,
+  "correctness_bias": 2.237471580505371
 }

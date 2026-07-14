@@ -1,0 +1,104 @@
+# CompIRT Run Log
+
+Generated: 2026-07-14T11:26:40-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- BONUS_STEPS: 2000
+- C1_C4_ITEM_STEPS: unknown
+- C1_C4_MIN_CROSS_TEAM_GAMES: unknown
+- C1_C4_SEED: unknown
+- CALIBRATE_CORRECTNESS: 0
+- DATABASE: unknown
+- DEVICE: cuda
+- DIFFICULTY_LINK: tanh
+- DIMENSIONS: 5
+- GPU: 1
+- HOLDOUT_COMPARISON_OUTPUT: results/compirt/holdout/multidim-tanh-all2024/holdout/comparison
+- HOLDOUT_COMPOSITIONAL_OUTPUT: results/compirt/holdout/multidim-tanh-all2024/holdout/compositional
+- HOLDOUT_EVALUATION_OUTPUT: results/compirt/holdout/multidim-tanh-all2024/holdout/evaluation
+- HOLDOUT_PYRAMIDAL_OUTPUT: results/compirt/holdout/multidim-tanh-all2024/holdout/pyramidal
+- HOLDOUT_SYNERGY_EVALUATION_OUTPUT: results/compirt/holdout/multidim-tanh-all2024/holdout/synergy-evaluation
+- HOLDOUT_SYNERGY_OUTPUT: results/compirt/holdout/multidim-tanh-all2024/holdout/synergy
+- LR: 0.01
+- MODEL: multidim
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- NEW_PLAYER_PRIOR: tier
+- NO_NORMALIZE_TFIDF: unknown
+- PREDICT_BUZZ_POSITIONS: 1
+- PYRAMIDAL_STEPS: 3000
+- PYTHON: /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python
+- ROOT: results/compirt/holdout/multidim-tanh-all2024
+- RUNNER: run_scripts/run_compirt_holdout.py
+- RUN_C1_C4: 0
+- RUN_SYNERGY: 1
+- SAVE_SYNERGY_DETAILS: 0
+- SYNERGY_DIMENSIONS: 3
+- TEST_SPLIT: year_2025
+- TFIDF_EFFECT_PRIOR_SCALE: unknown
+- TFIDF_PLOT_COUNT: unknown
+- TFIDF_VARIANT: unknown
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: <all>
+- TRAIN_PYRAMIDAL_OUTPUT: results/compirt/holdout/multidim-tanh-all2024/train/pyramidal
+- TRAIN_SPLIT: year_2024
+
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-all2024/train/pyramidal --dimensions 5 --difficulty-link tanh --predict-buzz-positions
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,819,443.4
+step  100  ELBO loss: 519,861.4
+step  200  ELBO loss: 482,949.9
+step  300  ELBO loss: 449,871.3
+step  400  ELBO loss: 414,917.7
+step  500  ELBO loss: 390,993.1
+step  600  ELBO loss: 379,370.9
+step  700  ELBO loss: 373,286.9
+step  800  ELBO loss: 369,844.4
+step  900  ELBO loss: 367,645.2
+step 1000  ELBO loss: 366,908.0
+step 1100  ELBO loss: 365,844.8
+step 1200  ELBO loss: 364,510.3
+step 1300  ELBO loss: 364,755.5
+step 1400  ELBO loss: 364,263.4
+step 1500  ELBO loss: 364,004.5
+step 1600  ELBO loss: 363,675.9
+step 1700  ELBO loss: 363,155.6
+step 1800  ELBO loss: 363,084.1
+step 1900  ELBO loss: 362,725.9
+step 2000  ELBO loss: 363,114.0
+step 2100  ELBO loss: 362,168.2
+step 2200  ELBO loss: 362,116.9
+step 2300  ELBO loss: 361,541.3
+step 2400  ELBO loss: 361,851.5
+step 2500  ELBO loss: 361,738.9
+step 2600  ELBO loss: 361,518.0
+step 2700  ELBO loss: 361,374.1
+step 2800  ELBO loss: 361,454.1
+step 2900  ELBO loss: 361,704.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-all2024/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-all2024/holdout/pyramidal --dimensions 5 --difficulty-link tanh --predict-buzz-positions
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 27,791,960.5
+step  100  ELBO loss: 1,068,455.7
+step  200  ELBO loss: 827,614.5
+step  300  ELBO loss: 668,380.3
+step  400  ELBO loss: 564,621.1
+step  500  ELBO loss: 507,884.6
+step  600  ELBO loss: 486,328.9
+step  700  ELBO loss: 479,318.3
+step  800  ELBO loss: 476,397.3
+step  900  ELBO loss: 474,174.3
+step 1000  ELBO loss: 473,757.2
+step 1100  ELBO loss: 472,152.1
+step 1200  ELBO loss: 471,508.8
+step 1300  ELBO loss: 470,760.8

@@ -14,6 +14,7 @@ module is the shared place that knows how to do both.
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import numpy as np
@@ -109,7 +110,7 @@ def _positive_log_series(frame, columns):
     return series
 
 
-def _multidim_effective_difficulty(tossup, positions):
+def _multidim_effective_difficulty(tossup, positions, link="sigmoid"):
     """Return sum_k alpha_jk * d_jk(t) from saved vector difficulty columns."""
     columns = _parameter_columns(tossup)
     _validate_tossup_multidim_dimensions(
@@ -124,11 +125,12 @@ def _multidim_effective_difficulty(tossup, positions):
         tossup[columns["gamma"]].to_numpy(dtype=float)[:, None],
         tossup[columns["mu"]].to_numpy(dtype=float)[:, None],
         np.asarray(positions, dtype=float)[None, :],
+        link,
     )
     return alpha @ per_dimension
 
 
-def _multidim_difficulty_components(tossup, columns, positions):
+def _multidim_difficulty_components(tossup, columns, positions, link="sigmoid"):
     """Return per-dimension difficulty curves and the alpha-weighted aggregate."""
     beta = tossup[columns["beta"]].to_numpy(dtype=float)
     gamma = tossup[columns["gamma"]].to_numpy(dtype=float)
@@ -140,8 +142,23 @@ def _multidim_difficulty_components(tossup, columns, positions):
         gamma[:, None],
         mu[:, None],
         positions[None, :],
+        link,
     )
     return per_dimension, alpha @ per_dimension
+
+
+def load_difficulty_link(results_dir):
+    """Return the difficulty-curve link a training run used.
+
+    Trainers that support the opt-in tanh link record 'difficulty_link' in
+    their 'summary.json'; every run without the key (all older runs and every
+    other family) used the sigmoid link.
+    """
+    path = Path(results_dir) / "summary.json"
+    if not path.exists():
+        return "sigmoid"
+    summary = json.loads(path.read_text(encoding="utf-8"))
+    return summary.get("difficulty_link", "sigmoid")
 
 
 def load_difficulty_adjustment_curves(results_dir):
@@ -182,7 +199,7 @@ def difficulty_adjustment_at(adjustments, tossup_id, positions):
     return np.interp(np.asarray(positions, dtype=float), grid, curve)
 
 
-def _saved_difficulty_curve(tossup, positions):
+def _saved_difficulty_curve(tossup, positions, link="sigmoid"):
     """Return scalar or alpha-weighted multidimensional difficulty, if present."""
     if {"beta", "gamma", "mu"}.issubset(tossup.index):
         return difficulty_curve(
@@ -190,10 +207,11 @@ def _saved_difficulty_curve(tossup, positions):
             float(tossup["gamma"]),
             float(tossup["mu"]),
             positions,
+            link,
         )
     columns = _parameter_columns(tossup)
     if all(columns[name] for name in ("alpha", "beta", "gamma", "mu")):
-        return _multidim_effective_difficulty(tossup, positions)
+        return _multidim_effective_difficulty(tossup, positions, link)
     return None
 
 

@@ -1,9 +1,12 @@
 {
   "model": "competing-risks",
+  "split": "year_2025",
   "tournament": "",
   "dimensions": 5,
   "steps": 5000,
-  "final_loss": 473270.12368011475,
+  "lr": 0.005,
+  "seed": 42,
+  "final_loss": 473104.64834594727,
   "players": 1755,
   "tossups": 1350,
   "events": 65443,

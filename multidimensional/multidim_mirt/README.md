@@ -4,12 +4,21 @@ This package contains the side-by-side MIRT-style tossup variant:
 
 ```text
 d_jk(t) = beta_jk * sigmoid(gamma_jk * (mu_jk - t / T_j))
-logit_ij(t) = sum_k alpha_jk * (theta_ik - d_jk(t))
+logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))
 hazard_ij(t) = logit_ij(t) - c_i
 ```
 
-The tossup dimension loadings use a positive `Gamma(2, 2)` prior on `alpha`,
-so higher player skill on a loaded dimension always helps.
+The sigmoid inside `d_jk(t)` is the default link; the opt-in
+`--difficulty-link tanh` trainer flag replaces it with tanh so the curve can go
+negative late in the question (`d_jk(t)` spans `(-beta_jk, beta_jk)` instead of
+`(0, beta_jk)`). The choice is recorded as `difficulty_link` in `summary.json`
+and `evaluate_compirt.py` auto-detects it when replaying curves. Runners pass
+it via the `DIFFICULTY_LINK` env var.
+
+The tossup relevance vector uses a positive `Gamma(2, 2)` prior on `r`, so
+higher player skill on a loaded dimension always helps. The weight is named `r`
+rather than the baseline's `alpha` because per-dimension difficulty puts it
+outside the skill gap; Stage 1 saves it as `r_1..K` columns.
 
 It keeps the root CompIRT pipeline shape:
 

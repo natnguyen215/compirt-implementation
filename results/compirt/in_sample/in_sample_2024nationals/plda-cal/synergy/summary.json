@@ -1,0 +1,30 @@
+{
+  "model": "topic-weighted-compositional",
+  "formula": "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * beta_bk",
+  "topic_vectors": "topic/fixed/outputs/plda/document_latent_vectors.csv",
+  "topic_dimensions": 5,
+  "topic_columns": [
+    "latent_topic_00",
+    "latent_topic_01",
+    "latent_topic_02",
+    "latent_topic_03",
+    "latent_topic_04"
+  ],
+  "tournament": "2024-acf-nationals",
+  "steps": 3000,
+  "final_loss": 10455.488319512457,
+  "use_synergy": true,
+  "synergy_dimensions": 3,
+  "saved_synergy_details": true,
+  "calibrate_correctness": true,
+  "skill_dimensions": 5,
+  "bonus_part_observations": 21051,
+  "bonus_parts": 1071,
+  "tau": 0.9640399217605591,
+  "mean_synergy_contribution": 0.3549650311470032,
+  "median_synergy_contribution": 0.39349365234375,
+  "negative_synergy_fraction": 0.01453612654980761,
+  "positive_synergy_fraction": 0.9846088071825566,
+  "correctness_scale": 2.1407485008239746,
+  "correctness_bias": -2.0991714000701904
+}

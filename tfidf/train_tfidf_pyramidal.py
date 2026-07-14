@@ -1,4 +1,4 @@
-"""Train one of the isolated TF-IDF-aware pyramidal tossup variants.
+"""Train the isolated cumulative TF-IDF-aware pyramidal tossup model.
 
 This mirrors the root 'train_pyramidal.py' but attaches precomputed TF-IDF clue
 features to the tensor dict and fits 'tfidf.pyramidal_tfidf_model'. The root
@@ -34,13 +34,10 @@ from compirt_data import (
 )
 from tfidf.pyramidal_tfidf_model import (
     CUMULATIVE_DIFFICULTY,
-    HAZARD_SPIKE,
-    REPLACE_POSITION,
     TFIDF_VARIANTS,
     competing_risks_model,
     expected_first_buzz_positions,
     posterior_row_predictions,
-    uses_tfidf_effect,
 )
 from tfidf.tfidf_features import attach_tfidf_prefix_scores
 from utils.saving import (
@@ -55,24 +52,14 @@ from holdout.player_priors import attach_player_priors, player_tier_map
 
 
 DEFAULT_OUTPUT_PARENT = REPO_ROOT / "results" / "compirt"
-FORMULAS = {
-    REPLACE_POSITION: (
-        "d_j(t) = beta_j * sigmoid(gamma_j * (mu_j - tfidf_prefix_j(t))); "
-        "hazard_ij(t) = theta_i^T alpha_j - d_j(t) - c_i"
-    ),
-    CUMULATIVE_DIFFICULTY: (
-        "d'_j(t) = d_j(t) - lambda_tfidf * tfidf_prefix_j(t); "
-        "hazard_ij(t) = theta_i^T alpha_j - d'_j(t) - c_i"
-    ),
-    HAZARD_SPIKE: (
-        "correctness_ij(t) = theta_i^T alpha_j - d_j(t); "
-        "hazard_ij(t) = correctness_ij(t) - c_i + eta_tfidf * tfidf(w_j,t)"
-    ),
-}
+FORMULA = (
+    "d'_j(t) = d_j(t) - lambda_tfidf * tfidf_prefix_j(t); "
+    "hazard_ij(t) = theta_i^T alpha_j - d'_j(t) - c_i"
+)
 
 
 def default_output_dir(tfidf_variant: str) -> Path:
-    """Return a variant-specific default output directory."""
+    """Return the cumulative TF-IDF default output directory."""
     return DEFAULT_OUTPUT_PARENT / f"tfidf-{tfidf_variant}-pyramidal"
 
 
@@ -84,19 +71,17 @@ def save_tfidf_adjustment_curves(
     tfidf_variant,
     n_points=201,
 ):
-    """Persist signed per-tossup difficulty deltas for 'cumulative-difficulty'.
+    """Persist signed per-tossup cumulative TF-IDF difficulty deltas.
 
     For 'cumulative-difficulty' the effective difficulty is:
 
         d'_j(t) = d_j(t) - lambda_tfidf * p_j(t)
 
     The saved adjustment is therefore negative. Evaluators add it to the base
-    difficulty curve to replay the effective curve. The other variants change
-    no difficulty term ('hazard-spike') or need no delta ('replace-position'),
-    so nothing is written for them.
+    difficulty curve to replay the effective curve.
     """
     if tfidf_variant != CUMULATIVE_DIFFICULTY:
-        return
+        raise ValueError("Only cumulative-difficulty is supported")
 
     lambda_tfidf = float(posterior["tfidf_clue_effect"].detach().cpu())
     prefix = data["tfidf_prefix"].detach().cpu().numpy()
@@ -121,7 +106,7 @@ def train_model(
     lr=0.02,
     calibrate_correctness=False,
     tfidf_effect_prior_scale=1.0,
-    tfidf_variant=REPLACE_POSITION,
+    tfidf_variant=CUMULATIVE_DIFFICULTY,
 ):
     """Fit the selected TF-IDF competing-risks model."""
     return fit_svi(
@@ -209,7 +194,7 @@ def run_experiment(args):
 
     # Attach fitted predictions back onto the readable observation rows; the
     # TF-IDF scores at each row's 't_star' ride along as diagnostics.
-    correct, hazard, survival, prefix_score, token_score = posterior_row_predictions(
+    correct, hazard, survival, prefix_score = posterior_row_predictions(
         data, posterior, args.calibrate_correctness, args.tfidf_variant
     )
     buzz_expected = (
@@ -218,8 +203,6 @@ def run_experiment(args):
         else None
     )
     extra_columns = {"tfidf_prefix_score": prefix_score}
-    if args.tfidf_variant == HAZARD_SPIKE:
-        extra_columns["tfidf_token_score"] = token_score
     save_tossup_predictions(
         args.output_dir,
         observations,
@@ -233,7 +216,7 @@ def run_experiment(args):
     summary = {
         "model": f"tfidf-{args.tfidf_variant}-pyramidal",
         "tfidf_variant": args.tfidf_variant,
-        "formula": FORMULAS[args.tfidf_variant],
+        "formula": FORMULA,
         "split": args.split,
         "tournament": args.tournament or "",
         "dimensions": args.dimensions,
@@ -253,16 +236,10 @@ def run_experiment(args):
         summary["train_posterior"] = str(args.train_posterior)
         summary["new_player_prior"] = args.new_player_prior
         summary["heldout_prior_summary"] = prior_summary
-    if uses_tfidf_effect(args.tfidf_variant):
-        summary["tfidf_effect_prior_scale"] = args.tfidf_effect_prior_scale
-    if args.tfidf_variant == CUMULATIVE_DIFFICULTY:
-        summary["tfidf_clue_effect"] = float(
-            posterior["tfidf_clue_effect"].detach().cpu()
-        )
-    if args.tfidf_variant == HAZARD_SPIKE:
-        summary["tfidf_hazard_effect"] = float(
-            posterior["tfidf_hazard_effect"].detach().cpu()
-        )
+    summary["tfidf_effect_prior_scale"] = args.tfidf_effect_prior_scale
+    summary["tfidf_clue_effect"] = float(
+        posterior["tfidf_clue_effect"].detach().cpu()
+    )
     write_summary(args.output_dir, summary, posterior)
     return summary
 
@@ -282,14 +259,14 @@ def parse_args():
     parser.add_argument(
         "--tfidf-variant",
         choices=TFIDF_VARIANTS,
-        default=REPLACE_POSITION,
-        help="Which requested TF-IDF formulation to train",
+        default=CUMULATIVE_DIFFICULTY,
+        help="Cumulative TF-IDF difficulty formulation",
     )
     parser.add_argument(
         "--tfidf-effect-prior-scale",
         type=float,
         default=1.0,
-        help="HalfNormal prior scale for cumulative/hazard TF-IDF effects",
+        help="HalfNormal prior scale for the cumulative TF-IDF effect",
     )
     parser.add_argument(
         "--no-normalize-tfidf",

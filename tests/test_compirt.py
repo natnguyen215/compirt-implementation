@@ -27,7 +27,12 @@ from compirt_eval.tossups import (
     multidim_difficulty_components_plot,
     pyramidal_parameter_distribution_plots,
 )
-from compositional_model import lse_aggregation, posterior_predictions, synergy_contribution
+from compositional_model import (
+    compositional_model,
+    lse_aggregation,
+    posterior_predictions,
+    synergy_contribution,
+)
 from evaluate_compirt import bonus_metrics, density_estimate, first_buzz_distribution
 from multidimensional.multidim_mirt.pyramidal_model import (
     competing_risks_model as multidim_competing_risks_model,
@@ -160,6 +165,22 @@ class DataTests(unittest.TestCase):
 
 
 class ModelTests(unittest.TestCase):
+    def test_bonus_alpha_uses_paper_normal_prior(self):
+        data = {
+            "part_ids": ["part-1"],
+            "part": torch.tensor([0]),
+            "roster": torch.tensor([[0]]),
+            "roster_mask": torch.tensor([[True]]),
+            "y": torch.tensor([1.0]),
+        }
+        trace = pyro.poutine.trace(compositional_model).get_trace(
+            data, torch.zeros((1, 2))
+        )
+
+        self.assertIsInstance(
+            trace.nodes["alpha"]["fn"].base_dist, torch.distributions.Normal
+        )
+
     def test_dead_tossup_survival_matches_equations_6_and_13(self):
         zero_vector = torch.zeros((1, 1))
         zero = torch.zeros(1)
@@ -183,9 +204,9 @@ class ModelTests(unittest.TestCase):
         synergy = synergy_contribution(psi, roster, mask)
         self.assertEqual(float(synergy), 2.0)
 
-    def test_multidim_difficulty_curve_and_alpha_weighted_formula(self):
+    def test_multidim_difficulty_curve_and_r_weighted_formula(self):
         theta = torch.tensor([[10.0, 0.0]])
-        alpha = torch.tensor([[0.25, 0.75]])
+        r = torch.tensor([[0.25, 0.75]])
         beta = torch.tensor([[4.0, 8.0]])
         gamma = torch.tensor([[0.0, 0.0]])
         mu = torch.tensor([[0.5, 0.5]])
@@ -193,14 +214,14 @@ class ModelTests(unittest.TestCase):
         T_j = torch.tensor([2])
 
         difficulty = multidim_difficulty_curve(beta, gamma, mu, t, T_j)
-        logit = multidim_correctness_logit(theta, alpha, beta, gamma, mu, t, T_j)
+        logit = multidim_correctness_logit(theta, r, beta, gamma, mu, t, T_j)
 
         self.assertEqual(tuple(difficulty.shape), (1, 2))
         self.assertTrue(torch.allclose(difficulty, torch.tensor([[2.0, 4.0]])))
         # 0.25 * (10 - 2) + 0.75 * (0 - 4)
         self.assertTrue(torch.allclose(logit, torch.tensor([-1.0])))
 
-    def test_multidim_svi_posterior_uses_vector_difficulty_with_alpha(self):
+    def test_multidim_svi_posterior_uses_vector_difficulty_with_r(self):
         data = {
             "player": torch.tensor([0]),
             "tossup": torch.tensor([0]),
@@ -225,8 +246,8 @@ class ModelTests(unittest.TestCase):
         svi.step(data, 2, False)
         posterior = guide.median(data, 2, False)
 
-        self.assertEqual(tuple(posterior["alpha"].shape), (1, 2))
-        self.assertTrue(torch.all(posterior["alpha"] > 0))
+        self.assertEqual(tuple(posterior["r"].shape), (1, 2))
+        self.assertTrue(torch.all(posterior["r"] > 0))
         self.assertEqual(tuple(posterior["beta"].shape), (1, 2))
         self.assertEqual(tuple(posterior["gamma"].shape), (1, 2))
         self.assertEqual(tuple(posterior["mu"].shape), (1, 2))
@@ -241,7 +262,7 @@ class ModelTests(unittest.TestCase):
         posterior = {
             "theta": torch.tensor([[0.0, 0.0]]),
             "c": torch.tensor([0.0]),
-            "alpha": torch.tensor([[1.0, 1.0]]),
+            "r": torch.tensor([[1.0, 1.0]]),
             "beta": torch.tensor([[0.0, 0.0]]),
             "gamma": torch.tensor([[1.0, 1.0]]),
             "mu": torch.tensor([[0.5, 0.5]]),
@@ -371,7 +392,7 @@ class ModelTests(unittest.TestCase):
         self.assertAlmostEqual(metrics["per_bonus_points_mae"], 20 / 3)
         self.assertAlmostEqual(metrics["ppb_mae"], 0.0)
 
-    def test_bonus_metrics_distinguish_exact_parts_from_rounded_score(self):
+    def test_bonus_metrics_report_strict_exact_part_recovery(self):
         parts = pd.DataFrame(
             {
                 "response_id": ["r1", "r1", "r1", "r2", "r2", "r2"],
@@ -391,7 +412,6 @@ class ModelTests(unittest.TestCase):
         metrics = bonus_metrics(parts, teams)
 
         self.assertAlmostEqual(metrics["exact_acc"], 0.5)
-        self.assertAlmostEqual(metrics["rounded_score_accuracy"], 1.0)
 
     def test_saved_parameters_reconstruct_first_buzz_distribution(self):
         players = pd.DataFrame(
@@ -436,8 +456,8 @@ class ModelTests(unittest.TestCase):
         tossups = pd.DataFrame(
             {
                 "tossup_id": ["q1"],
-                "alpha_1": [0.25],
-                "alpha_2": [0.75],
+                "r_1": [0.25],
+                "r_2": [0.75],
                 "beta_1": [0.0],
                 "beta_2": [0.0],
                 "gamma_1": [1.0],
@@ -469,8 +489,8 @@ class ModelTests(unittest.TestCase):
             pd.DataFrame(
                 {
                     "tossup_id": ["q1"],
-                    "alpha_1": [0.25],
-                    "alpha_2": [0.75],
+                    "r_1": [0.25],
+                    "r_2": [0.75],
                     "beta_1": [2.0],
                     "beta_2": [4.0],
                     "gamma_1": [3.0],

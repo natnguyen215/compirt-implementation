@@ -16,8 +16,7 @@ BONUS_METRICS = [
     "log_loss",
     "ece",
     "part_accuracy",
-    "exact_score_accuracy",
-    "rounded_score_accuracy",
+    "exact_acc",
     "per_bonus_points_mae",
     "ppb_mae",
 ]
@@ -30,9 +29,7 @@ TOSSUP_METRICS = [
     "buzz_position_mae",
     "buzz_position_median_absolute_error",
 ]
-METRIC_ALIASES = {
-    "exact_acc": "exact_score_accuracy",
-}
+METRIC_ALIASES = {}
 
 
 def _repo_display(path: Path) -> str:

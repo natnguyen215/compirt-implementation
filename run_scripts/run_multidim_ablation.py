@@ -5,6 +5,10 @@ Each dimension gets its own run directory under the ablation root. The runner
 intentionally calls the underlying training/evaluation entry points directly so
 it can skip the no-synergy compositional branch used by the standard holdout
 driver.
+
+'--pyramidal-module' picks the Stage-1 trainer: the plain multidim MIRT model or
+the TF-IDF multidim variant, which take the same dimension and held-out-prior
+flags. Stage 2 is the shared root compositional model either way.
 """
 
 from __future__ import annotations
@@ -38,8 +42,13 @@ from utils.run_logging import (
 DEFAULT_ROOT = Path("results/compirt/holdout/multidim-ablation")
 DEFAULT_DIMENSIONS = (11, 12, 13, 14, 15)
 DEFAULT_PLOT_DIMENSIONS = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
-LEGACY_METRIC_NAMES = {
-    "exact_score_accuracy": "rounded_score_accuracy",
+LEGACY_METRIC_NAMES = {}
+
+# Both Stage-1 trainers take the same dimension/holdout-prior flags, so the sweep
+# only needs to swap the module it invokes.
+PYRAMIDAL_MODULES = {
+    "multidim": "multidimensional.multidim_mirt.train_pyramidal",
+    "tfidf-multidim": "tfidf.multidim.train_pyramidal",
 }
 
 
@@ -102,6 +111,7 @@ def build_stages(args: argparse.Namespace, dimension: int) -> list[Stage]:
     calibration_args = ["--calibrate-correctness"] if args.calibrate_correctness else []
     predict_args = ["--predict-buzz-positions"] if args.predict_buzz_positions else []
     synergy_detail_args = ["--save-synergy-details"] if args.save_synergy_details else []
+    alpha_prior_args = ["--alpha-prior", args.alpha_prior]
 
     return [
         Stage(
@@ -110,7 +120,7 @@ def build_stages(args: argparse.Namespace, dimension: int) -> list[Stage]:
             [
                 python,
                 "-m",
-                "multidimensional.multidim_mirt.train_pyramidal",
+                PYRAMIDAL_MODULES[args.pyramidal_module],
                 "--split",
                 args.train_split,
                 *train_filter_args,
@@ -134,7 +144,7 @@ def build_stages(args: argparse.Namespace, dimension: int) -> list[Stage]:
             [
                 python,
                 "-m",
-                "multidimensional.multidim_mirt.train_pyramidal",
+                PYRAMIDAL_MODULES[args.pyramidal_module],
                 "--split",
                 args.test_split,
                 *train_filter_args,
@@ -177,6 +187,7 @@ def build_stages(args: argparse.Namespace, dimension: int) -> list[Stage]:
                 "--use-synergy",
                 "--synergy-dimensions",
                 str(args.synergy_dimensions),
+                *alpha_prior_args,
                 *synergy_detail_args,
                 *calibration_args,
                 "--output-dir",
@@ -362,6 +373,21 @@ def save_aggregate_outputs(root: Path, frame: pd.DataFrame) -> Path:
     return csv_output
 
 
+def save_ablation_config(root: Path, args: argparse.Namespace) -> Path:
+    """Record every resolved runner setting next to the results.
+
+    Lets a sweep be reproduced from its output directory alone, without having to
+    recover the invocation from 'run.log'.
+    """
+    config = {
+        key: str(value) if isinstance(value, Path) else value
+        for key, value in sorted(vars(args).items())
+    }
+    config_path = root / "ablation_config.json"
+    config_path.write_text(json.dumps(config, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return config_path
+
+
 def configure_environment() -> None:
     """Set runtime defaults used by the existing experiment runners."""
     os.environ.setdefault("PYTHONUNBUFFERED", "1")
@@ -388,6 +414,21 @@ def parse_args() -> argparse.Namespace:
         help="Latent skill dimensions to include in the aggregate CSV and graphs.",
     )
     parser.add_argument("--synergy-dimensions", type=int, default=3)
+    parser.add_argument(
+        "--pyramidal-module",
+        choices=tuple(PYRAMIDAL_MODULES),
+        default="multidim",
+        help="Stage-1 trainer to sweep: plain multidim MIRT or its TF-IDF variant.",
+    )
+    parser.add_argument(
+        "--alpha-prior",
+        choices=("normal", "gamma"),
+        default="gamma",
+        help=(
+            "Bonus-part discrimination prior. 'gamma' matches the Gamma(2, 2) "
+            "relevance vector of the multidim pyramidal stage."
+        ),
+    )
     parser.add_argument("--train-split", default="year_2024")
     parser.add_argument("--test-split", default="year_2025")
     parser.add_argument("--tournament")
@@ -446,7 +487,8 @@ def main() -> None:
             {
                 "RUNNER": "run_scripts/run_multidim_ablation.py",
                 "ROOT": path_for_command(args.root),
-                "MODEL": "multidim-ablation",
+                "MODEL": f"{args.pyramidal_module}-ablation",
+                "PYRAMIDAL_MODULE": PYRAMIDAL_MODULES[args.pyramidal_module],
                 "TRAIN_SPLIT": args.train_split,
                 "TEST_SPLIT": args.test_split,
                 "TOURNAMENT": args.tournament or "<all>",
@@ -455,6 +497,7 @@ def main() -> None:
                 "DIMENSIONS": args.dimensions,
                 "PLOT_DIMENSIONS": args.plot_dimensions,
                 "SYNERGY_DIMENSIONS": args.synergy_dimensions,
+                "ALPHA_PRIOR": args.alpha_prior,
                 "PYRAMIDAL_STEPS": args.pyramidal_steps,
                 "BONUS_STEPS": args.bonus_steps,
                 "LR": args.lr,
@@ -474,6 +517,11 @@ def main() -> None:
     )
 
     if not args.collect_only:
+        # Written before training so a crashed sweep still records what it tried,
+        # and never on a --collect-only pass, which would otherwise overwrite the
+        # real sweep's settings with the aggregation run's defaults.
+        config_path = save_ablation_config(args.root, args)
+        print(f"Wrote run configuration to {path_for_command(config_path)}\n", flush=True)
         for dimension in args.dimensions:
             print(f"\n=== multidim ablation: dimension {dimension} ===", flush=True)
             for stage in build_stages(args, dimension):

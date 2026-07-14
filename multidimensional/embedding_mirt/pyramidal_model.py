@@ -1,10 +1,10 @@
 """Embedding-based multidimensional pyramidal tossup model.
 
 This is a sibling of 'multidimensional/multidim_mirt/pyramidal_model.py' that
-replaces its freely learned, positive tossup discrimination 'alpha ~ Gamma(2,
-2)' with a content-aware relevance vector computed from a frozen text
-embedding. CAIMIRA (docs/2410.06524v1.pdf, Eq. 5/7) uses a linear map; this
-variant uses a small feed-forward projection:
+replaces its freely learned, positive tossup relevance 'r ~ Gamma(2, 2)' with a
+content-aware relevance vector computed from a frozen text embedding. CAIMIRA
+(docs/2410.06524v1.pdf, Eq. 5/7) uses a linear map; this variant uses a small
+feed-forward projection:
 
     r_j = softmax(W_2 gelu(W_1 @ centered(e_j) + b_1) + b_2)
 
@@ -15,22 +15,22 @@ AutoNormal SVI loop the rest of CompIRT uses (mirrors how
 'topic/learned/joint_pyramidal.py' point-estimates its topic-word matrix).
 
 Only 'sample_parameters' and 'competing_risks_model' differ from
-'multidimensional.multidim_mirt.pyramidal_model': everything else -- 'difficulty_curve',
-'correctness_logit', 'hazard_logit', 'log_survival', 'row_parameters',
-'sample_correctness_calibration', 'posterior_row_predictions', and
-'expected_first_buzz_positions' -- is imported unchanged, because they already
-accept an 'alpha'-shaped argument positionally, and 'r' fills that slot
-exactly like 'alpha' would. The two functions that read the *fitted posterior
-dict by key* ('posterior_row_predictions', 'expected_first_buzz_positions')
-are wrapped with a one-line 'alpha' alias so multidim_mirt's unmodified
-implementation can read this package's 'posterior["r"]'.
+'multidimensional.multidim_mirt.pyramidal_model': everything else --
+'difficulty_curve', 'correctness_logit', 'hazard_logit', 'log_survival',
+'row_parameters', 'sample_correctness_calibration', 'posterior_row_predictions',
+and 'expected_first_buzz_positions' -- is imported unchanged, because both
+packages carry per-dimension difficulty and therefore name the weight vector 'r'
+(the baseline's scalar-difficulty discrimination 'alpha' has no counterpart
+here). The difference is only where 'r' comes from: sampled there, projected
+from an embedding here.
 
-Note on model behavior: unlike 'alpha ~ Gamma(2, 2)' (unbounded above, mean 1
-per dimension regardless of 'n_dimensions'), 'r_j' is a softmax and always sums
-to 1 across dimensions. Raising '--dimensions' here spreads a fixed relevance
-budget thinner (mean r_jk ~ 1/n_dimensions) rather than adding independent
-discriminative capacity, so dimension sweeps are not directly comparable
-between the two packages -- this is CAIMIRA's design, not a bug.
+Note on model behavior: unlike the freely learned 'r ~ Gamma(2, 2)' (unbounded
+above, mean 1 per dimension regardless of 'n_dimensions'), this 'r_j' is a
+softmax and always sums to 1 across dimensions. Raising '--dimensions' here
+spreads a fixed relevance budget thinner (mean r_jk ~ 1/n_dimensions) rather
+than adding independent discriminative capacity, so dimension sweeps are not
+directly comparable between the two packages -- this is CAIMIRA's design, not a
+bug.
 """
 
 from __future__ import annotations
@@ -45,16 +45,12 @@ import pyro.distributions as dist
 
 from multidimensional.multidim_mirt.pyramidal_model import (
     correctness_logit,
+    expected_first_buzz_positions,
     hazard_logit,
     log_survival,
+    posterior_row_predictions,
     row_parameters,
     sample_correctness_calibration,
-)
-from multidimensional.multidim_mirt.pyramidal_model import (
-    expected_first_buzz_positions as _multidim_expected_first_buzz_positions,
-)
-from multidimensional.multidim_mirt.pyramidal_model import (
-    posterior_row_predictions as _multidim_posterior_row_predictions,
 )
 
 __all__ = [
@@ -134,9 +130,9 @@ def sample_parameters(data, n_dimensions):
     """Sample player and difficulty parameters; compute 'r' from embeddings.
 
     Player and difficulty priors are identical to
-    'multidimensional.multidim_mirt.pyramidal_model.sample_parameters'. There is no sampled
-    'alpha' -- 'r' is a deterministic function of the fixed 'data["embedding"]'
-    and the point-estimated FFN projection.
+    'multidimensional.multidim_mirt.pyramidal_model.sample_parameters'. The
+    difference is that 'r' is not sampled here -- it is a deterministic function
+    of the fixed 'data["embedding"]' and the point-estimated FFN projection.
     """
     n_players = len(data["player_ids"])
     n_tossups = len(data["tossup_ids"])
@@ -237,26 +233,3 @@ def competing_risks_model(data, n_dimensions=5, calibrate_correctness=False):
         + dist.Bernoulli(logits=correctness).log_prob(data["y"][buzz]).sum()
     )
     pyro.factor("embedding_competing_risks_likelihood", log_likelihood)
-
-
-def _alias_r_as_alpha(posterior: dict) -> dict:
-    """Return a shallow copy of 'posterior' with 'r' also keyed as 'alpha'.
-
-    'multidimensional.multidim_mirt.pyramidal_model.posterior_row_predictions' and
-    'expected_first_buzz_positions' are otherwise byte-identical to what this
-    package would need, but they read the discrimination vector out of the
-    posterior dict by the key 'alpha'. Aliasing avoids a ~90-line duplicate.
-    """
-    return {**posterior, "alpha": posterior["r"]}
-
-
-def posterior_row_predictions(data, posterior, calibrate_correctness=False):
-    """Return fitted correctness, hazard, and survival for each row."""
-    return _multidim_posterior_row_predictions(
-        data, _alias_r_as_alpha(posterior), calibrate_correctness
-    )
-
-
-def expected_first_buzz_positions(data, posterior):
-    """Compute the expected first-buzz relative position for each event."""
-    return _multidim_expected_first_buzz_positions(data, _alias_r_as_alpha(posterior))

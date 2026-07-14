@@ -1,0 +1,36 @@
+# CompIRT Run Log
+
+Generated: 2026-07-14T11:06:48-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- ALPHA_PRIOR: gamma
+- BONUS_STEPS: 2000
+- CALIBRATE_CORRECTNESS: False
+- COLLECT_ONLY: True
+- DATA_DIR: unknown
+- DEVICE: cuda
+- DIMENSIONS: 11, 12, 13, 14, 15
+- GPU: unknown
+- LR: 0.01
+- MODEL: tfidf-multidim-ablation
+- NEW_PLAYER_PRIOR: tier
+- PLOT_DIMENSIONS: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14
+- PREDICT_BUZZ_POSITIONS: True
+- PYRAMIDAL_MODULE: tfidf.multidim.train_pyramidal
+- PYRAMIDAL_STEPS: 3000
+- PYTHON: .venv/bin/python
+- RERUN: False
+- ROOT: results/compirt/holdout/tfidf-multidim-ablation-gamma
+- RUNNER: run_scripts/run_multidim_ablation.py
+- SAVE_SYNERGY_DETAILS: False
+- SYNERGY_DIMENSIONS: 1
+- TEST_SPLIT: year_2025
+- TOURNAMENT: <all>
+- TRAIN_SPLIT: year_2024
+
+
+Wrote aggregate metrics to results/compirt/holdout/tfidf-multidim-ablation-gamma/csvs/multidim_ablation_metrics.csv
+Wrote aggregate graphs to results/compirt/holdout/tfidf-multidim-ablation-gamma/graphs

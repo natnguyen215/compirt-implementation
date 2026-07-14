@@ -22,21 +22,24 @@ The root CompIRT files are separated by responsibility through their names:
 - `topic/`: topic-model experiments — `topic/fixed/` (topics fit upstream via
   LDA/PLDA/categories and fed in as fixed weights), `topic/learned/` (topics
   learned jointly with the IRT model), and shared topic helpers in `topic/utils/`.
-- `tfidf/`: isolated IDF-aware pyramidal variants for clue timing.
+- `tfidf/`: isolated cumulative IDF-aware pyramidal model for clue timing.
 - `multidimensional/`: multidimensional-difficulty experiments —
   `multidimensional/multidim_mirt/` (the multidimensional-skill pyramidal
-  variant, with a free learned discrimination vector `alpha`),
-  `multidimensional/embedding_mirt/` (sibling that replaces `alpha` with a
-  CAIMIRA-style relevance vector `r` computed from a frozen Qwen3-Embedding-8B
+  variant, with a free learned relevance vector `r`),
+  `multidimensional/embedding_mirt/` (sibling whose `r` is instead a
+  CAIMIRA-style relevance vector computed from a frozen Qwen3-Embedding-8B
   vector of the question text through a learned linear projection). The
   embedding variant reuses `multidim_mirt`'s tossup math and the root
-  `compositional_model.py` rather than duplicating them.
+  `compositional_model.py` rather than duplicating them. Both name the weight
+  `r` rather than the baseline's `alpha` because their difficulty is
+  per-dimension; see the naming convention in `CLAUDE.md`.
 
 Variant scripts run as modules from the repo root, e.g.
 `.venv/bin/python -m topic.fixed.train_topic_pyramidal --help`.
 
 See `docs/compirt-experiments.md` for setup, commands, assumptions, and
-limitations.
+limitations, including the opt-in temporal C1--C4 roster-generalization
+evaluation (`RUN_C1_C4=1`).
 
 # CompIRT Paper Implementation
 

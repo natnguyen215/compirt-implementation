@@ -8,8 +8,8 @@
 
 ## Bonus Metrics
 
-| auc | log_loss | ece | accuracy | part_accuracy | exact_acc | rounded_score_accuracy | per_bonus_points_mae | ppb_mae |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0.904664 | 0.393597 | 0.0258666 | 0.821214 | 0.821214 | 0.543305 | 0.533527 | 5.52209 | 3.02324 |
+| auc | log_loss | ece | accuracy | part_accuracy | exact_acc | per_bonus_points_mae | ppb_mae |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.904664 | 0.393597 | 0.0258666 | 0.821214 | 0.821214 | 0.543305 | 5.52209 | 3.02324 |
 
 Generated figures include aggregate and buzz-position-stratified reliability, tossup difficulty over empirical buzz locations, per-dimension difficulty overlays for multidim fits, predicted-versus-empirical buzz timing, bonus PPB predictions, and player, tossup, bonus-part, and optional synergy parameter distributions and cross-run player-stability diagnostics.

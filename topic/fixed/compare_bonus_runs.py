@@ -24,13 +24,10 @@ COLUMNS = [
     "ppb_mae",
     "per_bonus_points_mae",
     "exact_acc",
-    "rounded_score_accuracy",
     "auc",
     "ece",
 ]
-LEGACY_METRIC_NAMES = {
-    "exact_score_accuracy": "rounded_score_accuracy",
-}
+LEGACY_METRIC_NAMES = {}
 DEFAULT_RUNS = [
     "results/compirt/in_sample/plda-all2024",
     "results/compirt/in_sample/baseline-all2024",

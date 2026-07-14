@@ -18,15 +18,15 @@ The guiding idea is simple: entities describe what existed, observations describ
 
 ## Current Build
 
-Generated from `data/dbs/acf-24-25.db`.
+Generated from `data/database.db`.
 
 | Table | Rows |
 | --- | ---: |
 | `tournaments` | 68 |
-| `players` | 2,665 |
+| `players` | 2,661 |
 | `teams` | 1,054 |
 | `games` | 5,704 |
-| `tossups` | 2,936 |
+| `tossups` | 2,686 |
 | `bonuses` | 2,935 |
 | `tossup_buzzes` | 136,586 |
 | `bonus_responses` | 104,941 |

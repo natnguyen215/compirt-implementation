@@ -37,7 +37,6 @@ This file consolidates the metric CSVs, bonus-model comparison deltas, and fitte
 | ece | 0.0258666 |
 | part_accuracy | 0.821214 |
 | exact_score_accuracy | 0.543305 |
-| rounded_score_accuracy | 0.533527 |
 | per_bonus_points_mae | 5.52209 |
 | ppb_mae | 3.02324 |
 | accuracy | 0.821214 |
@@ -63,9 +62,9 @@ This file consolidates the metric CSVs, bonus-model comparison deltas, and fitte
 | accuracy | 0.821214 | 0.848323 | 0.027109 | synergy |
 | part_accuracy | 0.821214 | 0.848323 | 0.027109 | synergy |
 | exact_score_accuracy | 0.543305 | 0.602198 | 0.0588936 | synergy |
-| rounded_score_accuracy | 0.533527 | 0.598872 | 0.0653449 | synergy |
-| per_bonus_points_mae | 5.52209 | 4.7947 | -0.727391 | synergy |
-| ppb_mae | 3.02324 | 1.72536 | -1.29788 | synergy |
+| 0.533527 | 0.598872 | 0.0653449 | synergy |
+| 5.52209 | 4.7947 | -0.727391 | synergy |
+| 3.02324 | 1.72536 | -1.29788 | synergy |
 
 ## Pyramidal Player And Tossup Parameters
 

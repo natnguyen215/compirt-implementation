@@ -1,1 +1,1 @@
-"""Isolated TF-IDF-aware pyramidal tossup variants."""
+"""Isolated cumulative TF-IDF-aware pyramidal tossup model."""

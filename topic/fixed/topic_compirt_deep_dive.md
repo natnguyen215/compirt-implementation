@@ -518,8 +518,10 @@ Use the repo-root driver `run_scripts/run_compirt_holdout.py` with `MODEL=topic`
 4. evaluate_topic_compirt.py on the held-out predictions → <ROOT>/holdout/evaluation
 ```
 
-The metrics in `<ROOT>/holdout/evaluation/` are then genuine held-out Scenario A/B
-estimates rather than in-sample fit.
+The metrics in `<ROOT>/holdout/evaluation/` are therefore transductive
+temporal-test estimates: they evaluate a future tournament split, but they are
+not fully inductive predictions for unseen questions because the 2025 item and
+player parameters are co-estimated from that split.
 
 ---
 

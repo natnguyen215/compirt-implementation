@@ -16,19 +16,10 @@ from compirt_eval.eval_docs import (
 
 
 class MetricNormalizationTests(unittest.TestCase):
-    def test_normalize_metric_row_promotes_legacy_exact_acc(self):
+    def test_normalize_metric_row_preserves_exact_acc(self):
         row = normalize_metric_row({"auc": 0.9, "exact_acc": 0.5})
 
         self.assertEqual(row["auc"], 0.9)
-        self.assertEqual(row["exact_score_accuracy"], 0.5)
-        self.assertNotIn("exact_acc", row)
-
-    def test_normalize_metric_row_keeps_current_exact_score_name(self):
-        row = normalize_metric_row(
-            {"exact_acc": 0.5, "exact_score_accuracy": 0.6}
-        )
-
-        self.assertEqual(row["exact_score_accuracy"], 0.6)
         self.assertEqual(row["exact_acc"], 0.5)
 
 
@@ -124,7 +115,7 @@ class EvalDocsTests(unittest.TestCase):
         self.assertIn("Stage 2 Bonus Metrics", text)
         self.assertIn("all 2024", text)
         self.assertIn("Bonus Stage Scalars", text)
-        self.assertIn("exact_score_accuracy", text)
+        self.assertIn("exact_acc", text)
         self.assertIn("Stage 1 Tossup Metrics", text)
         self.assertIn("buzz_position_mae", text)
         self.assertIn("No-Synergy Versus Synergy Deltas", text)

@@ -14,6 +14,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pyro
 import torch
 
 from compirt_data import (
@@ -63,12 +64,19 @@ def load_player_skills(path, device):
 
 
 def train_model(
-    data, theta, use_synergy, synergy_dimensions, n_steps, lr, calibrate_correctness=False
+    data,
+    theta,
+    use_synergy,
+    synergy_dimensions,
+    n_steps,
+    lr,
+    calibrate_correctness=False,
+    alpha_prior="normal",
 ):
     """Fit bonus-part parameters while treating 'theta' as fixed input."""
     return fit_svi(
         compositional_model,
-        (data, theta, use_synergy, synergy_dimensions, calibrate_correctness),
+        (data, theta, use_synergy, synergy_dimensions, calibrate_correctness, alpha_prior),
         n_steps,
         lr,
     )
@@ -78,6 +86,7 @@ def run_experiment(args):
     """Run the complete compositional bonus training and output pipeline."""
     args.output_dir.mkdir(parents=True, exist_ok=True)
     require_device(args.device)
+    pyro.set_rng_seed(args.seed)
     # Load and freeze player skills from tossups, then build bonus-part rows.
     player_ids, theta = load_player_skills(args.player_skills, args.device)
     tables = filter_tournament(
@@ -113,6 +122,7 @@ def run_experiment(args):
         args.steps,
         args.lr,
         args.calibrate_correctness,
+        args.alpha_prior,
     )
     probabilities, aggregates, synergy = posterior_predictions(
         data, theta, posterior, args.use_synergy, args.calibrate_correctness
@@ -146,13 +156,17 @@ def run_experiment(args):
         )
 
     summary = {
+        "split": args.split,
         "tournament": args.tournament or "",
         "steps": args.steps,
+        "lr": args.lr,
+        "seed": args.seed,
         "final_loss": losses[-1],
         "use_synergy": args.use_synergy,
         "synergy_dimensions": args.synergy_dimensions if args.use_synergy else 0,
         "saved_synergy_details": args.use_synergy and args.save_synergy_details,
         "calibrate_correctness": args.calibrate_correctness,
+        "alpha_prior": args.alpha_prior,
         "skill_dimensions": theta.shape[1],
         "bonus_part_observations": len(observations),
         "bonus_parts": len(data["part_ids"]),
@@ -180,11 +194,21 @@ def parse_args():
     parser.add_argument("--player-skills", type=Path, required=True)
     parser.add_argument("--steps", type=int, default=1000)
     parser.add_argument("--lr", type=float, default=0.02)
+    parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     parser.add_argument("--use-synergy", action="store_true")
     parser.add_argument("--synergy-dimensions", type=int, default=1)
     parser.add_argument("--save-synergy-details", action="store_true")
     parser.add_argument("--calibrate-correctness", action="store_true")
+    parser.add_argument(
+        "--alpha-prior",
+        choices=("normal", "gamma"),
+        default="normal",
+        help=(
+            "Bonus-part discrimination prior. Use 'gamma' only when the fixed "
+            "theta basis is already pinned positive (multidim pyramidal)."
+        ),
+    )
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     return parser.parse_args()
 

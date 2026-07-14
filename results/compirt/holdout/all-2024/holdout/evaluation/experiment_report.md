@@ -4,12 +4,12 @@
 
 | auc | log_loss | ece | accuracy | buzz_position_mae | buzz_position_median_absolute_error |
 | --- | --- | --- | --- | --- | --- |
-| 0.683961 | 0.59377 | 0.152617 | 0.698538 | 0.14333 | 0.123803 |
+| 0.683797 | 0.591326 | 0.149341 | 0.701114 | 0.143238 | 0.123594 |
 
 ## Bonus Metrics
 
-| auc | log_loss | ece | accuracy | part_accuracy | exact_acc | rounded_score_accuracy | per_bonus_points_mae | ppb_mae |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0.933456 | 0.337605 | 0.0369495 | 0.853382 | 0.853382 | 0.612317 | 0.606263 | 4.82446 | 2.07937 |
+| auc | log_loss | ece | accuracy | part_accuracy | exact_acc | per_bonus_points_mae | ppb_mae |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.932352 | 0.340014 | 0.0370095 | 0.852323 | 0.852323 | 0.609306 | 4.86941 | 2.12287 |
 
 Generated figures include aggregate and buzz-position-stratified reliability, tossup difficulty over empirical buzz locations, per-dimension difficulty overlays for multidim fits, predicted-versus-empirical buzz timing, bonus PPB predictions, and player, tossup, bonus-part, and optional synergy parameter distributions and cross-run player-stability diagnostics.

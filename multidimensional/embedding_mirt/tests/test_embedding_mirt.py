@@ -254,7 +254,7 @@ class CheckProjectionShapesTests(unittest.TestCase):
 
 
 class PyramidalSviTests(unittest.TestCase):
-    def test_svi_posterior_has_no_alpha_and_fits_a_projection(self):
+    def test_svi_posterior_has_no_sampled_relevance_and_fits_a_projection(self):
         data = {
             "player": torch.tensor([0]),
             "tossup": torch.tensor([0]),
@@ -272,7 +272,7 @@ class PyramidalSviTests(unittest.TestCase):
 
         posterior = _fit(competing_risks_model, (data, 2, False))
 
-        self.assertNotIn("alpha", posterior)
+        # 'r' is projected from the frozen embedding, never a sampled site.
         self.assertNotIn("r", posterior)
         self.assertEqual(tuple(posterior["beta"].shape), (1, 2))
         self.assertEqual(tuple(pyro.param("r_projection_input_weight").shape), (8, 3))

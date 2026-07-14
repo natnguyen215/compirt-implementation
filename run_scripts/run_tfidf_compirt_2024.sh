@@ -14,7 +14,11 @@ GPU="${GPU:-0}"
 SPLIT="${SPLIT:-year_2024}"
 TOURNAMENT="${TOURNAMENT-}"
 CALIBRATE_CORRECTNESS="${CALIBRATE_CORRECTNESS:-0}"
-TFIDF_VARIANT="${TFIDF_VARIANT:-replace-position}"
+TFIDF_VARIANT="${TFIDF_VARIANT:-cumulative-difficulty}"
+if [[ "$TFIDF_VARIANT" != "cumulative-difficulty" ]]; then
+  echo "Only TFIDF_VARIANT=cumulative-difficulty is supported" >&2
+  exit 2
+fi
 
 if [[ "$CALIBRATE_CORRECTNESS" == "1" ]]; then
   DEFAULT_ROOT="results/compirt/in_sample/tfidf-${TFIDF_VARIANT}-all2024-cal"

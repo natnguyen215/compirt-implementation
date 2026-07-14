@@ -28,17 +28,23 @@ from compirt_eval.tossups.parameters import (
     _validate_multidim_dimensions,
     difficulty_adjustment_at,
     load_difficulty_adjustment_curves,
+    load_difficulty_link,
 )
 
 
-def first_buzz_distribution(event, players, tossups, n_bins=12, adjustments=None):
+def first_buzz_distribution(
+    event, players, tossups, n_bins=12, adjustments=None, link="sigmoid"
+):
     """Reconstruct team first-buzz mass from saved posterior median parameters.
 
-    This mirrors the model's competing-risks timing (Eq. 5 hazard and Eq. 6
-    survival) outside Pyro: it walks every token, combines the roster's
-    independent no-buzz probabilities into a team hazard, and returns how much
-    first-buzz probability falls in each of 'n_bins' relative-position bins,
-    plus the dead-tossup (nobody buzzes) mass.
+    This replays the fitted Eq. 5 hazards outside Pyro as an end-inclusive
+    diagnostic distribution: it walks every token through T_j, combines the
+    roster's independent no-buzz probabilities into a team hazard, and returns
+    how much first-buzz probability falls in each relative-position bin plus
+    the probability remaining after the final token. The training likelihood
+    follows the paper's Eq. 6/13 convention S(T_j) = product over s < T_j, so
+    this diagnostic should not be read as a byte-for-byte replay of its
+    dead-tossup censoring term.
     """
     tossup_id = event["tossup_id"].iloc[0]
     tossup = tossups.loc[tossup_id]
@@ -60,6 +66,7 @@ def first_buzz_distribution(event, players, tossups, n_bins=12, adjustments=None
             float(tossup["gamma"]),
             float(tossup["mu"]),
             relative,
+            link,
         )
     else:
         _validate_multidim_dimensions(
@@ -69,7 +76,7 @@ def first_buzz_distribution(event, players, tossups, n_bins=12, adjustments=None
             columns["gamma"],
             columns["mu"],
         )
-        difficulty = _multidim_effective_difficulty(tossup, relative)
+        difficulty = _multidim_effective_difficulty(tossup, relative, link)
     adjustment = difficulty_adjustment_at(adjustments, tossup_id, relative)
     if adjustment is not None:
         # TF-IDF runs: replay the effective difficulty d' the model trained on.
@@ -95,7 +102,9 @@ def first_buzz_distribution(event, players, tossups, n_bins=12, adjustments=None
     return binned_mass, dead_mass
 
 
-def _aggregate_buzz_timing(predictions, players, tossups, tossup_id, n_bins, adjustments=None):
+def _aggregate_buzz_timing(
+    predictions, players, tossups, tossup_id, n_bins, adjustments=None, link="sigmoid"
+):
     """Average fitted and empirical first-buzz mass over one tossup's events.
 
     Walks every event for 'tossup_id', sums the model's fitted first-buzz mass
@@ -113,7 +122,7 @@ def _aggregate_buzz_timing(predictions, players, tossups, tossup_id, n_bins, adj
         if not set(event["player_id"]).issubset(players.index):
             continue
         fitted_mass, fitted_dead = first_buzz_distribution(
-            event, players, tossups, n_bins, adjustments
+            event, players, tossups, n_bins, adjustments, link
         )
         predicted += fitted_mass
         predicted_dead += fitted_dead
@@ -160,6 +169,7 @@ def buzz_density_fit_plot(results_dir, output_dir, n_bins=12):
     if not _supports_first_buzz_reconstruction(players, tossups):
         return
     adjustments = load_difficulty_adjustment_curves(results_dir)
+    link = load_difficulty_link(results_dir)
 
     selected = [item for item in selected_tossups(predictions) if item in tossups.index]
     if not selected:
@@ -171,7 +181,7 @@ def buzz_density_fit_plot(results_dir, output_dir, n_bins=12):
     summaries = []
     for ax, tossup_id in zip(axes.flat, selected):
         timing = _aggregate_buzz_timing(
-            predictions, players, tossups, tossup_id, n_bins, adjustments
+            predictions, players, tossups, tossup_id, n_bins, adjustments, link
         )
         if timing is None:
             ax.set_visible(False)

@@ -1,0 +1,7 @@
+{
+  "model": "Qwen/Qwen3-Embedding-8B",
+  "instruction": "Embed the difficulty of this question",
+  "embedding_dim": 4096,
+  "tossups": 360,
+  "bonuses": 360
+}

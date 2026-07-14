@@ -56,6 +56,9 @@ def log_survival(theta, topic_weight, difficulty_beta, gamma, mu, c, t_star, T_j
     """
     max_t = int(t_star.max().item())
     positions = torch.arange(1, max_t + 1, device=t_star.device).unsqueeze(0)
+    # Eq. 6 is strict-before survival, and Eq. 13 deliberately uses S(T_j) for
+    # dead tossups. NO-BUZZ rows therefore stop at T_j - 1 under the paper's
+    # indexing convention; an inclusive mask would define a different model.
     before_stop = positions < t_star.unsqueeze(1)
     # Unsqueezing row parameters broadcasts them against every token position,
     # producing one hazard logit per row-position pair.

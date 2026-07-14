@@ -1,1 +1,1 @@
-"""Multidimensional TF-IDF pyramidal CompIRT variants."""
+"""Multidimensional cumulative TF-IDF pyramidal CompIRT model."""

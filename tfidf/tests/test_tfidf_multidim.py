@@ -1,4 +1,4 @@
-"""Tests for multidimensional TF-IDF pyramidal variants."""
+"""Tests for the multidimensional cumulative TF-IDF pyramidal model."""
 
 from __future__ import annotations
 
@@ -25,8 +25,6 @@ try:
     from tfidf.plot_tfidf_difficulty_curves import curve_components
     from tfidf.pyramidal_tfidf_model import (
         CUMULATIVE_DIFFICULTY,
-        HAZARD_SPIKE,
-        REPLACE_POSITION,
     )
 except ModuleNotFoundError as error:
     if error.name != "pyro":
@@ -38,46 +36,20 @@ except ModuleNotFoundError as error:
 class MultidimTfidfFormulaTests(unittest.TestCase):
     def setUp(self):
         self.theta = torch.zeros((1, 2))
-        self.alpha = torch.tensor([[0.5, 1.5]])
+        self.r = torch.tensor([[0.5, 1.5]])
         self.beta = torch.tensor([[2.0, 2.0]])
         self.gamma = torch.tensor([[10.0, 10.0]])
         self.mu = torch.tensor([[0.5, 0.5]])
         self.t = torch.tensor([1.0])
         self.T = torch.tensor([4.0])
 
-    def test_replace_position_uses_information_axis_per_dimension(self):
-        low_info = correctness_logit(
-            self.theta,
-            self.alpha,
-            self.beta,
-            self.gamma,
-            self.mu,
-            self.t,
-            self.T,
-            torch.tensor([0.25]),
-            tfidf_variant=REPLACE_POSITION,
-        )
-        high_info = correctness_logit(
-            self.theta,
-            self.alpha,
-            self.beta,
-            self.gamma,
-            self.mu,
-            self.t,
-            self.T,
-            torch.tensor([0.75]),
-            tfidf_variant=REPLACE_POSITION,
-        )
-
-        self.assertLess(float(low_info), float(high_info))
-
-    def test_cumulative_difficulty_applies_before_alpha_weighting(self):
+    def test_cumulative_difficulty_applies_before_r_weighting(self):
         beta = torch.zeros((1, 2))
         effect = torch.tensor(2.0)
 
         early = correctness_logit(
             self.theta,
-            self.alpha,
+            self.r,
             beta,
             self.gamma,
             self.mu,
@@ -89,7 +61,7 @@ class MultidimTfidfFormulaTests(unittest.TestCase):
         )
         late = correctness_logit(
             self.theta,
-            self.alpha,
+            self.r,
             beta,
             self.gamma,
             self.mu,
@@ -101,7 +73,7 @@ class MultidimTfidfFormulaTests(unittest.TestCase):
         )
         hazard = hazard_logit(
             self.theta,
-            self.alpha,
+            self.r,
             beta,
             self.gamma,
             self.mu,
@@ -109,7 +81,6 @@ class MultidimTfidfFormulaTests(unittest.TestCase):
             self.t,
             self.T,
             torch.tensor([0.75]),
-            torch.tensor([0.0]),
             effect,
             CUMULATIVE_DIFFICULTY,
         )
@@ -118,57 +89,7 @@ class MultidimTfidfFormulaTests(unittest.TestCase):
         self.assertAlmostEqual(float(late), 3.0)
         self.assertAlmostEqual(float(hazard), 2.75)
 
-    def test_hazard_spike_changes_hazard_not_correctness(self):
-        beta = torch.zeros((1, 2))
-        effect = torch.tensor(1.5)
-        prefix = torch.tensor([0.5])
-
-        correctness_without_token = correctness_logit(
-            self.theta,
-            self.alpha,
-            beta,
-            self.gamma,
-            self.mu,
-            self.t,
-            self.T,
-            prefix,
-            effect,
-            HAZARD_SPIKE,
-        )
-        hazard_without_token = hazard_logit(
-            self.theta,
-            self.alpha,
-            beta,
-            self.gamma,
-            self.mu,
-            torch.tensor([0.25]),
-            self.t,
-            self.T,
-            prefix,
-            torch.tensor([0.0]),
-            effect,
-            HAZARD_SPIKE,
-        )
-        hazard_with_token = hazard_logit(
-            self.theta,
-            self.alpha,
-            beta,
-            self.gamma,
-            self.mu,
-            torch.tensor([0.25]),
-            self.t,
-            self.T,
-            prefix,
-            torch.tensor([2.0]),
-            effect,
-            HAZARD_SPIKE,
-        )
-
-        self.assertAlmostEqual(float(correctness_without_token), 0.0)
-        self.assertAlmostEqual(float(hazard_without_token), -0.25)
-        self.assertAlmostEqual(float(hazard_with_token), 2.75)
-
-    def test_svi_posterior_has_positive_alpha_and_vector_difficulty(self):
+    def test_svi_posterior_has_positive_r_and_vector_difficulty(self):
         data = {
             "player": torch.tensor([0]),
             "tossup": torch.tensor([0]),
@@ -178,7 +99,6 @@ class MultidimTfidfFormulaTests(unittest.TestCase):
             "y": torch.tensor([1.0]),
             "is_buzz": torch.tensor([True]),
             "tfidf_prefix": torch.tensor([[1.0]]),
-            "tfidf_token": torch.tensor([[1.0]]),
             "player_ids": ["p1"],
             "tossup_ids": ["q1"],
             "event_ids": ["e1"],
@@ -192,11 +112,11 @@ class MultidimTfidfFormulaTests(unittest.TestCase):
             loss=Trace_ELBO(),
         )
 
-        svi.step(data, 2, False, 1.0, REPLACE_POSITION)
-        posterior = guide.median(data, 2, False, 1.0, REPLACE_POSITION)
+        svi.step(data, 2, False, 1.0, CUMULATIVE_DIFFICULTY)
+        posterior = guide.median(data, 2, False, 1.0, CUMULATIVE_DIFFICULTY)
 
-        self.assertEqual(tuple(posterior["alpha"].shape), (1, 2))
-        self.assertTrue(torch.all(posterior["alpha"] > 0))
+        self.assertEqual(tuple(posterior["r"].shape), (1, 2))
+        self.assertTrue(torch.all(posterior["r"] > 0))
         self.assertEqual(tuple(posterior["beta"].shape), (1, 2))
         self.assertEqual(tuple(posterior["gamma"].shape), (1, 2))
         self.assertEqual(tuple(posterior["mu"].shape), (1, 2))
@@ -204,14 +124,14 @@ class MultidimTfidfFormulaTests(unittest.TestCase):
 
 @unittest.skipIf(pyro is None, "pyro is not installed in this environment")
 class MultidimTfidfOutputTests(unittest.TestCase):
-    def test_adjustment_curves_save_alpha_weighted_aggregate_delta(self):
+    def test_adjustment_curves_save_r_weighted_aggregate_delta(self):
         data = {
             "tossup_ids": ["q1"],
             "tfidf_prefix": torch.tensor([[0.0, 0.5, 1.0]]),
         }
         observations = pd.DataFrame({"tossup_id": ["q1"], "T_j": [3]})
         posterior = {
-            "alpha": torch.tensor([[0.5, 1.5]]),
+            "r": torch.tensor([[0.5, 1.5]]),
             "tfidf_clue_effect": torch.tensor(2.0),
         }
 
@@ -233,8 +153,8 @@ class MultidimTfidfOutputTests(unittest.TestCase):
     def test_plot_curve_components_accept_multidim_saved_parameters(self):
         row = pd.Series(
             {
-                "alpha_1": 0.5,
-                "alpha_2": 1.5,
+                "r_1": 0.5,
+                "r_2": 1.5,
                 "beta_1": 0.0,
                 "beta_2": 0.0,
                 "gamma_1": 1.0,
@@ -246,7 +166,6 @@ class MultidimTfidfOutputTests(unittest.TestCase):
         features = {
             "T": 3,
             "prefix": torch.tensor([0.0, 0.5, 1.0]),
-            "token": torch.tensor([1.0, 1.0, 1.0]),
         }
         summary = {
             "tfidf_variant": CUMULATIVE_DIFFICULTY,

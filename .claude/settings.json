@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(.venv/bin/python -m unittest discover -s tests)",
+      "Bash(.venv/bin/python -c ' *)",
+      "Bash(.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --tournament 2024-acf-regionals-mit --dimensions 2 --steps 60 --device cpu --predict-buzz-positions --output-dir /tmp/claude-42499/-teapot-students-natnguyen-CompIRT-Implementation/148095bb-c987-44a3-954f-4559f188ffd2/scratchpad/smoke-sigmoid)",
+      "Bash(bash -n run_scripts/run_multidim_holdout.sh)",
+      "Bash(bash -n run_scripts/run_multidim_all2024.sh)",
+      "Bash(MODEL=baseline DIFFICULTY_LINK=tanh .venv/bin/python run_scripts/run_compirt_holdout.py)",
+      "Bash(.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --help)",
+      "Bash(nvidia-smi --query-gpu=index,memory.used,memory.total,utilization.gpu --format=csv)",
+      "Bash(DIFFICULTY_LINK=tanh CUDA_VISIBLE_DEVICES=1 GPU=1 NO_CAL_ROOT=results/compirt/holdout/multidim-tanh-all2024 CAL_ROOT=results/compirt/holdout/multidim-tanh-all2024-cal ./run_scripts/run_multidim_holdout.sh)",
+      "Bash(DIFFICULTY_LINK=tanh GPU=1 NO_CAL_ROOT=results/compirt/in_sample/multidim-tanh-all2024 CAL_ROOT=results/compirt/in_sample/multidim-tanh-all2024-cal ./run_scripts/run_multidim_all2024.sh)",
+      "Bash(git -C /teapot/students/natnguyen/CompIRT-Implementation status --short)",
+      "Bash(git -C /teapot/students/natnguyen/CompIRT-Implementation diff --stat)"
+    ]
+  }
+}

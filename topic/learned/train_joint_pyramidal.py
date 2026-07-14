@@ -262,11 +262,18 @@ def run_experiment(args):
         "split": args.split,
         "tournament": args.tournament or "",
         "dimensions": args.dimensions,
+        # 'vocab_size' is the realized vocabulary; the knobs that produced it are
+        # recorded alongside so a run can be reproduced from summary.json alone.
         "vocab_size": len(vocabulary),
+        "vocab_size_limit": args.vocab_size,
+        "min_df": args.min_df,
+        "rm_top": args.rm_top,
         "bow_weight": args.bow_weight,
         "topic_concentration": args.topic_concentration,
         "steps": args.steps,
         "lr": args.lr,
+        "seed": args.seed,
+        "new_player_prior": args.new_player_prior if args.train_posterior else "",
         "final_loss": losses[-1],
         "calibrate_correctness": args.calibrate_correctness,
         "players": len(data["player_ids"]),

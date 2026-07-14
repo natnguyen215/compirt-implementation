@@ -135,6 +135,7 @@ def main() -> None:
     pyramidal_steps = env_default("PYRAMIDAL_STEPS", "3000")
     bonus_steps = env_default("BONUS_STEPS", "2000")
     dimensions = env_default("DIMENSIONS", "5")
+    difficulty_link = env_default("DIFFICULTY_LINK", "sigmoid")
     synergy_dimensions = env_default("SYNERGY_DIMENSIONS", "3")
     lr = env_default("LR", "0.01")
     device = env_default("DEVICE", "cuda")
@@ -168,6 +169,7 @@ def main() -> None:
                 "DEVICE": device,
                 "GPU": gpu,
                 "DIMENSIONS": dimensions,
+                "DIFFICULTY_LINK": difficulty_link,
                 "PYRAMIDAL_STEPS": pyramidal_steps,
                 "BONUS_STEPS": bonus_steps,
                 "LR": lr,
@@ -206,6 +208,8 @@ def main() -> None:
         *tournament_args(tournament),
         "--dimensions",
         dimensions,
+        "--difficulty-link",
+        difficulty_link,
         "--steps",
         pyramidal_steps,
         "--lr",

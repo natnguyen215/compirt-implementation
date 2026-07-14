@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest import mock
 
 import pandas as pd
 
@@ -27,6 +30,8 @@ def args_for(root: Path) -> SimpleNamespace:
         device="cuda",
         new_player_prior="tier",
         synergy_dimensions=3,
+        pyramidal_module="multidim",
+        alpha_prior="gamma",
         calibrate_correctness=False,
         predict_buzz_positions=True,
         save_synergy_details=False,
@@ -66,6 +71,51 @@ class CommandConstructionTests(unittest.TestCase):
         self.assertNotIn("holdout/evaluation", all_marker_text)
 
 
+class ConfigTests(unittest.TestCase):
+    def test_save_ablation_config_writes_every_resolved_setting(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config_path = ablation.save_ablation_config(root, args_for(root))
+            config = json.loads(config_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(config_path.name, "ablation_config.json")
+        self.assertEqual(config["synergy_dimensions"], 3)
+        self.assertEqual(config["new_player_prior"], "tier")
+        self.assertEqual(config["pyramidal_steps"], 3000)
+        self.assertEqual(config["lr"], 0.01)
+        # Paths must survive the JSON round-trip as strings.
+        self.assertEqual(config["python"], ".venv/bin/python")
+
+    def _run_main(self, root: Path, extra_argv: list[str]) -> mock.Mock:
+        """Run main() with training and aggregation stubbed out."""
+        argv = ["run_multidim_ablation", "--root", str(root), *extra_argv]
+        with (
+            mock.patch.object(ablation.sys, "argv", argv),
+            mock.patch.dict(os.environ, {"COMPIRT_LOG_ACTIVE": "1"}),
+            mock.patch.object(ablation, "save_ablation_config") as save_config,
+            mock.patch.object(ablation, "run_stage"),
+            mock.patch.object(ablation, "collect_results", return_value=pd.DataFrame()),
+            mock.patch.object(ablation, "save_aggregate_outputs", return_value=root / "x.csv"),
+        ):
+            ablation.main()
+        return save_config
+
+    def test_collect_only_does_not_overwrite_the_sweep_configuration(self):
+        """A re-aggregation pass must not clobber the real sweep's settings."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "ablation"
+            save_config = self._run_main(root, ["--collect-only"])
+
+        save_config.assert_not_called()
+
+    def test_training_run_records_configuration_before_stages(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "ablation"
+            save_config = self._run_main(root, ["--dimensions", "3"])
+
+        save_config.assert_called_once()
+
+
 class MetricCollectionTests(unittest.TestCase):
     def test_collect_run_reads_nested_metrics_and_normalizes_legacy_names(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -93,7 +143,7 @@ class MetricCollectionTests(unittest.TestCase):
                     {
                         "log_loss": 0.33,
                         "part_accuracy": 0.86,
-                        "exact_score_accuracy": 0.61,
+                        "exact_acc": 0.61,
                     }
                 ]
             ).to_csv(
@@ -132,7 +182,7 @@ class MetricCollectionTests(unittest.TestCase):
         self.assertEqual(row["synergy_dimensions"], 3)
         self.assertAlmostEqual(row["bonus_log_loss"], 0.33)
         self.assertAlmostEqual(row["bonus_part_accuracy"], 0.86)
-        self.assertAlmostEqual(row["bonus_rounded_score_accuracy"], 0.61)
+        self.assertAlmostEqual(row["bonus_exact_acc"], 0.61)
         self.assertAlmostEqual(row["tossup_log_loss"], 0.44)
         self.assertAlmostEqual(row["tossup_auc"], 0.91)
         self.assertAlmostEqual(row["tossup_accuracy"], 0.5)

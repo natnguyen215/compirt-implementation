@@ -13,8 +13,10 @@ SVI rather than the paper's proposed NumPyro NUTS-MCMC inference.
 - Equation 8: the paper's literal unnormalized log-sum-exp aggregation
 - Equations 10--11: optional pairwise synergy and bonus-part outcome model
 
-Registered team rosters are treated as the players present in each game. The
-tossup likelihood uses the first recorded buzz only. Later bounce-back after a
+Per-game lineups are inferred from buzz evidence (`lineup.py`, cached under
+`data/lineups/`) rather than the full registered roster; games with no buzz
+evidence fall back to the full roster. The tossup likelihood uses the first
+recorded buzz only. Later bounce-back after a
 neg is deferred because the paper leaves its full derivation unfinished. Packet
 positions that cannot be matched to a known tossup are skipped. Bonus training
 keeps fitted tossup skills fixed.
@@ -96,11 +98,12 @@ Enable the paper's synergy term:
 pairs, but is not needed for predictions.
 
 The saved team synergy contribution is an unnormalized sum of every pairwise
-profile dot product on the full registered roster. It is not a direct measure
-of teamwork quality. Because registered rosters stand in for actual lineups,
-the contribution can include players who did not play that game. It also grows
-with the number of roster pairs and, when rosters are mostly fixed, can act as
-a team-level intercept that compensates for the skill aggregate or item
+profile dot product over the inferred game lineup. It is not a direct measure
+of teamwork quality. Because lineups are inferred from buzz evidence rather than
+observed, the contribution can still include players who did not actually play.
+It also grows with the number of roster pairs and, when lineups are mostly
+fixed, can act as a team-level intercept that compensates for the skill
+aggregate or item
 difficulties. Future synergy outputs include roster size, pair count,
 per-pair contribution, and sign-rate diagnostics to make this confounding
 visible. Interpret synergy only after held-out recombined-roster evaluation.
@@ -184,6 +187,71 @@ The evaluator reports PPB MAE after averaging observed and predicted bonus
 points within each game/team, matching the paper's game-level definition. It
 also reports per-bonus point MAE separately.
 
+## Dimension Ablations
+
+Three runners sweep the latent dimensionality and plot held-out metrics against
+it. Each fits the held-out pipeline per sweep point: Stage-1 train on
+`TRAIN_SPLIT`, a Stage-1 held-out pass on `TEST_SPLIT`, Stage 2, then evaluation.
+The `multidim` and `learned` runners fit a **synergy-only** Stage 2, so neither
+writes a `holdout/compositional` branch.
+
+```bash
+# multidim MIRT: sweeps the latent skill dimension m
+.venv/bin/python -m run_scripts.run_multidim_ablation --dimensions 1 2 3 4 5
+
+# learned topic (joint sLDA): sweeps the topic count K, which *is* the skill dimension
+.venv/bin/python -m run_scripts.run_learned_topic_ablation --dimensions 1 2 3 4 5
+
+# baseline: a 2-D grid over skill dimension m and synergy rank s
+.venv/bin/python -m run_scripts.run_baseline_ablation \
+    --dimensions 1 2 3 4 5 --synergy-dimensions 0 1 2 3
+```
+
+Each sweep point lands in `<root>/dim_<n>/{train,holdout}/...`, and the ablation
+root collects them:
+
+- `<root>/csvs/{baseline,multidim,learned_topic}_ablation_metrics.csv`: one row
+  per point.
+- `<root>/graphs/*_vs_dimensions.png` (baseline, multidim) or `*_vs_topics.png`
+  (learned). The baseline runner also writes `*_grid.png` heatmaps.
+- `<root>/ablation_config.json`: every resolved runner setting, written before
+  training starts. A `--collect-only` pass never overwrites it.
+
+Stages are resumable: each is skipped when its marker file (`summary.json`, or
+`experiment_report.md` for evaluation) already exists. Pass `--rerun` to force
+them. `--collect-only` rebuilds the aggregate CSV and graphs from existing run
+folders without retraining, and `--plot-dimensions` aggregates a wider set than
+the `--dimensions` you just trained — so a sweep can be extended incrementally.
+
+The **baseline** runner sweeps two axes at once. `--dimensions` (`m`) is the
+width of `theta_i` and of the free learned `alpha_j`; `m = 1` is the paper's
+scalar-skill CompIRT and so is the reference row. `--synergy-dimensions` (`s`) is
+the rank of the pairwise synergy term, and `s = 0` runs the no-synergy
+compositional branch as the reference column. A point lands in
+`<root>/dim_<m>/holdout/syn_<s>/`, whose bonus stage is named after the branch it
+ran (`compositional/` at `s = 0`, `synergy/` otherwise). Two consequences of
+Stage 1 not depending on `s`: the pyramidal fits are shared down each dimension's
+whole synergy column, so an `|m| x |s|` grid costs only `|m|` Stage-1 fits; and
+the tossup metrics are constant in `s`, so they are written into every CSV row
+but plotted only against `m`. Only the bonus metrics get the 2-D heatmaps.
+
+Baseline sweeps are seeded (`--seed`, default 42, threaded into both baseline
+trainers and recorded in each `summary.json`), as are learned-topic sweeps. The
+`multidim` Stage-1 trainer is **not** seeded, so adjacent points on the committed
+`m`-curve under `results/compirt/holdout/multidim-ablation/` differ partly by SVI
+initialization noise rather than by dimensionality alone; read that curve for its
+trend, not for small gaps between neighbours.
+
+The learned runner additionally exposes `--bow-weight`, `--topic-concentration`,
+`--vocab-size`, `--min-df`, `--rm-top`, and `--seed`; every value it used is
+recorded in `ablation_config.json`, in the per-point `summary.json`, and as
+columns of the aggregate CSV. **Read the `K` curve with `--bow-weight` in mind.**
+At its default of `1.0` the LDA word likelihood dominates the outcome likelihood
+(~50--150 word tokens per document against a handful of buzzes), so topics come
+out nearly unsupervised and a flat metric-vs-`K` curve is a plausible artifact
+rather than evidence that topic count does not matter. `topic/learned/CLAUDE.md`
+recommends sweeping it over roughly `0.05--1.0` against a held-out IRT metric.
+
 ## Other Info
 
 Healthy full-run outputs should have finite, generally decreasing loss curves;
@@ -193,15 +261,39 @@ no completed numeric target values for Buzz MAE, AUC, ECE, or PPB MAE. Synergy
 scores should not be interpreted as useful unless a later held-out
 recombined-team experiment shows improvement over the no-synergy model.
 
-The current artifacts cannot produce C1--C4 compositional-generalization
-curves, cold-start learning curves, or MCMC trace and R-hat plots. Those require
-new held-out split runs, repeated adaptation fits, or posterior samples. The
+Cold-start learning curves and MCMC trace/R-hat plots still require repeated
+adaptation fits or posterior samples. C1--C4 compositional generalization is
+available through the opt-in temporal runner described below. The
 timing-fit plot uses posterior medians and is therefore a fitted predictive
 check rather than a full posterior-predictive check.
 
+## Opt-in Scenario C
+
+The temporal holdout runner can additionally test whether historical player
+synergy profiles transfer to familiar, recombined, partially new, and fully new
+test rosters. See
+[`compirt_eval/SCENARIO_C.md`](../compirt_eval/SCENARIO_C.md) for the complete
+implementation protocol, classification rules, and output schema.
+
+```bash
+RUN_C1_C4=1 MODEL=baseline DEVICE=cuda \
+  .venv/bin/python -m run_scripts.run_compirt_holdout
+```
+
+Scenario C is disabled by default and does not change the existing Scenario A/B
+outputs. It trains historical no-synergy and synergy bonus stages, freezes their
+team-level parameters, and fits only the new test bonus-item parameters. Results
+are written beneath `<resolved-root>/holdout/c1-c4/`.
+
+Optional controls are `C1_C4_ITEM_STEPS` (defaults to `BONUS_STEPS`),
+`C1_C4_MIN_CROSS_TEAM_GAMES` (default 10), and `C1_C4_SEED` (default 42).
+Scenario C reports point estimates and sample sizes; it does not run bootstrap
+resampling. The implementation supports the root bonus-stage families:
+`baseline`, `multidim`, `tfidf`, and `tfidf_multidim`.
+
 Equation 8 is implemented exactly as printed in the paper:
 `tau * log(sum(exp(member_score / tau)))`. It is not normalized by roster size.
-As a result, larger registered rosters receive a larger aggregate contribution,
+As a result, larger rosters receive a larger aggregate contribution,
 and the aggregation does not approach the mean as `tau` grows despite the
 paper's accompanying verbal claim.
 

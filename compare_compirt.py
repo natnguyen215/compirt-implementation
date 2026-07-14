@@ -19,12 +19,8 @@ LOWER_IS_BETTER = {
     "per_bonus_points_mae",
     "ppb_mae",
 }
-LEGACY_METRIC_NAMES = {
-    "exact_score_accuracy": "rounded_score_accuracy",
-}
-EXCLUDED_COMPARISON_METRICS = {
-    "rounded_score_accuracy",
-}
+LEGACY_METRIC_NAMES = {}
+EXCLUDED_COMPARISON_METRICS = set()
 
 
 def resolve_metrics_path(path: Path) -> Path:

@@ -1,0 +1,76 @@
+# CompIRT Evaluation Summary
+
+Evaluation folder: `results/compirt/holdout/baseline-ablation/dim_1/holdout/syn_6/synergy-evaluation`
+Result root: `results/compirt/holdout/baseline-ablation/dim_1/holdout/syn_6`
+
+This file consolidates the metric CSVs, bonus-model comparison deltas, and fitted-parameter distribution summaries for quick review.
+
+## Run Variables And Stage Scalars
+
+| stage | field | value |
+| --- | --- | --- |
+| synergy | tournament | all tournaments |
+| synergy | dimensions | 1 |
+| synergy | steps | 2000 |
+| synergy | final_loss | 87528.3 |
+| synergy | calibrate_correctness | False |
+| synergy | synergy_dimensions | 6 |
+
+## Bonus Stage Scalars
+
+| field | value |
+| --- | --- |
+| tau | 0.0077133 |
+| mean_synergy_contribution | 0.12351 |
+| median_synergy_contribution | 0.0476919 |
+| negative_synergy_fraction | 0.418483 |
+| positive_synergy_fraction | 0.557134 |
+
+## Stage 2 Bonus Metrics
+
+| metric | value |
+| --- | --- |
+| auc | 0.920852 |
+| log_loss | 0.358799 |
+| ece | 0.0223591 |
+| part_accuracy | 0.839167 |
+| exact_acc | 0.577315 |
+| per_bonus_points_mae | 4.98963 |
+| ppb_mae | 1.6978 |
+| accuracy | 0.839167 |
+
+## Stage 1 Tossup Metrics
+
+| metric | value |
+| --- | --- |
+| auc | 0.633004 |
+| log_loss | 0.632639 |
+| ece | 0.165846 |
+| accuracy | 0.673428 |
+| buzz_position_mae | 0.155906 |
+| buzz_position_median_absolute_error | 0.135917 |
+
+## No-Synergy Versus Synergy Deltas
+
+No sibling comparison/bonus_model_comparison.csv was found.
+
+## Pyramidal Player And Tossup Parameters
+
+| group | parameter | observations | mean | standard_deviation | minimum | p05 | p25 | median | p75 | p95 | maximum |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| player | c | 1755 | 5.27013 | 0.9304 | 1.56789 | 3.35098 | 4.84343 | 5.39532 | 5.8516 | 6.52473 | 7.89358 |
+| player | theta_1 | 1755 | 0.377838 | 1.00951 | -4.16731 | -1.63914 | 0.0368822 | 0.520743 | 0.963071 | 1.70476 | 2.89545 |
+| player | theta_norm | 1755 | 0.842549 | 0.672063 | 3.49764e-05 | 0.0665987 | 0.355339 | 0.698574 | 1.14449 | 2.11422 | 4.16731 |
+| tossup | beta | 1350 | 3.19965 | 0.883852 | -0.260797 | 1.72431 | 2.65742 | 3.23739 | 3.77603 | 4.56959 | 5.83159 |
+| tossup | gamma | 1350 | 62.4725 | 183.226 | 3.49064 | 5.64867 | 8.77278 | 13.7967 | 29.9628 | 247.638 | 2311.77 |
+| tossup | mu | 1350 | 0.590817 | 0.154717 | 0.069152 | 0.342139 | 0.488981 | 0.587218 | 0.696464 | 0.848644 | 0.989239 |
+| tossup | alpha_1 | 1350 | 1.37178 | 0.727057 | -0.856994 | 0.313808 | 0.921303 | 1.31047 | 1.79205 | 2.55613 | 5.09451 |
+| tossup | alpha_norm | 1350 | 1.3848 | 0.701932 | 0.00709622 | 0.356251 | 0.921303 | 1.31047 | 1.79205 | 2.55613 | 5.09451 |
+
+## Bonus And Synergy Parameters
+
+| group | parameter | observations | mean | standard_deviation | minimum | p05 | p25 | median | p75 | p95 | maximum |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| bonus_part | beta | 4716 | 0.285494 | 1.38855 | -2.90685 | -1.86954 | -0.843226 | 0.273041 | 1.41412 | 2.4545 | 3.89384 |
+| bonus_part | alpha_1 | 4716 | 0.255715 | 0.800949 | -1.87899 | -0.904544 | -0.280301 | 0.0505826 | 0.810108 | 1.696 | 2.45544 |
+| bonus_part | alpha_norm | 4716 | 0.638446 | 0.547013 | 8.04444e-05 | 0.0324707 | 0.186929 | 0.465148 | 0.99371 | 1.69954 | 2.45544 |

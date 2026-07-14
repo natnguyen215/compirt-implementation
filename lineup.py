@@ -41,6 +41,7 @@ import argparse
 import hashlib
 import random
 from collections import defaultdict
+from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
@@ -72,6 +73,58 @@ SEGMENT_COLUMNS = [
     "random_seed",
     "notes",
 ]
+
+
+@dataclass(frozen=True)
+class LineupRecord:
+    """One resolved lineup segment plus the evidence used to infer it.
+
+    Scenario C needs the inference provenance as well as the player list.  The
+    ordinary model pipeline still calls :meth:`LineupIndex.roster_for`; keeping
+    this record behind a second lookup preserves that existing interface.
+    """
+
+    game_id: str
+    team_id: str
+    segment: str
+    start_question_number: int
+    end_question_number: int
+    roster_size: int
+    distinct_game_buzzers: int
+    lineup_size: int
+    player_ids: tuple[str, ...]
+    short_handed: bool
+    confidence: str
+    resolution_rule: str
+    notes: str
+
+
+def _as_bool(value) -> bool:
+    """Parse booleans from either freshly built rows or the string CSV cache."""
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes"}
+
+
+def _record_from_row(row) -> LineupRecord:
+    """Convert one dataframe/cache row into a typed immutable record."""
+    raw_players = row.player_ids
+    players = tuple(raw_players.split("|")) if isinstance(raw_players, str) and raw_players else ()
+    return LineupRecord(
+        game_id=str(row.game_id),
+        team_id=str(row.team_id),
+        segment=str(row.segment),
+        start_question_number=int(row.start_question_number),
+        end_question_number=int(row.end_question_number),
+        roster_size=int(row.roster_size),
+        distinct_game_buzzers=int(row.distinct_game_buzzers),
+        lineup_size=int(row.lineup_size),
+        player_ids=players,
+        short_handed=_as_bool(row.short_handed),
+        confidence=str(row.confidence),
+        resolution_rule=str(row.resolution_rule),
+        notes=str(row.notes),
+    )
 
 
 def _segment_seed(game_id: str, team_id: str, segment: str) -> int:
@@ -248,11 +301,26 @@ class LineupIndex:
     """Look up inferred lineups by game, team, and question number."""
 
     def __init__(self, segments: pd.DataFrame):
-        self._by_key: dict[tuple[str, str], dict[str, list[str]]] = {}
+        self._by_key: dict[tuple[str, str], dict[str, LineupRecord]] = {}
         for row in segments.itertuples(index=False):
-            raw = row.player_ids
-            players = raw.split("|") if isinstance(raw, str) and raw else []
-            self._by_key.setdefault((row.game_id, row.team_id), {})[row.segment] = players
+            record = _record_from_row(row)
+            self._by_key.setdefault((record.game_id, record.team_id), {})[
+                record.segment
+            ] = record
+
+    def record_for(self, game_id, team_id, question_number) -> LineupRecord | None:
+        """Return the resolved lineup record covering one question.
+
+        This is the authoritative segment lookup for downstream diagnostics.
+        Callers must not duplicate the first-half/second-half boundary logic.
+        """
+        segments = self._by_key.get((game_id, team_id))
+        if not segments:
+            return None
+        if "whole_game" in segments:
+            return segments["whole_game"]
+        half = "first_half" if question_number <= FIRST_HALF_MAX else "second_half"
+        return segments.get(half)
 
     def roster_for(self, game_id, team_id, question_number) -> list[str]:
         """Return the active lineup for a team at a given question number.
@@ -260,13 +328,8 @@ class LineupIndex:
         The bonus in a cycle reuses its tossup's lineup because both resolve
         through the same '(game, team, question -> segment)' mapping.
         """
-        segments = self._by_key.get((game_id, team_id))
-        if not segments:
-            return []
-        if "whole_game" in segments:
-            return list(segments["whole_game"])
-        half = "first_half" if question_number <= FIRST_HALF_MAX else "second_half"
-        return list(segments.get(half, []))
+        record = self.record_for(game_id, team_id, question_number)
+        return list(record.player_ids) if record is not None else []
 
     def _missing_game_teams(self, tables) -> bool:
         for game in tables["games"].to_dict("records"):
@@ -277,12 +340,11 @@ class LineupIndex:
 
     def _merge(self, segments: pd.DataFrame) -> None:
         for row in segments.itertuples(index=False):
-            key = (row.game_id, row.team_id)
-            if key in self._by_key and row.segment in self._by_key[key]:
+            record = _record_from_row(row)
+            key = (record.game_id, record.team_id)
+            if key in self._by_key and record.segment in self._by_key[key]:
                 continue
-            raw = row.player_ids
-            players = raw.split("|") if isinstance(raw, str) and raw else []
-            self._by_key.setdefault(key, {})[row.segment] = players
+            self._by_key.setdefault(key, {})[record.segment] = record
 
     @classmethod
     def from_tables(cls, tables):

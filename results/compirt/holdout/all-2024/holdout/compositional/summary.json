@@ -1,7 +1,10 @@
 {
+  "split": "year_2025",
   "tournament": "",
   "steps": 3000,
-  "final_loss": 84856.64387559891,
+  "lr": 0.005,
+  "seed": 42,
+  "final_loss": 84928.72224521637,
   "use_synergy": false,
   "synergy_dimensions": 0,
   "saved_synergy_details": false,
@@ -9,5 +12,5 @@
   "skill_dimensions": 5,
   "bonus_part_observations": 181362,
   "bonus_parts": 4716,
-  "tau": 0.22594402730464935
+  "tau": 0.23903417587280273
 }

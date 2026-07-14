@@ -15,8 +15,8 @@ single-difficulty runs; raw scalar `beta`/`gamma`/`mu` and raw vector-coordinate
 
 | Run | Topic/source | cal | theta dims | scale | bias | Median c | Mean c | Median theta_norm | Mean theta_norm |
 | --- | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `all-2024` | none | ✗ | 5 |  |  | 4.97 | 4.73 | 1.68 | 1.72 |
-| `baseline-all2024-cal` | none | ✓ | 5 | 0.390 | 2.515 | 1.61 | 1.61 | 2.14 | 2.14 |
+| `all-2024` | none | ✗ | 5 |  |  | 4.99 | 4.74 | 1.66 | 1.71 |
+| `baseline-all2024-cal` | none | ✓ | 5 | 0.395 | 2.513 | 1.57 | 1.58 | 2.12 | 2.14 |
 | `plda-all2024` | PLDA 5d | ✗ | 5 |  |  | 5.21 | 5.15 | 2.06 | 2.21 |
 | `plda-all2024-cal` | PLDA 5d | ✓ | 5 | 0.396 | 1.921 | 3.61 | 3.64 | 2.38 | 2.46 |
 | `lda-all2024` | LDA 5d | ✗ | 5 |  |  | 5.18 | 5.11 | 2.11 | 2.26 |
@@ -25,6 +25,8 @@ single-difficulty runs; raw scalar `beta`/`gamma`/`mu` and raw vector-coordinate
 | `category-all2024-cal` | one-hot category 13d | ✓ | 13 | 0.288 | 1.836 | 3.07 | 3.07 | 2.29 | 2.30 |
 | `learned-topic-all2024` | learned topic 5d | ✗ | 5 |  |  | 5.18 | 5.11 | 2.11 | 2.27 |
 | `learned-topic-all2024-cal` | learned topic 5d | ✓ | 5 |  |  | 3.49 | 3.51 | 2.33 | 2.37 |
+| `learned-topic-tfidf-all2024` | learned topic + TF-IDF 5d | ✗ | 5 |  |  | 5.67 | 5.64 | 2.37 | 2.38 |
+| `learned-topic-tfidf-all2024-cal` | learned topic + TF-IDF 5d | ✓ | 5 | 0.330 | 1.718 | 3.78 | 3.79 | 2.46 | 2.48 |
 | `embedding-all2024` | embedding relevance 5d | ✗ | 5 |  |  | 5.14 | 5.06 | 1.98 | 2.13 |
 | `embedding-all2024-cal` | embedding relevance 5d | ✓ | 5 | 0.319 | 1.975 | 3.03 | 3.05 | 2.06 | 2.04 |
 | `multidim-all2024` | multidim MIRT 5d | ✗ | 5 |  |  | 4.89 | 4.51 | 1.49 | 1.57 |
@@ -44,8 +46,8 @@ within each tossup, so they describe how concentrated the vector is.
 
 | Run | Weight vector | dims | Median norm | Mean norm | Median max share | Median effective dims |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| `all-2024` | alpha | 5 | 1.78 | 1.78 | 0.397 | 3.49 |
-| `baseline-all2024-cal` | alpha | 5 | 2.29 | 2.28 | 0.405 | 3.43 |
+| `all-2024` | alpha | 5 | 1.78 | 1.80 | 0.417 | 3.35 |
+| `baseline-all2024-cal` | alpha | 5 | 2.34 | 2.32 | 0.380 | 3.61 |
 | `plda-all2024` | topic_weight | 5 | 0.67 | 0.69 | 0.610 | 2.21 |
 | `plda-all2024-cal` | topic_weight | 5 | 0.67 | 0.69 | 0.610 | 2.21 |
 | `lda-all2024` | topic_weight | 5 | 0.73 | 0.74 | 0.700 | 1.87 |
@@ -54,6 +56,8 @@ within each tossup, so they describe how concentrated the vector is.
 | `category-all2024-cal` | topic_weight | 13 | 1.00 | 1.00 | 1.000 | 1.00 |
 | `learned-topic-all2024` | topic_weight | 5 | 0.84 | 0.81 | 0.832 | 1.42 |
 | `learned-topic-all2024-cal` | topic_weight | 5 | 0.87 | 0.84 | 0.865 | 1.32 |
+| `learned-topic-tfidf-all2024` | topic_weight | 5 | 0.80 | 0.79 | 0.793 | 1.55 |
+| `learned-topic-tfidf-all2024-cal` | topic_weight | 5 | 0.86 | 0.83 | 0.852 | 1.36 |
 | `embedding-all2024` | r | 5 | 1.00 | 0.93 | 0.999 | 1.00 |
 | `embedding-all2024-cal` | r | 5 | 1.00 | 0.99 | 1.000 | 1.00 |
 | `multidim-all2024` | r | 5 | 3.04 | 3.15 | 0.419 | 3.43 |
@@ -67,14 +71,14 @@ within each tossup, so they describe how concentrated the vector is.
 
 For scalar-difficulty runs, `d(r) = beta * sigmoid(gamma * (mu - r))`. For
 vector-difficulty runs, `d_eff(r) = sum_k w_k * beta_k * sigmoid(gamma_k *
-(mu_k - r))`, where `w` is `alpha`, `r`, or `topic_weight`. TF-IDF cumulative
-runs include the saved TF-IDF difficulty delta. This is the cross-run table to
+(mu_k - r))`, where `w` is `alpha`, `r`, or `topic_weight`. TF-IDF runs include
+their saved TF-IDF difficulty delta. This is the cross-run table to
 use when comparing multidimensional difficulty against single-difficulty runs.
 
 | Run | Difficulty form | Median d(10%) | Median d(50%) | Median d(90%) | Mean d(50%) | Median effective mu |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| `all-2024` | scalar | 3.36 | 2.57 | 0.09 | 2.40 | 0.607 |
-| `baseline-all2024-cal` | scalar | 3.77 | 3.19 | 0.21 | 2.93 | 0.656 |
+| `all-2024` | scalar | 3.34 | 2.61 | 0.09 | 2.40 | 0.610 |
+| `baseline-all2024-cal` | scalar | 3.79 | 3.20 | 0.21 | 2.95 | 0.656 |
 | `plda-all2024` | vector/topic_weight | 2.65 | 2.03 | 0.04 | 1.84 | 0.580 |
 | `plda-all2024-cal` | vector/topic_weight | 3.16 | 2.71 | 0.19 | 2.54 | 0.644 |
 | `lda-all2024` | vector/topic_weight | 2.77 | 2.13 | 0.05 | 1.94 | 0.583 |
@@ -83,6 +87,8 @@ use when comparing multidimensional difficulty against single-difficulty runs.
 | `category-all2024-cal` | vector/topic_weight | 4.25 | 3.50 | 0.65 | 3.47 | 0.708 |
 | `learned-topic-all2024` | vector/topic_weight | 2.95 | 2.26 | 0.05 | 2.08 | 0.590 |
 | `learned-topic-all2024-cal` | vector/topic_weight | 3.70 | 3.16 | 0.36 | 2.98 | 0.666 |
+| `learned-topic-tfidf-all2024` | vector/topic_weight+topic_tfidf_delta | 2.11 | 0.83 | -1.75 | 0.74 | 0.693 |
+| `learned-topic-tfidf-all2024-cal` | vector/topic_weight+topic_tfidf_delta | 3.42 | 2.64 | -0.10 | 2.54 | 0.692 |
 | `embedding-all2024` | vector/r | 3.18 | 2.38 | 0.09 | 2.22 | 0.599 |
 | `embedding-all2024-cal` | vector/r | 4.17 | 3.56 | 0.70 | 3.43 | 0.712 |
 | `multidim-all2024` | vector/r | 5.56 | 3.65 | 0.83 | 3.65 | 0.557 |
@@ -98,8 +104,8 @@ Only runs that truly save scalar `beta`, `gamma`, and `mu` appear here.
 
 | Run | Median beta | Mean beta | Median gamma | Mean gamma | Median mu | Mean mu |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `all-2024` | 3.41 | 3.36 | 12.77 | 51.71 | 0.607 | 0.604 |
-| `baseline-all2024-cal` | 3.81 | 3.79 | 12.55 | 41.73 | 0.656 | 0.648 |
+| `all-2024` | 3.40 | 3.36 | 12.84 | 51.33 | 0.610 | 0.604 |
+| `baseline-all2024-cal` | 3.84 | 3.80 | 12.44 | 41.07 | 0.656 | 0.649 |
 | `tfidf-cumulative-difficulty-all2024` | 2.56 | 2.53 | 12.14 | 59.33 | 0.722 | 0.705 |
 | `tfidf-cumulative-difficulty-all2024-cal` | 3.24 | 3.26 | 13.47 | 58.79 | 0.707 | 0.700 |
 
@@ -119,6 +125,8 @@ table above is the comparable scalar view across all runs.
 | `category-all2024-cal` | topic_weight | 13 | 0.00 | 0.33 | 5.03 | 6.65 | 0.501 | 0.516 |
 | `learned-topic-all2024` | topic_weight | 5 | 0.18 | 0.91 | 5.19 | 18.59 | 0.502 | 0.523 |
 | `learned-topic-all2024-cal` | topic_weight | 5 | 0.20 | 1.09 | 5.19 | 13.62 | 0.505 | 0.542 |
+| `learned-topic-tfidf-all2024` | topic_weight | 5 | 0.19 | 0.78 | 5.12 | 16.27 | 0.503 | 0.547 |
+| `learned-topic-tfidf-all2024-cal` | topic_weight | 5 | 0.20 | 1.04 | 5.17 | 14.03 | 0.505 | 0.548 |
 | `embedding-all2024` | r | 5 | 0.02 | 0.74 | 5.12 | 15.22 | 0.502 | 0.523 |
 | `embedding-all2024-cal` | r | 5 | 0.02 | 0.86 | 5.09 | 9.81 | 0.503 | 0.541 |
 | `multidim-all2024` | r | 5 | 0.61 | 0.79 | 5.09 | 14.47 | 0.482 | 0.512 |
@@ -132,8 +140,8 @@ These values come from each run's Stage 2 synergy summary.
 
 | Run | Topic/source | cal | synergy dims | tau | Mean synergy | Median synergy | Positive frac. | Negative frac. |
 | --- | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `all-2024` | none | ✗ | 3 | 0.546 | -0.759 | -0.747 | 0.133 | 0.835 |
-| `baseline-all2024-cal` | none | ✓ | 3 | 0.635 | 0.220 | 0.084 | 0.587 | 0.382 |
+| `all-2024` | none | ✗ | 3 | 0.539 | -0.739 | -0.727 | 0.158 | 0.811 |
+| `baseline-all2024-cal` | none | ✓ | 3 | 0.591 | 0.214 | 0.079 | 0.602 | 0.367 |
 | `plda-all2024` | PLDA 5d | ✗ | 3 | 0.327 | -0.848 | -0.746 | 0.082 | 0.886 |
 | `plda-all2024-cal` | PLDA 5d | ✓ | 3 | 0.563 | 0.064 | 0.007 | 0.543 | 0.426 |
 | `lda-all2024` | LDA 5d | ✗ | 3 | 0.356 | -0.889 | -0.797 | 0.076 | 0.893 |
@@ -142,6 +150,8 @@ These values come from each run's Stage 2 synergy summary.
 | `category-all2024-cal` | one-hot category 13d | ✓ | 3 | 0.706 | 0.091 | 0.010 | 0.556 | 0.413 |
 | `learned-topic-all2024` | learned topic 5d | ✗ | 3 | 0.332 | -0.857 | -0.757 | 0.084 | 0.885 |
 | `learned-topic-all2024-cal` | learned topic 5d | ✓ | 3 | 0.516 | 0.081 | 0.017 | 0.570 | 0.399 |
+| `learned-topic-tfidf-all2024` | learned topic + TF-IDF 5d | ✗ | 3 | 0.356 | -0.204 | -0.062 | 0.366 | 0.603 |
+| `learned-topic-tfidf-all2024-cal` | learned topic + TF-IDF 5d | ✓ | 3 | 0.521 | 0.060 | 0.009 | 0.566 | 0.402 |
 | `embedding-all2024` | embedding relevance 5d | ✗ | 3 | 0.390 | -0.941 | -0.795 | 0.088 | 0.880 |
 | `embedding-all2024-cal` | embedding relevance 5d | ✓ | 3 | 0.582 | 0.109 | 0.023 | 0.579 | 0.389 |
 | `multidim-all2024` | multidim MIRT 5d | ✗ | 3 | 0.519 | -0.686 | -0.688 | 0.195 | 0.774 |

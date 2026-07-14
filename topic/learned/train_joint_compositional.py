@@ -239,6 +239,7 @@ def run_experiment(args):
         "topic_concentration": args.topic_concentration,
         "steps": args.steps,
         "lr": args.lr,
+        "seed": args.seed,
         "final_loss": losses[-1],
         "use_synergy": args.use_synergy,
         "synergy_dimensions": args.synergy_dimensions if args.use_synergy else 0,

@@ -1,4 +1,4 @@
-"""Plot TF-IDF-aware difficulty and hazard diagnostics for a fitted TF-IDF run."""
+"""Plot cumulative TF-IDF difficulty diagnostics for a fitted TF-IDF run."""
 
 from __future__ import annotations
 
@@ -23,8 +23,6 @@ from compirt_eval.metrics import difficulty_curve
 from compirt_eval.tossups.difficulty import selected_tossups
 from tfidf.pyramidal_tfidf_model import (
     CUMULATIVE_DIFFICULTY,
-    HAZARD_SPIKE,
-    REPLACE_POSITION,
     tfidf_score_at,
 )
 from tfidf.tfidf_features import attach_tfidf_prefix_scores
@@ -64,9 +62,18 @@ def _numbered_labels(row, prefix):
     )
 
 
+def _relevance_labels(row):
+    """Return vector-weight columns: 'r_*' for multidim runs, 'alpha_*' for older ones."""
+    relevance_columns = _numbered_labels(row, "r_")
+    alpha_columns = _numbered_labels(row, "alpha_")
+    if relevance_columns and alpha_columns:
+        raise ValueError("Saved vector weights must use either r_* or alpha_*, not both")
+    return relevance_columns or alpha_columns
+
+
 def _multidim_columns(row):
     return {
-        "alpha": _numbered_labels(row, "alpha_"),
+        "r": _relevance_labels(row),
         "beta": _numbered_labels(row, "beta_"),
         "gamma": _numbered_labels(row, "gamma_"),
         "mu": _numbered_labels(row, "mu_"),
@@ -74,38 +81,38 @@ def _multidim_columns(row):
 
 
 def _saved_difficulty(row, positions):
-    """Return scalar or alpha-weighted multidim difficulty over 'positions'.
+    """Return scalar or relevance-weighted multidim difficulty over 'positions'.
 
     Scalar runs save 'beta'/'gamma'/'mu' columns; multidim runs save numbered
-    'alpha_K'/'beta_K'/'gamma_K'/'mu_K' columns, which are collapsed with the
-    same 'sum_k alpha_jk * d_jk(t)' weighting the model uses.
+    'r_K'/'beta_K'/'gamma_K'/'mu_K' columns, which are collapsed with the
+    same 'sum_k r_jk * d_jk(t)' weighting the model uses.
     """
     positions = np.asarray(positions, dtype=float)
     if {"beta", "gamma", "mu"}.issubset(row.index):
         return difficulty_curve(row.beta, row.gamma, row.mu, positions)
 
     columns = _multidim_columns(row)
-    if not all(columns[name] for name in ("alpha", "beta", "gamma", "mu")):
+    if not all(columns[name] for name in ("r", "beta", "gamma", "mu")):
         raise ValueError("TF-IDF plot requires scalar or multidim difficulty columns")
-    dimensions = {len(columns[name]) for name in ("alpha", "beta", "gamma", "mu")}
+    dimensions = {len(columns[name]) for name in ("r", "beta", "gamma", "mu")}
     if len(dimensions) != 1:
         raise ValueError("Multidim TF-IDF difficulty columns must have matching widths")
 
-    alpha = row[columns["alpha"]].to_numpy(dtype=float)
+    r = row[columns["r"]].to_numpy(dtype=float)
     per_dimension = difficulty_curve(
         row[columns["beta"]].to_numpy(dtype=float)[:, None],
         row[columns["gamma"]].to_numpy(dtype=float)[:, None],
         row[columns["mu"]].to_numpy(dtype=float)[:, None],
         positions[None, :],
     )
-    return alpha @ per_dimension
+    return r @ per_dimension
 
 
-def _alpha_mass(row):
-    """Return sum_k alpha_jk for multidim rows, or 1.0 for scalar rows."""
+def _relevance_mass(row):
+    """Return sum_k r_jk for multidim rows, or 1.0 for scalar rows."""
     columns = _multidim_columns(row)
-    if columns["alpha"] and not {"beta", "gamma", "mu"}.issubset(row.index):
-        return float(row[columns["alpha"]].to_numpy(dtype=float).sum())
+    if columns["r"] and not {"beta", "gamma", "mu"}.issubset(row.index):
+        return float(row[columns["r"]].to_numpy(dtype=float).sum())
     return 1.0
 
 
@@ -118,40 +125,18 @@ def curve_components(row, features, summary, relative_positions):
     t = features["prefix"].new_tensor(token_positions)
     base = _saved_difficulty(row, relative_positions)
     prefix = tfidf_score_at(features["prefix"], t).detach().cpu().numpy()
-    token = tfidf_score_at(features["token"], t).detach().cpu().numpy()
-
-    variant = summary.get("tfidf_variant", REPLACE_POSITION)
-    if variant == REPLACE_POSITION:
-        effective = _saved_difficulty(row, prefix)
-        return {
-            "base": base,
-            "effective": effective,
-            "delta": effective - base,
-            "delta_label": "Position-replacement delta",
-            "score": prefix,
-            "score_label": "idf_prefix",
-        }
-    if variant == CUMULATIVE_DIFFICULTY:
-        adjustment = -float(summary["tfidf_clue_effect"]) * prefix * _alpha_mass(row)
-        return {
-            "base": base,
-            "effective": base + adjustment,
-            "delta": adjustment,
-            "delta_label": "Difficulty reduction",
-            "score": prefix,
-            "score_label": "idf_prefix",
-        }
-    if variant == HAZARD_SPIKE:
-        boost = float(summary["tfidf_hazard_effect"]) * token
-        return {
-            "base": base,
-            "effective": base,
-            "delta": boost,
-            "delta_label": "Hazard logit boost",
-            "score": token,
-            "score_label": "token_idf",
-        }
-    raise ValueError(f"Unknown TF-IDF variant in summary: {variant}")
+    variant = summary.get("tfidf_variant", CUMULATIVE_DIFFICULTY)
+    if variant != CUMULATIVE_DIFFICULTY:
+        raise ValueError(f"Unknown TF-IDF variant in summary: {variant}")
+    adjustment = -float(summary["tfidf_clue_effect"]) * prefix * _relevance_mass(row)
+    return {
+        "base": base,
+        "effective": base + adjustment,
+        "delta": adjustment,
+        "delta_label": "Difficulty reduction",
+        "score": prefix,
+        "score_label": "idf_prefix",
+    }
 
 
 def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int):
@@ -174,7 +159,7 @@ def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int)
     rows = math.ceil(len(selected) / columns)
     fig, axes = plt.subplots(rows, columns, figsize=(13, 4.3 * rows), squeeze=False)
     positions = np.linspace(0.0, 1.0, 160)
-    variant = summary.get("tfidf_variant", REPLACE_POSITION)
+    variant = summary.get("tfidf_variant", CUMULATIVE_DIFFICULTY)
 
     for ax, tossup_id in zip(axes.flat, selected):
         row = parameters.loc[tossup_id]
@@ -183,7 +168,6 @@ def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int)
         features = {
             "T": T,
             "prefix": data["tfidf_prefix"][index],
-            "token": data["tfidf_token"][index],
         }
         curves = curve_components(row, features, summary, positions)
 
@@ -207,14 +191,13 @@ def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int)
             alpha=0.65,
             label="Base difficulty d(t)",
         )
-        if variant != HAZARD_SPIKE:
-            curve_ax.plot(
-                positions,
-                curves["effective"],
-                color="black",
-                linewidth=2.2,
-                label="Effective difficulty d'(t)",
-            )
+        curve_ax.plot(
+            positions,
+            curves["effective"],
+            color="black",
+            linewidth=2.2,
+            label="Effective difficulty d'(t)",
+        )
         curve_ax.plot(
             positions,
             curves["delta"],

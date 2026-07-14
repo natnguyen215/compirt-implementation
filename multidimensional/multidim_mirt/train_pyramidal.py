@@ -4,7 +4,10 @@ This mirrors the root 'train_pyramidal.py' but imports
 'multidimensional.multidim_mirt.pyramidal_model' and saves vector-valued tossup
 difficulty parameters:
 
-    alpha_1..K, beta_1..K, gamma_1..K, mu_1..K
+    r_1..K, beta_1..K, gamma_1..K, mu_1..K
+
+The weight column is 'r', not the baseline's 'alpha', because per-dimension
+difficulty puts the weight outside the skill gap (see the model's docstring).
 
 Start reading at 'run_experiment' near the bottom; it coordinates the same
 load -> build -> tensors -> train -> predict -> save workflow as the root
@@ -49,7 +52,7 @@ from utils.training import fit_svi, require_device
 
 
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "results" / "compirt" / "multidim-pyramidal"
-FORMULA = "logit_ij(t) = sum_k alpha_jk * (theta_ik - d_jk(t))"
+FORMULA = "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))"
 
 
 def save_multidim_parameters(output_dir, data, posterior):
@@ -66,7 +69,7 @@ def save_multidim_parameters(output_dir, data, posterior):
     player_df.to_csv(output_dir / "players.csv", index=False)
 
     tossups = {"tossup_id": data["tossup_ids"]}
-    add_numbered_tensor_columns(tossups, "alpha", posterior["alpha"])
+    add_numbered_tensor_columns(tossups, "r", posterior["r"])
     add_numbered_tensor_columns(tossups, "beta", posterior["beta"])
     add_numbered_tensor_columns(tossups, "gamma", posterior["gamma"])
     add_numbered_tensor_columns(tossups, "mu", posterior["mu"])
@@ -79,11 +82,12 @@ def train_model(
     n_steps=1000,
     lr=0.02,
     calibrate_correctness=False,
+    difficulty_link="sigmoid",
 ):
     """Fit the model and return posterior medians, guide, and loss curve."""
     return fit_svi(
         competing_risks_model,
-        (data, n_dimensions, calibrate_correctness),
+        (data, n_dimensions, calibrate_correctness, difficulty_link),
         n_steps,
         lr,
         return_guide=True,
@@ -129,6 +133,7 @@ def run_experiment(args):
         args.steps,
         args.lr,
         args.calibrate_correctness,
+        args.difficulty_link,
     )
 
     save_multidim_parameters(args.output_dir, data, posterior)
@@ -141,10 +146,10 @@ def run_experiment(args):
 
     # Attach fitted predictions back onto the readable observation rows.
     correct, hazard, survival = posterior_row_predictions(
-        data, posterior, args.calibrate_correctness
+        data, posterior, args.calibrate_correctness, args.difficulty_link
     )
     buzz_expected = (
-        expected_first_buzz_positions(data, posterior)
+        expected_first_buzz_positions(data, posterior, args.difficulty_link)
         if args.predict_buzz_positions
         else None
     )
@@ -157,6 +162,7 @@ def run_experiment(args):
         "formula": FORMULA,
         "tournament": args.tournament or "",
         "dimensions": args.dimensions,
+        "difficulty_link": args.difficulty_link,
         "steps": args.steps,
         "final_loss": losses[-1],
         "players": len(data["player_ids"]),
@@ -176,6 +182,12 @@ def parse_args():
     parser.add_argument("--split", default="all")
     parser.add_argument("--tournament")
     parser.add_argument("--dimensions", type=int, default=1)
+    parser.add_argument(
+        "--difficulty-link",
+        choices=("sigmoid", "tanh"),
+        default="sigmoid",
+        help="link inside d_jk(t); tanh lets difficulty go negative late",
+    )
     parser.add_argument("--steps", type=int, default=1000)
     parser.add_argument("--lr", type=float, default=0.02)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")

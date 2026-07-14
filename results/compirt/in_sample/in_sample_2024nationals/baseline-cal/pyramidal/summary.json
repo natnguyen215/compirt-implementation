@@ -1,0 +1,19 @@
+{
+  "model": "competing-risks",
+  "tournament": "2024-acf-nationals",
+  "dimensions": 5,
+  "steps": 5000,
+  "final_loss": 60923.07885849476,
+  "players": 189,
+  "tossups": 360,
+  "events": 8132,
+  "predicted_buzz_positions": true,
+  "calibrate_correctness": true,
+  "observation_counts": {
+    "CENSORED": 53533,
+    "BUZZ": 7940,
+    "NO-BUZZ": 1431
+  },
+  "correctness_scale": 0.3287239074707031,
+  "correctness_bias": 1.7281891107559204
+}

@@ -22,15 +22,21 @@ def inverse_logit(logits):
     return 1.0 / (1.0 + np.exp(-np.clip(logits, -60, 60)))
 
 
-def difficulty_curve(beta, gamma, mu, positions):
+def difficulty_curve(beta, gamma, mu, positions, link="sigmoid"):
     """Evaluate the saved pyramidal difficulty curve on relative positions.
 
     This is the NumPy re-implementation of the model's Eq. 3 sigmoid difficulty,
-    used to redraw fitted curves from saved 'beta', 'gamma', and 'mu'.
+    used to redraw fitted curves from saved 'beta', 'gamma', and 'mu'. Runs
+    trained with the opt-in tanh link (recorded in their 'summary.json') must
+    be replayed with 'link="tanh"'.
     """
     # Clip the sigmoid argument to +-60 so np.exp stays finite; sigmoid is
     # already saturated to 0/1 well before that, so the curve is unchanged.
     argument = np.clip(gamma * (mu - positions), -60, 60)
+    if link == "tanh":
+        return beta * np.tanh(argument)
+    if link != "sigmoid":
+        raise ValueError(f"Unknown difficulty link {link!r}")
     return beta / (1.0 + np.exp(-argument))
 
 
@@ -105,9 +111,8 @@ def bonus_metrics(parts, teams):
     """Return the paper's part-, bonus-, and game-level bonus metrics.
 
     Covers part-level classification (AUC/log-loss/ECE/accuracy), strict exact
-    bonus-part recovery, rounded-score recovery, per-bonus points MAE, and
-    points-per-bonus (PPB) MAE, which the paper defines at the game/team level
-    (Scenario B).
+    bonus-part recovery, per-bonus points MAE, and points-per-bonus (PPB) MAE,
+    which the paper defines at the game/team level (Scenario B).
     """
     metrics = classification_metrics(parts["correct"], parts["predicted_correct"])
     part_matches = (parts["predicted_correct"] >= 0.5) == parts["correct"].astype(bool)
@@ -131,18 +136,6 @@ def bonus_metrics(parts, teams):
     else:
         metrics["exact_acc"] = float("nan")
 
-    # A standard three-part bonus can only score 0, 10, 20, or 30 points; snap
-    # the continuous expected-points prediction to the nearest of these.
-    possible_scores = np.asarray([0, 10, 20, 30])
-    predicted_score_index = np.abs(
-        teams["predicted_points"].to_numpy()[:, None] - possible_scores[None, :]
-    ).argmin(axis=1)
-    metrics["rounded_score_accuracy"] = float(
-        (
-            possible_scores[predicted_score_index]
-            == teams["total_points"].to_numpy()
-        ).mean()
-    )
     metrics["per_bonus_points_mae"] = mean_absolute_error(
         teams["total_points"], teams["predicted_points"]
     )
@@ -157,4 +150,3 @@ def bonus_metrics(parts, teams):
         game_ppb["observed_ppb"], game_ppb["predicted_ppb"]
     )
     return metrics
-

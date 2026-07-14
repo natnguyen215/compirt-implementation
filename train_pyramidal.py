@@ -14,6 +14,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+import pyro
+
 from pyramidal_model import (
     competing_risks_model,
     expected_first_buzz_positions,
@@ -63,6 +65,7 @@ def run_experiment(args):
     output_dir = args.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
     require_device(args.device)
+    pyro.set_rng_seed(args.seed)
     # Load tables -> build BUZZ/CENSORED/NO-BUZZ rows -> index into tensors.
     tables = filter_tournament(load_hf_tables(args.data_dir, args.split), args.tournament)
     observations = build_tossup_observations(tables)
@@ -121,9 +124,12 @@ def run_experiment(args):
     # summary.json records run configuration and dataset size at a glance.
     summary = {
         "model": "competing-risks",
+        "split": args.split,
         "tournament": args.tournament or "",
         "dimensions": args.dimensions,
         "steps": args.steps,
+        "lr": args.lr,
+        "seed": args.seed,
         "final_loss": losses[-1],
         "players": len(data["player_ids"]),
         "tossups": len(data["tossup_ids"]),
@@ -144,6 +150,7 @@ def parse_args():
     parser.add_argument("--dimensions", type=int, default=1)
     parser.add_argument("--steps", type=int, default=1000)
     parser.add_argument("--lr", type=float, default=0.02)
+    parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     parser.add_argument("--predict-buzz-positions", action="store_true")
     parser.add_argument("--calibrate-correctness", action="store_true")
