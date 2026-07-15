@@ -20,11 +20,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 DEFAULT_DATABASE = ROOT / "data" / "database.db"
-DEFAULT_TOP_PLAYERS = ROOT / "results" / "cuda-all-2024" / "pyramidal" / "top_players.csv"
-DEFAULT_PREDICTIONS = (
-    ROOT / "results" / "cuda-all-2024" / "pyramidal" / "tossup_predictions.csv"
-)
-DEFAULT_OUTPUT_DIR = ROOT / "results" / "cuda-all-2024" / "ranking_comparison"
 ACTUAL_RANK_MODES = ("ppg", "pp20")
 
 
@@ -365,9 +360,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tournament", required=True, help="Tournament slug to compare")
     parser.add_argument("--database", type=Path, default=DEFAULT_DATABASE)
-    parser.add_argument("--top-players", type=Path, default=DEFAULT_TOP_PLAYERS)
-    parser.add_argument("--predictions", type=Path, default=DEFAULT_PREDICTIONS)
-    parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument(
+        "--top-players",
+        type=Path,
+        required=True,
+        help="A fitted run's pyramidal top_players.csv",
+    )
+    parser.add_argument(
+        "--predictions",
+        type=Path,
+        required=True,
+        help="The same run's pyramidal tossup_predictions.csv",
+    )
+    parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(
         "--actual-rank-mode",
         choices=ACTUAL_RANK_MODES,

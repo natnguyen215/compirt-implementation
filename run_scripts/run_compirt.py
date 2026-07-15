@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Configurable CUDA CompIRT experiment runner.
 
-Python equivalent of 'run_compirt.sh'. Environment variables keep the same
-meaning as the shell script:
+'run_compirt.sh' is a thin wrapper around this script. Environment variables:
 
 * 'TOURNAMENT=""' includes every tournament in the selected split.
 * 'ROOT' chooses the output root.
@@ -30,7 +29,7 @@ from utils.run_logging import (
     tee_run_output,
 )
 
-PYTHON = REPO_ROOT / ".venv" / "bin" / "python"
+PYTHON = Path(os.environ.get("PYTHON", str(REPO_ROOT / ".venv" / "bin" / "python")))
 
 
 def env_default(name: str, default: str) -> str:

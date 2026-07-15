@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Full-2024 CompIRT experiment wrapper.
 
-Python equivalent of 'run_compirt_2024.sh'. It validates the dataset,
-checks model-ready data, then delegates to 'run_compirt.py' with all-2024
-defaults and both no-synergy and synergy variants enabled.
+'run_compirt_2024.sh' is a thin wrapper around this script. It validates the
+dataset, checks model-ready data, then delegates to 'run_compirt.py' with
+all-2024 defaults and both no-synergy and synergy variants enabled.
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ from utils.run_logging import (
     tee_run_output,
 )
 
-PYTHON = REPO_ROOT / ".venv" / "bin" / "python"
+PYTHON = Path(os.environ.get("PYTHON", str(REPO_ROOT / ".venv" / "bin" / "python")))
 
 
 def env_default(name: str, default: str) -> str:

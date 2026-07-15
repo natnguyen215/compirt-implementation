@@ -27,7 +27,6 @@ COLUMNS = [
     "auc",
     "ece",
 ]
-LEGACY_METRIC_NAMES = {}
 DEFAULT_RUNS = [
     "results/compirt/in_sample/plda-all2024",
     "results/compirt/in_sample/baseline-all2024",
@@ -44,9 +43,6 @@ def load_run(run_dir: Path) -> dict[str, object]:
         ):
             if path.exists():
                 row = pd.read_csv(path).iloc[0].to_dict()
-                for old_name, new_name in LEGACY_METRIC_NAMES.items():
-                    if old_name in row and new_name not in row:
-                        row[new_name] = row.pop(old_name)
                 row["run"] = run_dir.name
                 row["eval"] = sub
                 return row

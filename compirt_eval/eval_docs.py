@@ -25,25 +25,9 @@ TOSSUP_METRICS = [
     "log_loss",
     "ece",
     "accuracy",
-    "acc",
     "buzz_position_mae",
     "buzz_position_median_absolute_error",
 ]
-METRIC_ALIASES = {}
-
-
-def _repo_display(path: Path) -> str:
-    """Return a readable stable path string."""
-    return str(path)
-
-
-def normalize_metric_row(row: dict[str, object]) -> dict[str, object]:
-    """Normalize legacy metric names while preserving current names."""
-    normalized = dict(row)
-    for old_name, new_name in METRIC_ALIASES.items():
-        if old_name in normalized and new_name not in normalized:
-            normalized[new_name] = normalized.pop(old_name)
-    return normalized
 
 
 def load_metrics_row(evaluation_dir: Path, filename: str) -> dict[str, object]:
@@ -52,7 +36,7 @@ def load_metrics_row(evaluation_dir: Path, filename: str) -> dict[str, object]:
     frame = _read_csv(path)
     if frame.empty:
         return {}
-    return normalize_metric_row(frame.iloc[0].to_dict())
+    return frame.iloc[0].to_dict()
 
 
 def _metric_frame(row: dict[str, object], names: list[str]) -> pd.DataFrame:
@@ -219,10 +203,7 @@ def _comparison_frame(comparison_csv: Path | None) -> pd.DataFrame:
     """Load no-synergy versus synergy comparison metrics if available."""
     if comparison_csv is None or not Path(comparison_csv).exists():
         return pd.DataFrame()
-    frame = pd.read_csv(comparison_csv)
-    if "metric" in frame:
-        frame["metric"] = frame["metric"].replace(METRIC_ALIASES)
-    return frame
+    return pd.read_csv(comparison_csv)
 
 
 def _append_table(
@@ -298,8 +279,8 @@ def write_eval_docs_summary(
     lines = [
         "# CompIRT Evaluation Summary",
         "",
-        f"Evaluation folder: `{_repo_display(evaluation_dir)}`",
-        f"Result root: `{_repo_display(result_root_for_evaluation(evaluation_dir))}`",
+        f"Evaluation folder: `{evaluation_dir}`",
+        f"Result root: `{result_root_for_evaluation(evaluation_dir)}`",
         "",
         (
             "This file consolidates the metric CSVs, bonus-model comparison "

@@ -26,6 +26,11 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from run_scripts.lib.ablation import (
+    path_for_command,
+    repo_path,
+    tournament_args as optional_tournament_args,
+)
 from utils.run_logging import (
     format_run_log_header,
     resolve_result_root,
@@ -96,30 +101,8 @@ MODEL_SPECS: tuple[ModelSpec, ...] = (
 MODEL_BY_NAME = {spec.name: spec for spec in MODEL_SPECS}
 
 
-def repo_path(path: Path) -> Path:
-    """Resolve a possibly relative path against the repository root."""
-    return path if path.is_absolute() else REPO_ROOT / path
-
-
-def repo_relative(path: Path) -> Path:
-    """Return a stable display path for paths inside the repository."""
-    try:
-        return path.relative_to(REPO_ROOT)
-    except ValueError:
-        return path
-
-
-def path_for_command(path: Path) -> str:
-    """Render repository-local paths as relative command arguments."""
-    return str(repo_relative(path))
-
-
 def python_for_command(args: argparse.Namespace) -> str:
     return path_for_command(repo_path(args.python))
-
-
-def optional_tournament_args(tournament: str) -> list[str]:
-    return ["--tournament", tournament] if tournament else []
 
 
 def optional_data_dir_args(args: argparse.Namespace) -> list[str]:

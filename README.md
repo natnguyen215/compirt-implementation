@@ -14,11 +14,12 @@ The root CompIRT files are separated by responsibility through their names:
 - `evaluate_compirt.py` and the `compirt_eval/` package: the executed evaluation code
    plus its metrics, figures, and per-scenario (tossup/bonus) modules.
 - `data_pipeline/`: source-database to Hugging Face dataset builder and validator.
-- `run_scripts/run_compirt.sh` / `run_scripts/run_compirt.py`: end to end configurable
-  experiment (train, evaluate, and compare in one pass). Both python and bash versions.
-- `run_scripts/run_compirt_2024.sh` / `run_scripts/run_compirt_2024.py`:
-  full-2024 reproducibility wrapper. It runs dataset validation, then calls the
-  configurable runner with all-2024 defaults.
+- `run_scripts/run_compirt.py`: end to end configurable experiment (train,
+  evaluate, and compare in one pass). `run_scripts/run_compirt.sh` is a thin
+  wrapper around it.
+- `run_scripts/run_compirt_2024.py`: full-2024 reproducibility wrapper. It runs
+  dataset validation, then calls the configurable runner with all-2024
+  defaults. `run_scripts/run_compirt_2024.sh` is a thin wrapper around it.
 - `topic/`: topic-model experiments — `topic/fixed/` (topics fit upstream via
   LDA/PLDA/categories and fed in as fixed weights), `topic/learned/` (topics
   learned jointly with the IRT model), and shared topic helpers in `topic/utils/`.

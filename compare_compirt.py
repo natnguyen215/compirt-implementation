@@ -19,8 +19,6 @@ LOWER_IS_BETTER = {
     "per_bonus_points_mae",
     "ppb_mae",
 }
-LEGACY_METRIC_NAMES = {}
-EXCLUDED_COMPARISON_METRICS = set()
 
 
 def resolve_metrics_path(path: Path) -> Path:
@@ -93,12 +91,6 @@ def comparison_plot(comparison, output_dir):
     plt.close(fig)
 
 
-def normalize_metric_names(row: pd.Series) -> pd.Series:
-    """Return a metrics row using current metric names where legacy CSVs differ."""
-    renamed = row.rename(index=LEGACY_METRIC_NAMES)
-    return renamed[~renamed.index.duplicated(keep="first")]
-
-
 def main():
     """Diff two saved bonus-metric CSVs and write a comparison CSV, figure, and report.
 
@@ -117,12 +109,8 @@ def main():
         resolve_metrics_path(args.compositional_metrics)
     ).iloc[0]
     synergy = pd.read_csv(resolve_metrics_path(args.synergy_metrics)).iloc[0]
-    compositional = normalize_metric_names(compositional)
-    synergy = normalize_metric_names(synergy)
     common_metrics = [
-        metric
-        for metric in compositional.index
-        if metric in synergy.index and metric not in EXCLUDED_COMPARISON_METRICS
+        metric for metric in compositional.index if metric in synergy.index
     ]
 
     rows = []

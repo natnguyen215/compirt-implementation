@@ -9,18 +9,9 @@ from pathlib import Path
 import pandas as pd
 
 from compirt_eval.eval_docs import (
-    normalize_metric_row,
     result_root_for_evaluation,
     write_eval_docs_summary,
 )
-
-
-class MetricNormalizationTests(unittest.TestCase):
-    def test_normalize_metric_row_preserves_exact_acc(self):
-        row = normalize_metric_row({"auc": 0.9, "exact_acc": 0.5})
-
-        self.assertEqual(row["auc"], 0.9)
-        self.assertEqual(row["exact_acc"], 0.5)
 
 
 class EvalDocsTests(unittest.TestCase):

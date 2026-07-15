@@ -23,11 +23,8 @@ exactly one bonus branch per point, which the standard holdout driver cannot do.
 from __future__ import annotations
 
 import argparse
-import json
 import os
-import shlex
 import sys
-from dataclasses import dataclass
 from pathlib import Path
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib-compirt")
@@ -41,13 +38,24 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from compirt_eval.outputs import csv_path, graph_path, metrics_path
-from utils.run_logging import (
-    format_run_log_header,
-    resolve_result_root,
-    run_logged,
-    tee_run_output,
+from compirt_eval.outputs import csv_path, graph_path
+from run_scripts.lib.ablation import (
+    Stage,
+    add_shared_sweep_arguments,
+    configure_environment,
+    finalize_shared_sweep_args,
+    optional_path_args,
+    path_for_command,
+    read_metrics,
+    read_summary,
+    run_dir,
+    run_stage,
+    save_ablation_config,
+    start_run_log,
+    tossup_accuracy_from_predictions,
+    tournament_args,
 )
+from utils.run_logging import format_run_log_header
 
 DEFAULT_ROOT = Path("results/compirt/holdout/baseline-ablation")
 DEFAULT_DIMENSIONS = (1, 2, 3, 4, 5)
@@ -60,50 +68,6 @@ DEFAULT_SYNERGY_DIMENSIONS = (0, 1, 2, 3)
 SYNERGY_SHADE_CAP = 8
 NO_SYNERGY_COLOR = "0.45"
 SEQUENTIAL_CMAP = "Blues"
-
-
-@dataclass(frozen=True)
-class Stage:
-    """One resumable command in a grid ablation run."""
-
-    name: str
-    marker: Path
-    command: list[str]
-
-
-def repo_relative(path: Path) -> Path:
-    """Return a stable display path for paths inside the repository."""
-    try:
-        return path.relative_to(REPO_ROOT)
-    except ValueError:
-        return path
-
-
-def path_for_command(path: Path) -> str:
-    """Render paths so repository-local outputs stay readable in logs."""
-    return str(repo_relative(path))
-
-
-def repo_path(path: Path | None) -> Path | None:
-    """Resolve a path relative to the repository root."""
-    if path is None or path.is_absolute():
-        return path
-    return REPO_ROOT / path
-
-
-def tournament_args(tournament: str | None) -> list[str]:
-    """Return optional tournament-filter CLI args for training stages."""
-    return ["--tournament", tournament] if tournament else []
-
-
-def optional_path_args(flag: str, path: Path | None) -> list[str]:
-    """Return an optional path-valued CLI arg."""
-    return [flag, path_for_command(path)] if path is not None else []
-
-
-def run_dir(root: Path, dimension: int) -> Path:
-    """Return the output directory shared by one skill dimension's synergy row."""
-    return root / f"dim_{dimension}"
 
 
 def bonus_stage_name(synergy_dimensions: int) -> str:
@@ -256,52 +220,6 @@ def bonus_stages(
     ]
 
 
-def run_stage(stage: Stage, rerun: bool) -> None:
-    """Run one stage unless its marker already exists."""
-    if stage.marker.exists() and not rerun:
-        print(f"skip {stage.name}: {path_for_command(stage.marker)}", flush=True)
-        return
-    print("+ " + shlex.join(stage.command), flush=True)
-    run_logged(stage.command, cwd=REPO_ROOT)
-
-
-def read_summary(path: Path, prefix: str) -> dict[str, object]:
-    """Read a stage summary and retain selected fields with a prefix."""
-    if not path.exists():
-        return {}
-    summary = json.loads(path.read_text(encoding="utf-8"))
-    fields = {
-        f"{prefix}_final_loss": summary.get("final_loss"),
-        f"{prefix}_steps": summary.get("steps"),
-    }
-    if prefix == "bonus":
-        fields["bonus_use_synergy"] = summary.get("use_synergy")
-        fields["bonus_tau"] = summary.get("tau")
-        fields["mean_synergy_contribution"] = summary.get("mean_synergy_contribution")
-    return fields
-
-
-def read_metrics(evaluation_dir: Path, filename: str, prefix: str) -> dict[str, object]:
-    """Read one evaluation metrics CSV and prefix every metric column."""
-    path = metrics_path(evaluation_dir, filename)
-    if not path.exists():
-        return {}
-    row = pd.read_csv(path).iloc[0].to_dict()
-    return {f"{prefix}_{key}": value for key, value in row.items()}
-
-
-def tossup_accuracy_from_predictions(predictions_path: Path) -> float | None:
-    """Compute thresholded tossup correctness accuracy from saved buzz rows."""
-    if not predictions_path.exists():
-        return None
-    predictions = pd.read_csv(predictions_path)
-    buzz = predictions[predictions["z"] == "BUZZ"].copy()
-    if buzz.empty:
-        return None
-    matches = (buzz["predicted_correct"] >= 0.5) == buzz["y"].astype(bool)
-    return float(matches.mean())
-
-
 def collect_run(root: Path, dimension: int, synergy_dimensions: int) -> dict[str, object]:
     """Collect summaries and held-out metrics for one grid point."""
     current_run = run_dir(root, dimension)
@@ -320,7 +238,17 @@ def collect_run(root: Path, dimension: int, synergy_dimensions: int) -> dict[str
     }
     row.update(read_summary(train_pyr / "summary.json", "train_pyramidal"))
     row.update(read_summary(holdout_pyr / "summary.json", "holdout_pyramidal"))
-    row.update(read_summary(point / stage_name / "summary.json", "bonus"))
+    row.update(
+        read_summary(
+            point / stage_name / "summary.json",
+            "bonus",
+            {
+                "bonus_use_synergy": "use_synergy",
+                "bonus_tau": "tau",
+                "mean_synergy_contribution": "mean_synergy_contribution",
+            },
+        )
+    )
     row.update(read_metrics(evaluation, "bonus_metrics.csv", "bonus"))
     row.update(read_metrics(evaluation, "tossup_metrics.csv", "tossup"))
     if "tossup_accuracy" not in row:
@@ -546,32 +474,9 @@ def save_aggregate_outputs(root: Path, frame: pd.DataFrame) -> Path:
     return csv_output
 
 
-def save_ablation_config(root: Path, args: argparse.Namespace) -> Path:
-    """Record every resolved runner setting next to the results.
-
-    Lets a sweep be reproduced from its output directory alone, without having to
-    recover the invocation from 'run.log'.
-    """
-    config = {
-        key: str(value) if isinstance(value, Path) else value
-        for key, value in sorted(vars(args).items())
-    }
-    config_path = root / "ablation_config.json"
-    config_path.write_text(json.dumps(config, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    return config_path
-
-
-def configure_environment() -> None:
-    """Set runtime defaults used by the existing experiment runners."""
-    os.environ.setdefault("PYTHONUNBUFFERED", "1")
-    os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib-compirt")
-    os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
-
-
 def parse_args() -> argparse.Namespace:
     """Parse command-line options for the grid ablation runner."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
     parser.add_argument(
         "--dimensions",
         type=int,
@@ -600,43 +505,9 @@ def parse_args() -> argparse.Namespace:
         help="Synergy ranks to include in the aggregate CSV and graphs "
         "(defaults to --synergy-dimensions).",
     )
-    parser.add_argument("--train-split", default="year_2024")
-    parser.add_argument("--test-split", default="year_2025")
-    parser.add_argument("--tournament")
-    parser.add_argument("--data-dir", type=Path)
-    parser.add_argument("--pyramidal-steps", type=int, default=3000)
-    parser.add_argument("--bonus-steps", type=int, default=2000)
-    # Matches the committed multidim ablation rather than the trainer's own 0.02
-    # default, so the two families' curves stay comparable.
-    parser.add_argument("--lr", type=float, default=0.01)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
-    parser.add_argument("--new-player-prior", choices=("tier", "flat"), default="tier")
-    parser.add_argument(
-        "--python",
-        type=Path,
-        default=Path(os.environ.get("PYTHON", REPO_ROOT / ".venv" / "bin" / "python")),
-    )
-    parser.add_argument("--calibrate-correctness", action="store_true")
-    parser.add_argument(
-        "--predict-buzz-positions",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-    )
-    parser.add_argument("--save-synergy-details", action="store_true")
-    parser.add_argument(
-        "--rerun",
-        action="store_true",
-        help="Run stages even when their marker files already exist.",
-    )
-    parser.add_argument(
-        "--collect-only",
-        action="store_true",
-        help="Only rebuild the aggregate CSV and graphs from existing run folders.",
-    )
-    args = parser.parse_args()
-    args.root = Path(resolve_result_root(repo_path(args.root), "holdout"))
-    args.data_dir = repo_path(args.data_dir)
+    add_shared_sweep_arguments(parser, DEFAULT_ROOT)
+    args = finalize_shared_sweep_args(parser.parse_args())
     if args.plot_dimensions is None:
         args.plot_dimensions = list(args.dimensions)
     if args.plot_synergy_dimensions is None:
@@ -648,8 +519,6 @@ def parse_args() -> argparse.Namespace:
         for synergy in args.synergy_dimensions + args.plot_synergy_dimensions
     ):
         raise ValueError("synergy dimension values must all be at least 0")
-    if args.pyramidal_steps < 1 or args.bonus_steps < 1:
-        raise ValueError("--pyramidal-steps and --bonus-steps must be at least 1")
     return args
 
 
@@ -657,10 +526,7 @@ def main() -> None:
     """Run the grid ablation, then write aggregate metrics and plots."""
     args = parse_args()
     configure_environment()
-    args.root.mkdir(parents=True, exist_ok=True)
-    if os.environ.get("COMPIRT_LOG_ACTIVE") != "1":
-        os.environ["COMPIRT_LOG_ACTIVE"] = "1"
-        tee_run_output(args.root / "run.log")
+    start_run_log(args.root)
     print(
         format_run_log_header(
             {
