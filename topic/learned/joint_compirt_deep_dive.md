@@ -32,10 +32,10 @@ Because both likelihoods share $\theta_{\text{doc}}$, fitting them together make
 "who got it right" flow back into the topics. That is supervised LDA, fused with
 CompIRT.
 
-Everywhere the fixed-topic model reads $r$ from `data["topic_weight"]`, this model
-instead **samples** `theta_doc` and slices `theta_doc[:n_tossups]` as $r$. The
-competing-risks likelihood, difficulty curves, and bonus aggregation are otherwise
-**reused unchanged** from `topic_compirt`.
+Where the fixed-topic model reads $r$ from `data["topic_weight"]`, this model
+**samples** `theta_doc` and slices `theta_doc[:n_tossups]` as $r$. The
+competing-risks likelihood, difficulty curves, and bonus aggregation are
+**reused** from `topic_compirt`.
 
 ---
 
@@ -393,7 +393,7 @@ would put 2025 documents in different axes than the trained players. So:
 
 ### Running it
 
-`run_scripts/run_compirt_holdout.py` with `MODEL=learned` chains:
+`run_scripts/common/run_compirt_holdout.py` with `MODEL=learned` chains:
 
 ```text
 1. Stage-1 train on TRAIN_SPLIT → <ROOT>/train/pyramidal  (+ player_posterior.csv, topic_word_matrix.npy, vocabulary.json)
@@ -421,7 +421,7 @@ output — that is where the frozen topics live.
 - **`K` = topics = skill dimensions** — not a free topic hyperparameter.
 - **Held-out mode freezes the trained topic-word matrix** (`--train-topic-model`) and
   only changes the player prior; reuse the **training** vocabulary, never a fresh
-  one. The evaluator is the root `evaluate_compirt.py`, unchanged.
+  one. The evaluator is the root `evaluate_compirt.py`.
 - **No encoder / no amortization** — a brand-new question has no $\theta_{\text{doc}}$
   until a fold-in (a few SVI steps holding `topic_word` fixed); that is exactly what the
   held-out pass does for the whole 2025 set at once.

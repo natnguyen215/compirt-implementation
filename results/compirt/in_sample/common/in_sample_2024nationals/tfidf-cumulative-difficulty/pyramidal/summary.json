@@ -1,0 +1,32 @@
+{
+  "model": "tfidf-cumulative-difficulty-pyramidal",
+  "tfidf_variant": "cumulative-difficulty",
+  "formula": "d'_j(t) = d_j(t) - lambda_tfidf * tfidf_prefix_j(t); hazard_ij(t) = theta_i^T alpha_j - d'_j(t) - c_i",
+  "split": "year_2024",
+  "tournament": "2024-acf-nationals",
+  "dimensions": 5,
+  "steps": 5000,
+  "lr": 0.005,
+  "seed": 42,
+  "final_loss": 61165.96028202772,
+  "calibrate_correctness": false,
+  "tfidf_features": {
+    "tossups": 360,
+    "vocabulary_size": 13049,
+    "max_length": 168,
+    "normalized": true,
+    "token_weighting": "tf-idf",
+    "nonempty_tossups": 360,
+    "mean_raw_final_tfidf": 4.16619020386051
+  },
+  "players": 189,
+  "tossups": 360,
+  "events": 8132,
+  "observation_counts": {
+    "CENSORED": 53533,
+    "BUZZ": 7940,
+    "NO-BUZZ": 1431
+  },
+  "tfidf_effect_prior_scale": 1.0,
+  "tfidf_clue_effect": 2.578829526901245
+}

@@ -1,4 +1,4 @@
-"""Tests for the isolated topic-weighted CompIRT implementation."""
+"""Tests for topic-weighted CompIRT."""
 
 from __future__ import annotations
 
@@ -383,7 +383,7 @@ class TopicWeightedMathTests(unittest.TestCase):
             results_dir, output_dir, {1: "Topic A", 2: "Topic B"}
         )
 
-        graph = output_dir / "graphs" / "tossup_difficulty_curves_by_topic.png"
+        graph = output_dir / "graphs" / "tossup" / "tossup_difficulty_curves_by_topic.png"
         self.assertTrue(graph.exists())
         self.assertGreater(graph.stat().st_size, 0)
 
@@ -402,8 +402,11 @@ class TopicWeightedMathTests(unittest.TestCase):
             "event_ids": ["e1"],
         }
 
-        posterior, _ = fit_svi(
-            competing_risks_model, (data, 2, False), n_steps=1, lr=0.01
+        posterior, _guide, _losses = fit_svi(
+            competing_risks_model,
+            model_kwargs={"data": data, "calibrate_correctness": False},
+            n_steps=1,
+            lr=0.01,
         )
 
         self.assertNotIn("alpha", posterior)
@@ -422,8 +425,17 @@ class TopicWeightedMathTests(unittest.TestCase):
         }
         theta = torch.tensor([[2.0, 4.0], [0.0, 1.0]])
 
-        posterior, _ = fit_svi(
-            topic_compositional_model, (data, theta, True, 1, True), n_steps=1, lr=0.01
+        posterior, _guide, _losses = fit_svi(
+            topic_compositional_model,
+            model_kwargs={
+                "data": data,
+                "theta": theta,
+                "use_synergy": True,
+                "synergy_dimensions": 1,
+                "calibrate_correctness": True,
+            },
+            n_steps=1,
+            lr=0.01,
         )
         probabilities, aggregate, synergy = topic_posterior_predictions(
             data, theta, posterior, use_synergy=True, calibrate_correctness=True

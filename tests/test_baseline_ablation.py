@@ -12,7 +12,7 @@ from unittest import mock
 
 import pandas as pd
 
-from run_scripts import run_baseline_ablation as ablation
+from run_scripts.baseline import run_baseline_ablation as ablation
 
 
 def args_for(root: Path) -> SimpleNamespace:
@@ -31,7 +31,6 @@ def args_for(root: Path) -> SimpleNamespace:
         device="cuda",
         new_player_prior="tier",
         calibrate_correctness=False,
-        predict_buzz_positions=True,
         save_synergy_details=False,
     )
 
@@ -60,7 +59,10 @@ class CommandConstructionTests(unittest.TestCase):
         """Stage 1 is shared down a dimension's synergy column, so its paths must be too."""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / "baseline-ablation"
-            markers = [str(stage.marker) for stage in ablation.pyramidal_stages(args_for(root), 3)]
+            markers = [
+                str(stage.expected_output)
+                for stage in ablation.pyramidal_stages(args_for(root), 3)
+            ]
 
         for marker in markers:
             self.assertNotIn("syn_", marker)
@@ -174,16 +176,51 @@ class ConfigTests(unittest.TestCase):
     def test_save_ablation_config_writes_every_resolved_setting(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            config_path = ablation.save_ablation_config(root, args_for(root))
+            stages = ablation.pyramidal_stages(args_for(root), 1)
+            config_path = ablation.save_ablation_config(root, args_for(root), stages)
             config = json.loads(config_path.read_text(encoding="utf-8"))
 
         self.assertEqual(config_path.name, "ablation_config.json")
-        self.assertEqual(config["new_player_prior"], "tier")
-        self.assertEqual(config["pyramidal_steps"], 3000)
-        self.assertEqual(config["lr"], 0.01)
-        self.assertEqual(config["seed"], 42)
+        self.assertEqual(config["arguments"]["new_player_prior"], "tier")
+        self.assertEqual(config["arguments"]["pyramidal_steps"], 3000)
+        self.assertEqual(config["arguments"]["lr"], 0.01)
+        self.assertEqual(config["arguments"]["seed"], 42)
         # Paths must survive the JSON round-trip as strings.
-        self.assertEqual(config["python"], ".venv/bin/python")
+        self.assertEqual(config["arguments"]["python"], ".venv/bin/python")
+        self.assertEqual(len(config["stages"]), 2)
+
+    def test_resume_requires_matching_saved_stage_commands(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            args = args_for(root)
+            stages = ablation.pyramidal_stages(args, 1)
+            ablation.save_ablation_config(root, args, stages)
+            stages[0].expected_output.parent.mkdir(parents=True)
+            stages[0].expected_output.write_text("{}", encoding="utf-8")
+
+            ablation.validate_ablation_resume(root, stages, rerun=False)
+            changed = [
+                ablation.Stage(
+                    stages[0].name,
+                    stages[0].expected_output,
+                    [*stages[0].command, "--calibrate-correctness"],
+                ),
+                *stages[1:],
+            ]
+            with self.assertRaisesRegex(RuntimeError, "--rerun or a new --root"):
+                ablation.validate_ablation_resume(root, changed, rerun=False)
+            ablation.validate_ablation_resume(root, changed, rerun=True)
+
+    def test_legacy_completed_root_requires_rerun(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            stages = ablation.pyramidal_stages(args_for(root), 1)
+            (root / "ablation_config.json").write_text("{}", encoding="utf-8")
+            stages[0].expected_output.parent.mkdir(parents=True)
+            stages[0].expected_output.write_text("{}", encoding="utf-8")
+
+            with self.assertRaisesRegex(RuntimeError, "--rerun or a new --root"):
+                ablation.validate_ablation_resume(root, stages, rerun=False)
 
     def _run_main(self, root: Path, extra_argv: list[str]) -> mock.Mock:
         """Run main() with training and aggregation stubbed out."""

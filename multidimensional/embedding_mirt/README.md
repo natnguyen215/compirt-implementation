@@ -13,11 +13,11 @@ d_jk(t) = beta_jk * sigmoid(gamma_jk * (mu_jk - t / T_j))
 logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))
 ```
 
-CAIMIRA uses a single linear `W_R`/`b_R` map; this implementation now uses a
+Where CAIMIRA uses a single linear `W_R`/`b_R` map, this implementation uses a
 small FFN projection and centers embeddings first to remove the shared Qwen
 mean direction. The FFN weights are point-estimated jointly with
 `theta`/`beta`/`gamma`/`mu` by the same `AutoNormal` + SVI loop the rest of
-CompIRT uses. Everything else is reused, not reimplemented:
+CompIRT uses. The remaining math is imported directly:
 `difficulty_curve`/`correctness_logit`/`hazard_logit`/`log_survival` are
 imported directly from `multidimensional.multidim_mirt.pyramidal_model` (they
 already take an `alpha`-shaped argument positionally -- `r` fills that slot),
@@ -79,7 +79,7 @@ Note `r_j` is a softmax and always sums to 1 across dimensions, unlike
 regardless of `n_dimensions`. Raising `--dimensions` here spreads a fixed
 relevance budget thinner rather than adding independent discriminative
 capacity, so `--dimensions` sweeps are not directly comparable between the two
-packages -- this is CAIMIRA's design, not a bug.
+packages -- this follows from CAIMIRA's fixed-budget relevance design.
 
 ## Held-out (temporal split) runs
 

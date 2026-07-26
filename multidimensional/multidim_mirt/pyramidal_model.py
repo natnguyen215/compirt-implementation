@@ -1,42 +1,29 @@
 """Multidimensional-difficulty pyramidal tossup model.
 
-This is a small side-by-side extension of the baseline CompIRT tossup model in
-the root 'pyramidal_model.py'. It keeps learned player skills 'theta', but gives
-each latent dimension its own difficulty curve instead of one shared scalar
-curve:
+Each latent skill dimension has its own difficulty curve:
 
     d_jk(t) = beta_jk * sigmoid(gamma_jk * (mu_jk - t / T_j))
 
-Because difficulty is now per-dimension, the vector that weights each dimension
-sits *outside* the skill-minus-difficulty gap, which is the CAIMIRA relevance
-role rather than the paper's scalar-difficulty discrimination. It is therefore
-named 'r', not 'alpha' (the baseline's 'theta_i^T alpha_j - b_j(t)' keeps
-'alpha'):
+The relevance vector 'r' weights the per-dimension skill gaps:
 
     correctness_logit = sum_k r_jk * (theta_ik - d_jk(t))
     hazard_logit = correctness_logit - c_i
 
-Unlike the topic and embedding siblings, this 'r' is a *freely learned*
-'Gamma(2, 2)' vector: positive but unnormalized, so it does not sum to 1 across
-dimensions and raising 'n_dimensions' adds independent capacity.
+'r' is a freely learned 'Gamma(2, 2)' vector. Its positive, unnormalized
+coordinates give every added dimension independent capacity.
 
-Everything else mirrors 'pyramidal_model.py': competing-risks survival, optional
-correctness-only calibration, held-out player priors, and posterior median
-replay for CSV predictions.
-
-Important Dimensions (same as the baseline):
+Important dimensions:
 
 * 'n_rows' is the number of player-by-game-tossup observation rows.
 * 'n_players' and 'n_tossups' count the unique players and tossups.
 * 'n_dimensions' is the number of latent skill dimensions.
 
-Important Shapes (this is where the model differs from the baseline):
+Important shapes:
 
-* Player parameters match the baseline: 'theta' has shape
-  '(n_players, n_dimensions)' and 'c' has shape '(n_players,)'.
-* Every tossup difficulty parameter is now vector-valued: 'r', 'beta',
-  'gamma', and 'mu' each have shape '(n_tossups, n_dimensions)'. In the baseline
-  only 'alpha' carried a dimension axis.
+* 'theta' has shape '(n_players, n_dimensions)' and 'c' has shape
+  '(n_players,)'.
+* 'r', 'beta', 'gamma', and 'mu' each have shape
+  '(n_tossups, n_dimensions)'.
 * After 'row_parameters' indexes by observation row, all six parameters have
   shape '(n_rows, n_dimensions)'.
 """
@@ -45,9 +32,12 @@ from __future__ import annotations
 
 import torch
 import torch.nn.functional as F
+from torch.utils.checkpoint import checkpoint
 
 import pyro
 import pyro.distributions as dist
+
+from utils.training import survival_chunk_size
 
 
 # Opt-in link for the difficulty curve: sigmoid keeps d_jk(t) between 0 and
@@ -58,9 +48,9 @@ DIFFICULTY_LINKS = {"sigmoid": torch.sigmoid, "tanh": torch.tanh}
 def difficulty_curve(beta, gamma, mu, t, T_j, link="sigmoid"):
     """Return the per-dimension difficulty d_jk(t) at token position 't'.
 
-    Unlike the baseline scalar difficulty, each latent dimension 'k' gets its
-    own sigmoid, so 'beta', 'gamma', and 'mu' carry a trailing dimension axis and
-    the return value keeps shape '(..., n_dimensions)'.
+    Each latent dimension 'k' gets its own sigmoid, so 'beta', 'gamma', and 'mu'
+    carry a trailing dimension axis and the return value keeps shape
+    '(..., n_dimensions)'.
     """
     # 't / T_j' is a scalar per row; unsqueeze so it broadcasts across dimensions.
     relative_position = (t / T_j).unsqueeze(-1)
@@ -71,8 +61,7 @@ def difficulty_curve(beta, gamma, mu, t, T_j, link="sigmoid"):
 def correctness_logit(theta, r, beta, gamma, mu, t, T_j, link="sigmoid"):
     """Return the log-odds of a correct answer if the player buzzes at 't'.
 
-    The baseline subtracts one scalar difficulty from 'theta^T alpha'. Here each
-    dimension's difficulty is subtracted from that dimension's skill first, then
+    Each dimension's difficulty is subtracted from that dimension's skill, then
     the relevance-weighted sum collapses the dimension axis to '(n_rows,)'.
     """
     # Per-dimension skill gap theta_ik - d_jk(t).
@@ -86,20 +75,54 @@ def hazard_logit(theta, r, beta, gamma, mu, c, t, T_j, link="sigmoid"):
     return correctness_logit(theta, r, beta, gamma, mu, t, T_j, link) - c
 
 
-def log_survival(theta, r, beta, gamma, mu, c, t_star, T_j, link="sigmoid"):
-    """Return log probability of not buzzing at any position before 't_star'.
+def log_survival(
+    theta, r, beta, gamma, mu, c, t_star, T_j, link="sigmoid", chunk_size=None, t_start=None
+):
+    """Return log probability of not buzzing across the interval '[t_start, t_star)'.
 
-    Identical in structure to the baseline survival term: build one shared token
-    grid, evaluate the hazard for every row-position pair, and sum the stable
-    'log(1 - hazard)' over positions strictly before each row's stopping token.
+    Build one shared token grid, evaluate the hazard for every row-position
+    pair, and sum the stable 'log(1 - hazard)' over positions in each row's risk
+    interval. 't_start' (default 1) exceeds 1 only for phase-1 bounceback rows,
+    where the opposing team enters the risk set at 't_neg + 1' after a neg;
+    phase-0 rows keep the historical strict-before '[1, t_star)' survival exactly.
     """
+    if chunk_size is None:
+        chunk_size = survival_chunk_size()
+    if chunk_size and t_star.shape[0] > chunk_size:
+        # Each row's survival term is independent, so summing the grid in row
+        # chunks under gradient checkpointing caps peak memory at one chunk's
+        # (rows, positions, dimensions) grid while leaving the result identical
+        # to the full-batch computation. 'link' is a non-tensor passthrough;
+        # 't_start' is sliced per chunk alongside the other row tensors.
+        parts = [
+            checkpoint(
+                log_survival,
+                theta[lo:lo + chunk_size],
+                r[lo:lo + chunk_size],
+                beta[lo:lo + chunk_size],
+                gamma[lo:lo + chunk_size],
+                mu[lo:lo + chunk_size],
+                c[lo:lo + chunk_size],
+                t_star[lo:lo + chunk_size],
+                T_j[lo:lo + chunk_size],
+                link,
+                use_reentrant=False,
+                t_start=None if t_start is None else t_start[lo:lo + chunk_size],
+            )
+            for lo in range(0, t_star.shape[0], chunk_size)
+        ]
+        return torch.cat(parts)
     # Shared token-position grid [1, ..., max_t], broadcast to '(n_rows, max_t)'.
     max_t = int(t_star.max().item())
     positions = torch.arange(1, max_t + 1, device=t_star.device).unsqueeze(0)
-    # Eq. 6 is strict-before survival, and Eq. 13 deliberately uses S(T_j) for
-    # dead tossups. NO-BUZZ rows therefore stop at T_j - 1 under the paper's
-    # indexing convention; an inclusive mask would define a different model.
+    # Eq. 6 is strict-before survival, and Eq. 13 uses S(T_j) for dead tossups.
+    # The published indexing stops NO-BUZZ rows at T_j - 1, so this comparison
+    # must stay strict.
     before_stop = positions < t_star.unsqueeze(1)
+    if t_start is not None:
+        # Bounceback rows survive only from t_start onward; phase-0 rows pass
+        # t_start = 1 (or None), for which this mask is all-True from position 1.
+        before_stop = before_stop & (positions >= t_start.unsqueeze(1))
     # Unsqueeze row parameters so the hazard is evaluated at every row-position
     # pair; the dimension axis stays trailing. Logits are '(n_rows, max_t)'.
     logits = hazard_logit(
@@ -137,9 +160,9 @@ def row_parameters(data, theta, c, r, beta, gamma, mu):
 def sample_parameters(data, n_dimensions):
     """Sample player parameters and vector-valued tossup parameters.
 
-    Player priors match the baseline (Eq. 14): 'theta ~ N(0, I)', 'c ~ N(0, 1)',
-    with optional held-out overrides attached to 'data'. The tossup priors differ
-    because every difficulty parameter is now per-dimension.
+    Player priors follow Eq. 14: 'theta ~ N(0, I)' and 'c ~ N(0, 1)', with
+    optional held-out overrides attached to 'data'. Every tossup difficulty
+    parameter is per-dimension.
     """
     n_players = len(data["player_ids"])
     n_tossups = len(data["tossup_ids"])
@@ -148,8 +171,8 @@ def sample_parameters(data, n_dimensions):
     vector_zero = data["y"].new_zeros(n_dimensions)
     vector_one = data["y"].new_ones(n_dimensions)
 
-    # Held-out evaluation can attach informative per-player priors to 'data';
-    # when those keys are absent the defaults reproduce the standard model.
+    # Held-out evaluation can attach informative per-player priors to 'data'.
+    # Absent keys use the standard zero-location, unit-scale priors.
     theta_loc = data.get("theta_prior_loc", vector_zero)
     theta_scale = data.get("theta_prior_scale", vector_one)
     c_loc = data.get("c_prior_loc", zero)
@@ -194,8 +217,8 @@ def sample_correctness_calibration(data):
 def competing_risks_model(data, n_dimensions=1, calibrate_correctness=False, link="sigmoid"):
     """Define the multidimensional-difficulty competing-risks likelihood.
 
-    Structurally identical to the baseline: every rostered player contributes
-    survival before the stopping position, the actual first buzzer additionally
+    Every rostered player contributes survival before the stopping position. The
+    actual first buzzer additionally
     contributes a hazard-at-'t_star' factor and an observed correctness factor,
     and the hand-computed joint log-likelihood is added with 'pyro.factor'.
     """
@@ -204,7 +227,9 @@ def competing_risks_model(data, n_dimensions=1, calibrate_correctness=False, lin
         data, theta, c, r, beta, gamma, mu
     )
 
-    # Survival: every BUZZ, CENSORED, and NO-BUZZ row contributes.
+    # Survival: every BUZZ, CENSORED, and NO-BUZZ row contributes over its risk
+    # interval [t_start, t_star). 'data.get' keeps manual data dicts (no t_start)
+    # on the historical [1, t_star) path.
     survival = log_survival(
         row_theta,
         row_r,
@@ -215,6 +240,7 @@ def competing_risks_model(data, n_dimensions=1, calibrate_correctness=False, lin
         data["t_star"],
         data["T_j"],
         link,
+        t_start=data.get("t_start"),
     )
     # Event term: only observed first buzzers contribute hazard and correctness.
     buzz = data["is_buzz"]
@@ -240,7 +266,7 @@ def competing_risks_model(data, n_dimensions=1, calibrate_correctness=False, lin
         link,
     )
     if calibrate_correctness:
-        # Recalibrate correctness only; hazard/timing keep the original logit.
+        # Apply calibration to correctness; hazard/timing keeps its base logit.
         scale, bias = sample_correctness_calibration(data)
         correctness = scale * correctness + bias
 
@@ -292,6 +318,7 @@ def posterior_row_predictions(data, posterior, calibrate_correctness=False, link
             data["t_star"],
             data["T_j"],
             link,
+            t_start=data.get("t_start"),
         )
     )
     return correctness, hazard, survival
@@ -301,11 +328,20 @@ def expected_first_buzz_positions(data, posterior, link="sigmoid"):
     """Compute the expected first-buzz relative position for each event.
 
     Observation rows are first regrouped into padded event rosters, then the
-    function walks token by token and accumulates 't * P(first buzz at t)', using
-    the same team first-buzz derivation as the baseline model.
+    function walks token by token and accumulates 't * P(first buzz at t)'. The
+    returned position is E[t | a buzz occurs], matching the observed-buzz events
+    used for evaluation.
     """
     n_events = len(data["event_ids"])
-    counts = torch.bincount(data["event"], minlength=n_events)
+    # First-buzz timing is a full-field phase-0 quantity; skip phase-1 bounceback
+    # rows (they share an event_id but are an opponent-only continuation).
+    # Absent 'is_phase0' (pre-bounceback data) means every row is phase 0.
+    phase0 = data.get("is_phase0")
+    if phase0 is None:
+        phase0 = torch.ones(
+            len(data["event"]), dtype=torch.bool, device=data["event"].device
+        )
+    counts = torch.bincount(data["event"][phase0], minlength=n_events)
     max_roster = int(counts.max().item())
     # Training rows are one player at a time; regroup them into per-event roster
     # matrices so all of an event's players can be stepped through together.
@@ -317,6 +353,8 @@ def expected_first_buzz_positions(data, posterior, link="sigmoid"):
     event_tossup = data["tossup"].new_zeros(n_events)
     event_T = data["T_j"].new_ones(n_events)
     for row in range(len(data["event"])):
+        if not bool(phase0[row]):
+            continue
         event = int(data["event"][row].item())
         slot = next_slot[event]
         roster[event, slot] = data["player"][row]
@@ -353,6 +391,13 @@ def expected_first_buzz_positions(data, posterior, link="sigmoid"):
         first_probability = event_survival * total_hazard
         expected = expected + position * first_probability
         event_survival = event_survival * (1.0 - total_hazard)
-    expected = expected + event_T * event_survival
-    relative = (expected / event_T).detach().cpu().tolist()
+    # Condition the prediction on a buzz occurring:
+    #   E[t | buzz] = sum_t t * P(first buzz at t) / P(any buzz).
+    # Use the question end when the fitted buzz mass is numerically zero.
+    buzz_mass = 1.0 - event_survival
+    end_position = event_T.to(expected.dtype)
+    expected = torch.where(
+        buzz_mass > 1e-9, expected / buzz_mass.clamp(min=1e-9), end_position
+    )
+    relative = (expected / end_position).detach().cpu().tolist()
     return dict(zip(data["event_ids"], relative))

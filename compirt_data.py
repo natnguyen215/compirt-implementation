@@ -37,15 +37,42 @@ TABLES = (
 def load_hf_tables(data_dir: str | Path = DEFAULT_DATA_DIR, split: str = "all"):
     """Load every linked HuggingFace table as a pandas DataFrame.
 
-    'split' is '"all"' or a year split such as '"year_2024"'. The
-    returned dict is keyed by table name ('tables["games"]', etc.).
+    'split' is '"all"', a year split such as '"year_2024"', a derived
+    final-round split such as '"round-holdout:year_2024:test:0.2"', or a derived
+    stratified whole-game split such as
+    '"game-holdout:year_2024:test:5:0:42"'. The returned dict is keyed by table
+    name ('tables["games"]', etc.).
     """
+    from holdout.round_splits import (
+        parse_round_holdout_split,
+        select_round_holdout_tables,
+    )
+    from holdout.game_splits import (
+        parse_game_holdout_split,
+        select_game_holdout_tables,
+    )
+
     data_dir = Path(data_dir)
+    round_spec = parse_round_holdout_split(split)
+    game_spec = parse_game_holdout_split(split)
+    if round_spec is not None:
+        disk_split = round_spec.base_split
+    elif game_spec is not None:
+        disk_split = game_spec.base_split
+    else:
+        disk_split = split
     # Each table is its own DatasetDict directory; pandas is easier to join.
-    return {
-        name: load_from_disk(str(data_dir / name))[split].to_pandas()
+    tables = {
+        name: load_from_disk(str(data_dir / name))[disk_split].to_pandas()
         for name in TABLES
     }
+    if round_spec is not None:
+        return select_round_holdout_tables(
+            tables, round_spec.part, round_spec.fraction
+        )
+    if game_spec is not None:
+        return select_game_holdout_tables(tables, game_spec)
+    return tables
 
 
 def filter_tournament(tables, tournament: str | None):
@@ -56,7 +83,7 @@ def filter_tournament(tables, tournament: str | None):
     through its own foreign key so the result stays mutually consistent.
     """
     if not tournament:
-        # Copy so callers cannot mutate the originals.
+        # Return independent tables to protect the originals from mutation.
         return {name: table.copy() for name, table in tables.items()}
 
     tournaments = tables["tournaments"]
@@ -130,7 +157,275 @@ def _player_team(game, teams, player_id):
     return None
 
 
-def build_tossup_observations(tables, lineups=None):
+def _observed_first_buzz_rows(
+    first_buzzes,
+    games,
+    teams,
+    tournaments,
+    lineups,
+    tossup_qnum,
+    tossup_category,
+):
+    """Expand each first-buzz event into BUZZ and CENSORED roster rows.
+
+    The observed buzzer carries correctness at the clamped buzz position; every
+    other active player is censored at that same position.
+    """
+    rows = []
+    for buzz in first_buzzes.itertuples(index=False):
+        game = games[buzz.game_id]
+        question_number = int(tossup_qnum.get(buzz.tossup_id, 1))
+        roster, player_team = _event_roster(
+            buzz.game_id, game, lineups, question_number
+        )
+        # The observed buzzer must remain in the risk set even if lineup
+        # inference omitted an off-roster or otherwise anomalous player.
+        if buzz.player_id not in player_team:
+            team_of = _player_team(game, teams, buzz.player_id)
+            if team_of is not None:
+                player_team[buzz.player_id] = team_of
+                roster.append(buzz.player_id)
+        T_j = max(1, int(buzz.num_tokens_total))
+        t_star = min(max(1, int(buzz.token_position)), T_j)
+        tier = tournaments[game["tournament_id"]]["tier"]
+        for player_id in roster:
+            is_buzzer = player_id == buzz.player_id
+            rows.append(
+                {
+                    "event_id": f"{buzz.game_id}::{buzz.tossup_id}",
+                    "game_id": buzz.game_id,
+                    "team_id": player_team[player_id],
+                    "player_id": player_id,
+                    "tossup_id": buzz.tossup_id,
+                    # raw_t_star preserves source anomalies; the likelihood
+                    # consumes the clamped position in [1, T_j].
+                    "raw_t_star": int(buzz.token_position),
+                    # First-buzz rows are phase 0: everyone is at risk from the
+                    # first token, so survival runs over [t_start, t_star).
+                    "t_start": 1,
+                    "phase": 0,
+                    "t_star": t_star,
+                    "T_j": T_j,
+                    "relative_position": t_star / T_j,
+                    "y": float(bool(buzz.correct)) if is_buzzer else float("nan"),
+                    "z": "BUZZ" if is_buzzer else "CENSORED",
+                    "tournament_id": game["tournament_id"],
+                    "tier": tier,
+                    "category": tossup_category.get(buzz.tossup_id, "Unknown"),
+                    "roster_size": len(roster),
+                }
+            )
+    return rows
+
+
+def _terminal_no_buzz_rows(
+    tables,
+    games,
+    tournaments,
+    lineups,
+    first_buzzes,
+):
+    """Recover played tossups without a buzz and emit one NO-BUZZ row per player.
+
+    Packet position supplies tossup identity, while each game's 'tossups_read'
+    limit prevents unread packet questions from becoming dead-tossup events.
+    """
+    if not games or "packet_id" not in tables["games"].columns:
+        return []
+    tossups_by_packet = {
+        packet_id: group.sort_values("question_num")
+        for packet_id, group in tables["tossups"].groupby("packet")
+    }
+    buzzed = set(zip(first_buzzes["game_id"], first_buzzes["tossup_id"]))
+    rows = []
+    for game_id, game in games.items():
+        scheduled = tossups_by_packet.get(int(game["packet_id"]))
+        if scheduled is None:
+            # Without a packet match, no tossup identity can be recovered safely.
+            continue
+        scheduled = scheduled.iloc[: int(game["tossups_read"])]
+        tier = tournaments[game["tournament_id"]]["tier"]
+        for tossup in scheduled.itertuples(index=False):
+            if (game_id, tossup.tossup_id) in buzzed:
+                continue
+            roster, player_team = _event_roster(
+                game_id, game, lineups, int(tossup.question_num)
+            )
+            T_j = max(1, len(tossup.tokens))
+            for player_id in roster:
+                rows.append(
+                    {
+                        "event_id": f"{game_id}::{tossup.tossup_id}",
+                        "game_id": game_id,
+                        "team_id": player_team[player_id],
+                        "player_id": player_id,
+                        "tossup_id": tossup.tossup_id,
+                        "raw_t_star": T_j,
+                        "t_start": 1,
+                        "phase": 0,
+                        "t_star": T_j,
+                        "T_j": T_j,
+                        "relative_position": 1.0,
+                        "y": float("nan"),
+                        "z": "NO-BUZZ",
+                        "tournament_id": game["tournament_id"],
+                        "tier": tier,
+                        "category": getattr(tossup, "category", "Unknown"),
+                        "roster_size": len(roster),
+                    }
+                )
+    return rows
+
+
+def _bounceback_rows(
+    neg_first_buzzes,
+    continuation_buzzes,
+    games,
+    teams,
+    tournaments,
+    lineups,
+    tossup_qnum,
+    tossup_category,
+):
+    """Emit the opponent-only phase-1 risk set after a first-buzz neg.
+
+    Paper Section 3.1 ("Neg handling") and Appendix A: once a player negs at
+    't_neg', that player's team is locked out and only the opposing team stays
+    at risk over the remaining tokens '[t_neg + 1, T_j]'. Phase 0 has already
+    censored every player at 't_neg' (the neg is a BUZZ row, everyone else a
+    CENSORED row at that token), so this second phase adds *only* the opponent's
+    continuation. Combined, an opponent's survival is the product of its phase-0
+    term over '[1, t_neg)' and its phase-1 term over '[t_neg + 1, ...)'; the neg
+    token itself contributes no factor for the opponent, matching the
+    competing-risks convention that losers are censored just before the winner's
+    event (Eq. 6 uses a strict '< t' product).
+
+    Row types mirror phase 0 but carry a 'BOUNCE-' prefix so every existing
+    'z == "BUZZ"' first-buzz diagnostic transparently ignores them:
+
+    * 'BOUNCE-BUZZ'     the opponent who converts (or misses) the bounceback;
+                        contributes hazard and correctness at the bounce token.
+    * 'BOUNCE-CENSORED' the opponent's other players, censored at the bounce
+                        token.
+    * 'BOUNCE-NO-BUZZ'  every opponent when the question ran out with *no*
+                        recorded continuation at all; right-censored to 'T_j'
+                        (genuine post-neg survival evidence).
+
+    The bounceback is the *earliest post-neg record belonging to the opposing
+    team*. Records attributed to the locked-out negging team are impossible
+    under lockout, so they are skipped over rather than trusted. Three outcomes:
+
+    * an opposing-team continuation exists -> BOUNCE-BUZZ / BOUNCE-CENSORED;
+    * no continuation record at all -> BOUNCE-NO-BUZZ (real right-censoring);
+    * continuation records exist but none resolves to the opposing team (e.g.
+      only same-team anomalies) -> phase 1 is *omitted* for that event. Emitting
+      a no-buzz there would falsely assert the opponent survived to the end.
+
+    A continuation recorded at or before the neg token is pushed to 't_neg + 1'
+    so the phase-1 interval stays ordered.
+    """
+    continuations_by_event = {}
+    for row in continuation_buzzes.itertuples(index=False):
+        # continuation_buzzes is already token-then-buzz-id ordered, so each
+        # list stays in ascending token order.
+        continuations_by_event.setdefault(
+            (row.game_id, row.tossup_id), []
+        ).append(row)
+
+    rows = []
+    for neg in neg_first_buzzes.itertuples(index=False):
+        game = games[neg.game_id]
+        question_number = int(tossup_qnum.get(neg.tossup_id, 1))
+        roster, player_team = _event_roster(
+            neg.game_id, game, lineups, question_number
+        )
+        neg_team = player_team.get(neg.player_id) or _player_team(
+            game, teams, neg.player_id
+        )
+        if neg_team is None:
+            # Without the locked-out team we cannot define the opponent risk set.
+            continue
+        opponent = [
+            player_id for player_id in roster if player_team[player_id] != neg_team
+        ]
+        T_j = max(1, int(neg.num_tokens_total))
+        t_neg = min(max(1, int(neg.token_position)), T_j)
+        # First token at which the opponent alone is at risk.
+        t_start = min(t_neg + 1, T_j)
+        tier = tournaments[game["tournament_id"]]["tier"]
+        tossup_cat = tossup_category.get(neg.tossup_id, "Unknown")
+
+        # Earliest post-neg record that resolves to the opposing team.
+        continuations = continuations_by_event.get(
+            (neg.game_id, neg.tossup_id), []
+        )
+        bounce = None
+        bounce_team = None
+        for candidate in continuations:
+            candidate_team = player_team.get(candidate.player_id) or _player_team(
+                game, teams, candidate.player_id
+            )
+            if candidate_team is not None and candidate_team != neg_team:
+                bounce = candidate
+                bounce_team = candidate_team
+                break
+
+        if bounce is None and continuations:
+            # Only same-team / unresolvable continuations: omit phase 1 rather
+            # than fabricate false no-buzz survival evidence for the opponent.
+            continue
+
+        def base_row(player_id, t_star, z, y, raw_t_star):
+            return {
+                "event_id": f"{neg.game_id}::{neg.tossup_id}",
+                "game_id": neg.game_id,
+                "team_id": player_team[player_id],
+                "player_id": player_id,
+                "tossup_id": neg.tossup_id,
+                "raw_t_star": raw_t_star,
+                "t_start": t_start,
+                "phase": 1,
+                "t_star": t_star,
+                "T_j": T_j,
+                "relative_position": t_star / T_j,
+                "y": y,
+                "z": z,
+                "tournament_id": game["tournament_id"],
+                "tier": tier,
+                "category": tossup_cat,
+                "roster_size": len(opponent),
+            }
+
+        if bounce is not None:
+            # Keep the observed converter in the risk set even if lineup
+            # inference dropped them, mirroring the phase-0 fallback.
+            if bounce.player_id not in player_team:
+                player_team[bounce.player_id] = bounce_team
+                opponent.append(bounce.player_id)
+            raw_bounce = min(max(1, int(bounce.token_position)), T_j)
+            bounce_pos = min(max(t_start, raw_bounce), T_j)
+            for player_id in opponent:
+                is_buzzer = player_id == bounce.player_id
+                rows.append(
+                    base_row(
+                        player_id,
+                        bounce_pos,
+                        "BOUNCE-BUZZ" if is_buzzer else "BOUNCE-CENSORED",
+                        float(bool(bounce.correct)) if is_buzzer else float("nan"),
+                        int(bounce.token_position),
+                    )
+                )
+        else:
+            # No continuation at all: the opponent heard the rest of the
+            # question and never buzzed, a right-censored survival to T_j.
+            for player_id in opponent:
+                rows.append(
+                    base_row(player_id, T_j, "BOUNCE-NO-BUZZ", float("nan"), T_j)
+                )
+    return rows
+
+
+def build_tossup_observations(tables, lineups=None, include_bounceback=False):
     """Build one model row per rostered player per game-tossup event.
 
     For a tossup with a recorded first buzz, the function emits:
@@ -141,6 +436,20 @@ def build_tossup_observations(tables, lineups=None):
 
     For a recoverable dead tossup, it emits one 'NO-BUZZ' row per player.
     These rows let the competing-risks model learn from nobody buzzing.
+
+    With 'include_bounceback=True', tossups whose first buzz was a neg
+    (raw value '-5') additionally get an opposing-team phase-1 risk set
+    ('BOUNCE-*' rows) covering the tokens after the neg, completing the paper's
+    unfinished neg-then-bounceback derivation (Section 3.1 / Appendix A). See
+    '_bounceback_rows'. The default is off: no 'BOUNCE-*' rows are produced and
+    every phase-0 value is unchanged, so every other model family and the
+    held-out/ablation runners fit numerically identical models to before.
+
+    Every row carries a phase-1 survival interval '[t_start, t_star)': phase-0
+    rows use 't_start = 1' (identical to the historical '[1, t_star)') and
+    phase-1 bounceback rows use 't_start = t_neg + 1'. The 't_start' and 'phase'
+    columns are present regardless (phase-0 rows are '1' and '0'), a small
+    additive schema change from pre-bounceback runs.
 
     The active players are the per-game lineups inferred in 'lineup.py' (cached
     under 'data/lineups/') rather than the full registered roster, so the
@@ -155,102 +464,57 @@ def build_tossup_observations(tables, lineups=None):
     tournaments = tables["tournaments"].set_index("tournament_id").to_dict("index")
     if lineups is None:
         lineups = LineupIndex.load_or_build(tables)
-    tossup_qnum = tables["tossups"].set_index("tossup_id")["question_num"].to_dict()
+    tossup_metadata = tables["tossups"].set_index("tossup_id")
+    tossup_qnum = tossup_metadata["question_num"].to_dict()
+    tossup_category = (
+        tossup_metadata["category"].to_dict()
+        if "category" in tossup_metadata
+        else {}
+    )
     buzzes = tables["tossup_buzzes"].copy()
-    # Order by token position, breaking ties deterministically on the numeric
-    # suffix of buzz_id, then keep only each event's first buzz. Later buzzes,
-    # including post-neg bounce-backs, are intentionally not modeled.
+    # Order by token position with deterministic buzz_id tie-breaking, then rank
+    # buzzes within each event so the first buzz (and, for bouncebacks, the
+    # second) can be selected by rank.
     buzzes["_buzz_order"] = buzzes["buzz_id"].str.rsplit("-", n=1).str[-1].astype(int)
     buzzes = buzzes.sort_values(
         ["game_id", "tossup_id", "token_position", "_buzz_order"]
     )
-    first_buzzes = buzzes.drop_duplicates(["game_id", "tossup_id"])
-    rows = []
-
-    for buzz in first_buzzes.itertuples(index=False):
-        game = games[buzz.game_id]
-        # Both teams' inferred lineups for this tossup's segment compete.
-        question_number = int(tossup_qnum.get(buzz.tossup_id, 1))
-        roster, player_team = _event_roster(
-            buzz.game_id, game, lineups, question_number
+    buzzes["_event_rank"] = buzzes.groupby(["game_id", "tossup_id"]).cumcount()
+    first_buzzes = buzzes[buzzes["_event_rank"] == 0]
+    rows = _observed_first_buzz_rows(
+        first_buzzes,
+        games,
+        teams,
+        tournaments,
+        lineups,
+        tossup_qnum,
+        tossup_category,
+    )
+    rows.extend(
+        _terminal_no_buzz_rows(
+            tables, games, tournaments, lineups, first_buzzes
         )
-        # The observed buzzer must always yield a BUZZ row even if inference
-        # somehow omitted them (e.g. a buzz by a player off the roster).
-        if buzz.player_id not in player_team:
-            team_of = _player_team(game, teams, buzz.player_id)
-            if team_of is not None:
-                player_team[buzz.player_id] = team_of
-                roster.append(buzz.player_id)
-        # Clamp into [1, T_j]; raw_t_star keeps any source-data anomaly visible.
-        T_j = max(1, int(buzz.num_tokens_total))
-        t_star = min(max(1, int(buzz.token_position)), T_j)
-        tier = tournaments[game["tournament_id"]]["tier"]
-        for player_id in roster:
-            is_buzzer = player_id == buzz.player_id
-            rows.append(
-                {
-                    "event_id": f"{buzz.game_id}::{buzz.tossup_id}",
-                    "game_id": buzz.game_id,
-                    "team_id": player_team[player_id],
-                    "player_id": player_id,
-                    "tossup_id": buzz.tossup_id,
-                    "raw_t_star": int(buzz.token_position),
-                    "t_star": t_star,
-                    "T_j": T_j,
-                    "relative_position": t_star / T_j,
-                    # Correctness is observed only for the buzzer.
-                    "y": float(bool(buzz.correct)) if is_buzzer else float("nan"),
-                    "z": "BUZZ" if is_buzzer else "CENSORED",
-                    "tournament_id": game["tournament_id"],
-                    "tier": tier,
-                    "roster_size": len(roster),
-                }
+    )
+    if include_bounceback:
+        # A neg is the first recorded buzz with raw value -5; its bounceback is
+        # the earliest later record from the opposing team, so pass every
+        # post-first record (rank >= 1) and let _bounceback_rows pick it. Phase-1
+        # rows are appended after phase-0 rows so any drop_duplicates('event_id')
+        # downstream keeps the phase-0 representative.
+        neg_first_buzzes = first_buzzes[first_buzzes["value"] == -5]
+        continuation_buzzes = buzzes[buzzes["_event_rank"] >= 1]
+        rows.extend(
+            _bounceback_rows(
+                neg_first_buzzes,
+                continuation_buzzes,
+                games,
+                teams,
+                tournaments,
+                lineups,
+                tossup_qnum,
+                tossup_category,
             )
-
-    if games and "packet_id" in tables["games"].columns:
-        # Dead tossups have no buzz record; recover them from each game's packet.
-        tossups_by_packet = {
-            packet_id: group.sort_values("question_num")
-            for packet_id, group in tables["tossups"].groupby("packet")
-        }
-        buzzed = set(zip(first_buzzes["game_id"], first_buzzes["tossup_id"]))
-        for game_id, game in games.items():
-            scheduled = tossups_by_packet.get(int(game["packet_id"]))
-            if scheduled is None:
-                # Skip unmatched packets rather than invent tossup identities.
-                continue
-            # A game may end before the packet is exhausted; only count reads.
-            scheduled = scheduled.iloc[: int(game["tossups_read"])]
-            tier = tournaments[game["tournament_id"]]["tier"]
-            for tossup in scheduled.itertuples(index=False):
-                if (game_id, tossup.tossup_id) in buzzed:
-                    continue
-                # The dead tossup's segment follows its packet question number.
-                roster, player_team = _event_roster(
-                    game_id, game, lineups, int(tossup.question_num)
-                )
-                # Every player is observed as not buzzing before the end.
-                T_j = max(1, len(tossup.tokens))
-                for player_id in roster:
-                    rows.append(
-                        {
-                            "event_id": f"{game_id}::{tossup.tossup_id}",
-                            "game_id": game_id,
-                            "team_id": player_team[player_id],
-                            "player_id": player_id,
-                            "tossup_id": tossup.tossup_id,
-                            "raw_t_star": T_j,
-                            "t_star": T_j,
-                            "T_j": T_j,
-                            "relative_position": 1.0,
-                            "y": float("nan"),
-                            "z": "NO-BUZZ",
-                            "tournament_id": game["tournament_id"],
-                            "tier": tier,
-                            "roster_size": len(roster),
-                        }
-                    )
-
+        )
     return pd.DataFrame(rows)
 
 
@@ -327,6 +591,18 @@ def tossup_tensors(observations, device="cpu"):
             dtype=torch.long,
             device=device,
         ),
+        # Survival for each row runs over the interval [t_start, t_star). Rows
+        # built before the bounceback change have no t_start column, so default
+        # to 1 (the historical [1, t_star) behavior).
+        "t_start": torch.tensor(
+            (
+                observations["t_start"]
+                if "t_start" in observations
+                else pd.Series(1, index=observations.index)
+            ).to_numpy(),
+            dtype=torch.long,
+            device=device,
+        ),
         "t_star": torch.tensor(
             observations["t_star"].to_numpy(), dtype=torch.long, device=device
         ),
@@ -340,13 +616,27 @@ def tossup_tensors(observations, device="cpu"):
             dtype=torch.float32,
             device=device,
         ),
+        # A "buzz" contributes hazard + correctness: the phase-0 first buzzer and
+        # the phase-1 bounceback buzzer both qualify.
         "is_buzz": torch.tensor(
-            (observations["z"] == "BUZZ").to_numpy(),
+            observations["z"].isin(["BUZZ", "BOUNCE-BUZZ"]).to_numpy(),
             dtype=torch.bool,
             device=device,
         ),
         "is_no_buzz": torch.tensor(
-            (observations["z"] == "NO-BUZZ").to_numpy(),
+            observations["z"].isin(["NO-BUZZ", "BOUNCE-NO-BUZZ"]).to_numpy(),
+            dtype=torch.bool,
+            device=device,
+        ),
+        # Phase-0 rows are the genuine full-field first-buzz risk set; first-buzz
+        # timing reconstruction and PPC replay restrict to them. Absent 'phase'
+        # column (pre-bounceback frames) means every row is phase 0.
+        "is_phase0": torch.tensor(
+            (
+                observations["phase"] == 0
+                if "phase" in observations
+                else pd.Series(True, index=observations.index)
+            ).to_numpy(),
             dtype=torch.bool,
             device=device,
         ),
@@ -412,13 +702,19 @@ def parse_args():
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--split", default="all")
     parser.add_argument("--tournament")
+    parser.add_argument(
+        "--include-bounceback",
+        action="store_true",
+        help="add opponent-only phase-1 rows after first-buzz negs "
+        "(paper Section 3.1 / Appendix A)",
+    )
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
     tables = filter_tournament(load_hf_tables(args.data_dir, args.split), args.tournament)
-    tossups = build_tossup_observations(tables)
+    tossups = build_tossup_observations(tables, include_bounceback=args.include_bounceback)
     bonuses = build_bonus_part_observations(tables)
     print(f"Tossup rows: {len(tossups):,}  events: {tossups['event_id'].nunique():,}")
     print(tossups["z"].value_counts().to_string())

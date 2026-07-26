@@ -1,0 +1,120 @@
+# CompIRT Run Log
+
+Generated: 2026-07-14T12:43:01-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- BONUS_STEPS: 2000
+- CALIBRATE_CORRECTNESS: 1
+- COMPARISON_OUTPUT: results/compirt/in_sample/multidim-tanh-all2024-cal/comparison
+- COMPOSITIONAL_OUTPUT: results/compirt/in_sample/multidim-tanh-all2024-cal/compositional
+- DEVICE: cuda
+- DIFFICULTY_LINK: tanh
+- DIMENSIONS: 5
+- EVALUATION_OUTPUT: results/compirt/in_sample/multidim-tanh-all2024-cal/evaluation
+- GPU: 0
+- LR: 0.01
+- MODEL: multidim
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- PYRAMIDAL_OUTPUT: results/compirt/in_sample/multidim-tanh-all2024-cal/pyramidal
+- PYRAMIDAL_STEPS: 3000
+- PYTHON: /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python
+- PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+- ROOT: results/compirt/in_sample/multidim-tanh-all2024-cal
+- RUNNER: run_scripts/run_multidim_compirt.py
+- RUN_SYNERGY: 1
+- SAVE_SYNERGY_DETAILS: 0
+- SPLIT: year_2024
+- SYNERGY_DIMENSIONS: 3
+- SYNERGY_EVALUATION_OUTPUT: results/compirt/in_sample/multidim-tanh-all2024-cal/synergy-evaluation
+- SYNERGY_OUTPUT: results/compirt/in_sample/multidim-tanh-all2024-cal/synergy
+- TOURNAMENT: <all>
+
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -c 'import torch; assert torch.cuda.is_available(), '"'"'CUDA is unavailable'"'"'; print(torch.cuda.get_device_name(0))'
+NVIDIA GeForce RTX 4090
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python multidimensional/multidim_mirt/train_pyramidal.py --split year_2024 --dimensions 5 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/in_sample/multidim-tanh-all2024-cal/pyramidal --calibrate-correctness
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,854,121.2
+step  100  ELBO loss: 411,155.9
+step  200  ELBO loss: 389,067.6
+step  300  ELBO loss: 382,645.2
+step  400  ELBO loss: 376,657.1
+step  500  ELBO loss: 367,977.8
+step  600  ELBO loss: 360,031.1
+step  700  ELBO loss: 356,459.8
+step  800  ELBO loss: 353,383.4
+step  900  ELBO loss: 351,394.9
+step 1000  ELBO loss: 349,810.3
+step 1100  ELBO loss: 349,196.6
+step 1200  ELBO loss: 348,217.0
+step 1300  ELBO loss: 347,784.3
+step 1400  ELBO loss: 346,423.1
+step 1500  ELBO loss: 346,392.4
+step 1600  ELBO loss: 346,915.7
+step 1700  ELBO loss: 345,543.8
+step 1800  ELBO loss: 345,781.3
+step 1900  ELBO loss: 345,172.3
+step 2000  ELBO loss: 345,327.4
+step 2100  ELBO loss: 344,658.1
+step 2200  ELBO loss: 345,207.9
+step 2300  ELBO loss: 343,874.0
+step 2400  ELBO loss: 344,164.1
+step 2500  ELBO loss: 344,217.5
+step 2600  ELBO loss: 343,919.7
+step 2700  ELBO loss: 343,794.6
+step 2800  ELBO loss: 343,612.8
+step 2900  ELBO loss: 343,573.6
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_compositional.py --split year_2024 --player-skills results/compirt/in_sample/multidim-tanh-all2024-cal/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --output-dir results/compirt/in_sample/multidim-tanh-all2024-cal/compositional --calibrate-correctness
+Bonus part rows: 133,461  Parts: 3,768
+step    0  ELBO loss: 168,468.3
+step  100  ELBO loss: 79,615.5
+step  200  ELBO loss: 70,268.4
+step  300  ELBO loss: 67,063.6
+step  400  ELBO loss: 65,516.8
+step  500  ELBO loss: 65,158.4
+step  600  ELBO loss: 64,777.1
+step  700  ELBO loss: 64,463.1
+step  800  ELBO loss: 64,811.1
+step  900  ELBO loss: 64,614.4
+step 1000  ELBO loss: 64,467.7
+step 1100  ELBO loss: 64,324.4
+step 1200  ELBO loss: 64,233.8
+step 1300  ELBO loss: 64,316.7
+step 1400  ELBO loss: 64,336.9
+step 1500  ELBO loss: 64,390.1
+step 1600  ELBO loss: 64,523.1
+step 1700  ELBO loss: 64,423.1
+step 1800  ELBO loss: 64,253.4
+step 1900  ELBO loss: 64,357.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_compositional.py --split year_2024 --player-skills results/compirt/in_sample/multidim-tanh-all2024-cal/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --output-dir results/compirt/in_sample/multidim-tanh-all2024-cal/synergy --use-synergy --synergy-dimensions 3 --calibrate-correctness
+Bonus part rows: 133,461  Parts: 3,768
+step    0  ELBO loss: 163,616.1
+step  100  ELBO loss: 81,196.4
+step  200  ELBO loss: 70,992.2
+step  300  ELBO loss: 66,949.5
+step  400  ELBO loss: 65,510.3
+step  500  ELBO loss: 64,672.9
+step  600  ELBO loss: 64,608.6
+step  700  ELBO loss: 64,448.9
+step  800  ELBO loss: 64,515.9
+step  900  ELBO loss: 64,388.4
+step 1000  ELBO loss: 64,392.1
+step 1100  ELBO loss: 64,117.8
+step 1200  ELBO loss: 64,088.7
+step 1300  ELBO loss: 64,278.7
+step 1400  ELBO loss: 64,294.4
+step 1500  ELBO loss: 64,526.2
+step 1600  ELBO loss: 64,472.7
+step 1700  ELBO loss: 64,031.8
+step 1800  ELBO loss: 64,163.7
+step 1900  ELBO loss: 64,137.5
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python evaluate_compirt.py --pyramidal-results results/compirt/in_sample/multidim-tanh-all2024-cal/pyramidal --compositional-results results/compirt/in_sample/multidim-tanh-all2024-cal/compositional --output-dir results/compirt/in_sample/multidim-tanh-all2024-cal/evaluation
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python evaluate_compirt.py --pyramidal-results results/compirt/in_sample/multidim-tanh-all2024-cal/pyramidal --compositional-results results/compirt/in_sample/multidim-tanh-all2024-cal/synergy --output-dir results/compirt/in_sample/multidim-tanh-all2024-cal/synergy-evaluation
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python compare_compirt.py --compositional-metrics results/compirt/in_sample/multidim-tanh-all2024-cal/evaluation/csvs/bonus_metrics.csv --synergy-metrics results/compirt/in_sample/multidim-tanh-all2024-cal/synergy-evaluation/csvs/bonus_metrics.csv --output-dir results/compirt/in_sample/multidim-tanh-all2024-cal/comparison
+Finished. Inspect results/compirt/in_sample/multidim-tanh-all2024-cal/synergy-evaluation/experiment_report.md

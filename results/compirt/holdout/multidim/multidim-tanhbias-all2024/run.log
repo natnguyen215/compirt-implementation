@@ -1,0 +1,229 @@
+# CompIRT Run Log
+
+Generated: 2026-07-15T21:34:52-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- BONUS_STEPS: 3000
+- C1_C4_ITEM_STEPS: unknown
+- C1_C4_MIN_CROSS_TEAM_GAMES: unknown
+- C1_C4_SEED: unknown
+- CALIBRATE_CORRECTNESS: 0
+- DATABASE: unknown
+- DEVICE: cuda
+- DIFFICULTY_LINK: unknown
+- DIFFICULTY_SCALE: 5.0
+- DIMENSIONS: 5
+- GPU: 0
+- HOLDOUT_COMPARISON_OUTPUT: results/compirt/holdout/multidim-tanhbias-all2024/holdout/comparison
+- HOLDOUT_COMPOSITIONAL_OUTPUT: results/compirt/holdout/multidim-tanhbias-all2024/holdout/compositional
+- HOLDOUT_EVALUATION_OUTPUT: results/compirt/holdout/multidim-tanhbias-all2024/holdout/evaluation
+- HOLDOUT_PYRAMIDAL_OUTPUT: results/compirt/holdout/multidim-tanhbias-all2024/holdout/pyramidal
+- HOLDOUT_SYNERGY_EVALUATION_OUTPUT: results/compirt/holdout/multidim-tanhbias-all2024/holdout/synergy-evaluation
+- HOLDOUT_SYNERGY_OUTPUT: results/compirt/holdout/multidim-tanhbias-all2024/holdout/synergy
+- LR: 0.01
+- MODEL: multidim_tanhbias
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- NEW_PLAYER_PRIOR: tier
+- NO_NORMALIZE_TFIDF: unknown
+- PYRAMIDAL_STEPS: 5000
+- PYTHON: /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python
+- ROOT: results/compirt/holdout/multidim-tanhbias-all2024
+- RUNNER: run_scripts/run_compirt_holdout.py
+- RUN_C1_C4: 0
+- RUN_SYNERGY: 1
+- SAVE_SYNERGY_DETAILS: 0
+- SEED: 42
+- SYNERGY_DIMENSIONS: 3
+- TEST_SPLIT: year_2025
+- TFIDF_EFFECT_PRIOR_SCALE: unknown
+- TFIDF_PLOT_COUNT: unknown
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: <all>
+- TRAIN_PYRAMIDAL_OUTPUT: results/compirt/holdout/multidim-tanhbias-all2024/train/pyramidal
+- TRAIN_SPLIT: year_2024
+
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal_tanhbias --split year_2024 --steps 5000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/multidim-tanhbias-all2024/train/pyramidal --dimensions 5 --difficulty-scale 5.0
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 42,447,156.3
+step  100  ELBO loss: 537,215.1
+step  200  ELBO loss: 494,097.3
+step  300  ELBO loss: 460,758.6
+step  400  ELBO loss: 435,557.7
+step  500  ELBO loss: 415,769.4
+step  600  ELBO loss: 405,222.0
+step  700  ELBO loss: 399,757.7
+step  800  ELBO loss: 397,188.9
+step  900  ELBO loss: 396,594.1
+step 1000  ELBO loss: 397,020.5
+step 1100  ELBO loss: 396,909.1
+step 1200  ELBO loss: 397,773.5
+step 1300  ELBO loss: 397,939.2
+step 1400  ELBO loss: 400,097.0
+step 1500  ELBO loss: 401,404.2
+step 1600  ELBO loss: 400,793.0
+step 1700  ELBO loss: 401,415.5
+step 1800  ELBO loss: 401,497.0
+step 1900  ELBO loss: 403,216.3
+step 2000  ELBO loss: 402,453.0
+step 2100  ELBO loss: 403,515.7
+step 2200  ELBO loss: 403,989.5
+step 2300  ELBO loss: 404,282.6
+step 2400  ELBO loss: 404,654.5
+step 2500  ELBO loss: 405,171.8
+step 2600  ELBO loss: 406,979.3
+step 2700  ELBO loss: 406,278.6
+step 2800  ELBO loss: 407,377.4
+step 2900  ELBO loss: 408,278.7
+step 3000  ELBO loss: 407,820.9
+step 3100  ELBO loss: 407,705.9
+step 3200  ELBO loss: 409,066.0
+step 3300  ELBO loss: 409,357.4
+step 3400  ELBO loss: 409,751.6
+step 3500  ELBO loss: 409,048.3
+step 3600  ELBO loss: 410,562.9
+step 3700  ELBO loss: 410,756.5
+step 3800  ELBO loss: 410,886.9
+step 3900  ELBO loss: 410,864.6
+step 4000  ELBO loss: 410,832.8
+step 4100  ELBO loss: 412,043.7
+step 4200  ELBO loss: 411,271.8
+step 4300  ELBO loss: 411,880.5
+step 4400  ELBO loss: 412,398.9
+step 4500  ELBO loss: 413,460.8
+step 4600  ELBO loss: 411,438.2
+step 4700  ELBO loss: 413,049.8
+step 4800  ELBO loss: 412,782.1
+step 4900  ELBO loss: 412,933.1
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal_tanhbias --split year_2025 --steps 5000 --lr 0.01 --seed 42 --device cuda --train-posterior results/compirt/holdout/multidim-tanhbias-all2024/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanhbias-all2024/holdout/pyramidal --dimensions 5 --difficulty-scale 5.0
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 54,023,877.8
+step  100  ELBO loss: 1,594,590.6
+step  200  ELBO loss: 1,067,516.1
+step  300  ELBO loss: 789,135.0
+step  400  ELBO loss: 635,340.6
+step  500  ELBO loss: 550,702.2
+step  600  ELBO loss: 516,169.1
+step  700  ELBO loss: 506,815.3
+step  800  ELBO loss: 504,295.8
+step  900  ELBO loss: 503,500.4
+step 1000  ELBO loss: 502,946.9
+step 1100  ELBO loss: 501,116.4
+step 1200  ELBO loss: 502,222.6
+step 1300  ELBO loss: 501,590.1
+step 1400  ELBO loss: 501,645.2
+step 1500  ELBO loss: 501,790.5
+step 1600  ELBO loss: 500,914.2
+step 1700  ELBO loss: 501,402.8
+step 1800  ELBO loss: 500,216.2
+step 1900  ELBO loss: 501,485.1
+step 2000  ELBO loss: 499,683.9
+step 2100  ELBO loss: 500,038.6
+step 2200  ELBO loss: 500,625.7
+step 2300  ELBO loss: 499,702.0
+step 2400  ELBO loss: 499,689.7
+step 2500  ELBO loss: 500,062.7
+step 2600  ELBO loss: 500,243.5
+step 2700  ELBO loss: 499,002.2
+step 2800  ELBO loss: 500,117.6
+step 2900  ELBO loss: 499,426.4
+step 3000  ELBO loss: 498,839.7
+step 3100  ELBO loss: 498,779.5
+step 3200  ELBO loss: 499,657.9
+step 3300  ELBO loss: 499,969.1
+step 3400  ELBO loss: 499,476.8
+step 3500  ELBO loss: 499,079.9
+step 3600  ELBO loss: 499,086.7
+step 3700  ELBO loss: 499,832.6
+step 3800  ELBO loss: 498,983.3
+step 3900  ELBO loss: 498,693.1
+step 4000  ELBO loss: 499,269.1
+step 4100  ELBO loss: 499,099.3
+step 4200  ELBO loss: 498,636.6
+step 4300  ELBO loss: 498,643.8
+step 4400  ELBO loss: 498,633.2
+step 4500  ELBO loss: 499,260.6
+step 4600  ELBO loss: 497,834.2
+step 4700  ELBO loss: 498,062.1
+step 4800  ELBO loss: 498,004.1
+step 4900  ELBO loss: 497,721.6
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanhbias-all2024/holdout/pyramidal/players.csv --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/multidim-tanhbias-all2024/holdout/compositional
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 220,423.8
+step  100  ELBO loss: 115,179.7
+step  200  ELBO loss: 107,908.9
+step  300  ELBO loss: 105,088.4
+step  400  ELBO loss: 104,331.4
+step  500  ELBO loss: 103,895.6
+step  600  ELBO loss: 103,450.2
+step  700  ELBO loss: 103,506.0
+step  800  ELBO loss: 102,996.8
+step  900  ELBO loss: 102,874.8
+step 1000  ELBO loss: 102,545.0
+step 1100  ELBO loss: 102,821.8
+step 1200  ELBO loss: 102,770.8
+step 1300  ELBO loss: 102,349.2
+step 1400  ELBO loss: 102,415.5
+step 1500  ELBO loss: 102,207.1
+step 1600  ELBO loss: 102,532.2
+step 1700  ELBO loss: 102,324.7
+step 1800  ELBO loss: 102,804.5
+step 1900  ELBO loss: 102,212.4
+step 2000  ELBO loss: 102,390.8
+step 2100  ELBO loss: 102,568.9
+step 2200  ELBO loss: 102,047.6
+step 2300  ELBO loss: 101,775.1
+step 2400  ELBO loss: 101,487.0
+step 2500  ELBO loss: 102,002.0
+step 2600  ELBO loss: 101,122.5
+step 2700  ELBO loss: 102,117.3
+step 2800  ELBO loss: 102,125.2
+step 2900  ELBO loss: 101,248.3
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanhbias-all2024/holdout/pyramidal/players.csv --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/multidim-tanhbias-all2024/holdout/synergy --use-synergy --synergy-dimensions 3
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 211,535.6
+step  100  ELBO loss: 115,551.4
+step  200  ELBO loss: 107,427.4
+step  300  ELBO loss: 104,010.8
+step  400  ELBO loss: 103,690.7
+step  500  ELBO loss: 102,514.8
+step  600  ELBO loss: 102,383.5
+step  700  ELBO loss: 102,245.7
+step  800  ELBO loss: 101,062.4
+step  900  ELBO loss: 101,411.1
+step 1000  ELBO loss: 101,369.9
+step 1100  ELBO loss: 101,045.6
+step 1200  ELBO loss: 101,440.4
+step 1300  ELBO loss: 100,634.0
+step 1400  ELBO loss: 100,868.4
+step 1500  ELBO loss: 101,040.7
+step 1600  ELBO loss: 100,560.8
+step 1700  ELBO loss: 100,564.7
+step 1800  ELBO loss: 100,528.7
+step 1900  ELBO loss: 100,930.8
+step 2000  ELBO loss: 101,143.1
+step 2100  ELBO loss: 100,548.9
+step 2200  ELBO loss: 100,525.9
+step 2300  ELBO loss: 100,053.5
+step 2400  ELBO loss: 100,677.5
+step 2500  ELBO loss: 100,592.7
+step 2600  ELBO loss: 100,631.3
+step 2700  ELBO loss: 100,796.8
+step 2800  ELBO loss: 100,880.8
+step 2900  ELBO loss: 100,829.0
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanhbias-all2024/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanhbias-all2024/holdout/compositional --output-dir results/compirt/holdout/multidim-tanhbias-all2024/holdout/evaluation
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanhbias-all2024/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanhbias-all2024/holdout/synergy --output-dir results/compirt/holdout/multidim-tanhbias-all2024/holdout/synergy-evaluation
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m compare_compirt --compositional-metrics results/compirt/holdout/multidim-tanhbias-all2024/holdout/evaluation/csvs/bonus_metrics.csv --synergy-metrics results/compirt/holdout/multidim-tanhbias-all2024/holdout/synergy-evaluation/csvs/bonus_metrics.csv --output-dir results/compirt/holdout/multidim-tanhbias-all2024/holdout/comparison
+Finished held-out multidim_tanhbias run. Scenario A/B metrics in results/compirt/holdout/multidim-tanhbias-all2024/holdout/evaluation.
+Synergy metrics in results/compirt/holdout/multidim-tanhbias-all2024/holdout/synergy-evaluation.

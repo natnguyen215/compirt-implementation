@@ -1,0 +1,32 @@
+{
+  "model": "tfidf-multidim-cumulative-difficulty-pyramidal",
+  "formula": "d'_jk(t) = d_jk(t) - lambda_tfidf * tfidf_prefix_j(t); hazard_ij(t) = sum_k r_jk * (theta_ik - d'_jk(t)) - c_i",
+  "split": "year_2024",
+  "tournament": "",
+  "dimensions": 16,
+  "steps": 3000,
+  "lr": 0.01,
+  "seed": 42,
+  "final_loss": 391578.58559539914,
+  "calibrate_correctness": false,
+  "tfidf_features": {
+    "tossups": 1260,
+    "vocabulary_size": 26222,
+    "max_length": 168,
+    "normalized": true,
+    "token_weighting": "tf-idf",
+    "nonempty_tossups": 1260,
+    "mean_raw_final_tfidf": 4.513249159213829
+  },
+  "players": 1455,
+  "tossups": 1260,
+  "events": 48612,
+  "observation_counts": {
+    "CENSORED": 295555,
+    "BUZZ": 47914,
+    "NO-BUZZ": 4935
+  },
+  "tfidf_effect_prior_scale": 1.0,
+  "tfidf_clue_effect": 2.496392698958516e-05,
+  "tfidf_adjustment_curve": "r_weighted_aggregate"
+}

@@ -1,6 +1,5 @@
 """Lightweight tests for the cumulative TF-IDF pyramidal model."""
 
-import math
 import unittest
 
 import pandas as pd
@@ -10,7 +9,6 @@ from tfidf.tfidf_features import build_tfidf_feature_matrices
 
 try:
     from tfidf.pyramidal_tfidf_model import (
-        CUMULATIVE_DIFFICULTY,
         correctness_logit,
         hazard_logit,
     )
@@ -18,7 +16,6 @@ except ModuleNotFoundError as error:
     if error.name != "pyro":
         raise
     correctness_logit = hazard_logit = None
-    CUMULATIVE_DIFFICULTY = None
 
 
 class TfidfFeatureTests(unittest.TestCase):
@@ -35,9 +32,6 @@ class TfidfFeatureTests(unittest.TestCase):
 
         # idf(w) = log((1 + N) / (1 + df(w))); no +1 floor. "common" appears in
         # both docs (df == N), so its idf is log(1) == 0.
-        rare_idf = math.log(3.0 / 2.0)
-        common_idf = 0.0
-
         self.assertEqual(tuple(prefix.shape), (2, 4))
         self.assertAlmostEqual(float(prefix[0, 1]), 1.0)
         self.assertAlmostEqual(float(prefix[1, 2]), 1.0)
@@ -56,8 +50,6 @@ class TfidfFeatureTests(unittest.TestCase):
             tossups, ["q1", "q2"], max_length=4
         )
 
-        rare_idf = math.log(3.0 / 2.0)
-
         # Ubiquitous "common" (df == n_documents) collapses to zero mass.
         # The normalized reveal stays flat across the zero-mass common token.
         self.assertAlmostEqual(float(prefix[0, 0]), 0.5)
@@ -66,7 +58,7 @@ class TfidfFeatureTests(unittest.TestCase):
         self.assertEqual(summary["token_weighting"], "tf-idf")
 
 
-class TfidfVariantTests(unittest.TestCase):
+class TfidfFormulaTests(unittest.TestCase):
     def setUp(self):
         if correctness_logit is None:
             self.skipTest("pyro is not installed in this environment")
@@ -92,7 +84,6 @@ class TfidfVariantTests(unittest.TestCase):
             self.T,
             torch.tensor([0.25]),
             effect,
-            CUMULATIVE_DIFFICULTY,
         )
         late = correctness_logit(
             self.theta,
@@ -104,7 +95,6 @@ class TfidfVariantTests(unittest.TestCase):
             self.T,
             torch.tensor([0.75]),
             effect,
-            CUMULATIVE_DIFFICULTY,
         )
         hazard = hazard_logit(
             self.theta,
@@ -117,7 +107,6 @@ class TfidfVariantTests(unittest.TestCase):
             self.T,
             torch.tensor([0.75]),
             effect,
-            CUMULATIVE_DIFFICULTY,
         )
 
         self.assertAlmostEqual(float(early), 0.5)

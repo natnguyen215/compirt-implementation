@@ -1,9 +1,7 @@
 """Precompute frozen Qwen3-Embedding-8B vectors for tossups and bonuses.
 
-This is the one-time embedding step 'train_pyramidal.py'/'train_compositional.py'
-read from disk (they never call the embedding model themselves) -- the same role
-'run_lda.py'/'run_plda.py' play for the topic variant's fixed 'r' vectors, just
-with a neural text embedder instead of a topic model.
+This one-time step writes the frozen embeddings consumed by
+'train_pyramidal.py' and 'train_compositional.py'.
 
 Each tossup's full question text and each bonus's leadin + part text are fed
 through the embedder with an instruction prefix, following Qwen3-Embedding's
@@ -11,9 +9,8 @@ documented instruction format:
 
     "Instruct: {task description}\\nQuery: {text}"
 
-One embedding is computed per tossup and per bonus (not per clue/part) because
-'r_j' is a fixed property of the question, like the topic model's fixed topic
-mixture -- it does not vary with buzz position or bonus part.
+One embedding is computed per tossup and per bonus. Each embedding defines a
+fixed question-level 'r_j' across buzz positions or bonus parts.
 """
 
 from __future__ import annotations
@@ -32,12 +29,10 @@ if str(REPO_ROOT) not in sys.path:
 
 EMBEDDING_MIRT_DIR = REPO_ROOT / "multidimensional" / "embedding_mirt"
 
-# Keep every HF-Hub artifact this script touches -- the downloaded
-# Qwen3-Embedding-8B weights, the hub cache, and the cached login token --
-# under multidimensional/embedding_mirt/ instead of the default
-# '~/.cache/huggingface', so a fresh checkout is self-contained. Must be set
-# before 'huggingface_hub' is imported (directly or via
-# 'sentence_transformers'/'datasets') since it reads this env var at import time.
+# Keep the downloaded weights, hub cache, and login token together under
+# multidimensional/embedding_mirt/. This must be set before 'huggingface_hub'
+# is imported, directly or through 'sentence_transformers'/'datasets', because
+# the library reads the environment variable at import time.
 os.environ.setdefault("HF_HOME", str(EMBEDDING_MIRT_DIR / "hf_cache"))
 
 from compirt_data import DEFAULT_DATA_DIR, filter_tournament, load_hf_tables
@@ -72,7 +67,7 @@ def build_documents(tables) -> tuple[list[str], list[str], list[str], list[str]]
 
 
 def embed_texts(model, texts: list[str], instruction: str, batch_size: int) -> np.ndarray:
-    """Embed 'texts' with the Qwen3 instruction format, batched.f"""
+    """Embed 'texts' in batches using the Qwen3 instruction format."""
     prompted = [f"Instruct: {instruction}\nQuery: {text}" for text in texts]
     embeddings = model.encode(
         prompted,

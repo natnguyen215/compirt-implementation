@@ -1,10 +1,9 @@
-"""Evaluate isolated topic-weighted CompIRT outputs.
+"""Evaluate topic-weighted CompIRT outputs.
 
 Command-line entry point for 'topic_compirt.evaluation.evaluate_topic_compirt'.
 It consumes the CSV files written by 'train_topic_pyramidal.py' and
 'train_topic_compositional.py' (or the joint sLDA trainers in
-'topic/learned') and writes metrics, plots, and a Markdown
-report, mirroring the root 'evaluate_compirt.py' CLI.
+'topic/learned') and writes metrics, plots, and a Markdown report.
 """
 
 from __future__ import annotations
@@ -23,11 +22,6 @@ def main():
     parser.add_argument("--pyramidal-results", type=Path, required=True)
     parser.add_argument("--compositional-results", type=Path, required=True)
     parser.add_argument(
-        "--comparison-pyramidal-results",
-        type=Path,
-        help="Optional second fitted pyramidal run for player-skill stability",
-    )
-    parser.add_argument(
         "--topic-names",
         type=Path,
         help="Optional dimension,column,category CSV to relabel topic-coordinate legends",
@@ -42,7 +36,6 @@ def main():
         args.pyramidal_results,
         args.compositional_results,
         args.output_dir,
-        args.comparison_pyramidal_results,
         dimension_labels,
     )
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Isolated topic-weighted CompIRT runner.
-# Results go to results/compirt/in_sample/topic_compirt by default.
+# Topic-weighted CompIRT runner.
+# Results go to results/compirt/in_sample/topic/topic_compirt by default.
 
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
-source "$REPO_ROOT/run_scripts/lib/result_root.sh"
+source "$REPO_ROOT/run_scripts/common/lib/result_root.sh"
 TOPIC_FIXED_DIR="topic/fixed"
 
 PYTHON="${PYTHON:-.venv/bin/python}"
@@ -14,11 +14,12 @@ PYTHON="${PYTHON:-.venv/bin/python}"
 # Set TOURNAMENT="" to include every tournament in the selected split.
 SPLIT="${SPLIT:-year_2024}"
 TOURNAMENT="${TOURNAMENT-2024-acf-regionals}"
-OUTPUT_ROOT="$(resolve_result_root "${ROOT:-results/compirt/in_sample/topic_compirt}" in_sample)"
+OUTPUT_ROOT="$(resolve_result_root "${ROOT:-results/compirt/in_sample/topic/topic_compirt}" in_sample)"
 DEVICE="${DEVICE:-cuda}"
 GPU="${GPU:-0}"
 DIMENSIONS="${DIMENSIONS:-10}"
 LR="${LR:-0.01}"
+SEED="${SEED:-42}"
 
 # Regenerate PLDA vectors by default because topic-weighted training needs
 # CompIRT-compatible document IDs in document_latent_vectors.csv.
@@ -34,8 +35,6 @@ PLDA_WORKERS="${PLDA_WORKERS:-1}"
 
 PYRAMIDAL_STEPS="${PYRAMIDAL_STEPS:-3000}"
 BONUS_STEPS="${BONUS_STEPS:-2000}"
-PREDICT_BUZZ_POSITIONS="${PREDICT_BUZZ_POSITIONS:-1}"
-
 RUN_SYNERGY="${RUN_SYNERGY:-0}"
 SYNERGY_DIMENSIONS="${SYNERGY_DIMENSIONS:-1}"
 SAVE_SYNERGY_DETAILS="${SAVE_SYNERGY_DETAILS:-0}"
@@ -69,6 +68,7 @@ echo "- DIMENSIONS: $DIMENSIONS"
 echo "- PYRAMIDAL_STEPS: $PYRAMIDAL_STEPS"
 echo "- BONUS_STEPS: $BONUS_STEPS"
 echo "- LR: $LR"
+echo "- SEED: $SEED"
 echo "- RUN_PLDA: $RUN_PLDA"
 echo "- PLDA_OUTPUT_DIR: $PLDA_OUTPUT_DIR"
 echo "- TOPIC_VECTORS: $TOPIC_VECTORS"
@@ -77,7 +77,6 @@ echo "- RUN_SYNERGY: $RUN_SYNERGY"
 echo "- SYNERGY_DIMENSIONS: $SYNERGY_DIMENSIONS"
 echo "- SAVE_SYNERGY_DETAILS: $SAVE_SYNERGY_DETAILS"
 echo "- CALIBRATE_CORRECTNESS: $CALIBRATE_CORRECTNESS"
-echo "- PREDICT_BUZZ_POSITIONS: $PREDICT_BUZZ_POSITIONS"
 echo "- EVALUATE: $EVALUATE"
 echo "- MPLCONFIGDIR: $MPLCONFIGDIR"
 echo "- PYRAMIDAL_OUTPUT: $OUTPUT_ROOT/pyramidal"
@@ -106,6 +105,7 @@ if [[ "$RUN_PLDA" == "1" ]]; then
     --iterations "$PLDA_ITERATIONS" \
     --train-interval "$PLDA_TRAIN_INTERVAL" \
     --workers "$PLDA_WORKERS" \
+    --seed "$SEED" \
     --output-dir "$PLDA_OUTPUT_DIR"
 elif [[ ! -f "$TOPIC_VECTORS" ]]; then
   echo "RUN_PLDA=0 but TOPIC_VECTORS does not exist: $TOPIC_VECTORS" >&2
@@ -125,13 +125,11 @@ pyramidal_args=(
   --dimensions "$DIMENSIONS"
   --steps "$PYRAMIDAL_STEPS"
   --lr "$LR"
+  --seed "$SEED"
   --device "$DEVICE"
   --output-dir "$OUTPUT_ROOT/pyramidal"
   "${calibrate_args[@]}"
 )
-if [[ "$PREDICT_BUZZ_POSITIONS" == "1" ]]; then
-  pyramidal_args+=(--predict-buzz-positions)
-fi
 "$PYTHON" -m topic.fixed.train_topic_pyramidal "${pyramidal_args[@]}"
 
 run_compositional() {
@@ -144,6 +142,7 @@ run_compositional() {
     --player-skills "$OUTPUT_ROOT/pyramidal/players.csv" \
     --steps "$BONUS_STEPS" \
     --lr "$LR" \
+    --seed "$SEED" \
     --device "$DEVICE" \
     --output-dir "$OUTPUT_ROOT/$model_name" \
     "${calibrate_args[@]}" \

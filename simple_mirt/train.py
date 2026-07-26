@@ -8,22 +8,16 @@ This file handles the complete training process:
 4. Save the fitted player and question values to CSV files.
 """
 
-# argparse reads options supplied in the terminal, such as "--device cuda".
 import argparse
-# Path makes it easier to build file and directory paths.
 from pathlib import Path
 
-# pandas reads and writes table-shaped data, including CSV files.
 import pandas as pd
-# Pyro provides tools for defining and fitting probabilistic models.
 import pyro
-# PyTorch provides tensors and GPU support.
 import torch
 from pyro.infer import MCMC, NUTS, SVI, Trace_ELBO
 from pyro.infer.autoguide import AutoNormal
 from pyro.optim import ClippedAdam
 
-# Import the MIRT model from the same directory.
 from model import model
 
 
@@ -130,7 +124,6 @@ def posterior_median(fitted_model):
 
 def save_results(output_dir, player_ids, question_ids, theta, alpha, d):
     """Write posterior median model parameters to CSV files."""
-    # Create the results directory if it does not exist yet.
     output_dir.mkdir(parents=True, exist_ok=True)
     players_path = output_dir / "players.csv"
     questions_path = output_dir / "questions.csv"
@@ -174,7 +167,6 @@ def parse_args():
 
 def main():
     """Run the complete load, train, summarize, and save process."""
-    # Read the options supplied in the terminal.
     args = parse_args()
 
     # Stop early with a clear message if GPU training was requested but unavailable.
@@ -228,7 +220,5 @@ def main():
     save_results(args.output_dir, player_ids, question_ids, theta, alpha, d)
 
 
-# Python runs main() only when this file is executed directly. It does not run
-# main() when another Python file imports something from train.py.
 if __name__ == "__main__":
     main()

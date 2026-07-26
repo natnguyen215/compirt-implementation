@@ -9,7 +9,7 @@ Run it on the 'document_latent_vectors.csv' produced by
 'train_joint_pyramidal.py'::
 
     .venv/bin/python -m topic.learned.topic_response_profiles \
-        --vectors results/compirt/in_sample/joint-slda/document_latent_vectors.csv \
+        --vectors results/compirt/in_sample/topic/joint-slda/document_latent_vectors.csv \
         --split year_2024
 """
 

@@ -1,36 +1,13 @@
 """Embedding-based multidimensional pyramidal tossup model.
 
-This is a sibling of 'multidimensional/multidim_mirt/pyramidal_model.py' that
-replaces its freely learned, positive tossup relevance 'r ~ Gamma(2, 2)' with a
-content-aware relevance vector computed from a frozen text embedding. CAIMIRA
-(docs/2410.06524v1.pdf, Eq. 5/7) uses a linear map; this variant uses a small
-feed-forward projection:
+Each frozen, centered question embedding is projected into a relevance vector:
 
     r_j = softmax(W_2 gelu(W_1 @ centered(e_j) + b_1) + b_2)
 
-'e_j' is a frozen Qwen3-Embedding-8B vector of the tossup's question text
-(precomputed by 'embed_questions.py'); the FFN weights are the only new latent
-parameters, point-estimated jointly with 'theta'/'beta'/'gamma'/'mu' via the same
-AutoNormal SVI loop the rest of CompIRT uses (mirrors how
-'topic/learned/joint_pyramidal.py' point-estimates its topic-word matrix).
-
-Only 'sample_parameters' and 'competing_risks_model' differ from
-'multidimensional.multidim_mirt.pyramidal_model': everything else --
-'difficulty_curve', 'correctness_logit', 'hazard_logit', 'log_survival',
-'row_parameters', 'sample_correctness_calibration', 'posterior_row_predictions',
-and 'expected_first_buzz_positions' -- is imported unchanged, because both
-packages carry per-dimension difficulty and therefore name the weight vector 'r'
-(the baseline's scalar-difficulty discrimination 'alpha' has no counterpart
-here). The difference is only where 'r' comes from: sampled there, projected
-from an embedding here.
-
-Note on model behavior: unlike the freely learned 'r ~ Gamma(2, 2)' (unbounded
-above, mean 1 per dimension regardless of 'n_dimensions'), this 'r_j' is a
-softmax and always sums to 1 across dimensions. Raising '--dimensions' here
-spreads a fixed relevance budget thinner (mean r_jk ~ 1/n_dimensions) rather
-than adding independent discriminative capacity, so dimension sweeps are not
-directly comparable between the two packages -- this is CAIMIRA's design, not a
-bug.
+'e_j' is the Qwen3-Embedding-8B representation produced by
+'embed_questions.py'. The FFN is point-estimated jointly with the player and
+tossup parameters. Softmax makes each 'r_j' sum to 1, so increasing
+'--dimensions' redistributes a fixed relevance budget across more coordinates.
 """
 
 from __future__ import annotations
@@ -79,12 +56,17 @@ def _xavier_normal(reference: torch.Tensor, shape: tuple[int, int]) -> torch.Ten
 
 
 def _ffn_logits(embedding, projection):
+    """Return pre-softmax relevance logits from the two-layer FFN projection.
+
+    Implements 'W_2 . gelu(W_1 . e_j + b_1) + b_2'; 'projection_logits' applies
+    the softmax that turns these into the relevance vector 'r_j'.
+    """
     hidden = F.gelu(embedding @ projection["input_weight"] + projection["hidden_bias"])
     return hidden @ projection["output_weight"] + projection["output_bias"]
 
 
 def projection_logits(embedding, projection, bias=None):
-    """Return relevance logits from either a saved FFN projection or old linear args."""
+    """Return relevance logits from an FFN projection or linear weight and bias."""
     if isinstance(projection, dict):
         kind = projection.get("kind", "linear")
         if kind == "ffn":
@@ -100,10 +82,8 @@ def projection_logits(embedding, projection, bias=None):
 def project_relevance(embedding, projection, bias=None):
     """Return a softmax relevance distribution from an embedding projection.
 
-    New embedding runs use an FFN projection,
-    'softmax(W_2 gelu(W_1 @ e_j + b_1) + b_2)'. The old three-argument linear
-    call, 'project_relevance(embedding, weight, bias)', is still accepted so
-    existing tests and saved linear projections remain readable.
+    Supports an FFN projection dictionary and the three-argument linear
+    'project_relevance(embedding, weight, bias)' form.
     """
     return F.softmax(projection_logits(embedding, projection, bias), dim=-1)
 
@@ -129,10 +109,9 @@ def fitted_projection() -> dict[str, torch.Tensor | str]:
 def sample_parameters(data, n_dimensions):
     """Sample player and difficulty parameters; compute 'r' from embeddings.
 
-    Player and difficulty priors are identical to
-    'multidimensional.multidim_mirt.pyramidal_model.sample_parameters'. The
-    difference is that 'r' is not sampled here -- it is a deterministic function
-    of the fixed 'data["embedding"]' and the point-estimated FFN projection.
+    Player priors follow Eq. 14, and each tossup receives per-dimension 'beta',
+    'gamma', and 'mu'. The relevance vector 'r' is a deterministic function of
+    the fixed 'data["embedding"]' and the point-estimated FFN projection.
     """
     n_players = len(data["player_ids"])
     n_tossups = len(data["tossup_ids"])
@@ -160,8 +139,7 @@ def sample_parameters(data, n_dimensions):
             ).to_event(1),
         )
 
-    # r_j = softmax(FFN(e_j)): point-estimated projection of the frozen
-    # embedding, not a sampled site.
+    # Point-estimate r_j = softmax(FFN(e_j)) from the frozen embedding.
     embedding = data["embedding"]
     embed_dim = embedding.shape[1]
     hidden_dim = int(data.get("projection_hidden_dim", DEFAULT_PROJECTION_HIDDEN_DIM))
@@ -199,11 +177,9 @@ def sample_parameters(data, n_dimensions):
 def competing_risks_model(data, n_dimensions=5, calibrate_correctness=False):
     """Define the embedding-relevance competing-risks likelihood.
 
-    Structurally identical to 'multidimensional.multidim_mirt.pyramidal_model.competing_risks_model':
-    every rostered player contributes survival before the stopping position, the
-    actual first buzzer additionally contributes a hazard-at-'t_star' factor and
-    an observed correctness factor, and the joint log-likelihood is hand-summed
-    and attached with 'pyro.factor'.
+    Every rostered player contributes survival before the stopping position. The
+    first buzzer also contributes the hazard at 't_star' and observed
+    correctness. 'pyro.factor' attaches the hand-summed joint log-likelihood.
     """
     theta, c, r, beta, gamma, mu = sample_parameters(data, n_dimensions)
     row_theta, row_c, row_r, row_beta, row_gamma, row_mu = row_parameters(

@@ -1,11 +1,10 @@
-"""Train the isolated topic-weighted pyramidal tossup model.
+"""Train the topic-weighted pyramidal tossup model.
 
-This is the topic-weighted counterpart to the root 'train_pyramidal.py'. It
-learns player skills 'theta' and per-topic tossup difficulty curves. The fixed
-PLDA topic vector weights the skill-minus-difficulty gap for each tossup.
+The trainer learns player skills 'theta' and per-topic tossup difficulty curves.
+The fixed PLDA topic vector weights the skill-minus-difficulty gap for each
+tossup.
 
-Start reading at 'run_experiment' near the bottom. It coordinates the full
-workflow:
+'run_experiment' coordinates the full workflow:
 
     load tables -> build observations -> make tensors -> attach topic weights
         -> train model -> calculate predictions -> save CSV files, plots, summary
@@ -18,6 +17,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pyro
 
 from compirt_data import (
     DEFAULT_DATA_DIR,
@@ -42,24 +42,12 @@ from utils.saving import (
     write_summary,
 )
 from utils.training import fit_svi, require_device
+from utils.posterior import add_posterior_output_args
 from holdout.player_priors import attach_player_priors, player_tier_map
 
 
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "results" / "compirt" / "topic-pyramidal"
 FORMULA = "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))"
-
-
-def train_model(
-    data, n_dimensions, n_steps=1000, lr=0.02, calibrate_correctness=False
-):
-    """Fit the topic-weighted competing-risks model."""
-    return fit_svi(
-        competing_risks_model,
-        (data, n_dimensions, calibrate_correctness),
-        n_steps,
-        lr,
-        return_guide=True,
-    )
 
 
 def save_topic_parameters(output_dir, data, posterior):
@@ -86,10 +74,11 @@ def save_topic_parameters(output_dir, data, posterior):
 
 
 def run_experiment(args):
-    """Run the complete isolated topic-weighted pyramidal pipeline."""
+    """Run the complete topic-weighted pyramidal pipeline."""
     # Set up the output directory and validate the requested device.
     args.output_dir.mkdir(parents=True, exist_ok=True)
     require_device(args.device)
+    pyro.set_rng_seed(args.seed)
 
     # Prepare tossup observations and build the training tensors.
     tables = filter_tournament(load_hf_tables(args.data_dir, args.split), args.tournament)
@@ -129,8 +118,17 @@ def run_experiment(args):
         print(f"Held-out player priors: {prior_summary}")
 
     # Train the topic-weighted competing-risks model.
-    posterior, guide, losses = train_model(
-        data, dimensions, args.steps, args.lr, args.calibrate_correctness
+    posterior, guide, losses = fit_svi(
+        competing_risks_model,
+        model_kwargs={
+            "data": data,
+            "calibrate_correctness": args.calibrate_correctness,
+        },
+        n_steps=args.steps,
+        lr=args.lr,
+        posterior_output_dir=args.output_dir,
+        posterior_draws=args.posterior_draws,
+        posterior_seed=args.seed,
     )
 
     # Save fitted player/tossup parameters and the training-loss plot.
@@ -142,11 +140,7 @@ def run_experiment(args):
     correct, hazard, survival = posterior_row_predictions(
         data, posterior, args.calibrate_correctness
     )
-    buzz_expected = (
-        expected_first_buzz_positions(data, posterior)
-        if args.predict_buzz_positions
-        else None
-    )
+    buzz_expected = expected_first_buzz_positions(data, posterior)
     save_tossup_predictions(
         args.output_dir, observations, correct, hazard, survival, buzz_expected=buzz_expected
     )
@@ -161,12 +155,13 @@ def run_experiment(args):
         "tournament": args.tournament or "",
         "dimensions": dimensions,
         "steps": args.steps,
+        "lr": args.lr,
+        "seed": args.seed,
         "final_loss": losses[-1],
         "calibrate_correctness": args.calibrate_correctness,
         "players": len(data["player_ids"]),
         "tossups": len(data["tossup_ids"]),
         "events": len(data["event_ids"]),
-        "predicted_buzz_positions": args.predict_buzz_positions,
         "observation_counts": observations["z"].value_counts().to_dict(),
     }
     # Save the run summary to disk and return it to the caller.
@@ -176,6 +171,7 @@ def run_experiment(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
+    add_posterior_output_args(parser)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--split", default="all")
     parser.add_argument("--tournament")
@@ -188,8 +184,8 @@ def parse_args():
     )
     parser.add_argument("--steps", type=int, default=1000)
     parser.add_argument("--lr", type=float, default=0.02)
+    parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
-    parser.add_argument("--predict-buzz-positions", action="store_true")
     parser.add_argument(
         "--calibrate-correctness",
         action="store_true",

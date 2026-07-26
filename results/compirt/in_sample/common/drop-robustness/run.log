@@ -1,0 +1,1638 @@
+# CompIRT Run Log
+
+Generated: 2026-07-19T13:27:37-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- COLLECT_ONLY: False
+- DATA_DIR: unknown
+- DEVICE: cuda
+- DIFFICULTY_LINK: sigmoid
+- DROP_SEED: 2025
+- FRACTIONS: 0.001, 0.005, 0.01, 0.05
+- MODELS: plain, baseline, multidim
+- NOISE_SEEDS: 7, 123
+- PYTHON: .venv/bin/python
+- REPLICATES: 3
+- RERUN: False
+- ROOT: results/compirt/in_sample/drop-robustness
+- RUNNER: run_scripts/run_drop_robustness.py
+- SEED: 42
+- SPLIT: year_2024
+- TOURNAMENT: <all>
+
+wrote results/compirt/in_sample/drop-robustness/droplists/frac_0.001/rep_1.txt
+wrote results/compirt/in_sample/drop-robustness/droplists/frac_0.001/rep_2.txt
+wrote results/compirt/in_sample/drop-robustness/droplists/frac_0.001/rep_3.txt
+wrote results/compirt/in_sample/drop-robustness/droplists/frac_0.005/rep_1.txt
+wrote results/compirt/in_sample/drop-robustness/droplists/frac_0.005/rep_2.txt
+wrote results/compirt/in_sample/drop-robustness/droplists/frac_0.005/rep_3.txt
+wrote results/compirt/in_sample/drop-robustness/droplists/frac_0.01/rep_1.txt
+wrote results/compirt/in_sample/drop-robustness/droplists/frac_0.01/rep_2.txt
+wrote results/compirt/in_sample/drop-robustness/droplists/frac_0.01/rep_3.txt
+wrote results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_1.txt
+wrote results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_2.txt
+wrote results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_3.txt
+Wrote run configuration to results/compirt/in_sample/drop-robustness/ablation_config.json
+
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/full/pyramidal
+Players: 1,455  Tossups: 1,260  Observed cells: 346,384
+step    0  ELBO loss: 247,913.6
+step  100  ELBO loss: 116,904.7
+step  200  ELBO loss: 114,959.0
+step  300  ELBO loss: 114,696.3
+step  400  ELBO loss: 114,720.7
+step  500  ELBO loss: 114,717.4
+step  600  ELBO loss: 114,676.3
+step  700  ELBO loss: 114,723.9
+step  800  ELBO loss: 114,704.6
+step  900  ELBO loss: 114,704.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 7 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/noisefloor/seed_7/pyramidal
+Players: 1,455  Tossups: 1,260  Observed cells: 346,384
+step    0  ELBO loss: 247,322.8
+step  100  ELBO loss: 117,345.0
+step  200  ELBO loss: 115,016.9
+step  300  ELBO loss: 114,793.0
+step  400  ELBO loss: 114,737.9
+step  500  ELBO loss: 114,725.3
+step  600  ELBO loss: 114,743.6
+step  700  ELBO loss: 114,770.7
+step  800  ELBO loss: 114,773.3
+step  900  ELBO loss: 114,764.6
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 123 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/noisefloor/seed_123/pyramidal
+Players: 1,455  Tossups: 1,260  Observed cells: 346,384
+step    0  ELBO loss: 246,933.3
+step  100  ELBO loss: 116,899.6
+step  200  ELBO loss: 114,940.6
+step  300  ELBO loss: 114,731.4
+step  400  ELBO loss: 114,710.4
+step  500  ELBO loss: 114,740.9
+step  600  ELBO loss: 114,724.1
+step  700  ELBO loss: 114,723.3
+step  800  ELBO loss: 114,752.6
+step  900  ELBO loss: 114,759.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/frac_0.001/rep_1/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.001/rep_1.txt
+Dropped events: {'dropped_events': 48, 'dropped_rows': 346, 'remaining_events': 48564, 'remaining_rows': 348058}
+Players: 1,455  Tossups: 1,260  Observed cells: 346,038
+step    0  ELBO loss: 247,673.6
+step  100  ELBO loss: 116,795.7
+step  200  ELBO loss: 114,851.1
+step  300  ELBO loss: 114,588.6
+step  400  ELBO loss: 114,613.6
+step  500  ELBO loss: 114,609.8
+step  600  ELBO loss: 114,568.8
+step  700  ELBO loss: 114,616.4
+step  800  ELBO loss: 114,597.3
+step  900  ELBO loss: 114,596.8
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/frac_0.001/rep_2/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.001/rep_2.txt
+Dropped events: {'dropped_events': 48, 'dropped_rows': 345, 'remaining_events': 48564, 'remaining_rows': 348059}
+Players: 1,455  Tossups: 1,260  Observed cells: 346,042
+step    0  ELBO loss: 247,676.4
+step  100  ELBO loss: 116,791.5
+step  200  ELBO loss: 114,847.7
+step  300  ELBO loss: 114,584.8
+step  400  ELBO loss: 114,609.8
+step  500  ELBO loss: 114,606.7
+step  600  ELBO loss: 114,565.6
+step  700  ELBO loss: 114,613.2
+step  800  ELBO loss: 114,593.2
+step  900  ELBO loss: 114,593.3
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/frac_0.001/rep_3/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.001/rep_3.txt
+Dropped events: {'dropped_events': 48, 'dropped_rows': 348, 'remaining_events': 48564, 'remaining_rows': 348056}
+Players: 1,455  Tossups: 1,260  Observed cells: 346,040
+step    0  ELBO loss: 247,676.4
+step  100  ELBO loss: 116,797.3
+step  200  ELBO loss: 114,853.8
+step  300  ELBO loss: 114,591.1
+step  400  ELBO loss: 114,615.5
+step  500  ELBO loss: 114,612.8
+step  600  ELBO loss: 114,570.7
+step  700  ELBO loss: 114,618.8
+step  800  ELBO loss: 114,599.9
+step  900  ELBO loss: 114,599.3
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/frac_0.005/rep_1/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.005/rep_1.txt
+Dropped events: {'dropped_events': 243, 'dropped_rows': 1729, 'remaining_events': 48369, 'remaining_rows': 346675}
+Players: 1,455  Tossups: 1,259  Observed cells: 344,689
+step    0  ELBO loss: 246,731.3
+step  100  ELBO loss: 116,366.7
+step  200  ELBO loss: 114,438.4
+step  300  ELBO loss: 114,194.2
+step  400  ELBO loss: 114,191.8
+step  500  ELBO loss: 114,188.2
+step  600  ELBO loss: 114,157.4
+step  700  ELBO loss: 114,201.3
+step  800  ELBO loss: 114,173.4
+step  900  ELBO loss: 114,162.5
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/frac_0.005/rep_2/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.005/rep_2.txt
+Dropped events: {'dropped_events': 243, 'dropped_rows': 1742, 'remaining_events': 48369, 'remaining_rows': 346662}
+Players: 1,455  Tossups: 1,260  Observed cells: 344,644
+step    0  ELBO loss: 246,710.2
+step  100  ELBO loss: 116,350.2
+step  200  ELBO loss: 114,410.3
+step  300  ELBO loss: 114,148.7
+step  400  ELBO loss: 114,173.5
+step  500  ELBO loss: 114,169.6
+step  600  ELBO loss: 114,129.5
+step  700  ELBO loss: 114,176.7
+step  800  ELBO loss: 114,156.0
+step  900  ELBO loss: 114,156.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/frac_0.005/rep_3/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.005/rep_3.txt
+Dropped events: {'dropped_events': 243, 'dropped_rows': 1743, 'remaining_events': 48369, 'remaining_rows': 346661}
+Players: 1,455  Tossups: 1,260  Observed cells: 344,663
+step    0  ELBO loss: 246,716.1
+step  100  ELBO loss: 116,340.6
+step  200  ELBO loss: 114,403.5
+step  300  ELBO loss: 114,143.1
+step  400  ELBO loss: 114,168.2
+step  500  ELBO loss: 114,165.0
+step  600  ELBO loss: 114,123.4
+step  700  ELBO loss: 114,172.3
+step  800  ELBO loss: 114,150.2
+step  900  ELBO loss: 114,151.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/frac_0.01/rep_1/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.01/rep_1.txt
+Dropped events: {'dropped_events': 486, 'dropped_rows': 3470, 'remaining_events': 48126, 'remaining_rows': 344934}
+Players: 1,455  Tossups: 1,260  Observed cells: 342,974
+step    0  ELBO loss: 245,548.9
+step  100  ELBO loss: 115,824.7
+step  200  ELBO loss: 113,891.1
+step  300  ELBO loss: 113,630.9
+step  400  ELBO loss: 113,656.4
+step  500  ELBO loss: 113,650.6
+step  600  ELBO loss: 113,610.5
+step  700  ELBO loss: 113,660.1
+step  800  ELBO loss: 113,640.8
+step  900  ELBO loss: 113,638.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/frac_0.01/rep_2/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.01/rep_2.txt
+Dropped events: {'dropped_events': 486, 'dropped_rows': 3451, 'remaining_events': 48126, 'remaining_rows': 344953}
+Players: 1,455  Tossups: 1,260  Observed cells: 342,976
+step    0  ELBO loss: 245,539.1
+step  100  ELBO loss: 115,813.1
+step  200  ELBO loss: 113,884.8
+step  300  ELBO loss: 113,622.7
+step  400  ELBO loss: 113,645.5
+step  500  ELBO loss: 113,643.7
+step  600  ELBO loss: 113,604.7
+step  700  ELBO loss: 113,651.4
+step  800  ELBO loss: 113,631.6
+step  900  ELBO loss: 113,631.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/frac_0.01/rep_3/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.01/rep_3.txt
+Dropped events: {'dropped_events': 486, 'dropped_rows': 3470, 'remaining_events': 48126, 'remaining_rows': 344934}
+Players: 1,455  Tossups: 1,260  Observed cells: 342,959
+step    0  ELBO loss: 245,538.2
+step  100  ELBO loss: 115,824.7
+step  200  ELBO loss: 113,891.6
+step  300  ELBO loss: 113,629.7
+step  400  ELBO loss: 113,653.6
+step  500  ELBO loss: 113,652.1
+step  600  ELBO loss: 113,607.7
+step  700  ELBO loss: 113,658.3
+step  800  ELBO loss: 113,639.6
+step  900  ELBO loss: 113,637.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/frac_0.05/rep_1/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_1.txt
+Dropped events: {'dropped_events': 2430, 'dropped_rows': 17421, 'remaining_events': 46182, 'remaining_rows': 330983}
+Players: 1,455  Tossups: 1,259  Observed cells: 329,113
+step    0  ELBO loss: 235,902.8
+step  100  ELBO loss: 111,420.4
+step  200  ELBO loss: 109,558.9
+step  300  ELBO loss: 109,324.1
+step  400  ELBO loss: 109,317.1
+step  500  ELBO loss: 109,324.4
+step  600  ELBO loss: 109,289.8
+step  700  ELBO loss: 109,334.3
+step  800  ELBO loss: 109,301.4
+step  900  ELBO loss: 109,296.5
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/frac_0.05/rep_2/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_2.txt
+Dropped events: {'dropped_events': 2430, 'dropped_rows': 17477, 'remaining_events': 46182, 'remaining_rows': 330927}
+Players: 1,455  Tossups: 1,259  Observed cells: 329,133
+step    0  ELBO loss: 235,904.0
+step  100  ELBO loss: 111,463.8
+step  200  ELBO loss: 109,599.0
+step  300  ELBO loss: 109,365.4
+step  400  ELBO loss: 109,361.0
+step  500  ELBO loss: 109,353.4
+step  600  ELBO loss: 109,329.6
+step  700  ELBO loss: 109,371.8
+step  800  ELBO loss: 109,342.6
+step  900  ELBO loss: 109,326.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m simple_mirt.train_plain_irt --split year_2024 --dimensions 1 --steps 1000 --lr 0.02 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/plain/frac_0.05/rep_3/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_3.txt
+Dropped events: {'dropped_events': 2430, 'dropped_rows': 17447, 'remaining_events': 46182, 'remaining_rows': 330957}
+Players: 1,455  Tossups: 1,260  Observed cells: 329,134
+step    0  ELBO loss: 235,907.5
+step  100  ELBO loss: 111,410.9
+step  200  ELBO loss: 109,519.9
+step  300  ELBO loss: 109,262.3
+step  400  ELBO loss: 109,287.1
+step  500  ELBO loss: 109,287.9
+step  600  ELBO loss: 109,246.8
+step  700  ELBO loss: 109,289.3
+step  800  ELBO loss: 109,269.5
+step  900  ELBO loss: 109,269.0
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/full/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,694,389.1
+step  100  ELBO loss: 4,980,653.0
+step  200  ELBO loss: 576,652.5
+step  300  ELBO loss: 522,233.0
+step  400  ELBO loss: 486,708.1
+step  500  ELBO loss: 453,665.3
+step  600  ELBO loss: 428,478.8
+step  700  ELBO loss: 407,705.5
+step  800  ELBO loss: 391,996.3
+step  900  ELBO loss: 382,404.3
+step 1000  ELBO loss: 376,260.5
+step 1100  ELBO loss: 372,606.4
+step 1200  ELBO loss: 369,925.0
+step 1300  ELBO loss: 368,159.8
+step 1400  ELBO loss: 366,976.8
+step 1500  ELBO loss: 366,204.3
+step 1600  ELBO loss: 365,688.6
+step 1700  ELBO loss: 365,164.9
+step 1800  ELBO loss: 364,792.2
+step 1900  ELBO loss: 364,533.9
+step 2000  ELBO loss: 364,287.9
+step 2100  ELBO loss: 364,264.5
+step 2200  ELBO loss: 364,324.9
+step 2300  ELBO loss: 364,032.1
+step 2400  ELBO loss: 363,980.7
+step 2500  ELBO loss: 363,980.4
+step 2600  ELBO loss: 364,245.1
+step 2700  ELBO loss: 363,831.4
+step 2800  ELBO loss: 363,587.6
+step 2900  ELBO loss: 363,610.6
+step 3000  ELBO loss: 363,710.3
+step 3100  ELBO loss: 363,655.4
+step 3200  ELBO loss: 363,672.3
+step 3300  ELBO loss: 363,461.8
+step 3400  ELBO loss: 363,717.0
+step 3500  ELBO loss: 363,661.8
+step 3600  ELBO loss: 363,577.5
+step 3700  ELBO loss: 363,358.8
+step 3800  ELBO loss: 363,441.3
+step 3900  ELBO loss: 363,257.0
+step 4000  ELBO loss: 363,481.5
+step 4100  ELBO loss: 363,400.1
+step 4200  ELBO loss: 363,367.3
+step 4300  ELBO loss: 363,411.9
+step 4400  ELBO loss: 363,312.6
+step 4500  ELBO loss: 363,404.7
+step 4600  ELBO loss: 363,340.0
+step 4700  ELBO loss: 363,426.7
+step 4800  ELBO loss: 363,459.3
+step 4900  ELBO loss: 363,116.3
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 7 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/noisefloor/seed_7/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,702,690.1
+step  100  ELBO loss: 4,770,964.7
+step  200  ELBO loss: 585,895.4
+step  300  ELBO loss: 522,827.7
+step  400  ELBO loss: 486,777.7
+step  500  ELBO loss: 454,063.0
+step  600  ELBO loss: 427,439.5
+step  700  ELBO loss: 408,795.4
+step  800  ELBO loss: 395,161.3
+step  900  ELBO loss: 384,097.3
+step 1000  ELBO loss: 376,981.0
+step 1100  ELBO loss: 372,734.3
+step 1200  ELBO loss: 370,046.3
+step 1300  ELBO loss: 368,278.4
+step 1400  ELBO loss: 367,048.5
+step 1500  ELBO loss: 366,113.4
+step 1600  ELBO loss: 365,667.6
+step 1700  ELBO loss: 365,272.4
+step 1800  ELBO loss: 364,655.8
+step 1900  ELBO loss: 364,590.5
+step 2000  ELBO loss: 364,554.3
+step 2100  ELBO loss: 364,390.7
+step 2200  ELBO loss: 364,396.6
+step 2300  ELBO loss: 364,443.3
+step 2400  ELBO loss: 364,380.6
+step 2500  ELBO loss: 364,053.5
+step 2600  ELBO loss: 364,026.7
+step 2700  ELBO loss: 364,060.0
+step 2800  ELBO loss: 363,776.5
+step 2900  ELBO loss: 363,916.6
+step 3000  ELBO loss: 363,786.2
+step 3100  ELBO loss: 363,624.0
+step 3200  ELBO loss: 363,853.3
+step 3300  ELBO loss: 363,821.8
+step 3400  ELBO loss: 363,796.7
+step 3500  ELBO loss: 363,735.0
+step 3600  ELBO loss: 363,555.8
+step 3700  ELBO loss: 363,556.3
+step 3800  ELBO loss: 363,529.6
+step 3900  ELBO loss: 363,544.3
+step 4000  ELBO loss: 363,716.4
+step 4100  ELBO loss: 363,616.2
+step 4200  ELBO loss: 363,352.6
+step 4300  ELBO loss: 363,243.0
+step 4400  ELBO loss: 363,332.8
+step 4500  ELBO loss: 363,467.8
+step 4600  ELBO loss: 363,440.0
+step 4700  ELBO loss: 363,243.2
+step 4800  ELBO loss: 363,530.3
+step 4900  ELBO loss: 363,135.5
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 123 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/noisefloor/seed_123/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,779,072.6
+step  100  ELBO loss: 5,111,587.9
+step  200  ELBO loss: 606,387.2
+step  300  ELBO loss: 521,927.1
+step  400  ELBO loss: 485,414.3
+step  500  ELBO loss: 452,603.9
+step  600  ELBO loss: 427,241.0
+step  700  ELBO loss: 407,705.3
+step  800  ELBO loss: 392,562.7
+step  900  ELBO loss: 382,254.6
+step 1000  ELBO loss: 375,678.7
+step 1100  ELBO loss: 371,889.1
+step 1200  ELBO loss: 369,159.5
+step 1300  ELBO loss: 367,663.8
+step 1400  ELBO loss: 366,529.1
+step 1500  ELBO loss: 365,696.2
+step 1600  ELBO loss: 364,944.5
+step 1700  ELBO loss: 364,786.7
+step 1800  ELBO loss: 364,142.1
+step 1900  ELBO loss: 364,099.7
+step 2000  ELBO loss: 363,816.9
+step 2100  ELBO loss: 363,763.3
+step 2200  ELBO loss: 363,695.8
+step 2300  ELBO loss: 363,510.5
+step 2400  ELBO loss: 363,643.2
+step 2500  ELBO loss: 363,483.6
+step 2600  ELBO loss: 363,614.6
+step 2700  ELBO loss: 363,314.5
+step 2800  ELBO loss: 363,329.1
+step 2900  ELBO loss: 363,490.1
+step 3000  ELBO loss: 363,380.2
+step 3100  ELBO loss: 363,144.0
+step 3200  ELBO loss: 363,246.7
+step 3300  ELBO loss: 363,285.0
+step 3400  ELBO loss: 363,228.1
+step 3500  ELBO loss: 363,048.5
+step 3600  ELBO loss: 362,909.4
+step 3700  ELBO loss: 363,029.0
+step 3800  ELBO loss: 363,175.0
+step 3900  ELBO loss: 363,080.6
+step 4000  ELBO loss: 363,149.5
+step 4100  ELBO loss: 363,054.1
+step 4200  ELBO loss: 363,000.1
+step 4300  ELBO loss: 363,004.2
+step 4400  ELBO loss: 362,890.8
+step 4500  ELBO loss: 363,122.9
+step 4600  ELBO loss: 362,858.0
+step 4700  ELBO loss: 362,970.5
+step 4800  ELBO loss: 362,996.4
+step 4900  ELBO loss: 362,928.0
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/frac_0.001/rep_1/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.001/rep_1.txt
+Dropped events: {'dropped_events': 48, 'dropped_rows': 346, 'remaining_events': 48564, 'remaining_rows': 348058}
+Rows: 348,058  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295264
+BUZZ         47867
+NO-BUZZ       4927
+step    0  ELBO loss: 20,673,783.1
+step  100  ELBO loss: 4,969,194.3
+step  200  ELBO loss: 576,170.5
+step  300  ELBO loss: 521,751.9
+step  400  ELBO loss: 486,259.2
+step  500  ELBO loss: 453,254.7
+step  600  ELBO loss: 428,127.7
+step  700  ELBO loss: 407,533.6
+step  800  ELBO loss: 391,843.9
+step  900  ELBO loss: 382,113.3
+step 1000  ELBO loss: 375,874.6
+step 1100  ELBO loss: 372,207.3
+step 1200  ELBO loss: 369,508.1
+step 1300  ELBO loss: 367,749.7
+step 1400  ELBO loss: 366,563.7
+step 1500  ELBO loss: 365,797.7
+step 1600  ELBO loss: 365,290.2
+step 1700  ELBO loss: 364,789.4
+step 1800  ELBO loss: 364,415.5
+step 1900  ELBO loss: 364,183.4
+step 2000  ELBO loss: 363,921.7
+step 2100  ELBO loss: 363,914.5
+step 2200  ELBO loss: 363,992.2
+step 2300  ELBO loss: 363,691.6
+step 2400  ELBO loss: 363,629.1
+step 2500  ELBO loss: 363,628.2
+step 2600  ELBO loss: 363,912.1
+step 2700  ELBO loss: 363,477.2
+step 2800  ELBO loss: 363,239.1
+step 2900  ELBO loss: 363,269.2
+step 3000  ELBO loss: 363,362.4
+step 3100  ELBO loss: 363,312.6
+step 3200  ELBO loss: 363,326.6
+step 3300  ELBO loss: 363,130.6
+step 3400  ELBO loss: 363,355.4
+step 3500  ELBO loss: 363,312.9
+step 3600  ELBO loss: 363,228.2
+step 3700  ELBO loss: 362,991.8
+step 3800  ELBO loss: 363,075.3
+step 3900  ELBO loss: 362,885.9
+step 4000  ELBO loss: 363,112.9
+step 4100  ELBO loss: 363,029.4
+step 4200  ELBO loss: 362,996.3
+step 4300  ELBO loss: 363,040.5
+step 4400  ELBO loss: 362,946.2
+step 4500  ELBO loss: 363,015.4
+step 4600  ELBO loss: 362,962.1
+step 4700  ELBO loss: 363,056.2
+step 4800  ELBO loss: 363,052.5
+step 4900  ELBO loss: 362,723.6
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/frac_0.001/rep_2/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.001/rep_2.txt
+Dropped events: {'dropped_events': 48, 'dropped_rows': 345, 'remaining_events': 48564, 'remaining_rows': 348059}
+Rows: 348,059  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295258
+BUZZ         47866
+NO-BUZZ       4935
+step    0  ELBO loss: 20,674,021.1
+step  100  ELBO loss: 4,981,477.4
+step  200  ELBO loss: 576,239.6
+step  300  ELBO loss: 521,736.3
+step  400  ELBO loss: 486,250.2
+step  500  ELBO loss: 453,248.2
+step  600  ELBO loss: 428,107.7
+step  700  ELBO loss: 407,381.1
+step  800  ELBO loss: 391,704.4
+step  900  ELBO loss: 382,094.6
+step 1000  ELBO loss: 375,951.6
+step 1100  ELBO loss: 372,297.0
+step 1200  ELBO loss: 369,604.7
+step 1300  ELBO loss: 367,836.4
+step 1400  ELBO loss: 366,698.7
+step 1500  ELBO loss: 365,900.4
+step 1600  ELBO loss: 365,379.5
+step 1700  ELBO loss: 364,857.6
+step 1800  ELBO loss: 364,510.8
+step 1900  ELBO loss: 364,237.6
+step 2000  ELBO loss: 363,999.9
+step 2100  ELBO loss: 363,946.2
+step 2200  ELBO loss: 364,031.6
+step 2300  ELBO loss: 363,716.0
+step 2400  ELBO loss: 363,681.4
+step 2500  ELBO loss: 363,696.8
+step 2600  ELBO loss: 363,958.7
+step 2700  ELBO loss: 363,546.9
+step 2800  ELBO loss: 363,311.9
+step 2900  ELBO loss: 363,327.2
+step 3000  ELBO loss: 363,430.8
+step 3100  ELBO loss: 363,369.8
+step 3200  ELBO loss: 363,385.9
+step 3300  ELBO loss: 363,151.7
+step 3400  ELBO loss: 363,473.0
+step 3500  ELBO loss: 363,373.2
+step 3600  ELBO loss: 363,299.8
+step 3700  ELBO loss: 363,086.1
+step 3800  ELBO loss: 363,188.4
+step 3900  ELBO loss: 362,981.9
+step 4000  ELBO loss: 363,199.0
+step 4100  ELBO loss: 363,141.2
+step 4200  ELBO loss: 363,074.3
+step 4300  ELBO loss: 363,122.9
+step 4400  ELBO loss: 363,023.9
+step 4500  ELBO loss: 363,106.7
+step 4600  ELBO loss: 363,053.9
+step 4700  ELBO loss: 363,097.4
+step 4800  ELBO loss: 363,200.7
+step 4900  ELBO loss: 362,841.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/frac_0.001/rep_3/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.001/rep_3.txt
+Dropped events: {'dropped_events': 48, 'dropped_rows': 348, 'remaining_events': 48564, 'remaining_rows': 348056}
+Rows: 348,056  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295255
+BUZZ         47866
+NO-BUZZ       4935
+step    0  ELBO loss: 20,674,021.1
+step  100  ELBO loss: 4,969,014.4
+step  200  ELBO loss: 575,875.4
+step  300  ELBO loss: 521,761.9
+step  400  ELBO loss: 486,270.7
+step  500  ELBO loss: 453,256.2
+step  600  ELBO loss: 428,083.7
+step  700  ELBO loss: 407,405.9
+step  800  ELBO loss: 391,745.7
+step  900  ELBO loss: 382,097.7
+step 1000  ELBO loss: 375,937.1
+step 1100  ELBO loss: 372,285.4
+step 1200  ELBO loss: 369,620.3
+step 1300  ELBO loss: 367,855.3
+step 1400  ELBO loss: 366,667.7
+step 1500  ELBO loss: 365,891.8
+step 1600  ELBO loss: 365,366.7
+step 1700  ELBO loss: 364,837.5
+step 1800  ELBO loss: 364,481.3
+step 1900  ELBO loss: 364,217.5
+step 2000  ELBO loss: 363,973.6
+step 2100  ELBO loss: 363,931.0
+step 2200  ELBO loss: 363,996.8
+step 2300  ELBO loss: 363,703.5
+step 2400  ELBO loss: 363,654.0
+step 2500  ELBO loss: 363,635.7
+step 2600  ELBO loss: 363,896.6
+step 2700  ELBO loss: 363,476.0
+step 2800  ELBO loss: 363,234.8
+step 2900  ELBO loss: 363,259.7
+step 3000  ELBO loss: 363,339.8
+step 3100  ELBO loss: 363,277.7
+step 3200  ELBO loss: 363,293.3
+step 3300  ELBO loss: 363,089.7
+step 3400  ELBO loss: 363,310.4
+step 3500  ELBO loss: 363,261.6
+step 3600  ELBO loss: 363,168.4
+step 3700  ELBO loss: 362,947.4
+step 3800  ELBO loss: 363,034.1
+step 3900  ELBO loss: 362,845.9
+step 4000  ELBO loss: 363,047.9
+step 4100  ELBO loss: 362,962.6
+step 4200  ELBO loss: 362,930.2
+step 4300  ELBO loss: 362,974.6
+step 4400  ELBO loss: 362,895.9
+step 4500  ELBO loss: 362,940.7
+step 4600  ELBO loss: 362,873.8
+step 4700  ELBO loss: 362,998.9
+step 4800  ELBO loss: 362,941.4
+step 4900  ELBO loss: 362,611.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/frac_0.005/rep_1/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.005/rep_1.txt
+Dropped events: {'dropped_events': 243, 'dropped_rows': 1729, 'remaining_events': 48369, 'remaining_rows': 346675}
+Rows: 346,675  Players: 1,455  Tossups: 1,259
+z
+CENSORED    294092
+BUZZ         47675
+NO-BUZZ       4908
+step    0  ELBO loss: 20,584,725.2
+step  100  ELBO loss: 4,914,372.0
+step  200  ELBO loss: 572,021.1
+step  300  ELBO loss: 519,769.4
+step  400  ELBO loss: 484,431.6
+step  500  ELBO loss: 451,610.5
+step  600  ELBO loss: 426,395.3
+step  700  ELBO loss: 406,545.4
+step  800  ELBO loss: 391,141.6
+step  900  ELBO loss: 380,913.7
+step 1000  ELBO loss: 374,516.9
+step 1100  ELBO loss: 370,802.2
+step 1200  ELBO loss: 368,013.9
+step 1300  ELBO loss: 366,308.7
+step 1400  ELBO loss: 365,161.2
+step 1500  ELBO loss: 364,335.4
+step 1600  ELBO loss: 363,844.2
+step 1700  ELBO loss: 363,359.7
+step 1800  ELBO loss: 363,026.3
+step 1900  ELBO loss: 362,812.5
+step 2000  ELBO loss: 362,627.5
+step 2100  ELBO loss: 362,527.3
+step 2200  ELBO loss: 362,600.6
+step 2300  ELBO loss: 362,313.9
+step 2400  ELBO loss: 362,224.8
+step 2500  ELBO loss: 362,286.7
+step 2600  ELBO loss: 362,446.2
+step 2700  ELBO loss: 362,214.3
+step 2800  ELBO loss: 361,867.3
+step 2900  ELBO loss: 361,983.0
+step 3000  ELBO loss: 361,916.6
+step 3100  ELBO loss: 361,874.0
+step 3200  ELBO loss: 361,955.3
+step 3300  ELBO loss: 361,750.6
+step 3400  ELBO loss: 361,853.5
+step 3500  ELBO loss: 361,849.8
+step 3600  ELBO loss: 361,874.1
+step 3700  ELBO loss: 361,412.5
+step 3800  ELBO loss: 361,702.7
+step 3900  ELBO loss: 361,562.7
+step 4000  ELBO loss: 361,726.4
+step 4100  ELBO loss: 361,671.3
+step 4200  ELBO loss: 361,559.5
+step 4300  ELBO loss: 361,760.2
+step 4400  ELBO loss: 361,618.0
+step 4500  ELBO loss: 361,613.4
+step 4600  ELBO loss: 361,576.8
+step 4700  ELBO loss: 361,502.1
+step 4800  ELBO loss: 361,510.0
+step 4900  ELBO loss: 361,378.1
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/frac_0.005/rep_2/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.005/rep_2.txt
+Dropped events: {'dropped_events': 243, 'dropped_rows': 1742, 'remaining_events': 48369, 'remaining_rows': 346662}
+Rows: 346,662  Players: 1,455  Tossups: 1,260
+z
+CENSORED    294075
+BUZZ         47674
+NO-BUZZ       4913
+step    0  ELBO loss: 20,590,999.1
+step  100  ELBO loss: 4,945,523.7
+step  200  ELBO loss: 573,757.1
+step  300  ELBO loss: 519,828.4
+step  400  ELBO loss: 484,515.5
+step  500  ELBO loss: 451,661.9
+step  600  ELBO loss: 426,680.8
+step  700  ELBO loss: 406,295.4
+step  800  ELBO loss: 390,688.9
+step  900  ELBO loss: 380,909.4
+step 1000  ELBO loss: 374,741.5
+step 1100  ELBO loss: 371,076.5
+step 1200  ELBO loss: 368,407.3
+step 1300  ELBO loss: 366,623.6
+step 1400  ELBO loss: 365,465.2
+step 1500  ELBO loss: 364,704.1
+step 1600  ELBO loss: 364,192.8
+step 1700  ELBO loss: 363,680.5
+step 1800  ELBO loss: 363,341.8
+step 1900  ELBO loss: 363,038.5
+step 2000  ELBO loss: 362,793.1
+step 2100  ELBO loss: 362,752.5
+step 2200  ELBO loss: 362,774.2
+step 2300  ELBO loss: 362,501.7
+step 2400  ELBO loss: 362,451.4
+step 2500  ELBO loss: 362,426.2
+step 2600  ELBO loss: 362,633.3
+step 2700  ELBO loss: 362,253.8
+step 2800  ELBO loss: 362,042.0
+step 2900  ELBO loss: 362,045.4
+step 3000  ELBO loss: 362,130.1
+step 3100  ELBO loss: 362,038.4
+step 3200  ELBO loss: 362,085.0
+step 3300  ELBO loss: 361,862.2
+step 3400  ELBO loss: 362,094.0
+step 3500  ELBO loss: 362,066.8
+step 3600  ELBO loss: 361,996.5
+step 3700  ELBO loss: 361,784.6
+step 3800  ELBO loss: 361,870.4
+step 3900  ELBO loss: 361,714.5
+step 4000  ELBO loss: 361,872.5
+step 4100  ELBO loss: 361,818.8
+step 4200  ELBO loss: 361,782.5
+step 4300  ELBO loss: 361,845.3
+step 4400  ELBO loss: 361,763.1
+step 4500  ELBO loss: 361,836.4
+step 4600  ELBO loss: 361,745.6
+step 4700  ELBO loss: 361,893.0
+step 4800  ELBO loss: 361,810.9
+step 4900  ELBO loss: 361,496.5
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/frac_0.005/rep_3/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.005/rep_3.txt
+Dropped events: {'dropped_events': 243, 'dropped_rows': 1743, 'remaining_events': 48369, 'remaining_rows': 346661}
+Rows: 346,661  Players: 1,455  Tossups: 1,260
+z
+CENSORED    294099
+BUZZ         47678
+NO-BUZZ       4884
+step    0  ELBO loss: 20,587,889.1
+step  100  ELBO loss: 4,962,046.9
+step  200  ELBO loss: 573,875.9
+step  300  ELBO loss: 519,809.5
+step  400  ELBO loss: 484,497.9
+step  500  ELBO loss: 451,642.0
+step  600  ELBO loss: 426,651.6
+step  700  ELBO loss: 406,112.5
+step  800  ELBO loss: 390,548.0
+step  900  ELBO loss: 380,849.9
+step 1000  ELBO loss: 374,689.6
+step 1100  ELBO loss: 371,020.6
+step 1200  ELBO loss: 368,320.9
+step 1300  ELBO loss: 366,568.1
+step 1400  ELBO loss: 365,403.4
+step 1500  ELBO loss: 364,633.8
+step 1600  ELBO loss: 364,125.1
+step 1700  ELBO loss: 363,596.7
+step 1800  ELBO loss: 363,261.2
+step 1900  ELBO loss: 362,995.1
+step 2000  ELBO loss: 362,774.9
+step 2100  ELBO loss: 362,722.5
+step 2200  ELBO loss: 362,782.6
+step 2300  ELBO loss: 362,498.2
+step 2400  ELBO loss: 362,473.1
+step 2500  ELBO loss: 362,467.2
+step 2600  ELBO loss: 362,712.7
+step 2700  ELBO loss: 362,309.7
+step 2800  ELBO loss: 362,093.6
+step 2900  ELBO loss: 362,069.3
+step 3000  ELBO loss: 362,178.6
+step 3100  ELBO loss: 362,110.8
+step 3200  ELBO loss: 362,118.3
+step 3300  ELBO loss: 361,860.0
+step 3400  ELBO loss: 362,221.1
+step 3500  ELBO loss: 362,074.1
+step 3600  ELBO loss: 362,017.3
+step 3700  ELBO loss: 361,797.1
+step 3800  ELBO loss: 361,878.7
+step 3900  ELBO loss: 361,669.7
+step 4000  ELBO loss: 361,848.7
+step 4100  ELBO loss: 361,828.1
+step 4200  ELBO loss: 361,738.5
+step 4300  ELBO loss: 361,790.5
+step 4400  ELBO loss: 361,699.4
+step 4500  ELBO loss: 361,783.8
+step 4600  ELBO loss: 361,704.0
+step 4700  ELBO loss: 361,722.0
+step 4800  ELBO loss: 361,869.4
+step 4900  ELBO loss: 361,486.7
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/frac_0.01/rep_1/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.01/rep_1.txt
+Dropped events: {'dropped_events': 486, 'dropped_rows': 3470, 'remaining_events': 48126, 'remaining_rows': 344934}
+Rows: 344,934  Players: 1,455  Tossups: 1,260
+z
+CENSORED    292630
+BUZZ         47437
+NO-BUZZ       4867
+step    0  ELBO loss: 20,486,761.1
+step  100  ELBO loss: 4,921,184.1
+step  200  ELBO loss: 570,918.5
+step  300  ELBO loss: 517,437.3
+step  400  ELBO loss: 482,316.2
+step  500  ELBO loss: 449,618.0
+step  600  ELBO loss: 424,699.2
+step  700  ELBO loss: 404,381.4
+step  800  ELBO loss: 388,898.1
+step  900  ELBO loss: 379,197.3
+step 1000  ELBO loss: 373,034.3
+step 1100  ELBO loss: 369,419.6
+step 1200  ELBO loss: 366,773.8
+step 1300  ELBO loss: 365,057.3
+step 1400  ELBO loss: 363,934.2
+step 1500  ELBO loss: 363,196.4
+step 1600  ELBO loss: 362,682.7
+step 1700  ELBO loss: 362,147.9
+step 1800  ELBO loss: 361,813.2
+step 1900  ELBO loss: 361,508.6
+step 2000  ELBO loss: 361,295.4
+step 2100  ELBO loss: 361,198.1
+step 2200  ELBO loss: 361,247.7
+step 2300  ELBO loss: 360,934.8
+step 2400  ELBO loss: 360,880.1
+step 2500  ELBO loss: 360,851.4
+step 2600  ELBO loss: 361,093.9
+step 2700  ELBO loss: 360,672.7
+step 2800  ELBO loss: 360,434.4
+step 2900  ELBO loss: 360,414.5
+step 3000  ELBO loss: 360,506.7
+step 3100  ELBO loss: 360,414.5
+step 3200  ELBO loss: 360,431.0
+step 3300  ELBO loss: 360,207.9
+step 3400  ELBO loss: 360,506.4
+step 3500  ELBO loss: 360,377.2
+step 3600  ELBO loss: 360,322.6
+step 3700  ELBO loss: 360,097.0
+step 3800  ELBO loss: 360,205.0
+step 3900  ELBO loss: 359,987.5
+step 4000  ELBO loss: 360,148.3
+step 4100  ELBO loss: 360,126.3
+step 4200  ELBO loss: 360,041.4
+step 4300  ELBO loss: 360,101.9
+step 4400  ELBO loss: 359,998.0
+step 4500  ELBO loss: 360,096.5
+step 4600  ELBO loss: 360,000.4
+step 4700  ELBO loss: 360,056.2
+step 4800  ELBO loss: 360,166.7
+step 4900  ELBO loss: 359,770.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/frac_0.01/rep_2/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.01/rep_2.txt
+Dropped events: {'dropped_events': 486, 'dropped_rows': 3451, 'remaining_events': 48126, 'remaining_rows': 344953}
+Rows: 344,953  Players: 1,455  Tossups: 1,260
+z
+CENSORED    292624
+BUZZ         47434
+NO-BUZZ       4895
+step    0  ELBO loss: 20,494,243.1
+step  100  ELBO loss: 4,935,417.0
+step  200  ELBO loss: 571,433.1
+step  300  ELBO loss: 517,433.8
+step  400  ELBO loss: 482,267.3
+step  500  ELBO loss: 449,550.2
+step  600  ELBO loss: 424,616.9
+step  700  ELBO loss: 404,088.7
+step  800  ELBO loss: 388,529.9
+step  900  ELBO loss: 378,940.1
+step 1000  ELBO loss: 372,715.7
+step 1100  ELBO loss: 369,019.5
+step 1200  ELBO loss: 366,306.0
+step 1300  ELBO loss: 364,556.8
+step 1400  ELBO loss: 363,346.0
+step 1500  ELBO loss: 362,606.6
+step 1600  ELBO loss: 362,106.2
+step 1700  ELBO loss: 361,631.8
+step 1800  ELBO loss: 361,254.0
+step 1900  ELBO loss: 361,032.3
+step 2000  ELBO loss: 360,847.6
+step 2100  ELBO loss: 360,720.5
+step 2200  ELBO loss: 360,802.5
+step 2300  ELBO loss: 360,524.5
+step 2400  ELBO loss: 360,367.5
+step 2500  ELBO loss: 360,428.1
+step 2600  ELBO loss: 360,670.2
+step 2700  ELBO loss: 360,306.1
+step 2800  ELBO loss: 360,055.6
+step 2900  ELBO loss: 360,086.5
+step 3000  ELBO loss: 360,147.8
+step 3100  ELBO loss: 360,106.3
+step 3200  ELBO loss: 360,103.4
+step 3300  ELBO loss: 359,902.6
+step 3400  ELBO loss: 360,140.9
+step 3500  ELBO loss: 360,047.2
+step 3600  ELBO loss: 360,027.5
+step 3700  ELBO loss: 359,702.4
+step 3800  ELBO loss: 359,874.1
+step 3900  ELBO loss: 359,653.7
+step 4000  ELBO loss: 359,816.1
+step 4100  ELBO loss: 359,753.1
+step 4200  ELBO loss: 359,732.6
+step 4300  ELBO loss: 359,722.4
+step 4400  ELBO loss: 359,686.2
+step 4500  ELBO loss: 359,766.2
+step 4600  ELBO loss: 359,686.5
+step 4700  ELBO loss: 359,740.5
+step 4800  ELBO loss: 359,861.1
+step 4900  ELBO loss: 359,454.0
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/frac_0.01/rep_3/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.01/rep_3.txt
+Dropped events: {'dropped_events': 486, 'dropped_rows': 3470, 'remaining_events': 48126, 'remaining_rows': 344934}
+Rows: 344,934  Players: 1,455  Tossups: 1,260
+z
+CENSORED    292597
+BUZZ         47433
+NO-BUZZ       4904
+step    0  ELBO loss: 20,487,659.1
+step  100  ELBO loss: 4,948,240.5
+step  200  ELBO loss: 571,468.6
+step  300  ELBO loss: 517,436.0
+step  400  ELBO loss: 482,308.5
+step  500  ELBO loss: 449,580.7
+step  600  ELBO loss: 424,609.9
+step  700  ELBO loss: 403,911.8
+step  800  ELBO loss: 388,314.5
+step  900  ELBO loss: 378,870.4
+step 1000  ELBO loss: 372,817.4
+step 1100  ELBO loss: 369,215.5
+step 1200  ELBO loss: 366,585.8
+step 1300  ELBO loss: 364,827.9
+step 1400  ELBO loss: 363,650.0
+step 1500  ELBO loss: 362,893.2
+step 1600  ELBO loss: 362,323.8
+step 1700  ELBO loss: 361,753.5
+step 1800  ELBO loss: 361,388.6
+step 1900  ELBO loss: 361,153.1
+step 2000  ELBO loss: 360,853.6
+step 2100  ELBO loss: 360,808.0
+step 2200  ELBO loss: 360,837.2
+step 2300  ELBO loss: 360,534.1
+step 2400  ELBO loss: 360,501.7
+step 2500  ELBO loss: 360,444.0
+step 2600  ELBO loss: 360,731.3
+step 2700  ELBO loss: 360,301.2
+step 2800  ELBO loss: 360,034.5
+step 2900  ELBO loss: 360,109.7
+step 3000  ELBO loss: 360,197.2
+step 3100  ELBO loss: 360,075.5
+step 3200  ELBO loss: 360,151.5
+step 3300  ELBO loss: 359,939.3
+step 3400  ELBO loss: 360,148.5
+step 3500  ELBO loss: 360,154.1
+step 3600  ELBO loss: 360,102.1
+step 3700  ELBO loss: 359,751.6
+step 3800  ELBO loss: 359,915.1
+step 3900  ELBO loss: 359,762.6
+step 4000  ELBO loss: 359,959.9
+step 4100  ELBO loss: 359,859.0
+step 4200  ELBO loss: 359,851.8
+step 4300  ELBO loss: 359,899.1
+step 4400  ELBO loss: 359,818.4
+step 4500  ELBO loss: 359,884.6
+step 4600  ELBO loss: 359,868.3
+step 4700  ELBO loss: 360,002.5
+step 4800  ELBO loss: 359,927.0
+step 4900  ELBO loss: 359,586.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/frac_0.05/rep_1/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_1.txt
+Dropped events: {'dropped_events': 2430, 'dropped_rows': 17421, 'remaining_events': 46182, 'remaining_rows': 330983}
+Rows: 330,983  Players: 1,455  Tossups: 1,259
+z
+CENSORED    280737
+BUZZ         45515
+NO-BUZZ       4731
+step    0  ELBO loss: 19,662,281.2
+step  100  ELBO loss: 4,779,423.5
+step  200  ELBO loss: 550,702.2
+step  300  ELBO loss: 498,469.0
+step  400  ELBO loss: 465,213.1
+step  500  ELBO loss: 434,244.1
+step  600  ELBO loss: 410,208.9
+step  700  ELBO loss: 390,382.8
+step  800  ELBO loss: 375,092.7
+step  900  ELBO loss: 365,463.0
+step 1000  ELBO loss: 359,456.9
+step 1100  ELBO loss: 355,879.8
+step 1200  ELBO loss: 353,351.1
+step 1300  ELBO loss: 351,578.7
+step 1400  ELBO loss: 350,535.3
+step 1500  ELBO loss: 349,727.9
+step 1600  ELBO loss: 349,264.4
+step 1700  ELBO loss: 348,686.4
+step 1800  ELBO loss: 348,420.6
+step 1900  ELBO loss: 348,192.0
+step 2000  ELBO loss: 348,056.9
+step 2100  ELBO loss: 347,875.2
+step 2200  ELBO loss: 348,031.2
+step 2300  ELBO loss: 347,712.6
+step 2400  ELBO loss: 347,756.6
+step 2500  ELBO loss: 347,704.8
+step 2600  ELBO loss: 347,915.7
+step 2700  ELBO loss: 347,678.3
+step 2800  ELBO loss: 347,445.1
+step 2900  ELBO loss: 347,530.7
+step 3000  ELBO loss: 347,435.3
+step 3100  ELBO loss: 347,468.9
+step 3200  ELBO loss: 347,582.5
+step 3300  ELBO loss: 347,224.7
+step 3400  ELBO loss: 347,555.7
+step 3500  ELBO loss: 347,456.8
+step 3600  ELBO loss: 347,420.4
+step 3700  ELBO loss: 347,009.6
+step 3800  ELBO loss: 347,269.5
+step 3900  ELBO loss: 347,153.6
+step 4000  ELBO loss: 347,311.6
+step 4100  ELBO loss: 347,166.0
+step 4200  ELBO loss: 347,186.4
+step 4300  ELBO loss: 347,234.3
+step 4400  ELBO loss: 347,070.6
+step 4500  ELBO loss: 347,101.4
+step 4600  ELBO loss: 347,123.6
+step 4700  ELBO loss: 347,173.1
+step 4800  ELBO loss: 347,233.5
+step 4900  ELBO loss: 346,993.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/frac_0.05/rep_2/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_2.txt
+Dropped events: {'dropped_events': 2430, 'dropped_rows': 17477, 'remaining_events': 46182, 'remaining_rows': 330927}
+Rows: 330,927  Players: 1,455  Tossups: 1,259
+z
+CENSORED    280742
+BUZZ         45521
+NO-BUZZ       4664
+step    0  ELBO loss: 19,654,625.2
+step  100  ELBO loss: 4,729,924.3
+step  200  ELBO loss: 549,248.2
+step  300  ELBO loss: 498,238.0
+step  400  ELBO loss: 464,647.1
+step  500  ELBO loss: 433,392.1
+step  600  ELBO loss: 409,436.4
+step  700  ELBO loss: 390,534.1
+step  800  ELBO loss: 375,641.9
+step  900  ELBO loss: 365,697.8
+step 1000  ELBO loss: 359,501.4
+step 1100  ELBO loss: 355,829.0
+step 1200  ELBO loss: 353,180.8
+step 1300  ELBO loss: 351,564.2
+step 1400  ELBO loss: 350,467.3
+step 1500  ELBO loss: 349,662.1
+step 1600  ELBO loss: 349,204.5
+step 1700  ELBO loss: 348,742.4
+step 1800  ELBO loss: 348,398.5
+step 1900  ELBO loss: 348,221.3
+step 2000  ELBO loss: 348,062.0
+step 2100  ELBO loss: 347,942.7
+step 2200  ELBO loss: 348,064.0
+step 2300  ELBO loss: 347,813.6
+step 2400  ELBO loss: 347,729.4
+step 2500  ELBO loss: 347,753.7
+step 2600  ELBO loss: 347,962.9
+step 2700  ELBO loss: 347,645.7
+step 2800  ELBO loss: 347,357.3
+step 2900  ELBO loss: 347,490.6
+step 3000  ELBO loss: 347,395.1
+step 3100  ELBO loss: 347,387.9
+step 3200  ELBO loss: 347,385.7
+step 3300  ELBO loss: 347,203.6
+step 3400  ELBO loss: 347,339.8
+step 3500  ELBO loss: 347,254.3
+step 3600  ELBO loss: 347,325.1
+step 3700  ELBO loss: 346,874.4
+step 3800  ELBO loss: 347,152.2
+step 3900  ELBO loss: 346,963.7
+step 4000  ELBO loss: 347,133.5
+step 4100  ELBO loss: 347,101.1
+step 4200  ELBO loss: 346,945.6
+step 4300  ELBO loss: 347,146.0
+step 4400  ELBO loss: 347,006.8
+step 4500  ELBO loss: 346,975.4
+step 4600  ELBO loss: 346,952.6
+step 4700  ELBO loss: 346,948.2
+step 4800  ELBO loss: 346,859.9
+step 4900  ELBO loss: 346,692.1
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python train_pyramidal.py --split year_2024 --dimensions 5 --steps 5000 --lr 0.005 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/baseline/frac_0.05/rep_3/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_3.txt
+Dropped events: {'dropped_events': 2430, 'dropped_rows': 17447, 'remaining_events': 46182, 'remaining_rows': 330957}
+Rows: 330,957  Players: 1,455  Tossups: 1,260
+z
+CENSORED    280773
+BUZZ         45523
+NO-BUZZ       4661
+step    0  ELBO loss: 19,658,175.1
+step  100  ELBO loss: 4,901,910.6
+step  200  ELBO loss: 558,650.1
+step  300  ELBO loss: 497,611.6
+step  400  ELBO loss: 463,887.8
+step  500  ELBO loss: 432,239.3
+step  600  ELBO loss: 408,093.6
+step  700  ELBO loss: 388,601.9
+step  800  ELBO loss: 374,311.0
+step  900  ELBO loss: 365,697.9
+step 1000  ELBO loss: 359,915.0
+step 1100  ELBO loss: 356,403.6
+step 1200  ELBO loss: 353,906.9
+step 1300  ELBO loss: 352,218.9
+step 1400  ELBO loss: 351,099.8
+step 1500  ELBO loss: 350,353.2
+step 1600  ELBO loss: 349,778.3
+step 1700  ELBO loss: 349,227.9
+step 1800  ELBO loss: 348,863.3
+step 1900  ELBO loss: 348,531.9
+step 2000  ELBO loss: 348,329.6
+step 2100  ELBO loss: 348,212.0
+step 2200  ELBO loss: 348,231.3
+step 2300  ELBO loss: 347,909.7
+step 2400  ELBO loss: 347,950.9
+step 2500  ELBO loss: 347,848.5
+step 2600  ELBO loss: 348,118.9
+step 2700  ELBO loss: 347,654.4
+step 2800  ELBO loss: 347,433.5
+step 2900  ELBO loss: 347,603.7
+step 3000  ELBO loss: 347,610.4
+step 3100  ELBO loss: 347,565.1
+step 3200  ELBO loss: 347,628.7
+step 3300  ELBO loss: 347,334.6
+step 3400  ELBO loss: 347,596.3
+step 3500  ELBO loss: 347,640.9
+step 3600  ELBO loss: 347,544.2
+step 3700  ELBO loss: 347,190.1
+step 3800  ELBO loss: 347,351.1
+step 3900  ELBO loss: 347,166.3
+step 4000  ELBO loss: 347,337.6
+step 4100  ELBO loss: 347,274.8
+step 4200  ELBO loss: 347,188.0
+step 4300  ELBO loss: 347,449.7
+step 4400  ELBO loss: 347,357.0
+step 4500  ELBO loss: 347,196.8
+step 4600  ELBO loss: 347,286.4
+step 4700  ELBO loss: 347,305.7
+step 4800  ELBO loss: 347,426.2
+step 4900  ELBO loss: 347,001.6
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/full/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,921,054.3
+step  100  ELBO loss: 554,744.0
+step  200  ELBO loss: 480,871.9
+step  300  ELBO loss: 445,337.4
+step  400  ELBO loss: 413,820.3
+step  500  ELBO loss: 389,460.0
+step  600  ELBO loss: 378,203.9
+step  700  ELBO loss: 372,576.3
+step  800  ELBO loss: 369,113.0
+step  900  ELBO loss: 367,172.9
+step 1000  ELBO loss: 366,115.4
+step 1100  ELBO loss: 365,362.0
+step 1200  ELBO loss: 364,197.6
+step 1300  ELBO loss: 363,567.1
+step 1400  ELBO loss: 363,522.2
+step 1500  ELBO loss: 362,801.9
+step 1600  ELBO loss: 361,880.9
+step 1700  ELBO loss: 361,962.8
+step 1800  ELBO loss: 361,844.8
+step 1900  ELBO loss: 361,753.8
+step 2000  ELBO loss: 361,726.6
+step 2100  ELBO loss: 360,690.8
+step 2200  ELBO loss: 361,011.1
+step 2300  ELBO loss: 360,424.6
+step 2400  ELBO loss: 360,538.4
+step 2500  ELBO loss: 360,477.0
+step 2600  ELBO loss: 361,424.7
+step 2700  ELBO loss: 360,491.9
+step 2800  ELBO loss: 360,306.3
+step 2900  ELBO loss: 360,299.1
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 7 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/noisefloor/seed_7/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,085,679.4
+step  100  ELBO loss: 555,380.7
+step  200  ELBO loss: 480,671.4
+step  300  ELBO loss: 445,782.6
+step  400  ELBO loss: 413,410.5
+step  500  ELBO loss: 389,485.3
+step  600  ELBO loss: 378,322.3
+step  700  ELBO loss: 372,532.9
+step  800  ELBO loss: 369,236.8
+step  900  ELBO loss: 367,270.9
+step 1000  ELBO loss: 365,691.9
+step 1100  ELBO loss: 364,547.2
+step 1200  ELBO loss: 363,772.9
+step 1300  ELBO loss: 363,017.9
+step 1400  ELBO loss: 362,447.6
+step 1500  ELBO loss: 361,981.0
+step 1600  ELBO loss: 361,392.6
+step 1700  ELBO loss: 361,426.3
+step 1800  ELBO loss: 361,367.3
+step 1900  ELBO loss: 360,848.6
+step 2000  ELBO loss: 360,739.2
+step 2100  ELBO loss: 360,260.7
+step 2200  ELBO loss: 360,355.1
+step 2300  ELBO loss: 359,903.3
+step 2400  ELBO loss: 359,626.6
+step 2500  ELBO loss: 359,744.9
+step 2600  ELBO loss: 359,580.1
+step 2700  ELBO loss: 359,315.7
+step 2800  ELBO loss: 359,651.6
+step 2900  ELBO loss: 359,114.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 123 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/noisefloor/seed_123/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,181,376.7
+step  100  ELBO loss: 554,421.2
+step  200  ELBO loss: 480,051.1
+step  300  ELBO loss: 445,651.0
+step  400  ELBO loss: 415,776.6
+step  500  ELBO loss: 392,008.4
+step  600  ELBO loss: 380,469.4
+step  700  ELBO loss: 374,169.0
+step  800  ELBO loss: 370,586.6
+step  900  ELBO loss: 368,567.5
+step 1000  ELBO loss: 367,144.4
+step 1100  ELBO loss: 366,733.0
+step 1200  ELBO loss: 365,630.9
+step 1300  ELBO loss: 364,536.7
+step 1400  ELBO loss: 364,265.5
+step 1500  ELBO loss: 363,517.5
+step 1600  ELBO loss: 363,372.5
+step 1700  ELBO loss: 362,651.3
+step 1800  ELBO loss: 362,498.3
+step 1900  ELBO loss: 362,056.8
+step 2000  ELBO loss: 361,852.6
+step 2100  ELBO loss: 361,902.5
+step 2200  ELBO loss: 361,599.0
+step 2300  ELBO loss: 361,511.3
+step 2400  ELBO loss: 361,035.3
+step 2500  ELBO loss: 361,090.8
+step 2600  ELBO loss: 362,032.2
+step 2700  ELBO loss: 361,002.5
+step 2800  ELBO loss: 360,809.1
+step 2900  ELBO loss: 360,612.3
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/frac_0.001/rep_1/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.001/rep_1.txt
+Dropped events: {'dropped_events': 48, 'dropped_rows': 346, 'remaining_events': 48564, 'remaining_rows': 348058}
+Rows: 348,058  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295264
+BUZZ         47867
+NO-BUZZ       4927
+step    0  ELBO loss: 20,900,472.3
+step  100  ELBO loss: 554,242.9
+step  200  ELBO loss: 480,432.6
+step  300  ELBO loss: 444,931.1
+step  400  ELBO loss: 413,440.3
+step  500  ELBO loss: 389,095.2
+step  600  ELBO loss: 377,853.7
+step  700  ELBO loss: 372,240.2
+step  800  ELBO loss: 368,761.3
+step  900  ELBO loss: 366,823.7
+step 1000  ELBO loss: 365,795.1
+step 1100  ELBO loss: 365,027.1
+step 1200  ELBO loss: 363,850.7
+step 1300  ELBO loss: 363,223.1
+step 1400  ELBO loss: 363,177.6
+step 1500  ELBO loss: 362,474.1
+step 1600  ELBO loss: 361,521.8
+step 1700  ELBO loss: 361,618.4
+step 1800  ELBO loss: 361,491.0
+step 1900  ELBO loss: 361,416.3
+step 2000  ELBO loss: 361,363.9
+step 2100  ELBO loss: 360,340.2
+step 2200  ELBO loss: 360,637.2
+step 2300  ELBO loss: 360,084.9
+step 2400  ELBO loss: 360,174.8
+step 2500  ELBO loss: 360,126.4
+step 2600  ELBO loss: 361,068.2
+step 2700  ELBO loss: 360,134.9
+step 2800  ELBO loss: 359,896.0
+step 2900  ELBO loss: 359,919.3
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/frac_0.001/rep_2/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.001/rep_2.txt
+Dropped events: {'dropped_events': 48, 'dropped_rows': 345, 'remaining_events': 48564, 'remaining_rows': 348059}
+Rows: 348,059  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295258
+BUZZ         47866
+NO-BUZZ       4935
+step    0  ELBO loss: 20,900,612.3
+step  100  ELBO loss: 554,234.4
+step  200  ELBO loss: 480,428.7
+step  300  ELBO loss: 444,928.0
+step  400  ELBO loss: 413,408.5
+step  500  ELBO loss: 389,070.9
+step  600  ELBO loss: 377,825.1
+step  700  ELBO loss: 372,210.2
+step  800  ELBO loss: 368,754.5
+step  900  ELBO loss: 366,824.1
+step 1000  ELBO loss: 365,771.5
+step 1100  ELBO loss: 365,019.4
+step 1200  ELBO loss: 363,853.3
+step 1300  ELBO loss: 363,217.2
+step 1400  ELBO loss: 363,193.0
+step 1500  ELBO loss: 362,477.8
+step 1600  ELBO loss: 361,551.6
+step 1700  ELBO loss: 361,632.9
+step 1800  ELBO loss: 361,535.5
+step 1900  ELBO loss: 361,440.3
+step 2000  ELBO loss: 361,411.8
+step 2100  ELBO loss: 360,358.4
+step 2200  ELBO loss: 360,707.2
+step 2300  ELBO loss: 360,094.6
+step 2400  ELBO loss: 360,193.9
+step 2500  ELBO loss: 360,170.0
+step 2600  ELBO loss: 361,137.0
+step 2700  ELBO loss: 360,142.7
+step 2800  ELBO loss: 359,991.4
+step 2900  ELBO loss: 359,954.7
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/frac_0.001/rep_3/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.001/rep_3.txt
+Dropped events: {'dropped_events': 48, 'dropped_rows': 348, 'remaining_events': 48564, 'remaining_rows': 348056}
+Rows: 348,056  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295255
+BUZZ         47866
+NO-BUZZ       4935
+step    0  ELBO loss: 20,900,640.3
+step  100  ELBO loss: 554,266.1
+step  200  ELBO loss: 480,449.5
+step  300  ELBO loss: 444,946.6
+step  400  ELBO loss: 413,466.3
+step  500  ELBO loss: 389,114.0
+step  600  ELBO loss: 377,871.4
+step  700  ELBO loss: 372,258.0
+step  800  ELBO loss: 368,808.3
+step  900  ELBO loss: 366,866.4
+step 1000  ELBO loss: 365,816.7
+step 1100  ELBO loss: 365,073.7
+step 1200  ELBO loss: 363,921.2
+step 1300  ELBO loss: 363,265.0
+step 1400  ELBO loss: 363,232.1
+step 1500  ELBO loss: 362,505.6
+step 1600  ELBO loss: 361,568.1
+step 1700  ELBO loss: 361,632.2
+step 1800  ELBO loss: 361,537.7
+step 1900  ELBO loss: 361,422.4
+step 2000  ELBO loss: 361,424.0
+step 2100  ELBO loss: 360,365.0
+step 2200  ELBO loss: 360,664.8
+step 2300  ELBO loss: 360,109.7
+step 2400  ELBO loss: 360,201.5
+step 2500  ELBO loss: 360,160.5
+step 2600  ELBO loss: 361,107.4
+step 2700  ELBO loss: 360,165.9
+step 2800  ELBO loss: 360,022.6
+step 2900  ELBO loss: 360,007.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/frac_0.005/rep_1/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.005/rep_1.txt
+Dropped events: {'dropped_events': 243, 'dropped_rows': 1729, 'remaining_events': 48369, 'remaining_rows': 346675}
+Rows: 346,675  Players: 1,455  Tossups: 1,259
+z
+CENSORED    294092
+BUZZ         47675
+NO-BUZZ       4908
+step    0  ELBO loss: 20,804,120.8
+step  100  ELBO loss: 552,267.4
+step  200  ELBO loss: 478,621.2
+step  300  ELBO loss: 443,462.6
+step  400  ELBO loss: 413,115.6
+step  500  ELBO loss: 387,603.2
+step  600  ELBO loss: 375,657.6
+step  700  ELBO loss: 370,303.0
+step  800  ELBO loss: 366,748.8
+step  900  ELBO loss: 364,780.0
+step 1000  ELBO loss: 364,174.6
+step 1100  ELBO loss: 363,104.2
+step 1200  ELBO loss: 361,818.9
+step 1300  ELBO loss: 361,412.3
+step 1400  ELBO loss: 360,930.2
+step 1500  ELBO loss: 360,692.9
+step 1600  ELBO loss: 359,684.2
+step 1700  ELBO loss: 359,533.2
+step 1800  ELBO loss: 359,062.3
+step 1900  ELBO loss: 359,116.1
+step 2000  ELBO loss: 359,497.2
+step 2100  ELBO loss: 358,486.7
+step 2200  ELBO loss: 358,790.2
+step 2300  ELBO loss: 357,929.5
+step 2400  ELBO loss: 357,881.7
+step 2500  ELBO loss: 358,176.9
+step 2600  ELBO loss: 359,047.0
+step 2700  ELBO loss: 357,921.4
+step 2800  ELBO loss: 357,688.7
+step 2900  ELBO loss: 357,830.8
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/frac_0.005/rep_2/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.005/rep_2.txt
+Dropped events: {'dropped_events': 243, 'dropped_rows': 1742, 'remaining_events': 48369, 'remaining_rows': 346662}
+Rows: 346,662  Players: 1,455  Tossups: 1,260
+z
+CENSORED    294075
+BUZZ         47674
+NO-BUZZ       4913
+step    0  ELBO loss: 20,818,614.3
+step  100  ELBO loss: 552,279.8
+step  200  ELBO loss: 478,744.9
+step  300  ELBO loss: 443,386.6
+step  400  ELBO loss: 411,990.0
+step  500  ELBO loss: 387,725.8
+step  600  ELBO loss: 376,547.4
+step  700  ELBO loss: 370,953.9
+step  800  ELBO loss: 367,502.8
+step  900  ELBO loss: 365,575.1
+step 1000  ELBO loss: 364,519.5
+step 1100  ELBO loss: 363,819.7
+step 1200  ELBO loss: 362,651.0
+step 1300  ELBO loss: 361,995.9
+step 1400  ELBO loss: 361,960.8
+step 1500  ELBO loss: 361,250.6
+step 1600  ELBO loss: 360,327.5
+step 1700  ELBO loss: 360,404.5
+step 1800  ELBO loss: 360,276.6
+step 1900  ELBO loss: 360,240.2
+step 2000  ELBO loss: 360,127.0
+step 2100  ELBO loss: 359,106.2
+step 2200  ELBO loss: 359,425.8
+step 2300  ELBO loss: 358,849.1
+step 2400  ELBO loss: 358,946.9
+step 2500  ELBO loss: 358,915.2
+step 2600  ELBO loss: 359,841.9
+step 2700  ELBO loss: 358,872.3
+step 2800  ELBO loss: 358,741.1
+step 2900  ELBO loss: 358,697.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/frac_0.005/rep_3/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.005/rep_3.txt
+Dropped events: {'dropped_events': 243, 'dropped_rows': 1743, 'remaining_events': 48369, 'remaining_rows': 346661}
+Rows: 346,661  Players: 1,455  Tossups: 1,260
+z
+CENSORED    294099
+BUZZ         47678
+NO-BUZZ       4884
+step    0  ELBO loss: 20,812,354.3
+step  100  ELBO loss: 552,275.0
+step  200  ELBO loss: 478,725.5
+step  300  ELBO loss: 443,338.1
+step  400  ELBO loss: 412,106.5
+step  500  ELBO loss: 387,817.7
+step  600  ELBO loss: 376,580.7
+step  700  ELBO loss: 370,975.5
+step  800  ELBO loss: 367,574.4
+step  900  ELBO loss: 365,639.0
+step 1000  ELBO loss: 364,580.9
+step 1100  ELBO loss: 363,824.6
+step 1200  ELBO loss: 362,681.1
+step 1300  ELBO loss: 362,036.6
+step 1400  ELBO loss: 361,980.5
+step 1500  ELBO loss: 361,259.8
+step 1600  ELBO loss: 360,391.2
+step 1700  ELBO loss: 360,450.7
+step 1800  ELBO loss: 360,294.5
+step 1900  ELBO loss: 360,087.8
+step 2000  ELBO loss: 360,191.5
+step 2100  ELBO loss: 359,200.8
+step 2200  ELBO loss: 359,451.5
+step 2300  ELBO loss: 358,880.0
+step 2400  ELBO loss: 358,979.2
+step 2500  ELBO loss: 358,938.1
+step 2600  ELBO loss: 359,794.0
+step 2700  ELBO loss: 358,908.0
+step 2800  ELBO loss: 358,799.6
+step 2900  ELBO loss: 358,780.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/frac_0.01/rep_1/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.01/rep_1.txt
+Dropped events: {'dropped_events': 486, 'dropped_rows': 3470, 'remaining_events': 48126, 'remaining_rows': 344934}
+Rows: 344,934  Players: 1,455  Tossups: 1,260
+z
+CENSORED    292630
+BUZZ         47437
+NO-BUZZ       4867
+step    0  ELBO loss: 20,711,460.3
+step  100  ELBO loss: 549,841.7
+step  200  ELBO loss: 476,600.1
+step  300  ELBO loss: 441,388.3
+step  400  ELBO loss: 410,360.3
+step  500  ELBO loss: 386,253.9
+step  600  ELBO loss: 374,940.6
+step  700  ELBO loss: 369,343.7
+step  800  ELBO loss: 365,836.7
+step  900  ELBO loss: 363,855.9
+step 1000  ELBO loss: 362,825.7
+step 1100  ELBO loss: 362,140.9
+step 1200  ELBO loss: 360,957.2
+step 1300  ELBO loss: 360,233.3
+step 1400  ELBO loss: 360,216.6
+step 1500  ELBO loss: 359,573.8
+step 1600  ELBO loss: 358,615.0
+step 1700  ELBO loss: 358,658.8
+step 1800  ELBO loss: 358,544.3
+step 1900  ELBO loss: 358,482.7
+step 2000  ELBO loss: 358,428.9
+step 2100  ELBO loss: 357,414.4
+step 2200  ELBO loss: 357,681.3
+step 2300  ELBO loss: 357,224.7
+step 2400  ELBO loss: 357,251.6
+step 2500  ELBO loss: 357,212.5
+step 2600  ELBO loss: 358,144.9
+step 2700  ELBO loss: 357,159.2
+step 2800  ELBO loss: 356,981.2
+step 2900  ELBO loss: 357,055.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/frac_0.01/rep_2/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.01/rep_2.txt
+Dropped events: {'dropped_events': 486, 'dropped_rows': 3451, 'remaining_events': 48126, 'remaining_rows': 344953}
+Rows: 344,953  Players: 1,455  Tossups: 1,260
+z
+CENSORED    292624
+BUZZ         47434
+NO-BUZZ       4895
+step    0  ELBO loss: 20,718,330.3
+step  100  ELBO loss: 549,830.2
+step  200  ELBO loss: 476,585.4
+step  300  ELBO loss: 441,362.7
+step  400  ELBO loss: 410,157.2
+step  500  ELBO loss: 385,921.3
+step  600  ELBO loss: 374,802.1
+step  700  ELBO loss: 369,217.4
+step  800  ELBO loss: 365,774.4
+step  900  ELBO loss: 363,825.2
+step 1000  ELBO loss: 362,789.6
+step 1100  ELBO loss: 362,045.2
+step 1200  ELBO loss: 360,912.9
+step 1300  ELBO loss: 360,244.7
+step 1400  ELBO loss: 360,212.9
+step 1500  ELBO loss: 359,462.8
+step 1600  ELBO loss: 358,589.2
+step 1700  ELBO loss: 358,679.7
+step 1800  ELBO loss: 358,529.6
+step 1900  ELBO loss: 358,507.6
+step 2000  ELBO loss: 358,430.6
+step 2100  ELBO loss: 357,393.8
+step 2200  ELBO loss: 357,669.8
+step 2300  ELBO loss: 357,148.7
+step 2400  ELBO loss: 357,243.8
+step 2500  ELBO loss: 357,158.5
+step 2600  ELBO loss: 358,108.1
+step 2700  ELBO loss: 357,190.2
+step 2800  ELBO loss: 357,084.2
+step 2900  ELBO loss: 357,043.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/frac_0.01/rep_3/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.01/rep_3.txt
+Dropped events: {'dropped_events': 486, 'dropped_rows': 3470, 'remaining_events': 48126, 'remaining_rows': 344934}
+Rows: 344,934  Players: 1,455  Tossups: 1,260
+z
+CENSORED    292597
+BUZZ         47433
+NO-BUZZ       4904
+step    0  ELBO loss: 20,710,888.3
+step  100  ELBO loss: 549,838.3
+step  200  ELBO loss: 476,610.5
+step  300  ELBO loss: 441,382.1
+step  400  ELBO loss: 410,063.9
+step  500  ELBO loss: 386,101.1
+step  600  ELBO loss: 374,934.9
+step  700  ELBO loss: 369,343.3
+step  800  ELBO loss: 365,862.8
+step  900  ELBO loss: 363,987.4
+step 1000  ELBO loss: 362,915.7
+step 1100  ELBO loss: 362,208.1
+step 1200  ELBO loss: 361,078.7
+step 1300  ELBO loss: 360,355.6
+step 1400  ELBO loss: 360,325.2
+step 1500  ELBO loss: 359,619.8
+step 1600  ELBO loss: 358,737.3
+step 1700  ELBO loss: 358,712.0
+step 1800  ELBO loss: 358,618.8
+step 1900  ELBO loss: 358,486.2
+step 2000  ELBO loss: 358,536.5
+step 2100  ELBO loss: 357,523.9
+step 2200  ELBO loss: 357,725.8
+step 2300  ELBO loss: 357,203.4
+step 2400  ELBO loss: 357,257.6
+step 2500  ELBO loss: 357,261.8
+step 2600  ELBO loss: 358,202.5
+step 2700  ELBO loss: 357,171.5
+step 2800  ELBO loss: 357,107.2
+step 2900  ELBO loss: 357,082.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/frac_0.05/rep_1/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_1.txt
+Dropped events: {'dropped_events': 2430, 'dropped_rows': 17421, 'remaining_events': 46182, 'remaining_rows': 330983}
+Rows: 330,983  Players: 1,455  Tossups: 1,259
+z
+CENSORED    280737
+BUZZ         45515
+NO-BUZZ       4731
+step    0  ELBO loss: 19,871,236.8
+step  100  ELBO loss: 530,283.8
+step  200  ELBO loss: 459,391.1
+step  300  ELBO loss: 425,467.8
+step  400  ELBO loss: 396,294.6
+step  500  ELBO loss: 372,131.0
+step  600  ELBO loss: 360,787.4
+step  700  ELBO loss: 355,521.0
+step  800  ELBO loss: 352,137.0
+step  900  ELBO loss: 350,212.7
+step 1000  ELBO loss: 349,687.6
+step 1100  ELBO loss: 348,623.2
+step 1200  ELBO loss: 347,378.6
+step 1300  ELBO loss: 346,922.7
+step 1400  ELBO loss: 346,608.1
+step 1500  ELBO loss: 346,307.8
+step 1600  ELBO loss: 345,276.3
+step 1700  ELBO loss: 345,101.4
+step 1800  ELBO loss: 344,675.7
+step 1900  ELBO loss: 344,679.9
+step 2000  ELBO loss: 345,303.6
+step 2100  ELBO loss: 344,057.0
+step 2200  ELBO loss: 344,404.7
+step 2300  ELBO loss: 343,518.0
+step 2400  ELBO loss: 343,588.4
+step 2500  ELBO loss: 343,847.2
+step 2600  ELBO loss: 344,675.2
+step 2700  ELBO loss: 343,559.0
+step 2800  ELBO loss: 343,313.5
+step 2900  ELBO loss: 343,483.6
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/frac_0.05/rep_2/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_2.txt
+Dropped events: {'dropped_events': 2430, 'dropped_rows': 17477, 'remaining_events': 46182, 'remaining_rows': 330927}
+Rows: 330,927  Players: 1,455  Tossups: 1,259
+z
+CENSORED    280742
+BUZZ         45521
+NO-BUZZ       4664
+step    0  ELBO loss: 19,866,510.8
+step  100  ELBO loss: 530,260.7
+step  200  ELBO loss: 459,435.5
+step  300  ELBO loss: 425,555.6
+step  400  ELBO loss: 396,344.2
+step  500  ELBO loss: 372,223.4
+step  600  ELBO loss: 360,723.8
+step  700  ELBO loss: 355,607.2
+step  800  ELBO loss: 352,097.2
+step  900  ELBO loss: 350,242.6
+step 1000  ELBO loss: 349,697.8
+step 1100  ELBO loss: 348,567.1
+step 1200  ELBO loss: 347,281.4
+step 1300  ELBO loss: 347,003.7
+step 1400  ELBO loss: 346,578.0
+step 1500  ELBO loss: 346,355.2
+step 1600  ELBO loss: 345,383.2
+step 1700  ELBO loss: 345,161.1
+step 1800  ELBO loss: 344,720.6
+step 1900  ELBO loss: 344,735.5
+step 2000  ELBO loss: 344,998.8
+step 2100  ELBO loss: 343,935.4
+step 2200  ELBO loss: 344,367.7
+step 2300  ELBO loss: 343,488.2
+step 2400  ELBO loss: 343,543.8
+step 2500  ELBO loss: 343,816.6
+step 2600  ELBO loss: 344,611.7
+step 2700  ELBO loss: 343,571.0
+step 2800  ELBO loss: 343,259.9
+step 2900  ELBO loss: 343,432.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --difficulty-link sigmoid --split year_2024 --dimensions 5 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/in_sample/drop-robustness/multidim/frac_0.05/rep_3/pyramidal --drop-events results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_3.txt
+Dropped events: {'dropped_events': 2430, 'dropped_rows': 17447, 'remaining_events': 46182, 'remaining_rows': 330957}
+Rows: 330,957  Players: 1,455  Tossups: 1,260
+z
+CENSORED    280773
+BUZZ         45523
+NO-BUZZ       4661
+step    0  ELBO loss: 19,875,916.3
+step  100  ELBO loss: 530,211.8
+step  200  ELBO loss: 459,523.8
+step  300  ELBO loss: 425,446.2
+step  400  ELBO loss: 395,392.6
+step  500  ELBO loss: 372,357.4
+step  600  ELBO loss: 361,707.7
+step  700  ELBO loss: 356,336.5
+step  800  ELBO loss: 353,074.1
+step  900  ELBO loss: 351,055.5
+step 1000  ELBO loss: 350,109.0
+step 1100  ELBO loss: 349,394.5
+step 1200  ELBO loss: 348,200.8
+step 1300  ELBO loss: 347,610.6
+step 1400  ELBO loss: 347,525.5
+step 1500  ELBO loss: 346,916.6
+step 1600  ELBO loss: 345,972.6
+step 1700  ELBO loss: 346,092.7
+step 1800  ELBO loss: 345,922.0
+step 1900  ELBO loss: 345,793.3
+step 2000  ELBO loss: 345,757.9
+step 2100  ELBO loss: 344,795.0
+step 2200  ELBO loss: 345,221.5
+step 2300  ELBO loss: 344,621.2
+step 2400  ELBO loss: 344,696.1
+step 2500  ELBO loss: 344,707.6
+step 2600  ELBO loss: 345,457.4
+step 2700  ELBO loss: 344,538.0
+step 2800  ELBO loss: 344,265.5
+step 2900  ELBO loss: 344,351.2
+
+Wrote aggregate metrics to results/compirt/in_sample/drop-robustness/csvs/drop_robustness_metrics.csv
+Wrote aggregate graphs to results/compirt/in_sample/drop-robustness/graphs

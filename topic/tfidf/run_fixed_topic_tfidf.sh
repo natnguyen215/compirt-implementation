@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# End-to-end fixed-topic TF-IDF runner. Stage 1 is isolated in topic/tfidf;
-# Stage 2 remains the unchanged topic-weighted bonus model fed by its theta.
+# End-to-end fixed-topic TF-IDF runner. Stage 1 uses topic/tfidf; Stage 2 uses
+# the topic-weighted bonus model with Stage 1 theta.
 
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
-source "$REPO_ROOT/run_scripts/lib/result_root.sh"
+source "$REPO_ROOT/run_scripts/common/lib/result_root.sh"
 
 PYTHON="${PYTHON:-.venv/bin/python}"
 SPLIT="${SPLIT:-year_2024}"
 TOURNAMENT="${TOURNAMENT-2024-acf-regionals}"
-OUTPUT_ROOT="$(resolve_result_root "${ROOT:-results/compirt/in_sample/topic-tfidf}" in_sample)"
+OUTPUT_ROOT="$(resolve_result_root "${ROOT:-results/compirt/in_sample/topic/topic-tfidf}" in_sample)"
 DEVICE="${DEVICE:-cuda}"
 GPU="${GPU:-0}"
 DIMENSIONS="${DIMENSIONS:-10}"
 LR="${LR:-0.01}"
+SEED="${SEED:-42}"
 PYRAMIDAL_STEPS="${PYRAMIDAL_STEPS:-3000}"
 BONUS_STEPS="${BONUS_STEPS:-2000}"
-PREDICT_BUZZ_POSITIONS="${PREDICT_BUZZ_POSITIONS:-1}"
 CALIBRATE_CORRECTNESS="${CALIBRATE_CORRECTNESS:-0}"
 RUN_SYNERGY="${RUN_SYNERGY:-1}"
 SYNERGY_DIMENSIONS="${SYNERGY_DIMENSIONS:-3}"
@@ -47,6 +47,8 @@ echo "- SPLIT: $SPLIT"
 echo "- TOURNAMENT: ${TOURNAMENT:-<all>}"
 echo "- TOPIC_VECTORS: $TOPIC_VECTORS"
 echo "- DIMENSIONS: $DIMENSIONS"
+echo "- LR: $LR"
+echo "- SEED: $SEED"
 echo "- TOPIC_TFIDF_EFFECT_PRIOR_SCALE: $TOPIC_TFIDF_EFFECT_PRIOR_SCALE"
 echo "- NO_NORMALIZE_TFIDF: $NO_NORMALIZE_TFIDF"
 echo "- CALIBRATE_CORRECTNESS: $CALIBRATE_CORRECTNESS"
@@ -68,6 +70,7 @@ if [[ "$RUN_PLDA" == "1" ]]; then
     --iterations "$PLDA_ITERATIONS" \
     --train-interval "$PLDA_TRAIN_INTERVAL" \
     --workers "$PLDA_WORKERS" \
+    --seed "$SEED" \
     --output-dir "$PLDA_OUTPUT_DIR"
 elif [[ ! -f "$TOPIC_VECTORS" ]]; then
   echo "RUN_PLDA=0 but TOPIC_VECTORS does not exist: $TOPIC_VECTORS" >&2
@@ -89,14 +92,12 @@ pyramidal_args=(
   --dimensions "$DIMENSIONS"
   --steps "$PYRAMIDAL_STEPS"
   --lr "$LR"
+  --seed "$SEED"
   --device "$DEVICE"
   --output-dir "$OUTPUT_ROOT/pyramidal"
   "${calibrate_args[@]}"
   "${tfidf_args[@]}"
 )
-if [[ "$PREDICT_BUZZ_POSITIONS" == "1" ]]; then
-  pyramidal_args+=(--predict-buzz-positions)
-fi
 "$PYTHON" -m topic.tfidf.train_fixed_pyramidal "${pyramidal_args[@]}"
 
 run_compositional() {
@@ -109,6 +110,7 @@ run_compositional() {
     --player-skills "$OUTPUT_ROOT/pyramidal/players.csv" \
     --steps "$BONUS_STEPS" \
     --lr "$LR" \
+    --seed "$SEED" \
     --device "$DEVICE" \
     --output-dir "$OUTPUT_ROOT/$model_name" \
     "${calibrate_args[@]}" \

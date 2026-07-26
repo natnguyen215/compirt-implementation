@@ -1,10 +1,14 @@
 # Confidence Threshold And Parameter Comparison
 
-**Scope.** These rows use the same 2024 in-sample run set as
-`synergy_bonus_model_comparison.md`. Values are recomputed from saved artifacts
-under `results/compirt/in_sample`: Stage 1 player/tossup CSVs and Stage 2
-synergy summaries. Blank `scale`/`bias` cells mean the run is uncalibrated or the
-saved pyramidal summary does not expose those fields.
+**Scope.** These rows cover the 22 2024 in-sample runs with directly comparable
+saved parameterizations. Values were rechecked after the 2026-07-16 evaluation
+refresh and come from artifacts under `results/compirt/in_sample`: Stage 1
+player/tossup CSVs and Stage 2 synergy summaries. Evaluation reruns update
+predictions and metrics, not these fitted parameters. The two embedding
+`*-projection` evaluation variants are omitted because this report uses the
+corresponding non-projection parameterization; `multidim-tanhbias-all2024` is
+holdout-only and therefore also omitted. Blank `scale`/`bias` cells mean the run
+is uncalibrated or the saved pyramidal summary does not expose those fields.
 
 The tables keep like quantities together. Multidimensional/topic/embedding
 difficulty is scalarized into the same effective difficulty curve as the
@@ -30,6 +34,8 @@ single-difficulty runs; raw scalar `beta`/`gamma`/`mu` and raw vector-coordinate
 | `embedding-all2024` | embedding relevance 5d | ✗ | 5 |  |  | 5.14 | 5.06 | 1.98 | 2.13 |
 | `embedding-all2024-cal` | embedding relevance 5d | ✓ | 5 | 0.319 | 1.975 | 3.03 | 3.05 | 2.06 | 2.04 |
 | `multidim-all2024` | multidim MIRT 5d | ✗ | 5 |  |  | 4.89 | 4.51 | 1.49 | 1.57 |
+| `multidim-tanh-all2024` | multidim MIRT tanh 5d | ✗ | 5 |  |  | 4.98 | 4.67 | 1.64 | 1.78 |
+| `multidim-tanh-all2024-cal` | multidim MIRT tanh 5d | ✓ | 5 | 0.298 | 2.225 | 1.39 | 1.38 | 2.76 | 2.76 |
 | `multidim-all2024-cal` | multidim MIRT 5d | ✓ | 5 | 0.303 | 2.297 | 1.01 | 1.06 | 1.78 | 1.78 |
 | `tfidf-cumulative-difficulty-all2024` | TF-IDF cumulative difficulty 5d | ✗ | 5 |  |  | 5.11 | 4.90 | 1.74 | 1.87 |
 | `tfidf-cumulative-difficulty-all2024-cal` | TF-IDF cumulative difficulty 5d | ✓ | 5 | 0.307 | 2.141 | 1.54 | 1.61 | 2.27 | 2.30 |
@@ -38,9 +44,10 @@ single-difficulty runs; raw scalar `beta`/`gamma`/`mu` and raw vector-coordinate
 
 ## Tossup Weight Vectors
 
-`alpha` is learned tossup discrimination in the scalar baseline/TF-IDF runs,
-`r` is the multidim or embedding relevance vector, and `topic_weight` is the
-topic mixture used in the fixed/learned-topic variants.
+`alpha` is learned tossup discrimination/relevance in the scalar baseline,
+default multidim, and TF-IDF runs; `r` is the tanh-multidim or embedding
+relevance vector; and `topic_weight` is the topic mixture used in the
+fixed/learned-topic variants.
 `max share` and `effective dims` are computed after normalizing absolute weights
 within each tossup, so they describe how concentrated the vector is.
 
@@ -60,20 +67,24 @@ within each tossup, so they describe how concentrated the vector is.
 | `learned-topic-tfidf-all2024-cal` | topic_weight | 5 | 0.86 | 0.83 | 0.852 | 1.36 |
 | `embedding-all2024` | r | 5 | 1.00 | 0.93 | 0.999 | 1.00 |
 | `embedding-all2024-cal` | r | 5 | 1.00 | 0.99 | 1.000 | 1.00 |
-| `multidim-all2024` | r | 5 | 3.04 | 3.15 | 0.419 | 3.43 |
-| `multidim-all2024-cal` | r | 5 | 3.27 | 3.31 | 0.373 | 3.87 |
+| `multidim-all2024` | alpha | 5 | 3.04 | 3.15 | 0.419 | 3.43 |
+| `multidim-tanh-all2024` | r | 5 | 2.86 | 2.90 | 0.425 | 3.39 |
+| `multidim-tanh-all2024-cal` | r | 5 | 2.82 | 2.87 | 0.371 | 3.87 |
+| `multidim-all2024-cal` | alpha | 5 | 3.27 | 3.31 | 0.373 | 3.87 |
 | `tfidf-cumulative-difficulty-all2024` | alpha | 5 | 2.04 | 2.04 | 0.398 | 3.44 |
 | `tfidf-cumulative-difficulty-all2024-cal` | alpha | 5 | 2.56 | 2.57 | 0.379 | 3.62 |
-| `tfidf-multidim-cumulative-difficulty-all2024` | r | 5 | 3.15 | 3.26 | 0.457 | 3.27 |
-| `tfidf-multidim-cumulative-difficulty-all2024-cal` | r | 5 | 3.29 | 3.33 | 0.380 | 3.85 |
+| `tfidf-multidim-cumulative-difficulty-all2024` | alpha | 5 | 3.15 | 3.26 | 0.457 | 3.27 |
+| `tfidf-multidim-cumulative-difficulty-all2024-cal` | alpha | 5 | 3.29 | 3.33 | 0.380 | 3.85 |
 
 ## Effective Difficulty Curves
 
-For scalar-difficulty runs, `d(r) = beta * sigmoid(gamma * (mu - r))`. For
-vector-difficulty runs, `d_eff(r) = sum_k w_k * beta_k * sigmoid(gamma_k *
-(mu_k - r))`, where `w` is `alpha`, `r`, or `topic_weight`. TF-IDF runs include
-their saved TF-IDF difficulty delta. This is the cross-run table to
-use when comparing multidimensional difficulty against single-difficulty runs.
+For scalar-difficulty runs, `d(r) = beta * sigmoid(gamma * (mu - r))`. Most
+vector-difficulty runs use `d_eff(r) = sum_k w_k * beta_k * sigmoid(gamma_k *
+(mu_k - r))`, where `w` is `alpha`, `r`, or `topic_weight`. The tanh variant
+replaces the inner sigmoid with tanh, allowing difficulty to become negative
+late in the question. TF-IDF runs include their saved TF-IDF difficulty delta.
+This is the cross-run table to use when comparing multidimensional difficulty
+against single-difficulty runs.
 
 | Run | Difficulty form | Median d(10%) | Median d(50%) | Median d(90%) | Mean d(50%) | Median effective mu |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -91,12 +102,14 @@ use when comparing multidimensional difficulty against single-difficulty runs.
 | `learned-topic-tfidf-all2024-cal` | vector/topic_weight+topic_tfidf_delta | 3.42 | 2.64 | -0.10 | 2.54 | 0.692 |
 | `embedding-all2024` | vector/r | 3.18 | 2.38 | 0.09 | 2.22 | 0.599 |
 | `embedding-all2024-cal` | vector/r | 4.17 | 3.56 | 0.70 | 3.43 | 0.712 |
-| `multidim-all2024` | vector/r | 5.56 | 3.65 | 0.83 | 3.65 | 0.557 |
-| `multidim-all2024-cal` | vector/r | 6.11 | 4.15 | 1.02 | 4.15 | 0.571 |
+| `multidim-all2024` | vector/alpha | 5.56 | 3.65 | 0.83 | 3.65 | 0.557 |
+| `multidim-tanh-all2024` | vector/r (tanh) | 2.75 | 0.67 | -2.10 | 0.70 | 0.578 |
+| `multidim-tanh-all2024-cal` | vector/r (tanh) | 2.99 | 1.20 | -2.09 | 1.09 | 0.606 |
+| `multidim-all2024-cal` | vector/alpha | 6.11 | 4.15 | 1.02 | 4.15 | 0.571 |
 | `tfidf-cumulative-difficulty-all2024` | scalar+tfidf_delta | 2.21 | 0.71 | -2.16 | 0.60 | 0.722 |
 | `tfidf-cumulative-difficulty-all2024-cal` | scalar+tfidf_delta | 3.04 | 1.94 | -1.22 | 1.82 | 0.707 |
-| `tfidf-multidim-cumulative-difficulty-all2024` | vector/r+tfidf_delta | 5.15 | 3.16 | 0.35 | 3.19 | 0.556 |
-| `tfidf-multidim-cumulative-difficulty-all2024-cal` | vector/r+tfidf_delta | 6.04 | 3.98 | 0.90 | 4.06 | 0.573 |
+| `tfidf-multidim-cumulative-difficulty-all2024` | vector/alpha+tfidf_delta | 5.15 | 3.16 | 0.35 | 3.19 | 0.556 |
+| `tfidf-multidim-cumulative-difficulty-all2024-cal` | vector/alpha+tfidf_delta | 6.04 | 3.98 | 0.90 | 4.06 | 0.573 |
 
 ## Scalar Difficulty Parameters
 
@@ -129,10 +142,12 @@ table above is the comparable scalar view across all runs.
 | `learned-topic-tfidf-all2024-cal` | topic_weight | 5 | 0.20 | 1.04 | 5.17 | 14.03 | 0.505 | 0.548 |
 | `embedding-all2024` | r | 5 | 0.02 | 0.74 | 5.12 | 15.22 | 0.502 | 0.523 |
 | `embedding-all2024-cal` | r | 5 | 0.02 | 0.86 | 5.09 | 9.81 | 0.503 | 0.541 |
-| `multidim-all2024` | r | 5 | 0.61 | 0.79 | 5.09 | 14.47 | 0.482 | 0.512 |
-| `multidim-all2024-cal` | r | 5 | 0.75 | 0.87 | 5.17 | 11.58 | 0.509 | 0.538 |
-| `tfidf-multidim-cumulative-difficulty-all2024` | r | 5 | 0.56 | 0.71 | 5.07 | 13.21 | 0.475 | 0.505 |
-| `tfidf-multidim-cumulative-difficulty-all2024-cal` | r | 5 | 0.74 | 0.85 | 5.20 | 10.38 | 0.506 | 0.536 |
+| `multidim-all2024` | alpha | 5 | 0.61 | 0.79 | 5.09 | 14.47 | 0.482 | 0.512 |
+| `multidim-tanh-all2024` | r | 5 | 0.12 | 0.38 | 2.77 | 5.31 | 0.541 | 0.553 |
+| `multidim-tanh-all2024-cal` | r | 5 | 0.19 | 0.43 | 2.72 | 5.22 | 0.561 | 0.578 |
+| `multidim-all2024-cal` | alpha | 5 | 0.75 | 0.87 | 5.17 | 11.58 | 0.509 | 0.538 |
+| `tfidf-multidim-cumulative-difficulty-all2024` | alpha | 5 | 0.56 | 0.71 | 5.07 | 13.21 | 0.475 | 0.505 |
+| `tfidf-multidim-cumulative-difficulty-all2024-cal` | alpha | 5 | 0.74 | 0.85 | 5.20 | 10.38 | 0.506 | 0.536 |
 
 ## Bonus Synergy Scalars
 
@@ -155,6 +170,8 @@ These values come from each run's Stage 2 synergy summary.
 | `embedding-all2024` | embedding relevance 5d | ✗ | 3 | 0.390 | -0.941 | -0.795 | 0.088 | 0.880 |
 | `embedding-all2024-cal` | embedding relevance 5d | ✓ | 3 | 0.582 | 0.109 | 0.023 | 0.579 | 0.389 |
 | `multidim-all2024` | multidim MIRT 5d | ✗ | 3 | 0.519 | -0.686 | -0.688 | 0.195 | 0.774 |
+| `multidim-tanh-all2024` | multidim MIRT tanh 5d | ✗ | 3 | 0.479 | -0.434 | -0.288 | 0.305 | 0.663 |
+| `multidim-tanh-all2024-cal` | multidim MIRT tanh 5d | ✓ | 3 | 0.348 | 0.506 | 0.307 | 0.641 | 0.328 |
 | `multidim-all2024-cal` | multidim MIRT 5d | ✓ | 3 | 0.699 | 0.104 | 0.021 | 0.544 | 0.425 |
 | `tfidf-cumulative-difficulty-all2024` | TF-IDF cumulative difficulty 5d | ✗ | 3 | 0.712 | -0.514 | -0.252 | 0.321 | 0.648 |
 | `tfidf-cumulative-difficulty-all2024-cal` | TF-IDF cumulative difficulty 5d | ✓ | 3 | 0.680 | -0.065 | 0.001 | 0.505 | 0.464 |
@@ -176,6 +193,13 @@ keeps scalar and multidimensional difficulty comparable; the raw `gamma` and
 `mu` tables are split by parameter form so coordinate-valued vector difficulty
 is not treated as the same object as scalar difficulty.
 
+The uncalibrated tanh run is less extreme than the default multidim run in its
+synergy contribution. Calibration moves the tanh run's mean synergy from
+-0.434 to +0.506 and its positive fraction from 0.305 to 0.641. The tanh runs'
+main structural difference remains the signed difficulty curve: median
+effective difficulty crosses from positive to negative between the midpoint
+and the end of a tossup with or without calibration.
+
 ## Column Notes
 
 `Median max share` measures how concentrated a tossup's weight vector is in its
@@ -196,7 +220,9 @@ using roughly three to four dimensions' worth of weight mass.
 from skill after combining any vector-valued difficulty coordinates. Scalar
 runs already have one curve: `d(r) = beta * sigmoid(gamma * (mu - r))`. Vector
 runs compute one curve per coordinate and combine them with the tossup weights:
-`d_eff(r) = sum_k w_k * beta_k * sigmoid(gamma_k * (mu_k - r))`. TF-IDF
-cumulative runs then add their saved TF-IDF difficulty adjustment. This is why
-the effective-difficulty table can compare scalar, topic, embedding, multidim,
-and TF-IDF variants in the same units.
+`d_eff(r) = sum_k w_k * beta_k * link(gamma_k * (mu_k - r))`, where `link` is
+sigmoid except for the explicitly labeled tanh run. TF-IDF cumulative runs then
+add their saved TF-IDF difficulty adjustment. This is why the
+effective-difficulty table can compare scalar, topic, embedding, multidim, and
+TF-IDF variants in the same units, while retaining the tanh row's signed late
+difficulty.

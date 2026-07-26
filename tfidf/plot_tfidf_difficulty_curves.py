@@ -18,13 +18,10 @@ from compirt_data import (
     load_hf_tables,
     tossup_tensors,
 )
-from compirt_eval.figures import short_id
-from compirt_eval.metrics import difficulty_curve
-from compirt_eval.tossups.difficulty import selected_tossups
-from tfidf.pyramidal_tfidf_model import (
-    CUMULATIVE_DIFFICULTY,
-    tfidf_score_at,
-)
+from compirt_eval.common.figures import short_id
+from compirt_eval.scenario_a_tossups.parameters import difficulty_curve
+from compirt_eval.scenario_a_tossups.difficulty import selected_tossups
+from tfidf.pyramidal_tfidf_model import tfidf_score_at
 from tfidf.tfidf_features import attach_tfidf_prefix_scores
 
 
@@ -125,9 +122,6 @@ def curve_components(row, features, summary, relative_positions):
     t = features["prefix"].new_tensor(token_positions)
     base = _saved_difficulty(row, relative_positions)
     prefix = tfidf_score_at(features["prefix"], t).detach().cpu().numpy()
-    variant = summary.get("tfidf_variant", CUMULATIVE_DIFFICULTY)
-    if variant != CUMULATIVE_DIFFICULTY:
-        raise ValueError(f"Unknown TF-IDF variant in summary: {variant}")
     adjustment = -float(summary["tfidf_clue_effect"]) * prefix * _relevance_mass(row)
     return {
         "base": base,
@@ -159,7 +153,6 @@ def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int)
     rows = math.ceil(len(selected) / columns)
     fig, axes = plt.subplots(rows, columns, figsize=(13, 4.3 * rows), squeeze=False)
     positions = np.linspace(0.0, 1.0, 160)
-    variant = summary.get("tfidf_variant", CUMULATIVE_DIFFICULTY)
 
     for ax, tossup_id in zip(axes.flat, selected):
         row = parameters.loc[tossup_id]
@@ -240,7 +233,7 @@ def plot_curves(results_dir: Path, output_dir: Path, data_dir: Path, count: int)
 
     for ax in axes.flat[len(selected):]:
         ax.set_visible(False)
-    fig.suptitle(f"TF-IDF {variant} diagnostics and empirical buzz locations")
+    fig.suptitle("Cumulative TF-IDF diagnostics and empirical buzz locations")
     fig.tight_layout()
     output_path = output_dir / "tfidf_effective_difficulty_curves.png"
     fig.savefig(output_path, dpi=160)

@@ -1,10 +1,10 @@
 """Fit new bonus-item parameters while freezing CompIRT player/team parameters.
 
 Scenario C asks whether player synergy profiles learned on historical rosters
-transfer to test rosters.  Consequently ``theta``, ``psi``, and ``tau`` enter
+transfer to test rosters.  Consequently 'theta', 'psi', and 'tau' enter
 this model as ordinary fixed tensors.  Only the new test bonus parts have Pyro
-sample sites (``alpha`` and ``beta``), which makes it impossible for an
-``AutoNormal`` guide to silently relearn the purportedly transferred values.
+sample sites ('alpha' and 'beta'), which makes it impossible for an
+'AutoNormal' guide to silently relearn the purportedly transferred values.
 This is transductive with respect to test items, as specified in paper Section
 4.2, but frozen with respect to the player/team parameters whose compositional
 transfer Scenario C measures.
@@ -28,7 +28,7 @@ def frozen_global_item_model(
     correctness_scale=None,
     correctness_bias=None,
 ):
-    """Observe test responses while sampling only per-part ``alpha``/``beta``."""
+    """Observe test responses while sampling only per-part 'alpha'/'beta'."""
     n_parts = len(data["part_ids"])
     n_dimensions = theta.shape[1]
     one = theta.new_tensor(1.0)

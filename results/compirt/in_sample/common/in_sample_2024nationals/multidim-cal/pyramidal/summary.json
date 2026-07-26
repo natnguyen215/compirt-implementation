@@ -1,0 +1,19 @@
+{
+  "model": "multidimensional-difficulty-competing-risks",
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))",
+  "tournament": "2024-acf-nationals",
+  "dimensions": 5,
+  "steps": 5000,
+  "final_loss": 59027.084418058395,
+  "players": 189,
+  "tossups": 360,
+  "events": 8132,
+  "calibrate_correctness": true,
+  "observation_counts": {
+    "CENSORED": 53533,
+    "BUZZ": 7940,
+    "NO-BUZZ": 1431
+  },
+  "correctness_scale": 0.2566194534301758,
+  "correctness_bias": 1.887344479560852
+}

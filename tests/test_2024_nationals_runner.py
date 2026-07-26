@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from run_scripts import run_2024_nationals_in_sample_ranking_comparison as runner
+from run_scripts.common import run_2024_nationals_in_sample_ranking_comparison as runner
 
 
 def args_for(*extra: str):
@@ -76,7 +76,29 @@ class CommandMatrixTests(unittest.TestCase):
             self.assertIn("--synergy-dimensions 3", text)
             self.assertNotIn("/compositional", text)
 
-    def test_no_commands_target_no_synergy_outputs_or_compare_compirt(self):
+    def test_every_training_command_forwards_seed_and_lr(self):
+        temporary, args = args_for(
+            "--models",
+            "baseline",
+            "plda",
+            "learned-topic",
+            "multidim",
+            "embedding",
+            "--calibration",
+            "no-cal",
+            "--seed",
+            "7",
+        )
+        with temporary:
+            stages = [stage for run in runner.build_model_runs(args) for stage in run.stages]
+
+        for stage in stages:
+            if stage.kind in ("pyramidal", "bonus"):
+                text = " ".join(stage.command)
+                self.assertIn("--seed 7", text)
+                self.assertIn("--lr 0.005", text)
+
+    def test_no_commands_target_no_synergy_outputs_or_bonus_comparison(self):
         temporary, args = args_for("--models", "baseline", "plda", "--calibration", "both")
         with temporary:
             stages = [stage for run in runner.build_model_runs(args) for stage in run.stages]
@@ -87,7 +109,7 @@ class CommandMatrixTests(unittest.TestCase):
         )
         self.assertNotIn("/compositional", text)
         self.assertNotIn("/evaluation", text)
-        self.assertNotIn("compare_compirt", text)
+        self.assertNotIn("run_scripts/common/run_synergy_comparison.py", text)
         self.assertNotIn("/compositional", marker_text)
         self.assertNotIn("/evaluation", marker_text)
 
@@ -100,7 +122,7 @@ class CommandMatrixTests(unittest.TestCase):
         self.assertEqual(len(ranking), 1)
         text = " ".join(ranking[0].command)
         self.assertIn("results/ranking_comparison/in_sample_2024nationals", text)
-        self.assertIn("compare_player_rankings.py", text)
+        self.assertIn("run_scripts/common/run_player_rankings.py", text)
         self.assertIn("--actual-rank-mode ppg", text)
         self.assertIn("--min-game-tossups 20", text)
 

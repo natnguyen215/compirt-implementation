@@ -1,0 +1,22 @@
+{
+  "model": "embedding-relevance-competing-risks",
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t)), r_j = softmax(W2 gelu(W1 @ (e_j - mean_e) + b1) + b2)",
+  "embeddings": "results/compirt/in_sample/in_sample_2024nationals/_embedding_cache/tossup_embeddings.npz",
+  "tournament": "2024-acf-nationals",
+  "dimensions": 5,
+  "projection": "ffn",
+  "projection_hidden_dim": 128,
+  "centered_embeddings": true,
+  "embedding_mean_norm": 0.8168122172355652,
+  "steps": 5000,
+  "final_loss": 62193.369079589844,
+  "players": 189,
+  "tossups": 360,
+  "events": 8132,
+  "calibrate_correctness": false,
+  "observation_counts": {
+    "CENSORED": 53533,
+    "BUZZ": 7940,
+    "NO-BUZZ": 1431
+  }
+}

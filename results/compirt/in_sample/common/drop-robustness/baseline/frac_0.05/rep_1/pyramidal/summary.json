@@ -1,0 +1,24 @@
+{
+  "model": "competing-risks",
+  "split": "year_2024",
+  "tournament": "",
+  "dimensions": 5,
+  "steps": 5000,
+  "lr": 0.005,
+  "seed": 42,
+  "final_loss": 347136.3288269043,
+  "players": 1455,
+  "tossups": 1259,
+  "events": 46182,
+  "calibrate_correctness": false,
+  "observation_counts": {
+    "CENSORED": 280737,
+    "BUZZ": 45515,
+    "NO-BUZZ": 4731
+  },
+  "drop_events_file": "results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_1.txt",
+  "dropped_events": 2430,
+  "dropped_rows": 17421,
+  "remaining_events": 46182,
+  "remaining_rows": 330983
+}

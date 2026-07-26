@@ -6,7 +6,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from run_scripts import run_compirt_holdout as runner
+from run_scripts.common import run_compirt_holdout as runner
 
 
 def run_with_environment(**values):
@@ -15,7 +15,6 @@ def run_with_environment(**values):
         "COMPIRT_LOG_ACTIVE": "1",
         "ROOT": "/tmp/scenario-c-runner-test",
         "PYTHON": ".venv/bin/python",
-        "PREDICT_BUZZ_POSITIONS": "0",
         **{key: str(value) for key, value in values.items()},
     }
     with patch.dict(os.environ, environment, clear=True), patch.object(
@@ -26,11 +25,28 @@ def run_with_environment(**values):
 
 
 class ScenarioCRunnerTests(unittest.TestCase):
+    def test_every_model_family_builds_its_current_stage_modules(self):
+        expected_pyramidal_module = {
+            model: modules["pyramidal"] for model, modules in runner.MODELS.items()
+        }
+        for model, module in expected_pyramidal_module.items():
+            with self.subTest(model=model):
+                commands = run_with_environment(
+                    MODEL=model,
+                    RUN_C1_C4="0",
+                    RUN_SYNERGY="0",
+                )
+                text = "\n".join(commands)
+                self.assertIn(f"-m {module}", text)
+                self.assertIn("--seed 42", text)
+                self.assertIn("holdout/pyramidal", text)
+                self.assertIn("holdout/compositional", text)
+
     def test_disabled_is_a_noop_for_existing_holdout_pipeline(self):
         commands = run_with_environment(MODEL="baseline", RUN_C1_C4="0")
         text = "\n".join(commands)
 
-        self.assertNotIn("run_scripts.run_scenario_c", text)
+        self.assertNotIn("run_scripts.common.run_scenario_c", text)
         self.assertNotIn("/train/compositional", text)
         self.assertNotIn("/train/synergy", text)
 
@@ -45,7 +61,7 @@ class ScenarioCRunnerTests(unittest.TestCase):
         self.assertIn("/train/compositional", text)
         self.assertIn("/train/synergy", text)
         self.assertIn("--save-synergy-details", text)
-        self.assertIn("run_scripts.run_scenario_c", text)
+        self.assertIn("run_scripts.common.run_scenario_c", text)
         self.assertIn("--min-cross-team-games 7", text)
         self.assertIn("/holdout/c1-c4/evaluation", text)
 
@@ -54,7 +70,7 @@ class ScenarioCRunnerTests(unittest.TestCase):
             with self.subTest(model=model):
                 commands = run_with_environment(MODEL=model, RUN_C1_C4="1")
                 text = "\n".join(commands)
-                self.assertIn("run_scripts.run_scenario_c", text)
+                self.assertIn("run_scripts.common.run_scenario_c", text)
                 self.assertIn("/train/compositional", text)
                 self.assertIn("/train/synergy", text)
 

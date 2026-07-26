@@ -1,14 +1,12 @@
 """Topic-weighted pyramidal tossup model (topic variant of Eq. 3-7, 13, 14).
 
-This mirrors the root 'pyramidal_model.py' competing-risks likelihood, but uses
-a CAIMIRA-style topic relevance vector for each tossup. The correctness logit is
+Each tossup has a fixed topic relevance vector. The correctness logit is
 
     sum_k r_jk * (theta_ik - d_jk(t))
 
 where 'r_j' is the fixed PLDA topic mixture and 'd_jk(t)' is a per-topic
-difficulty curve. There is no learned tossup discrimination 'alpha'; the fixed
-topic weights 'r_jk' take its place, and 'difficulty_beta', 'gamma', and 'mu' are learned
-per topic so difficulty sits inside the weighted sum.
+difficulty curve. The model learns 'difficulty_beta', 'gamma', and 'mu' per
+topic, placing difficulty inside the weighted sum.
 
 The topic weights are not latent Pyro parameters. They are fixed inputs loaded
 from 'document_latent_vectors.csv' and attached to 'data["topic_weight"]'
@@ -56,9 +54,9 @@ def log_survival(theta, topic_weight, difficulty_beta, gamma, mu, c, t_star, T_j
     """
     max_t = int(t_star.max().item())
     positions = torch.arange(1, max_t + 1, device=t_star.device).unsqueeze(0)
-    # Eq. 6 is strict-before survival, and Eq. 13 deliberately uses S(T_j) for
-    # dead tossups. NO-BUZZ rows therefore stop at T_j - 1 under the paper's
-    # indexing convention; an inclusive mask would define a different model.
+    # Eq. 6 is strict-before survival, and Eq. 13 uses S(T_j) for dead tossups.
+    # The published indexing stops NO-BUZZ rows at T_j - 1, so this comparison
+    # must stay strict.
     before_stop = positions < t_star.unsqueeze(1)
     # Unsqueezing row parameters broadcasts them against every token position,
     # producing one hazard logit per row-position pair.
@@ -104,7 +102,7 @@ def sample_parameters(data, n_dimensions):
     # Player priors as in root CompIRT: theta_i ~ N(0, I), c_i ~ N(0, 1) by
     # default. Held-out evaluation can attach informative per-player priors to
     # 'data' (training posterior for returning players, tier-conditioned for
-    # new players); absent keys reproduce the standard model exactly.
+    # new players). Absent keys use the standard zero-location, unit-scale priors.
     theta_loc = data.get("theta_prior_loc", vector_zero)
     theta_scale = data.get("theta_prior_scale", vector_one)
     c_loc = data.get("c_prior_loc", zero)
@@ -113,9 +111,8 @@ def sample_parameters(data, n_dimensions):
         theta = pyro.sample("theta", dist.Normal(theta_loc, theta_scale).to_event(1))
         c = pyro.sample("c", dist.Normal(c_loc, c_scale))
 
-    # Tossup priors, now per-topic and with no 'alpha': difficulty_beta/gamma/mu
-    # each have shape (n_tossups, n_dimensions). The sample site stays "beta" for
-    # backwards-compatible posterior keys and CSV columns.
+    # Per-topic tossup priors have shape (n_tossups, n_dimensions). The "beta"
+    # site supplies the difficulty_beta posterior and CSV columns.
     with pyro.plate("tossups", n_tossups):
         difficulty_beta = pyro.sample(
             "beta", dist.Normal(vector_zero, vector_one).to_event(1)
@@ -141,10 +138,9 @@ def sample_correctness_calibration(data):
     return scale, bias
 
 
-def competing_risks_model(data, n_dimensions=None, calibrate_correctness=False):
+def competing_risks_model(data, calibrate_correctness=False):
     """Define the topic-weighted competing-risks likelihood (Eq. 7 / Eq. 12)."""
-    if n_dimensions is None:
-        n_dimensions = data["topic_weight"].shape[1]
+    n_dimensions = data["topic_weight"].shape[1]
     theta, c, difficulty_beta, gamma, mu = sample_parameters(data, n_dimensions)
     (
         row_theta,
@@ -190,14 +186,12 @@ def competing_risks_model(data, n_dimensions=None, calibrate_correctness=False):
         data["T_j"][buzz],
     )
     if calibrate_correctness:
-        # Recalibrate ONLY the correctness logit, leaving the hazard/timing
-        # (which also calls correctness_logit) untouched.
+        # Apply calibration to correctness; hazard/timing keeps its base logit.
         scale, bias = sample_correctness_calibration(data)
         correctness = scale * correctness + bias
     # Eq. 7 / Eq. 12 in log space:
     #   sum_i log S_ij(t*) + log h_i*j(t*) + log Bernoulli(y_i*j | p_i*j(t*)).
-    # Competing risks are not a single built-in distribution, so the joint
-    # log-likelihood is hand-computed and attached with pyro.factor.
+    # Attach the hand-computed competing-risks log-likelihood with pyro.factor.
     log_likelihood = (
         # Sum log survival over every player-event row: BUZZ, CENSORED, NO-BUZZ.
         survival.sum()
@@ -255,7 +249,8 @@ def expected_first_buzz_positions(data, posterior):
 
     Rows are regrouped into padded event rosters, then walked token by token:
     P(first buzz at t) = P(no earlier team buzz) * P(at least one buzzes at t),
-    using the Eq. 5 hazards. Leftover probability goes to the question end.
+    using the Eq. 5 hazards. The returned position is E[t | a buzz occurs],
+    since the evaluation compares it only against events with an observed buzz.
     """
     n_events = len(data["event_ids"])
     counts = torch.bincount(data["event"], minlength=n_events)
@@ -307,6 +302,13 @@ def expected_first_buzz_positions(data, posterior):
         first_probability = event_survival * total_hazard
         expected = expected + position * first_probability
         event_survival = event_survival * (1.0 - total_hazard)
-    expected = expected + event_T * event_survival
-    relative = (expected / event_T).detach().cpu().tolist()
+    # Condition the prediction on a buzz occurring:
+    #   E[t | buzz] = sum_t t * P(first buzz at t) / P(any buzz).
+    # Use the question end when the fitted buzz mass is numerically zero.
+    buzz_mass = 1.0 - event_survival
+    end_position = event_T.to(expected.dtype)
+    expected = torch.where(
+        buzz_mass > 1e-9, expected / buzz_mass.clamp(min=1e-9), end_position
+    )
+    relative = (expected / end_position).detach().cpu().tolist()
     return dict(zip(data["event_ids"], relative))

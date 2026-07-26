@@ -1,9 +1,8 @@
-"""Evaluation replay for the dedicated topic-specific TF-IDF experiment.
+"""Evaluation replay for topic-specific TF-IDF runs.
 
-The baseline topic evaluator is reused for its common metrics, bonus reports,
-and parameter dashboards. This module supplies the two text-conditioned pieces
-that baseline runs do not need: effective-difficulty curves and first-buzz
-timing reconstructed from saved aggregate TF-IDF adjustments.
+This module evaluates common metrics and bonus reports, then adds
+effective-difficulty curves and first-buzz timing reconstructed from saved
+aggregate TF-IDF adjustments.
 """
 
 from __future__ import annotations
@@ -15,11 +14,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from compirt_eval.figures import numeric_columns, short_id
-from compirt_eval.metrics import inverse_logit
-from compirt_eval.outputs import graph_path
-from compirt_eval.tossups import selected_tossups
-from compirt_eval.tossups.parameters import (
+from compirt_eval.common.figures import numeric_columns, short_id
+from compirt_eval.common.metrics import inverse_logit
+from compirt_eval.common.report_paths import graph_path
+from compirt_eval.scenario_a_tossups import selected_tossups
+from compirt_eval.scenario_a_tossups.parameters import (
     difficulty_adjustment_at,
     load_difficulty_adjustment_curves,
 )
@@ -30,9 +29,8 @@ from topic.tfidf.outputs import TOPIC_TFIDF_LAMBDAS_FILENAME
 def topic_first_buzz_distribution(event, players, tossups, adjustments, n_bins=12):
     """Reconstruct first-buzz mass using saved TF-IDF-adjusted difficulty.
 
-    Same math as the baseline 'topic_first_buzz_distribution', except the saved
-    signed adjustment is interpolated onto each token and added to the weighted
-    difficulty before hazards are formed.
+    Interpolate the saved signed adjustment onto each token and add it to the
+    weighted difficulty before forming hazards.
     """
     tossup_id = event["tossup_id"].iloc[0]
     tossup = tossups.loc[tossup_id]
@@ -160,7 +158,7 @@ def topic_difficulty_plot(results_dir, output_dir, adjustments):
         axis.set_visible(False)
     fig.suptitle("TF-IDF-adjusted topic-weighted difficulty and empirical buzzes")
     fig.tight_layout()
-    fig.savefig(graph_path(output_dir, "tossup_difficulty_curves.png"), dpi=160)
+    fig.savefig(graph_path(output_dir, "tossup_difficulty_curves.png", "tossup"), dpi=160)
     plt.close(fig)
 
 
@@ -176,10 +174,10 @@ def load_topic_lambdas(results_dir):
 def tfidf_prefix_at(adjustments, tossup_id, positions, topic_weight, lambdas):
     """Recover this tossup's cumulative TF-IDF prefix mass from saved outputs.
 
-    ``save_adjustment_curves`` stores only the aggregate signed adjustment
-    ``-tfidf_prefix_j(t) * sum_k r_jk * lambda_k``. Since ``r_j`` (tossups.csv)
-    and ``lambda`` (topic_tfidf_lambdas.csv) are both saved, dividing the
-    aggregate back out by the topic-weighted lambda recovers ``tfidf_prefix_j(t)``
+    'save_adjustment_curves' stores only the aggregate signed adjustment
+    '-tfidf_prefix_j(t) * sum_k r_jk * lambda_k'. Since 'r_j' (tossups.csv)
+    and 'lambda' (topic_tfidf_lambdas.csv) are both saved, dividing the
+    aggregate back out by the topic-weighted lambda recovers 'tfidf_prefix_j(t)'
     itself -- which is what lets each topic's own adjusted curve be drawn without
     reconstructing the text corpus. A tossup whose weighted lambda is ~0 gets no
     adjustment to invert, so its prefix is reported as absent.
@@ -198,10 +196,10 @@ def topic_difficulty_components_plot(
 ):
     """Per-topic curves + weighted difficulty, both raw and TF-IDF-adjusted.
 
-    Mirrors the baseline ``topic_difficulty_components_plot``, but each topic's
-    curve is drawn twice: solid for the raw difficulty ``d_jk(t)`` and dashed for
-    the TF-IDF-adjusted ``d_jk(t) - lambda_k * tfidf_prefix_j(t)``. The heavy
-    black pair is the topic-weighted aggregate of each. Because the per-topic
+    Each topic's curve is drawn twice: solid for the raw difficulty 'd_jk(t)'
+    and dashed for the TF-IDF-adjusted
+    'd_jk(t) - lambda_k * tfidf_prefix_j(t)'. The heavy black pair is the
+    topic-weighted aggregate of each. Because the per-topic
     adjustments weight up to the saved aggregate, the dashed black curve equals
     the raw weighted curve plus the saved signed adjustment -- the same effective
     difficulty the timing replay uses.
@@ -338,7 +336,7 @@ def topic_difficulty_components_plot(
     )
     fig.tight_layout()
     fig.savefig(
-        graph_path(output_dir, "tossup_difficulty_curves_by_topic.png"), dpi=160
+        graph_path(output_dir, "tossup_difficulty_curves_by_topic.png", "tossup"), dpi=160
     )
     plt.close(fig)
 
@@ -370,7 +368,6 @@ def evaluate_topic_tfidf(
     pyramidal_results: Path,
     compositional_results: Path,
     output_dir: Path,
-    comparison_pyramidal_results: Path | None = None,
     dimension_labels=None,
 ):
     """Run full topic evaluation, replaying saved text-conditioned adjustments."""
@@ -380,16 +377,14 @@ def evaluate_topic_tfidf(
             pyramidal_results,
             compositional_results,
             output_dir,
-            comparison_pyramidal_results,
             dimension_labels,
         )
 
-    # The baseline evaluator's aggregate timing routine resolves this global at
-    # runtime. Temporarily substituting the TF-IDF replay keeps its plotting and
-    # metric schema identical while supplying the dedicated difficulty curve.
+    # Temporarily supply the TF-IDF first-buzz replay to the aggregate evaluator.
     original_distribution = base_evaluation.topic_first_buzz_distribution
 
     def adjusted_distribution(event, players, tossups, n_bins=12):
+        """Inject the saved adjustments into first-buzz reconstruction."""
         return topic_first_buzz_distribution(
             event, players, tossups, adjustments, n_bins
         )
@@ -400,15 +395,13 @@ def evaluate_topic_tfidf(
             pyramidal_results,
             compositional_results,
             output_dir,
-            comparison_pyramidal_results,
             dimension_labels,
         )
     finally:
         base_evaluation.topic_first_buzz_distribution = original_distribution
 
-    # Replace the baseline effective-difficulty view with the same adjusted
-    # curve used for timing replay. Other baseline diagnostic panels remain
-    # useful descriptions of the underlying topic parameters.
+    # Draw the effective-difficulty curve used by timing replay, followed by the
+    # topic-parameter diagnostics.
     topic_difficulty_plot(pyramidal_results, output_dir, adjustments)
     topic_difficulty_components_plot(
         pyramidal_results, output_dir, adjustments, dimension_labels
@@ -416,7 +409,7 @@ def evaluate_topic_tfidf(
     report_path = output_dir / "experiment_report.md"
     with report_path.open("a", encoding="utf-8") as handle:
         handle.write(
-            "\nThe dedicated TF-IDF replay applies saved signed adjustments "
+            "\nThe TF-IDF replay applies saved signed adjustments "
             "`-tfidf_prefix_j(t) * sum_k r_jk lambda_k` to both effective "
             "difficulty and first-buzz timing.\n"
         )

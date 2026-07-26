@@ -1,14 +1,8 @@
 """Joint learned-topic pyramidal model with topic-specific TF-IDF effects.
 
-This is the supervised-LDA-style counterpart to :mod:`topic.tfidf.pyramidal`.
-Document topic proportions remain learned Dirichlet latents; their tossup rows
+Document topic proportions are learned Dirichlet latents; their tossup rows
 weight both the ordinary per-topic skill gaps and the per-topic TF-IDF lambda
-vector. The baseline learned-topic package is intentionally left unchanged.
-
-This is a near-copy of 'topic/learned/joint_pyramidal.py' -- diff against that
-file when reconciling changes; the TF-IDF ``prefix``/``lambdas`` plumbing is
-the only departure, and the trainer reuses the learned package's writers
-(topics, topic-word matrix, document vectors) unchanged.
+vector. The trainer saves topics, the topic-word matrix, and document vectors.
 """
 
 from __future__ import annotations
@@ -33,7 +27,6 @@ from topic.tfidf.pyramidal import (
 def joint_model(
     data,
     n_dimensions,
-    vocab_size,
     bow_weight,
     topic_concentration=1.0,
     calibrate_correctness=False,
@@ -42,14 +35,15 @@ def joint_model(
     """Define a joint LDA word model plus TF-IDF-adjusted IRT likelihood."""
     prefix = prefix_by_row(data)
     bow = data["bow"]
+    vocab_size = bow.shape[-1]
     n_documents = bow.shape[0]
     n_tossups = len(data["tossup_ids"])
     n_players = len(data["player_ids"])
     zero, one = bow.new_tensor(0.0), bow.new_tensor(1.0)
     vector_zero, vector_one = bow.new_zeros(n_dimensions), bow.new_ones(n_dimensions)
 
-    # Topic-word distributions are learned from scratch unless held-out replay
-    # attaches the frozen matrix from a previous dedicated TF-IDF run.
+    # Training learns the topic-word distributions; held-out replay attaches
+    # the frozen training matrix through 'fixed_topic_word'.
     frozen_topic_word = data.get("fixed_topic_word")
     if frozen_topic_word is not None:
         topic_word = frozen_topic_word
@@ -80,10 +74,8 @@ def joint_model(
                 obs=bow,
             )
 
-    # Per-topic tossup difficulty curve parameters (no learned alpha). The Pyro
-    # site is still named "beta" for compatibility with the existing
-    # topic_compirt evaluation code, but this is CompIRT difficulty_beta, not
-    # LDA's topic-word beta/phi.
+    # Per-topic tossup difficulty parameters. The "beta" site supplies the
+    # difficulty_beta posterior consumed by topic_compirt evaluation.
     with pyro.plate("tossups", n_tossups):
         difficulty_beta = pyro.sample(
             "beta", dist.Normal(vector_zero, vector_one).to_event(1)
@@ -147,6 +139,8 @@ def joint_model(
         bias = pyro.sample("correctness_bias", dist.Normal(zero, bow.new_tensor(3.0)))
         correctness = scale * correctness + bias
 
+    # Attach the hand-computed competing-risks log-likelihood with pyro.factor;
+    # the word model's Multinomial factor contributes to the same objective.
     log_likelihood = (
         survival.sum()
         + F.logsigmoid(buzz_logits).sum()

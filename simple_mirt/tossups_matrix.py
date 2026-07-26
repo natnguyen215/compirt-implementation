@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 
 
-# ── Connection ─────────────────────────────────────────────────────────────────
+# Database connection
 
 @contextmanager
 def get_connection(db_path: str):
@@ -30,7 +30,7 @@ def get_connection(db_path: str):
         conn.close()
 
 
-# ── DB loaders ─────────────────────────────────────────────────────────────────
+# Database loaders
 
 def get_players(conn: sqlite3.Connection) -> pd.DataFrame:
     """All players joined with their team and tournament."""
@@ -90,7 +90,7 @@ def load_all_data(db_path: str) -> dict[str, pd.DataFrame]:
         }
 
 
-# ── Game membership ─────────────────────────────────────────────────────────────
+# Game membership
 
 def _player_game_membership(
     games_df: pd.DataFrame,
@@ -148,7 +148,7 @@ def get_game_tossups(buzzes_df: pd.DataFrame) -> dict[int, set[int]]:
     )
 
 
-# ── Response matrix ─────────────────────────────────────────────────────────────
+# Response matrix
 
 def build_response_matrix(
     players_df: pd.DataFrame,
@@ -206,7 +206,7 @@ def build_response_matrix(
     return matrix
 
 
-# ── Summary ─────────────────────────────────────────────────────────────────────
+# Summary
 
 def summarise_matrix(matrix: pd.DataFrame) -> pd.DataFrame:
     """Per-player stats: tossups_heard, correct, incorrect, conversion_rate."""
@@ -220,7 +220,7 @@ def summarise_matrix(matrix: pd.DataFrame) -> pd.DataFrame:
     }, index=matrix.index)
 
 
-# ── Script entry point ──────────────────────────────────────────────────────────
+# Script entry point
 
 if __name__ == "__main__":
     import sys

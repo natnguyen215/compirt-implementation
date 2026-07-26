@@ -1,0 +1,795 @@
+# CompIRT Run Log
+
+Generated: 2026-07-15T23:22:07-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- ALPHA_PRIOR: gamma
+- BONUS_STEPS: 2000
+- CALIBRATE_CORRECTNESS: False
+- COLLECT_ONLY: False
+- DATA_DIR: unknown
+- DEVICE: cuda
+- DIFFICULTY_LINK: unknown
+- DIFFICULTY_SCALE: unknown
+- DIMENSIONS: 16, 20, 24, 28, 32, 36, 40
+- GPU: 1
+- LR: 0.01
+- MODEL: tfidf-multidim-ablation
+- NEW_PLAYER_PRIOR: tier
+- PLOT_DIMENSIONS: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 20, 24, 28, 32, 36, 40
+- PYRAMIDAL_MODULE: tfidf.multidim.train_pyramidal
+- PYRAMIDAL_STEPS: 3000
+- PYTHON: .venv/bin/python
+- RERUN: True
+- ROOT: results/compirt/holdout/tfidf-multidim-ablation-gamma
+- RUNNER: run_scripts/run_multidim_ablation.py
+- SAVE_SYNERGY_DETAILS: False
+- SEED: 42
+- SYNERGY_DIMENSIONS: 1
+- TEST_SPLIT: year_2025
+- TOURNAMENT: <all>
+- TRAIN_SPLIT: year_2024
+
+Wrote run configuration to results/compirt/holdout/tfidf-multidim-ablation-gamma/ablation_config.json
+
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2024 --dimensions 16 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_16/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Dimensions: 16  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 208,175,598.4
+step  100  ELBO loss: 669,286.1
+step  200  ELBO loss: 610,927.5
+step  300  ELBO loss: 555,314.6
+step  400  ELBO loss: 504,255.7
+step  500  ELBO loss: 458,776.4
+step  600  ELBO loss: 433,277.4
+step  700  ELBO loss: 418,288.9
+step  800  ELBO loss: 408,619.0
+step  900  ELBO loss: 405,889.3
+step 1000  ELBO loss: 401,838.8
+step 1100  ELBO loss: 400,389.2
+step 1200  ELBO loss: 398,144.3
+step 1300  ELBO loss: 398,802.4
+step 1400  ELBO loss: 396,106.1
+step 1500  ELBO loss: 395,510.7
+step 1600  ELBO loss: 394,856.6
+step 1700  ELBO loss: 395,294.3
+step 1800  ELBO loss: 394,596.6
+step 1900  ELBO loss: 395,681.0
+step 2000  ELBO loss: 394,786.4
+step 2100  ELBO loss: 393,825.2
+step 2200  ELBO loss: 394,353.4
+step 2300  ELBO loss: 392,504.3
+step 2400  ELBO loss: 394,349.4
+step 2500  ELBO loss: 391,878.5
+step 2600  ELBO loss: 393,043.1
+step 2700  ELBO loss: 393,171.0
+step 2800  ELBO loss: 393,025.4
+step 2900  ELBO loss: 393,526.8
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2025 --dimensions 16 --steps 3000 --lr 0.01 --seed 42 --device cuda --train-posterior results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_16/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_16/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350  Dimensions: 16  IDF vocab: 26,061
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 264,725,577.2
+step  100  ELBO loss: 1,336,367.8
+step  200  ELBO loss: 948,768.9
+step  300  ELBO loss: 748,252.2
+step  400  ELBO loss: 630,709.5
+step  500  ELBO loss: 564,524.5
+step  600  ELBO loss: 536,623.2
+step  700  ELBO loss: 524,907.4
+step  800  ELBO loss: 516,504.9
+step  900  ELBO loss: 513,493.3
+step 1000  ELBO loss: 511,189.2
+step 1100  ELBO loss: 510,052.2
+step 1200  ELBO loss: 507,669.3
+step 1300  ELBO loss: 507,089.4
+step 1400  ELBO loss: 506,552.8
+step 1500  ELBO loss: 505,038.1
+step 1600  ELBO loss: 504,571.2
+step 1700  ELBO loss: 504,607.4
+step 1800  ELBO loss: 504,538.7
+step 1900  ELBO loss: 505,168.0
+step 2000  ELBO loss: 504,474.7
+step 2100  ELBO loss: 503,833.7
+step 2200  ELBO loss: 504,272.9
+step 2300  ELBO loss: 502,287.9
+step 2400  ELBO loss: 501,781.9
+step 2500  ELBO loss: 501,888.8
+step 2600  ELBO loss: 504,932.8
+step 2700  ELBO loss: 501,526.3
+step 2800  ELBO loss: 501,404.1
+step 2900  ELBO loss: 501,983.2
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_16/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --seed 42 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_16/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 392,945.6
+step  100  ELBO loss: 168,239.1
+step  200  ELBO loss: 106,127.0
+step  300  ELBO loss: 96,449.9
+step  400  ELBO loss: 94,371.4
+step  500  ELBO loss: 93,609.7
+step  600  ELBO loss: 93,307.0
+step  700  ELBO loss: 93,301.6
+step  800  ELBO loss: 93,394.5
+step  900  ELBO loss: 92,935.0
+step 1000  ELBO loss: 93,167.4
+step 1100  ELBO loss: 93,255.3
+step 1200  ELBO loss: 93,154.2
+step 1300  ELBO loss: 93,147.8
+step 1400  ELBO loss: 93,480.1
+step 1500  ELBO loss: 93,510.9
+step 1600  ELBO loss: 93,266.6
+step 1700  ELBO loss: 93,152.3
+step 1800  ELBO loss: 92,931.0
+step 1900  ELBO loss: 93,028.2
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_16/holdout/pyramidal --compositional-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_16/holdout/synergy --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_16/holdout/synergy-evaluation
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2024 --dimensions 20 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_20/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Dimensions: 20  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 259,436,494.5
+step  100  ELBO loss: 726,259.2
+step  200  ELBO loss: 661,918.1
+step  300  ELBO loss: 596,837.9
+step  400  ELBO loss: 538,387.3
+step  500  ELBO loss: 485,976.0
+step  600  ELBO loss: 453,677.0
+step  700  ELBO loss: 437,473.8
+step  800  ELBO loss: 425,752.2
+step  900  ELBO loss: 418,931.5
+step 1000  ELBO loss: 418,553.0
+step 1100  ELBO loss: 413,944.2
+step 1200  ELBO loss: 413,251.0
+step 1300  ELBO loss: 412,544.4
+step 1400  ELBO loss: 408,997.1
+step 1500  ELBO loss: 408,446.7
+step 1600  ELBO loss: 409,275.1
+step 1700  ELBO loss: 409,806.5
+step 1800  ELBO loss: 411,102.2
+step 1900  ELBO loss: 410,340.9
+step 2000  ELBO loss: 408,300.3
+step 2100  ELBO loss: 409,747.3
+step 2200  ELBO loss: 407,566.7
+step 2300  ELBO loss: 410,128.6
+step 2400  ELBO loss: 408,973.7
+step 2500  ELBO loss: 409,149.5
+step 2600  ELBO loss: 410,047.4
+step 2700  ELBO loss: 406,994.5
+step 2800  ELBO loss: 406,834.0
+step 2900  ELBO loss: 409,884.1
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2025 --dimensions 20 --steps 3000 --lr 0.01 --seed 42 --device cuda --train-posterior results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_20/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_20/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350  Dimensions: 20  IDF vocab: 26,061
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 329,747,182.5
+step  100  ELBO loss: 1,377,203.3
+step  200  ELBO loss: 986,990.9
+step  300  ELBO loss: 779,219.3
+step  400  ELBO loss: 656,944.6
+step  500  ELBO loss: 586,975.7
+step  600  ELBO loss: 555,180.6
+step  700  ELBO loss: 541,801.8
+step  800  ELBO loss: 531,530.0
+step  900  ELBO loss: 526,883.4
+step 1000  ELBO loss: 525,800.6
+step 1100  ELBO loss: 523,318.2
+step 1200  ELBO loss: 521,712.4
+step 1300  ELBO loss: 523,388.5
+step 1400  ELBO loss: 520,695.0
+step 1500  ELBO loss: 522,095.0
+step 1600  ELBO loss: 519,234.9
+step 1700  ELBO loss: 519,225.4
+step 1800  ELBO loss: 521,574.3
+step 1900  ELBO loss: 521,884.0
+step 2000  ELBO loss: 518,591.4
+step 2100  ELBO loss: 518,514.8
+step 2200  ELBO loss: 518,135.3
+step 2300  ELBO loss: 517,455.4
+step 2400  ELBO loss: 518,116.1
+step 2500  ELBO loss: 518,183.7
+step 2600  ELBO loss: 518,557.0
+step 2700  ELBO loss: 517,575.7
+step 2800  ELBO loss: 515,435.0
+step 2900  ELBO loss: 517,858.7
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_20/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --seed 42 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_20/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 421,608.7
+step  100  ELBO loss: 181,426.6
+step  200  ELBO loss: 110,688.5
+step  300  ELBO loss: 99,442.7
+step  400  ELBO loss: 96,393.8
+step  500  ELBO loss: 96,385.0
+step  600  ELBO loss: 95,644.5
+step  700  ELBO loss: 95,769.1
+step  800  ELBO loss: 95,292.6
+step  900  ELBO loss: 95,357.3
+step 1000  ELBO loss: 95,440.6
+step 1100  ELBO loss: 95,235.2
+step 1200  ELBO loss: 95,245.8
+step 1300  ELBO loss: 95,258.9
+step 1400  ELBO loss: 95,668.4
+step 1500  ELBO loss: 95,951.0
+step 1600  ELBO loss: 95,459.4
+step 1700  ELBO loss: 95,639.8
+step 1800  ELBO loss: 95,268.6
+step 1900  ELBO loss: 95,372.2
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_20/holdout/pyramidal --compositional-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_20/holdout/synergy --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_20/holdout/synergy-evaluation
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2024 --dimensions 24 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_24/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Dimensions: 24  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 310,659,179.7
+step  100  ELBO loss: 785,345.8
+step  200  ELBO loss: 714,235.6
+step  300  ELBO loss: 638,734.7
+step  400  ELBO loss: 572,469.3
+step  500  ELBO loss: 511,204.1
+step  600  ELBO loss: 474,237.9
+step  700  ELBO loss: 456,494.5
+step  800  ELBO loss: 442,568.9
+step  900  ELBO loss: 434,780.2
+step 1000  ELBO loss: 431,999.8
+step 1100  ELBO loss: 429,241.8
+step 1200  ELBO loss: 426,924.8
+step 1300  ELBO loss: 431,477.2
+step 1400  ELBO loss: 426,689.6
+step 1500  ELBO loss: 422,946.7
+step 1600  ELBO loss: 421,864.3
+step 1700  ELBO loss: 423,322.8
+step 1800  ELBO loss: 426,658.7
+step 1900  ELBO loss: 426,073.9
+step 2000  ELBO loss: 424,619.9
+step 2100  ELBO loss: 425,256.3
+step 2200  ELBO loss: 426,599.8
+step 2300  ELBO loss: 427,222.4
+step 2400  ELBO loss: 428,153.9
+step 2500  ELBO loss: 425,677.7
+step 2600  ELBO loss: 427,149.4
+step 2700  ELBO loss: 428,788.1
+step 2800  ELBO loss: 424,326.5
+step 2900  ELBO loss: 426,410.8
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2025 --dimensions 24 --steps 3000 --lr 0.01 --seed 42 --device cuda --train-posterior results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_24/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_24/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350  Dimensions: 24  IDF vocab: 26,061
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 394,464,898.3
+step  100  ELBO loss: 1,440,391.1
+step  200  ELBO loss: 1,039,011.4
+step  300  ELBO loss: 819,316.9
+step  400  ELBO loss: 688,138.7
+step  500  ELBO loss: 609,107.7
+step  600  ELBO loss: 572,962.5
+step  700  ELBO loss: 557,305.3
+step  800  ELBO loss: 548,028.8
+step  900  ELBO loss: 542,205.8
+step 1000  ELBO loss: 541,762.4
+step 1100  ELBO loss: 540,404.8
+step 1200  ELBO loss: 538,917.6
+step 1300  ELBO loss: 539,315.9
+step 1400  ELBO loss: 536,434.0
+step 1500  ELBO loss: 537,339.9
+step 1600  ELBO loss: 537,997.1
+step 1700  ELBO loss: 536,256.6
+step 1800  ELBO loss: 538,511.9
+step 1900  ELBO loss: 541,067.9
+step 2000  ELBO loss: 538,617.7
+step 2100  ELBO loss: 538,223.0
+step 2200  ELBO loss: 539,974.8
+step 2300  ELBO loss: 540,296.2
+step 2400  ELBO loss: 541,554.0
+step 2500  ELBO loss: 540,736.4
+step 2600  ELBO loss: 540,221.9
+step 2700  ELBO loss: 537,781.5
+step 2800  ELBO loss: 539,920.5
+step 2900  ELBO loss: 539,564.5
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_24/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --seed 42 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_24/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 438,585.8
+step  100  ELBO loss: 191,906.3
+step  200  ELBO loss: 114,660.4
+step  300  ELBO loss: 101,485.4
+step  400  ELBO loss: 98,335.4
+step  500  ELBO loss: 97,837.3
+step  600  ELBO loss: 97,521.8
+step  700  ELBO loss: 97,451.7
+step  800  ELBO loss: 97,137.2
+step  900  ELBO loss: 96,898.9
+step 1000  ELBO loss: 96,649.6
+step 1100  ELBO loss: 96,900.3
+step 1200  ELBO loss: 96,817.5
+step 1300  ELBO loss: 96,749.0
+step 1400  ELBO loss: 97,344.8
+step 1500  ELBO loss: 97,490.9
+step 1600  ELBO loss: 97,152.7
+step 1700  ELBO loss: 96,862.6
+step 1800  ELBO loss: 96,815.4
+step 1900  ELBO loss: 97,042.4
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_24/holdout/pyramidal --compositional-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_24/holdout/synergy --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_24/holdout/synergy-evaluation
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2024 --dimensions 28 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_28/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Dimensions: 28  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 361,963,673.5
+step  100  ELBO loss: 843,266.0
+step  200  ELBO loss: 764,017.4
+step  300  ELBO loss: 678,924.6
+step  400  ELBO loss: 605,316.3
+step  500  ELBO loss: 537,102.8
+step  600  ELBO loss: 497,193.1
+step  700  ELBO loss: 475,085.5
+step  800  ELBO loss: 461,781.4
+step  900  ELBO loss: 449,481.1
+step 1000  ELBO loss: 446,142.9
+step 1100  ELBO loss: 442,005.8
+step 1200  ELBO loss: 441,297.9
+step 1300  ELBO loss: 444,846.8
+step 1400  ELBO loss: 439,867.4
+step 1500  ELBO loss: 439,657.0
+step 1600  ELBO loss: 438,722.9
+step 1700  ELBO loss: 443,665.0
+step 1800  ELBO loss: 440,243.9
+step 1900  ELBO loss: 439,858.5
+step 2000  ELBO loss: 442,353.9
+step 2100  ELBO loss: 445,473.5
+step 2200  ELBO loss: 443,773.8
+step 2300  ELBO loss: 446,333.6
+step 2400  ELBO loss: 444,602.0
+step 2500  ELBO loss: 443,521.4
+step 2600  ELBO loss: 447,310.2
+step 2700  ELBO loss: 447,205.0
+step 2800  ELBO loss: 444,466.2
+step 2900  ELBO loss: 447,988.6
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2025 --dimensions 28 --steps 3000 --lr 0.01 --seed 42 --device cuda --train-posterior results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_28/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_28/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350  Dimensions: 28  IDF vocab: 26,061
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 460,783,278.5
+step  100  ELBO loss: 1,501,693.9
+step  200  ELBO loss: 1,082,720.2
+step  300  ELBO loss: 856,524.8
+step  400  ELBO loss: 717,647.4
+step  500  ELBO loss: 632,652.8
+step  600  ELBO loss: 593,316.6
+step  700  ELBO loss: 575,795.5
+step  800  ELBO loss: 566,944.0
+step  900  ELBO loss: 557,514.7
+step 1000  ELBO loss: 556,402.4
+step 1100  ELBO loss: 553,301.1
+step 1200  ELBO loss: 554,746.8
+step 1300  ELBO loss: 560,476.0
+step 1400  ELBO loss: 561,685.6
+step 1500  ELBO loss: 558,864.4
+step 1600  ELBO loss: 562,638.1
+step 1700  ELBO loss: 566,111.5
+step 1800  ELBO loss: 562,350.1
+step 1900  ELBO loss: 562,664.8
+step 2000  ELBO loss: 564,321.4
+step 2100  ELBO loss: 571,402.3
+step 2200  ELBO loss: 572,585.3
+step 2300  ELBO loss: 570,730.9
+step 2400  ELBO loss: 572,592.5
+step 2500  ELBO loss: 574,280.2
+step 2600  ELBO loss: 575,287.8
+step 2700  ELBO loss: 582,308.7
+step 2800  ELBO loss: 574,840.4
+step 2900  ELBO loss: 577,282.0
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_28/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --seed 42 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_28/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 441,531.2
+step  100  ELBO loss: 200,621.6
+step  200  ELBO loss: 118,870.8
+step  300  ELBO loss: 103,160.4
+step  400  ELBO loss: 99,311.8
+step  500  ELBO loss: 98,779.7
+step  600  ELBO loss: 98,238.5
+step  700  ELBO loss: 98,422.8
+step  800  ELBO loss: 98,018.8
+step  900  ELBO loss: 97,632.7
+step 1000  ELBO loss: 97,675.0
+step 1100  ELBO loss: 97,787.5
+step 1200  ELBO loss: 97,633.6
+step 1300  ELBO loss: 97,959.1
+step 1400  ELBO loss: 98,067.0
+step 1500  ELBO loss: 98,258.1
+step 1600  ELBO loss: 97,965.3
+step 1700  ELBO loss: 97,842.1
+step 1800  ELBO loss: 97,462.4
+step 1900  ELBO loss: 98,133.9
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_28/holdout/pyramidal --compositional-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_28/holdout/synergy --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_28/holdout/synergy-evaluation
+/teapot/students/natnguyen/CompIRT-Implementation/compirt_eval/tossups/distributions.py:274: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  tossups[norm_column] = np.linalg.norm(
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2024 --dimensions 32 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_32/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Dimensions: 32  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 413,222,645.1
+step  100  ELBO loss: 904,622.4
+step  200  ELBO loss: 817,820.6
+step  300  ELBO loss: 721,740.1
+step  400  ELBO loss: 639,039.5
+step  500  ELBO loss: 564,972.0
+step  600  ELBO loss: 520,166.0
+step  700  ELBO loss: 495,739.5
+step  800  ELBO loss: 479,345.0
+step  900  ELBO loss: 468,859.9
+step 1000  ELBO loss: 464,913.9
+step 1100  ELBO loss: 461,181.3
+step 1200  ELBO loss: 457,805.5
+step 1300  ELBO loss: 458,266.3
+step 1400  ELBO loss: 455,889.8
+step 1500  ELBO loss: 453,693.8
+step 1600  ELBO loss: 456,297.9
+step 1700  ELBO loss: 458,343.4
+step 1800  ELBO loss: 460,995.7
+step 1900  ELBO loss: 462,303.4
+step 2000  ELBO loss: 458,420.9
+step 2100  ELBO loss: 460,407.2
+step 2200  ELBO loss: 467,153.9
+step 2300  ELBO loss: 465,231.2
+step 2400  ELBO loss: 469,442.4
+step 2500  ELBO loss: 472,733.8
+step 2600  ELBO loss: 473,997.8
+step 2700  ELBO loss: 480,663.1
+step 2800  ELBO loss: 481,230.5
+step 2900  ELBO loss: 482,703.4
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2025 --dimensions 32 --steps 3000 --lr 0.01 --seed 42 --device cuda --train-posterior results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_32/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_32/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350  Dimensions: 32  IDF vocab: 26,061
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 525,598,628.1
+step  100  ELBO loss: 1,564,300.8
+step  200  ELBO loss: 1,145,642.6
+step  300  ELBO loss: 908,228.1
+step  400  ELBO loss: 755,884.0
+step  500  ELBO loss: 660,530.8
+step  600  ELBO loss: 615,671.3
+step  700  ELBO loss: 597,695.7
+step  800  ELBO loss: 587,654.6
+step  900  ELBO loss: 580,616.9
+step 1000  ELBO loss: 580,697.1
+step 1100  ELBO loss: 588,543.3
+step 1200  ELBO loss: 593,623.2
+step 1300  ELBO loss: 588,162.9
+step 1400  ELBO loss: 592,736.3
+step 1500  ELBO loss: 593,730.8
+step 1600  ELBO loss: 601,522.6
+step 1700  ELBO loss: 606,279.4
+step 1800  ELBO loss: 616,044.5
+step 1900  ELBO loss: 618,482.7
+step 2000  ELBO loss: 627,696.5
+step 2100  ELBO loss: 634,867.7
+step 2200  ELBO loss: 643,860.4
+step 2300  ELBO loss: 654,665.9
+step 2400  ELBO loss: 669,667.8
+step 2500  ELBO loss: 694,033.4
+step 2600  ELBO loss: 709,523.5
+step 2700  ELBO loss: 733,586.6
+step 2800  ELBO loss: 745,176.9
+step 2900  ELBO loss: 759,047.8
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_32/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --seed 42 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_32/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 785,151.0
+step  100  ELBO loss: 298,270.7
+step  200  ELBO loss: 148,024.8
+step  300  ELBO loss: 118,684.2
+step  400  ELBO loss: 112,343.9
+step  500  ELBO loss: 111,307.3
+step  600  ELBO loss: 110,505.7
+step  700  ELBO loss: 110,488.4
+step  800  ELBO loss: 109,931.6
+step  900  ELBO loss: 109,793.5
+step 1000  ELBO loss: 109,731.4
+step 1100  ELBO loss: 109,456.8
+step 1200  ELBO loss: 109,566.6
+step 1300  ELBO loss: 109,674.1
+step 1400  ELBO loss: 110,008.1
+step 1500  ELBO loss: 110,015.0
+step 1600  ELBO loss: 109,329.4
+step 1700  ELBO loss: 109,650.4
+step 1800  ELBO loss: 109,115.8
+step 1900  ELBO loss: 110,222.4
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_32/holdout/pyramidal --compositional-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_32/holdout/synergy --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_32/holdout/synergy-evaluation
+/teapot/students/natnguyen/CompIRT-Implementation/compirt_eval/tossups/distributions.py:274: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  tossups[norm_column] = np.linalg.norm(
+Game simulation: 3,273 games, 500 replicas per game
+Game simulation: 164/3,273 games complete (5%)
+Game simulation: 328/3,273 games complete (10%)
+Game simulation: 491/3,273 games complete (15%)
+Game simulation: 655/3,273 games complete (20%)
+Game simulation: 819/3,273 games complete (25%)
+Game simulation: 982/3,273 games complete (30%)
+Game simulation: 1,146/3,273 games complete (35%)
+Game simulation: 1,310/3,273 games complete (40%)
+Game simulation: 1,473/3,273 games complete (45%)
+Game simulation: 1,637/3,273 games complete (50%)
+Game simulation: 1,801/3,273 games complete (55%)
+Game simulation: 1,964/3,273 games complete (60%)
+Game simulation: 2,128/3,273 games complete (65%)
+Game simulation: 2,292/3,273 games complete (70%)
+Game simulation: 2,455/3,273 games complete (75%)
+Game simulation: 2,619/3,273 games complete (80%)
+Game simulation: 2,783/3,273 games complete (85%)
+Game simulation: 2,946/3,273 games complete (90%)
+Game simulation: 3,110/3,273 games complete (95%)
+Game simulation: 3,273/3,273 games complete (100%)
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2024 --dimensions 36 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_36/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Dimensions: 36  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 465,019,886.7
+step  100  ELBO loss: 971,040.1
+step  200  ELBO loss: 873,600.3
+step  300  ELBO loss: 766,556.2
+step  400  ELBO loss: 674,239.1
+step  500  ELBO loss: 594,043.1
+step  600  ELBO loss: 542,016.4
+step  700  ELBO loss: 515,946.1
+step  800  ELBO loss: 494,933.6
+step  900  ELBO loss: 485,621.9
+step 1000  ELBO loss: 485,146.9
+step 1100  ELBO loss: 477,944.7
+step 1200  ELBO loss: 475,394.7
+step 1300  ELBO loss: 473,369.5
+step 1400  ELBO loss: 470,217.4
+step 1500  ELBO loss: 471,632.6
+step 1600  ELBO loss: 471,864.9
+step 1700  ELBO loss: 477,609.4
+step 1800  ELBO loss: 475,986.3
+step 1900  ELBO loss: 477,086.0
+step 2000  ELBO loss: 488,449.3
+step 2100  ELBO loss: 484,058.1
+step 2200  ELBO loss: 495,634.0
+step 2300  ELBO loss: 503,454.5
+step 2400  ELBO loss: 506,387.6
+step 2500  ELBO loss: 513,038.4
+step 2600  ELBO loss: 526,113.2
+step 2700  ELBO loss: 530,441.3
+step 2800  ELBO loss: 545,766.7
+step 2900  ELBO loss: 550,667.6
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2025 --dimensions 36 --steps 3000 --lr 0.01 --seed 42 --device cuda --train-posterior results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_36/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_36/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350  Dimensions: 36  IDF vocab: 26,061
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 589,913,925.3
+step  100  ELBO loss: 1,666,594.5
+step  200  ELBO loss: 1,245,994.2
+step  300  ELBO loss: 996,082.5
+step  400  ELBO loss: 828,667.7
+step  500  ELBO loss: 718,238.9
+step  600  ELBO loss: 666,319.8
+step  700  ELBO loss: 648,388.6
+step  800  ELBO loss: 639,739.1
+step  900  ELBO loss: 641,057.2
+step 1000  ELBO loss: 644,685.9
+step 1100  ELBO loss: 656,841.5
+step 1200  ELBO loss: 660,354.5
+step 1300  ELBO loss: 666,810.6
+step 1400  ELBO loss: 681,883.5
+step 1500  ELBO loss: 702,019.5
+step 1600  ELBO loss: 716,477.7
+step 1700  ELBO loss: 739,206.9
+step 1800  ELBO loss: 753,436.8
+step 1900  ELBO loss: 792,659.4
+step 2000  ELBO loss: 817,598.7
+step 2100  ELBO loss: 840,512.5
+step 2200  ELBO loss: 870,096.0
+step 2300  ELBO loss: 908,141.2
+step 2400  ELBO loss: 929,320.0
+step 2500  ELBO loss: 954,762.8
+step 2600  ELBO loss: 992,226.1
+step 2700  ELBO loss: 1,016,449.2
+step 2800  ELBO loss: 1,035,698.2
+step 2900  ELBO loss: 1,072,440.4
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_36/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --seed 42 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_36/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 1,152,146.5
+step  100  ELBO loss: 431,542.7
+step  200  ELBO loss: 193,397.1
+step  300  ELBO loss: 145,759.0
+step  400  ELBO loss: 133,183.4
+step  500  ELBO loss: 130,131.2
+step  600  ELBO loss: 128,360.8
+step  700  ELBO loss: 128,883.2
+step  800  ELBO loss: 127,702.9
+step  900  ELBO loss: 127,370.0
+step 1000  ELBO loss: 127,588.0
+step 1100  ELBO loss: 126,958.8
+step 1200  ELBO loss: 126,445.2
+step 1300  ELBO loss: 126,911.3
+step 1400  ELBO loss: 127,158.4
+step 1500  ELBO loss: 127,547.5
+step 1600  ELBO loss: 126,880.1
+step 1700  ELBO loss: 127,324.3
+step 1800  ELBO loss: 125,833.2
+step 1900  ELBO loss: 127,197.6
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_36/holdout/pyramidal --compositional-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_36/holdout/synergy --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_36/holdout/synergy-evaluation
+/teapot/students/natnguyen/CompIRT-Implementation/compirt_eval/tossups/distributions.py:274: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  tossups[norm_column] = np.linalg.norm(
+/teapot/students/natnguyen/CompIRT-Implementation/compirt_eval/figures.py:191: UserWarning: Tight layout not applied. The bottom and top margins cannot be made large enough to accommodate all Axes decorations.
+  fig.tight_layout()
+/teapot/students/natnguyen/CompIRT-Implementation/compirt_eval/figures.py:191: UserWarning: Tight layout not applied. tight_layout cannot make Axes height small enough to accommodate all Axes decorations.
+  fig.tight_layout()
+/teapot/students/natnguyen/CompIRT-Implementation/compirt_eval/figures.py:191: UserWarning: Tight layout not applied. The bottom and top margins cannot be made large enough to accommodate all Axes decorations.
+  fig.tight_layout()
+Game simulation: 3,273 games, 500 replicas per game
+Game simulation: 164/3,273 games complete (5%)
+Game simulation: 328/3,273 games complete (10%)
+Game simulation: 491/3,273 games complete (15%)
+Game simulation: 655/3,273 games complete (20%)
+Game simulation: 819/3,273 games complete (25%)
+Game simulation: 982/3,273 games complete (30%)
+Game simulation: 1,146/3,273 games complete (35%)
+Game simulation: 1,310/3,273 games complete (40%)
+Game simulation: 1,473/3,273 games complete (45%)
+Game simulation: 1,637/3,273 games complete (50%)
+Game simulation: 1,801/3,273 games complete (55%)
+Game simulation: 1,964/3,273 games complete (60%)
+Game simulation: 2,128/3,273 games complete (65%)
+Game simulation: 2,292/3,273 games complete (70%)
+Game simulation: 2,455/3,273 games complete (75%)
+Game simulation: 2,619/3,273 games complete (80%)
+Game simulation: 2,783/3,273 games complete (85%)
+Game simulation: 2,946/3,273 games complete (90%)
+Game simulation: 3,110/3,273 games complete (95%)
+Game simulation: 3,273/3,273 games complete (100%)
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2024 --dimensions 40 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_40/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Dimensions: 40  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 516,952,209.7
+step  100  ELBO loss: 1,039,031.7
+step  200  ELBO loss: 931,694.9
+step  300  ELBO loss: 814,268.1
+step  400  ELBO loss: 711,838.9
+step  500  ELBO loss: 621,211.0
+step  600  ELBO loss: 562,438.3
+step  700  ELBO loss: 534,667.4
+step  800  ELBO loss: 515,753.7
+step  900  ELBO loss: 503,342.9
+step 1000  ELBO loss: 497,184.9
+step 1100  ELBO loss: 493,162.9
+step 1200  ELBO loss: 489,120.8
+step 1300  ELBO loss: 489,923.4
+step 1400  ELBO loss: 488,855.1
+step 1500  ELBO loss: 488,662.9
+step 1600  ELBO loss: 492,809.3
+step 1700  ELBO loss: 497,185.4
+step 1800  ELBO loss: 500,328.7
+step 1900  ELBO loss: 501,994.1
+step 2000  ELBO loss: 524,584.7
+step 2100  ELBO loss: 517,345.3
+step 2200  ELBO loss: 540,109.2
+step 2300  ELBO loss: 539,680.4
+step 2400  ELBO loss: 568,905.4
+step 2500  ELBO loss: 576,508.2
+step 2600  ELBO loss: 589,289.8
+step 2700  ELBO loss: 600,547.1
+step 2800  ELBO loss: 622,183.2
+step 2900  ELBO loss: 631,634.2
++ .venv/bin/python -m tfidf.multidim.train_pyramidal --split year_2025 --dimensions 40 --steps 3000 --lr 0.01 --seed 42 --device cuda --train-posterior results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_40/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_40/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350  Dimensions: 40  IDF vocab: 26,061
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 655,942,829.5
+step  100  ELBO loss: 1,938,647.8
+step  200  ELBO loss: 1,449,810.8
+step  300  ELBO loss: 1,156,179.2
+step  400  ELBO loss: 955,858.0
+step  500  ELBO loss: 817,897.1
+step  600  ELBO loss: 745,738.8
+step  700  ELBO loss: 719,503.9
+step  800  ELBO loss: 716,132.1
+step  900  ELBO loss: 721,303.9
+step 1000  ELBO loss: 735,494.5
+step 1100  ELBO loss: 756,050.1
+step 1200  ELBO loss: 755,006.9
+step 1300  ELBO loss: 769,700.4
+step 1400  ELBO loss: 784,561.9
+step 1500  ELBO loss: 808,887.7
+step 1600  ELBO loss: 823,724.7
+step 1700  ELBO loss: 853,160.4
+step 1800  ELBO loss: 878,584.4
+step 1900  ELBO loss: 930,193.0
+step 2000  ELBO loss: 975,333.3
+step 2100  ELBO loss: 1,042,025.9
+step 2200  ELBO loss: 1,196,255.1
+step 2300  ELBO loss: 1,170,807.2
+step 2400  ELBO loss: 1,235,489.6
+step 2500  ELBO loss: 1,296,949.3
+step 2600  ELBO loss: 1,359,000.3
+step 2700  ELBO loss: 1,409,444.4
+step 2800  ELBO loss: 1,463,133.9
+step 2900  ELBO loss: 1,525,438.8
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_40/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --seed 42 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_40/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 1,647,644.8
+step  100  ELBO loss: 594,041.4
+step  200  ELBO loss: 253,001.0
+step  300  ELBO loss: 186,229.9
+step  400  ELBO loss: 165,332.4
+step  500  ELBO loss: 158,658.5
+step  600  ELBO loss: 156,069.5
+step  700  ELBO loss: 155,462.1
+step  800  ELBO loss: 153,455.5
+step  900  ELBO loss: 153,997.6
+step 1000  ELBO loss: 153,089.9
+step 1100  ELBO loss: 153,327.4
+step 1200  ELBO loss: 152,359.3
+step 1300  ELBO loss: 152,776.7
+step 1400  ELBO loss: 152,776.8
+step 1500  ELBO loss: 152,885.8
+step 1600  ELBO loss: 152,123.8
+step 1700  ELBO loss: 152,661.9
+step 1800  ELBO loss: 151,639.7
+step 1900  ELBO loss: 153,594.2
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_40/holdout/pyramidal --compositional-results results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_40/holdout/synergy --output-dir results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_40/holdout/synergy-evaluation
+/teapot/students/natnguyen/CompIRT-Implementation/compirt_eval/tossups/distributions.py:274: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+  tossups[norm_column] = np.linalg.norm(
+/teapot/students/natnguyen/CompIRT-Implementation/compirt_eval/figures.py:191: UserWarning: Tight layout not applied. The bottom and top margins cannot be made large enough to accommodate all Axes decorations.
+  fig.tight_layout()
+/teapot/students/natnguyen/CompIRT-Implementation/compirt_eval/figures.py:191: UserWarning: Tight layout not applied. tight_layout cannot make Axes height small enough to accommodate all Axes decorations.
+  fig.tight_layout()
+/teapot/students/natnguyen/CompIRT-Implementation/compirt_eval/figures.py:191: UserWarning: Tight layout not applied. The bottom and top margins cannot be made large enough to accommodate all Axes decorations.
+  fig.tight_layout()
+Game simulation: 3,273 games, 500 replicas per game
+Game simulation: 164/3,273 games complete (5%)
+Game simulation: 328/3,273 games complete (10%)
+Game simulation: 491/3,273 games complete (15%)
+Game simulation: 655/3,273 games complete (20%)
+Game simulation: 819/3,273 games complete (25%)
+Game simulation: 982/3,273 games complete (30%)
+Game simulation: 1,146/3,273 games complete (35%)
+Game simulation: 1,310/3,273 games complete (40%)
+Game simulation: 1,473/3,273 games complete (45%)
+Game simulation: 1,637/3,273 games complete (50%)
+Game simulation: 1,801/3,273 games complete (55%)
+Game simulation: 1,964/3,273 games complete (60%)
+Game simulation: 2,128/3,273 games complete (65%)
+Game simulation: 2,292/3,273 games complete (70%)
+Game simulation: 2,455/3,273 games complete (75%)
+Game simulation: 2,619/3,273 games complete (80%)
+Game simulation: 2,783/3,273 games complete (85%)
+Game simulation: 2,946/3,273 games complete (90%)
+Game simulation: 3,110/3,273 games complete (95%)
+Game simulation: 3,273/3,273 games complete (100%)
+
+Wrote aggregate metrics to results/compirt/holdout/tfidf-multidim-ablation-gamma/csvs/multidim_ablation_metrics.csv
+Wrote aggregate graphs to results/compirt/holdout/tfidf-multidim-ablation-gamma/graphs

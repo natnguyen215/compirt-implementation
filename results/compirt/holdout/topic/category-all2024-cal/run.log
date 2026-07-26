@@ -1,0 +1,191 @@
+# CompIRT Run Log
+
+Generated: 2026-07-02T14:08:53-07:00
+Placeholder: yes
+Captured stdout/stderr: unavailable
+Note: this log was reconstructed from saved result artifacts; historical command output was not captured.
+
+## Run Variables
+
+- BONUS_STEPS: 3000
+- CALIBRATE_CORRECTNESS: True
+- DEVICE: unknown
+- DIMENSIONS: 13
+- GPU: unknown
+- LR: unknown
+- MODEL: topic-weighted-compositional, topic-weighted-pyramidal
+- PYRAMIDAL_STEPS: 5000
+- ROOT: results/compirt/holdout/category-all2024-cal
+- RUN_LOG_KIND: placeholder
+- SPLIT: unknown
+- SYNERGY_DIMENSIONS: 0, 3
+- TEST_SPLIT: unknown
+- TOPIC_VECTORS: topic/topic-modeling/outputs/category/document_latent_vectors.csv
+- TOURNAMENT: unknown
+- TRAIN_SPLIT: unknown
+
+## Recovered Stage Summaries
+
+### holdout/compositional
+
+```json
+{
+  "bonus_part_observations": 181362,
+  "bonus_parts": 4716,
+  "calibrate_correctness": true,
+  "correctness_bias": -0.8582897186279297,
+  "correctness_scale": 1.823349118232727,
+  "final_loss": 77652.57677128911,
+  "formula": "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * beta_bk",
+  "model": "topic-weighted-compositional",
+  "saved_synergy_details": false,
+  "skill_dimensions": 13,
+  "steps": 3000,
+  "synergy_dimensions": 0,
+  "tau": 0.6525890827178955,
+  "topic_columns": [
+    "latent_topic_00",
+    "latent_topic_01",
+    "latent_topic_02",
+    "latent_topic_03",
+    "latent_topic_04",
+    "latent_topic_05",
+    "latent_topic_06",
+    "latent_topic_07",
+    "latent_topic_08",
+    "latent_topic_09",
+    "latent_topic_10",
+    "latent_topic_11",
+    "latent_topic_12"
+  ],
+  "topic_dimensions": 13,
+  "topic_vectors": "topic/topic-modeling/outputs/category/document_latent_vectors.csv",
+  "tournament": "",
+  "use_synergy": false
+}
+```
+
+### holdout/pyramidal
+
+```json
+{
+  "calibrate_correctness": true,
+  "correctness_bias": 1.6652752161026,
+  "correctness_scale": 0.20516930520534515,
+  "dimensions": 13,
+  "events": 65443,
+  "final_loss": 458143.32187366486,
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))",
+  "model": "topic-weighted-pyramidal",
+  "observation_counts": {
+    "BUZZ": 64834,
+    "CENSORED": 437024,
+    "NO-BUZZ": 4524
+  },
+  "players": 1791,
+  "steps": 5000,
+  "topic_columns": [
+    "latent_topic_00",
+    "latent_topic_01",
+    "latent_topic_02",
+    "latent_topic_03",
+    "latent_topic_04",
+    "latent_topic_05",
+    "latent_topic_06",
+    "latent_topic_07",
+    "latent_topic_08",
+    "latent_topic_09",
+    "latent_topic_10",
+    "latent_topic_11",
+    "latent_topic_12"
+  ],
+  "topic_dimensions": 13,
+  "topic_vectors": "topic/topic-modeling/outputs/category/document_latent_vectors.csv",
+  "tossups": 1350,
+  "tournament": ""
+}
+```
+
+### holdout/synergy
+
+```json
+{
+  "bonus_part_observations": 181362,
+  "bonus_parts": 4716,
+  "calibrate_correctness": true,
+  "correctness_bias": -1.2805545330047607,
+  "correctness_scale": 1.543399453163147,
+  "final_loss": 79806.85768604279,
+  "formula": "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * beta_bk",
+  "mean_synergy_contribution": 0.3443939685821533,
+  "median_synergy_contribution": 0.32638293504714966,
+  "model": "topic-weighted-compositional",
+  "negative_synergy_fraction": 0.21661097694114534,
+  "positive_synergy_fraction": 0.7604128759056473,
+  "saved_synergy_details": true,
+  "skill_dimensions": 13,
+  "steps": 3000,
+  "synergy_dimensions": 3,
+  "tau": 0.6790665984153748,
+  "topic_columns": [
+    "latent_topic_00",
+    "latent_topic_01",
+    "latent_topic_02",
+    "latent_topic_03",
+    "latent_topic_04",
+    "latent_topic_05",
+    "latent_topic_06",
+    "latent_topic_07",
+    "latent_topic_08",
+    "latent_topic_09",
+    "latent_topic_10",
+    "latent_topic_11",
+    "latent_topic_12"
+  ],
+  "topic_dimensions": 13,
+  "topic_vectors": "topic/topic-modeling/outputs/category/document_latent_vectors.csv",
+  "tournament": "",
+  "use_synergy": true
+}
+```
+
+### train/pyramidal
+
+```json
+{
+  "calibrate_correctness": true,
+  "correctness_bias": 1.847019910812378,
+  "correctness_scale": 0.28257620334625244,
+  "dimensions": 13,
+  "events": 48612,
+  "final_loss": 351496.6630781889,
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))",
+  "model": "topic-weighted-pyramidal",
+  "observation_counts": {
+    "BUZZ": 47914,
+    "CENSORED": 341490,
+    "NO-BUZZ": 5620
+  },
+  "players": 1486,
+  "steps": 5000,
+  "topic_columns": [
+    "latent_topic_00",
+    "latent_topic_01",
+    "latent_topic_02",
+    "latent_topic_03",
+    "latent_topic_04",
+    "latent_topic_05",
+    "latent_topic_06",
+    "latent_topic_07",
+    "latent_topic_08",
+    "latent_topic_09",
+    "latent_topic_10",
+    "latent_topic_11",
+    "latent_topic_12"
+  ],
+  "topic_dimensions": 13,
+  "topic_vectors": "topic/topic-modeling/outputs/category/document_latent_vectors.csv",
+  "tossups": 1260,
+  "tournament": ""
+}
+```

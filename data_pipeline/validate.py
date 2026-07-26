@@ -1,12 +1,8 @@
 """Validate a built quizbowl IRT dataset against its schema and source database.
 
-'validate_dataset' is the entry point (also called automatically at the end
-of 'build_dataset_directory' before a new build replaces the old one, so a
-broken build never gets published). It re-derives everything it can from the
-saved tables themselves rather than trusting 'build_records'' output, so a
-bug introduced in 'dataset.py' is caught here rather than shipped silently.
-Checks run cheapest/most-structural first (schema, primary keys) before the
-data-integrity checks that require re-joining every table.
+'validate_dataset' is the entry point. 'build_dataset_directory' calls it before
+publishing a new build. Validation derives expectations from the saved tables
+and runs structural checks before data-integrity checks that rejoin every table.
 """
 
 from __future__ import annotations
@@ -33,8 +29,8 @@ def _expected_year_ids(
     irt_responses), but teams/games/players don't carry a year field
     directly -- their year is inherited from the tournament they belong to
     (and, for players, every tournament they've played in, since one player
-    can span multiple years). This mirrors that inheritance independently of
-    'write_datasets'' own year-assignment logic, so the two can be diffed.
+    can span multiple years). Derive that inheritance from the saved tables so
+    validation can compare it with 'write_datasets' year assignments.
     """
     pk = PRIMARY_KEYS[table_name]
     tournament_year = {row["tournament_id"]: int(row["year"]) for row in tables["tournaments"]}
@@ -76,6 +72,275 @@ def _expected_year_ids(
     return result
 
 
+def _load_and_check_schemas(
+    data_dir: Path, errors: list[str]
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, DatasetDict]]:
+    """Load every table after checking its split names and feature schema."""
+    tables: dict[str, list[dict[str, Any]]] = {}
+    splits: dict[str, DatasetDict] = {}
+    for table_name, expected_features in TABLE_FEATURES.items():
+        table_path = data_dir / table_name
+        if not table_path.is_dir():
+            errors.append(f"Missing dataset directory: {table_path}")
+            continue
+        dataset = load_from_disk(str(table_path))
+        splits[table_name] = dataset
+        if set(dataset.keys()) != {"all", "year_2024", "year_2025"}:
+            errors.append(f"{table_name}: unexpected splits {sorted(dataset.keys())}")
+        for split_name in dataset:
+            if dataset[split_name].features != expected_features:
+                errors.append(f"{table_name}/{split_name}: feature schema mismatch")
+        tables[table_name] = [dict(row) for row in dataset["all"]]
+    return tables, splits
+
+
+def _check_primary_ids_and_year_splits(
+    tables: dict[str, list[dict[str, Any]]],
+    splits: dict[str, DatasetDict],
+    errors: list[str],
+) -> None:
+    """Check primary-key uniqueness and exact membership in each year split."""
+    for table_name, rows in tables.items():
+        pk = PRIMARY_KEYS[table_name]
+        ids = [row[pk] for row in rows]
+        if len(ids) != len(set(ids)):
+            errors.append(f"{table_name}: duplicate primary IDs")
+        for year, expected_ids in _expected_year_ids(table_name, rows, tables).items():
+            actual_ids = set(splits[table_name][f"year_{year}"][pk])
+            if actual_ids != expected_ids:
+                errors.append(
+                    f"{table_name}/year_{year}: expected {len(expected_ids)} IDs, "
+                    f"found {len(actual_ids)}"
+                )
+
+
+def _check_foreign_keys_and_shapes(
+    tables: dict[str, list[dict[str, Any]]], errors: list[str]
+) -> None:
+    """Check cross-table references, binary outcomes, and three-part bonuses."""
+    tournament_ids = {row["tournament_id"] for row in tables["tournaments"]}
+    player_ids = {row["player_id"] for row in tables["players"]}
+    team_ids = {row["team_id"] for row in tables["teams"]}
+    game_ids = {row["game_id"] for row in tables["games"]}
+    tossup_ids = {row["tossup_id"] for row in tables["tossups"]}
+    bonus_ids = {row["bonus_id"] for row in tables["bonuses"]}
+
+    for team in tables["teams"]:
+        if team["tournament_id"] not in tournament_ids:
+            errors.append(f"teams: missing tournament {team['tournament_id']}")
+        if not set(team["player_ids"]) <= player_ids:
+            errors.append(f"teams: missing player reference on {team['team_id']}")
+    for game in tables["games"]:
+        if (
+            game["tournament_id"] not in tournament_ids
+            or not set(game["team_ids"]) <= team_ids
+        ):
+            errors.append(f"games: broken reference on {game['game_id']}")
+    for buzz in tables["tossup_buzzes"]:
+        if (
+            buzz["game_id"] not in game_ids
+            or buzz["team_id"] not in team_ids
+            or buzz["player_id"] not in player_ids
+            or buzz["tossup_id"] not in tossup_ids
+        ):
+            errors.append(f"tossup_buzzes: broken reference on {buzz['buzz_id']}")
+    for response in tables["bonus_responses"]:
+        if (
+            response["game_id"] not in game_ids
+            or response["team_id"] not in team_ids
+            or response["bonus_id"] not in bonus_ids
+            or (
+                response["earning_player_id"]
+                and response["earning_player_id"] not in player_ids
+            )
+        ):
+            errors.append(
+                f"bonus_responses: broken reference on {response['response_id']}"
+            )
+        if len(response["parts_correct"]) != 3:
+            errors.append(
+                "bonus_responses: response does not have three parts: "
+                f"{response['response_id']}"
+            )
+    for bonus in tables["bonuses"]:
+        if len(bonus["parts"]) != 3:
+            errors.append(
+                f"bonuses: bonus does not have three parts: {bonus['bonus_id']}"
+            )
+    for response in tables["irt_responses"]:
+        if (
+            response["player_id"] not in player_ids
+            or response["tossup_id"] not in tossup_ids
+        ):
+            errors.append(
+                f"irt_responses: broken reference on {response['response_id']}"
+            )
+        if int(response["response"]) not in {0, 1}:
+            errors.append(
+                f"irt_responses: non-binary response on {response['response_id']}"
+            )
+
+
+def _check_irt_response_derivation(
+    tables: dict[str, list[dict[str, Any]]], errors: list[str]
+) -> None:
+    """Independently reconstruct the full player-by-tossup response mapping."""
+    actual_irt = {
+        (row["player_id"], row["tossup_id"]): int(row["response"])
+        for row in tables["irt_responses"]
+    }
+    roster_by_team = {row["team_id"]: row["player_ids"] for row in tables["teams"]}
+    game_by_id = {row["game_id"]: row for row in tables["games"]}
+    correct_pairs = {
+        (row["player_id"], row["tossup_id"])
+        for row in tables["tossup_buzzes"]
+        if row["correct"]
+    }
+    expected_irt: dict[tuple[str, str], int] = {}
+    for game_id, tossup_id in {
+        (row["game_id"], row["tossup_id"]) for row in tables["tossup_buzzes"]
+    }:
+        for team_id in game_by_id[game_id]["team_ids"]:
+            for player_id in roster_by_team[team_id]:
+                key = (player_id, tossup_id)
+                expected_irt[key] = int(key in correct_pairs)
+    if actual_irt != expected_irt:
+        errors.append(
+            f"irt_responses: expected {len(expected_irt)} derived observations, "
+            f"found {len(actual_irt)}"
+        )
+
+
+def _check_score_timelines(
+    tables: dict[str, list[dict[str, Any]]], errors: list[str]
+) -> None:
+    """Replay saved events and verify intermediate and final score snapshots."""
+    buzzes_by_game: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    responses_by_game: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for buzz in tables["tossup_buzzes"]:
+        buzzes_by_game[buzz["game_id"]].append(buzz)
+    for response in tables["bonus_responses"]:
+        responses_by_game[response["game_id"]].append(response)
+
+    for game in tables["games"]:
+        scores = {team_id: 0 for team_id in game["team_ids"]}
+        events: dict[int, dict[str, list[dict[str, Any]]]] = defaultdict(
+            lambda: {"buzzes": [], "responses": []}
+        )
+        for buzz in buzzes_by_game[game["game_id"]]:
+            events[int(buzz["question_number_in_game"])]["buzzes"].append(buzz)
+        for response in responses_by_game[game["game_id"]]:
+            events[int(response["question_number_in_game"])]["responses"].append(
+                response
+            )
+
+        for question_number in sorted(events):
+            for buzz in sorted(
+                events[question_number]["buzzes"],
+                key=lambda row: (
+                    int(row["token_position"]),
+                    int(row["buzz_id"].rsplit("-", 1)[1]),
+                ),
+            ):
+                opponent_id = next(
+                    team_id
+                    for team_id in game["team_ids"]
+                    if team_id != buzz["team_id"]
+                )
+                if (
+                    buzz["team_score"] != scores[buzz["team_id"]]
+                    or buzz["opponent_score"] != scores[opponent_id]
+                ):
+                    errors.append(
+                        f"tossup_buzzes: score timeline mismatch on {buzz['buzz_id']}"
+                    )
+                scores[buzz["team_id"]] += int(buzz["value"])
+            for response in sorted(
+                events[question_number]["responses"],
+                key=lambda row: (row["team_id"], row["bonus_id"]),
+            ):
+                opponent_id = next(
+                    team_id
+                    for team_id in game["team_ids"]
+                    if team_id != response["team_id"]
+                )
+                if (
+                    response["team_score"] != scores[response["team_id"]]
+                    or response["opponent_score"] != scores[opponent_id]
+                ):
+                    errors.append(
+                        "bonus_responses: score timeline mismatch on "
+                        f"{response['response_id']}"
+                    )
+                scores[response["team_id"]] += int(response["total_points"])
+
+        reconstructed = [scores[team_id] for team_id in game["team_ids"]]
+        if reconstructed != game["final_scores"]:
+            errors.append(f"games: final score mismatch on {game['game_id']}")
+
+
+def _check_source_counts(
+    tables: dict[str, list[dict[str, Any]]],
+    db_path: Path,
+    errors: list[str],
+) -> None:
+    """Compare output counts with independent source-database queries."""
+    connection = sqlite3.connect(f"file:{db_path.resolve().as_posix()}?mode=ro", uri=True)
+    try:
+        expected_counts = {
+            "tournaments": connection.execute("SELECT COUNT(*) FROM tournament").fetchone()[0],
+            "teams": connection.execute("SELECT COUNT(*) FROM team").fetchone()[0],
+            "players": connection.execute("SELECT COUNT(DISTINCT slug) FROM player").fetchone()[0],
+            "games": connection.execute("SELECT COUNT(*) FROM game").fetchone()[0],
+            "tossups": connection.execute("SELECT COUNT(*) FROM tossup").fetchone()[0],
+            "bonuses": connection.execute(
+                "SELECT COUNT(DISTINCT pq.packet_id || ':' || pq.question_number) "
+                "FROM packet_question pq JOIN bonus b ON b.question_id=pq.question_id"
+            ).fetchone()[0],
+            "tossup_buzzes": connection.execute("SELECT COUNT(*) FROM buzz").fetchone()[0],
+            "bonus_responses": connection.execute(
+                "SELECT COUNT(*) FROM ("
+                "SELECT d.game_id,d.team_id,bp.bonus_id FROM bonus_part_direct d "
+                "JOIN bonus_part bp ON bp.id=d.bonus_part_id "
+                "GROUP BY d.game_id,d.team_id,bp.bonus_id)"
+            ).fetchone()[0],
+        }
+        for table_name, expected in expected_counts.items():
+            if len(tables[table_name]) != expected:
+                errors.append(
+                    f"{table_name}: expected {expected} source-derived rows, "
+                    f"found {len(tables[table_name])}"
+                )
+    finally:
+        connection.close()
+
+
+def _check_response_matrix(
+    tables: dict[str, list[dict[str, Any]]],
+    response_matrix_path: Path,
+    errors: list[str],
+) -> None:
+    """Compare the saved wide matrix with a fresh pivot of IRT responses."""
+    actual_matrix = pd.read_csv(response_matrix_path, index_col=0)
+    actual_matrix.columns = actual_matrix.columns.astype(str)
+    expected_matrix = (
+        pd.DataFrame(tables["irt_responses"])
+        .pivot(index="player_id", columns="tossup_id", values="response")
+        .sort_index()
+        .sort_index(axis=1)
+    )
+    actual_matrix = actual_matrix.sort_index().sort_index(axis=1)
+    try:
+        pd.testing.assert_frame_equal(
+            actual_matrix,
+            expected_matrix,
+            check_dtype=False,
+            check_names=False,
+        )
+    except AssertionError as error:
+        errors.append(f"response_matrix.csv does not match irt_responses: {error}")
+
+
 def validate_dataset(
     data_dir: Path,
     db_path: Path | None = None,
@@ -91,226 +356,17 @@ def validate_dataset(
     validation run surfaces the full scope of a regression.
     """
     errors: list[str] = []
-    tables: dict[str, list[dict[str, Any]]] = {}
-    splits: dict[str, DatasetDict] = {}
-
-    # --- Schema: every table present, with the expected splits and feature
-    # types (paper-thin check, but catches a stale/partial build directory
-    # before the slower row-level checks below waste time on bad data). -----
-    for table_name, expected_features in TABLE_FEATURES.items():
-        table_path = data_dir / table_name
-        if not table_path.is_dir():
-            errors.append(f"Missing dataset directory: {table_path}")
-            continue
-        dataset = load_from_disk(str(table_path))
-        splits[table_name] = dataset
-        if set(dataset.keys()) != {"all", "year_2024", "year_2025"}:
-            errors.append(f"{table_name}: unexpected splits {sorted(dataset.keys())}")
-        for split_name in dataset:
-            if dataset[split_name].features != expected_features:
-                errors.append(f"{table_name}/{split_name}: feature schema mismatch")
-        tables[table_name] = [dict(row) for row in dataset["all"]]
-
-    # Every remaining check assumes the schema above is intact, so stop here
-    # if it isn't rather than raising confusing downstream KeyErrors.
+    tables, splits = _load_and_check_schemas(data_dir, errors)
     if errors:
         raise ValueError("\n".join(errors))
-
-    # --- Primary keys unique, and year splits match the "all" split exactly
-    # (no row missing from its expected year, no row leaked into the wrong one). ---
-    for table_name, rows in tables.items():
-        pk = PRIMARY_KEYS[table_name]
-        ids = [row[pk] for row in rows]
-        if len(ids) != len(set(ids)):
-            errors.append(f"{table_name}: duplicate primary IDs")
-        expected_years = _expected_year_ids(table_name, rows, tables)
-        for year, expected_ids in expected_years.items():
-            actual_ids = set(splits[table_name][f"year_{year}"][pk])
-            if actual_ids != expected_ids:
-                errors.append(
-                    f"{table_name}/year_{year}: expected {len(expected_ids)} IDs, found {len(actual_ids)}"
-                )
-
-    # --- Foreign keys: every cross-table reference resolves to a real row. ---
-    tournament_ids = {row["tournament_id"] for row in tables["tournaments"]}
-    player_ids = {row["player_id"] for row in tables["players"]}
-    team_ids = {row["team_id"] for row in tables["teams"]}
-    game_ids = {row["game_id"] for row in tables["games"]}
-    tossup_ids = {row["tossup_id"] for row in tables["tossups"]}
-    bonus_ids = {row["bonus_id"] for row in tables["bonuses"]}
-
-    for team in tables["teams"]:
-        if team["tournament_id"] not in tournament_ids:
-            errors.append(f"teams: missing tournament {team['tournament_id']}")
-        if not set(team["player_ids"]) <= player_ids:
-            errors.append(f"teams: missing player reference on {team['team_id']}")
-    for game in tables["games"]:
-        if game["tournament_id"] not in tournament_ids or not set(game["team_ids"]) <= team_ids:
-            errors.append(f"games: broken reference on {game['game_id']}")
-    for buzz in tables["tossup_buzzes"]:
-        if (
-            buzz["game_id"] not in game_ids
-            or buzz["team_id"] not in team_ids
-            or buzz["player_id"] not in player_ids
-            or buzz["tossup_id"] not in tossup_ids
-        ):
-            errors.append(f"tossup_buzzes: broken reference on {buzz['buzz_id']}")
-    for response in tables["bonus_responses"]:
-        if (
-            response["game_id"] not in game_ids
-            or response["team_id"] not in team_ids
-            or response["bonus_id"] not in bonus_ids
-            or (response["earning_player_id"] and response["earning_player_id"] not in player_ids)
-        ):
-            errors.append(f"bonus_responses: broken reference on {response['response_id']}")
-        if len(response["parts_correct"]) != 3:
-            errors.append(f"bonus_responses: response does not have three parts: {response['response_id']}")
-    for bonus in tables["bonuses"]:
-        if len(bonus["parts"]) != 3:
-            errors.append(f"bonuses: bonus does not have three parts: {bonus['bonus_id']}")
-    for response in tables["irt_responses"]:
-        if response["player_id"] not in player_ids or response["tossup_id"] not in tossup_ids:
-            errors.append(f"irt_responses: broken reference on {response['response_id']}")
-        if int(response["response"]) not in {0, 1}:
-            errors.append(f"irt_responses: non-binary response on {response['response_id']}")
-
-    # --- irt_responses derivation: re-derive the full response matrix from
-    # tossup_buzzes/teams (every rostered player x every tossup their team
-    # saw) and check it matches the saved table exactly. This mirrors the
-    # derivation in dataset.py's build_records independently, so a bug there
-    # (e.g. missing a roster member, or crediting the wrong player) shows up
-    # as a mismatch here rather than propagating silently into training. ----
-    actual_irt = {
-        (row["player_id"], row["tossup_id"]): int(row["response"])
-        for row in tables["irt_responses"]
-    }
-    roster_by_team = {row["team_id"]: row["player_ids"] for row in tables["teams"]}
-    game_by_id = {row["game_id"]: row for row in tables["games"]}
-    correct_pairs = {
-        (row["player_id"], row["tossup_id"])
-        for row in tables["tossup_buzzes"]
-        if row["correct"]
-    }
-    expected_irt: dict[tuple[str, str], int] = {}
-    for game_id_value, tossup_id_value in {
-        (row["game_id"], row["tossup_id"]) for row in tables["tossup_buzzes"]
-    }:
-        for team_id in game_by_id[game_id_value]["team_ids"]:
-            for player_id in roster_by_team[team_id]:
-                key = (player_id, tossup_id_value)
-                expected_irt[key] = int(key in correct_pairs)
-    if actual_irt != expected_irt:
-        errors.append(
-            f"irt_responses: expected {len(expected_irt)} derived observations, "
-            f"found {len(actual_irt)}"
-        )
-
-    # --- Score timelines: replay each game's buzzes/bonus responses in
-    # order and check every event's recorded team_score/opponent_score
-    # matches the running total *at that point*, and that the accumulated
-    # total matches the game's saved final_scores. This is the same replay
-    # dataset.py performs to derive those scores in the first place, done
-    # again here purely from the saved tables as an independent check. ------
-    buzzes_by_game: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    responses_by_game: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for buzz in tables["tossup_buzzes"]:
-        buzzes_by_game[buzz["game_id"]].append(buzz)
-    for response in tables["bonus_responses"]:
-        responses_by_game[response["game_id"]].append(response)
-    for game in tables["games"]:
-        scores = {team_id: 0 for team_id in game["team_ids"]}
-        events: dict[int, dict[str, list[dict[str, Any]]]] = defaultdict(
-            lambda: {"buzzes": [], "responses": []}
-        )
-        for buzz in buzzes_by_game[game["game_id"]]:
-            events[int(buzz["question_number_in_game"])]["buzzes"].append(buzz)
-        for response in responses_by_game[game["game_id"]]:
-            events[int(response["question_number_in_game"])]["responses"].append(response)
-
-        for question_number in sorted(events):
-            # Within a question, buzzes are ordered by token position (then
-            # buzz_id as a stable tiebreaker) to replay them in the order
-            # they actually happened.
-            for buzz in sorted(
-                events[question_number]["buzzes"],
-                key=lambda row: (int(row["token_position"]), int(row["buzz_id"].rsplit("-", 1)[1])),
-            ):
-                opponent_id = next(team_id for team_id in game["team_ids"] if team_id != buzz["team_id"])
-                if buzz["team_score"] != scores[buzz["team_id"]] or buzz["opponent_score"] != scores[opponent_id]:
-                    errors.append(f"tossup_buzzes: score timeline mismatch on {buzz['buzz_id']}")
-                scores[buzz["team_id"]] += int(buzz["value"])
-            for response in sorted(
-                events[question_number]["responses"],
-                key=lambda row: (row["team_id"], row["bonus_id"]),
-            ):
-                opponent_id = next(team_id for team_id in game["team_ids"] if team_id != response["team_id"])
-                if (
-                    response["team_score"] != scores[response["team_id"]]
-                    or response["opponent_score"] != scores[opponent_id]
-                ):
-                    errors.append(f"bonus_responses: score timeline mismatch on {response['response_id']}")
-                scores[response["team_id"]] += int(response["total_points"])
-
-        reconstructed = [scores[team_id] for team_id in game["team_ids"]]
-        if reconstructed != game["final_scores"]:
-            errors.append(f"games: final score mismatch on {game['game_id']}")
-
-    # --- Source row counts: every output table has exactly as many rows as
-    # its corresponding source query, so nothing was silently dropped or
-    # duplicated while reshaping the raw SQLite export. Optional: only runs
-    # when the raw database is available alongside the built dataset. -------
+    _check_primary_ids_and_year_splits(tables, splits, errors)
+    _check_foreign_keys_and_shapes(tables, errors)
+    _check_irt_response_derivation(tables, errors)
+    _check_score_timelines(tables, errors)
     if db_path is not None:
-        connection = sqlite3.connect(f"file:{db_path.resolve().as_posix()}?mode=ro", uri=True)
-        try:
-            expected_counts = {
-                "tournaments": connection.execute("SELECT COUNT(*) FROM tournament").fetchone()[0],
-                "teams": connection.execute("SELECT COUNT(*) FROM team").fetchone()[0],
-                "players": connection.execute("SELECT COUNT(DISTINCT slug) FROM player").fetchone()[0],
-                "games": connection.execute("SELECT COUNT(*) FROM game").fetchone()[0],
-                "tossups": connection.execute(
-                    "SELECT COUNT(*) FROM tossup"
-                ).fetchone()[0],
-                "bonuses": connection.execute(
-                    "SELECT COUNT(DISTINCT pq.packet_id || ':' || pq.question_number) "
-                    "FROM packet_question pq JOIN bonus b ON b.question_id=pq.question_id"
-                ).fetchone()[0],
-                "tossup_buzzes": connection.execute("SELECT COUNT(*) FROM buzz").fetchone()[0],
-                "bonus_responses": connection.execute(
-                    "SELECT COUNT(*) FROM ("
-                    "SELECT d.game_id,d.team_id,bp.bonus_id FROM bonus_part_direct d "
-                    "JOIN bonus_part bp ON bp.id=d.bonus_part_id "
-                    "GROUP BY d.game_id,d.team_id,bp.bonus_id)"
-                ).fetchone()[0],
-            }
-            for table_name, expected in expected_counts.items():
-                if len(tables[table_name]) != expected:
-                    errors.append(
-                        f"{table_name}: expected {expected} source-derived rows, found {len(tables[table_name])}"
-                    )
-        finally:
-            connection.close()
-
-    # --- Response matrix: the saved wide CSV matches a matrix pivoted fresh
-    # from irt_responses. Optional: only runs when a matrix path is given. --
+        _check_source_counts(tables, db_path, errors)
     if response_matrix_path is not None:
-        actual_matrix = pd.read_csv(response_matrix_path, index_col=0)
-        actual_matrix.columns = actual_matrix.columns.astype(str)
-        expected_matrix = (
-            pd.DataFrame(tables["irt_responses"])
-            .pivot(index="player_id", columns="tossup_id", values="response")
-            .sort_index()
-            .sort_index(axis=1)
-        )
-        actual_matrix = actual_matrix.sort_index().sort_index(axis=1)
-        try:
-            pd.testing.assert_frame_equal(
-                actual_matrix,
-                expected_matrix,
-                check_dtype=False,
-                check_names=False,
-            )
-        except AssertionError as error:
-            errors.append(f"response_matrix.csv does not match irt_responses: {error}")
+        _check_response_matrix(tables, response_matrix_path, errors)
 
     if errors:
         preview = "\n".join(errors[:50])

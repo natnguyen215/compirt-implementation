@@ -24,8 +24,7 @@ import torch
 
 
 # Difficulty ordering for tiers. A player who competes at several tiers is
-# represented by the hardest one they reached, so a Nationals appearance is
-# never masked by an easier-tier appearance.
+# represented by the hardest tier they reached.
 TIER_ORDER = ["fall", "winter", "regionals", "nationals"]
 _MIN_SCALE = 1e-3
 
@@ -34,10 +33,9 @@ def player_tier_map(tables):
     """Map each player_id to a single tier from the split's 'teams' rows.
 
     A player can appear at multiple tournaments; we assign the hardest tier they
-    reached ('TIER_ORDER') so a Nationals appearance is never masked by an
-    easier-tier one. Players attend each tier at most once in this dataset, so
-    this is also the modal tier; resolving by difficulty keeps the intent robust
-    if a player ever appears at the same tier twice.
+    reached according to 'TIER_ORDER'. Players attend each tier at most once in
+    this dataset, making the result the modal tier as well. Difficulty ordering
+    also resolves repeated appearances deterministically.
     """
     tier_by_tournament = dict(
         zip(tables["tournaments"]["tournament_id"], tables["tournaments"]["tier"])

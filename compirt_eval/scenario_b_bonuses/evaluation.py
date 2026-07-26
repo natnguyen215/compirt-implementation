@@ -1,0 +1,63 @@
+"""Scenario B: bonus-part and points-per-bonus evaluation.
+
+Bonus-part calibration and prediction figures are orchestrated here.
+Scenario-owned scoring and parameter-distribution diagnostics live in the
+neighboring ``metrics`` and ``distributions`` modules.
+"""
+
+from __future__ import annotations
+
+import pandas as pd
+
+from compirt_eval.common.figures import reliability_plot
+from compirt_eval.common.metrics import stratified_prediction_metrics
+from compirt_eval.common.report_paths import csv_path, graph_path
+from compirt_eval.scenario_b_bonuses.distributions import (
+    bonus_parameter_distribution_plots,
+)
+from compirt_eval.scenario_b_bonuses.figures import (
+    bonus_score_by_observed_plot,
+    team_ppb_plot,
+)
+from compirt_eval.scenario_b_bonuses.metrics import (
+    bonus_metrics,
+    bonus_ranked_probability_scores,
+)
+from topic.utils.categories import top_level_category
+
+
+def evaluate_bonuses(results_dir, output_dir, dimension_labels=None):
+    """Evaluate binary bonus parts and total expected points per bonus."""
+    parts = pd.read_csv(results_dir / "bonus_part_predictions.csv")
+    teams = pd.read_csv(results_dir / "team_predictions.csv")
+    metrics = bonus_metrics(parts, teams)
+    response_scores = bonus_ranked_probability_scores(parts)
+    response_scores.to_csv(
+        csv_path(output_dir, "bonus_score_probability_predictions.csv"), index=False
+    )
+    diagnostic_parts = parts.copy()
+    if "category" in diagnostic_parts:
+        diagnostic_parts["category_group"] = diagnostic_parts["category"].map(
+            top_level_category
+        )
+    diagnostics = stratified_prediction_metrics(
+        diagnostic_parts,
+        "correct",
+        "predicted_correct",
+        "bonus_part_correctness",
+        {"tier": "tier", "category": "category_group"},
+    )
+    diagnostics.to_csv(
+        csv_path(output_dir, "bonus_prediction_diagnostics_by_stratum.csv"),
+        index=False,
+    )
+    reliability_plot(
+        parts["correct"],
+        parts["predicted_correct"],
+        "Bonus part reliability",
+        graph_path(output_dir, "bonus_reliability.png", "bonus"),
+    )
+    bonus_parameter_distribution_plots(results_dir, output_dir, dimension_labels)
+    team_ppb_plot(teams, output_dir)
+    bonus_score_by_observed_plot(teams, output_dir)
+    return metrics

@@ -1,28 +1,20 @@
 """Joint topic-gated CompIRT (sLDA-style) + compositional bonus model in Pyro.
 
-This is the bonus-stage analogue of 'joint_pyramidal'. The pyramidal stage
-already learns player skills 'theta' and the topic-word matrix 'topic_word' with
-tossup outcomes supervising the topics. This stage keeps both of those *fixed*
-and re-learns each bonus's Dirichlet topic proportions 'theta_doc' so that the
-bonus's own part-correctness outcomes -- not just its words -- shape its place in
-topic space (sLDA-style supervision for bonuses).
+The model keeps player skills 'theta' and the topic-word matrix 'topic_word'
+fixed while learning each bonus's Dirichlet topic proportions 'theta_doc'. Bonus
+part-correctness and word outcomes jointly shape its place in topic space.
 
-It is supervised-LDA in spirit, not the canonical Blei-McAuliffe form: there is no
-separate response-regression coefficient. The bonus's topic vector 'r_b' =
-'theta_doc' double-duties as the compositional weight that gates the bonus-part
-likelihood, so the one vector both explains the words and weights the skills.
+The bonus topic vector 'r_b = theta_doc' both explains the words and weights the
+skills in the bonus-part likelihood.
 
 Each bonus is one document: its three parts share the single 'theta_doc' that
 also serves as the compositional topic weight 'r_b'. The word model is the LDA
 mixture 'Multinomial(theta_doc @ topic_word)' (discrete per-word assignments
 marginalized out), scaled by 'bow_weight' against the bonus-part likelihood.
 
-'theta' and 'topic_word' arrive as plain fixed tensors (never sampled), so the one
-'AutoNormal' guide only covers 'theta_doc', the per-part 'difficulty_beta',
-'tau', and the optional synergy/calibration latents. The aggregation,
-difficulty, and synergy math is reused unchanged from
-'topic_compirt.compositional'; only the source of the topic weight differs (a
-learned latent here vs. a fixed CSV there).
+'theta' and 'topic_word' arrive as fixed tensors. The 'AutoNormal' guide covers
+'theta_doc', per-part 'difficulty_beta', 'tau', and the optional synergy and
+calibration latents.
 """
 
 from __future__ import annotations
@@ -35,7 +27,6 @@ import pyro
 import pyro.distributions as dist
 from pyro import poutine
 
-# Reuse the compositional helpers from the fixed-topic package.
 from compositional_model import lse_aggregation, synergy_contribution
 from topic.fixed.topic_compirt.compositional import (
     topic_weighted_member_abilities,
@@ -85,9 +76,8 @@ def joint_compositional_model(
                 obs=bonus_bow,
             )
 
-    # Eq. 14 bonus-part prior, per-topic and with no learned alpha.
-    # The Pyro site is still named "beta" for compatibility with existing
-    # topic_compirt outputs, but this is CompIRT difficulty_beta, not LDA beta.
+    # Eq. 14 per-topic bonus-part difficulty prior. The "beta" site supplies the
+    # difficulty_beta posterior and topic_compirt output columns.
     # difficulty_beta_bk ~ N(0, 1), shape (n_parts, n_dimensions).
     with pyro.plate("bonus_parts", n_parts):
         difficulty_beta = pyro.sample(
@@ -123,7 +113,7 @@ def joint_compositional_model(
         logits = logits + synergy_contribution(psi, data["roster"], data["roster_mask"])
 
     if calibrate_correctness:
-        # Platt-scale the whole logit (bonus parallel of the tossup fix).
+        # Platt-scale the full bonus correctness logit.
         scale = pyro.sample("correctness_scale", dist.LogNormal(zero, theta.new_tensor(0.5)))
         bias = pyro.sample("correctness_bias", dist.Normal(zero, theta.new_tensor(3.0)))
         logits = scale * logits + bias

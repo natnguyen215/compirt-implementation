@@ -1,0 +1,227 @@
+# CompIRT Run Log
+
+Generated: 2026-07-12T23:34:44-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- BONUS_STEPS: 3000
+- C1_C4_ITEM_STEPS: unknown
+- C1_C4_MIN_CROSS_TEAM_GAMES: unknown
+- C1_C4_SEED: unknown
+- CALIBRATE_CORRECTNESS: 0
+- DATABASE: unknown
+- DEVICE: cuda
+- DIMENSIONS: 5
+- GPU: unknown
+- HOLDOUT_COMPARISON_OUTPUT: results/compirt/holdout/learned-topic-tfidf-all2024/holdout/comparison
+- HOLDOUT_COMPOSITIONAL_OUTPUT: results/compirt/holdout/learned-topic-tfidf-all2024/holdout/compositional
+- HOLDOUT_EVALUATION_OUTPUT: results/compirt/holdout/learned-topic-tfidf-all2024/holdout/evaluation
+- HOLDOUT_PYRAMIDAL_OUTPUT: results/compirt/holdout/learned-topic-tfidf-all2024/holdout/pyramidal
+- HOLDOUT_SYNERGY_EVALUATION_OUTPUT: results/compirt/holdout/learned-topic-tfidf-all2024/holdout/synergy-evaluation
+- HOLDOUT_SYNERGY_OUTPUT: results/compirt/holdout/learned-topic-tfidf-all2024/holdout/synergy
+- LR: 0.005
+- MODEL: learned_tfidf
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- NEW_PLAYER_PRIOR: tier
+- NO_NORMALIZE_TFIDF: 0
+- PYRAMIDAL_STEPS: 5000
+- PYTHON: /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python
+- ROOT: results/compirt/holdout/learned-topic-tfidf-all2024
+- RUNNER: run_scripts/run_compirt_holdout.py
+- RUN_C1_C4: 0
+- RUN_SYNERGY: 1
+- SAVE_SYNERGY_DETAILS: 0
+- SYNERGY_DIMENSIONS: 3
+- TEST_SPLIT: year_2025
+- TFIDF_EFFECT_PRIOR_SCALE: 1.0
+- TFIDF_PLOT_COUNT: unknown
+- TFIDF_VARIANT: unknown
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: <all>
+- TRAIN_PYRAMIDAL_OUTPUT: results/compirt/holdout/learned-topic-tfidf-all2024/train/pyramidal
+- TRAIN_SPLIT: year_2024
+
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m topic.tfidf.train_learned_pyramidal --split year_2024 --steps 5000 --lr 0.005 --device cuda --output-dir results/compirt/holdout/learned-topic-tfidf-all2024/train/pyramidal --dimensions 5 --effect-prior-scale 1.0
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Bonuses: 1,295  Vocab: 2,000  Topics: 5  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 28,291,555.4
+step  100  ELBO loss: 9,591,926.0
+step  200  ELBO loss: 2,917,457.8
+step  300  ELBO loss: 1,200,748.1
+step  400  ELBO loss: 917,360.1
+step  500  ELBO loss: 871,254.2
+step  600  ELBO loss: 836,708.5
+step  700  ELBO loss: 804,786.4
+step  800  ELBO loss: 779,474.4
+step  900  ELBO loss: 758,380.5
+step 1000  ELBO loss: 744,250.6
+step 1100  ELBO loss: 734,279.0
+step 1200  ELBO loss: 726,828.4
+step 1300  ELBO loss: 721,078.7
+step 1400  ELBO loss: 716,189.7
+step 1500  ELBO loss: 712,358.1
+step 1600  ELBO loss: 709,305.4
+step 1700  ELBO loss: 706,696.6
+step 1800  ELBO loss: 704,692.9
+step 1900  ELBO loss: 702,884.4
+step 2000  ELBO loss: 701,552.7
+step 2100  ELBO loss: 700,463.3
+step 2200  ELBO loss: 699,583.7
+step 2300  ELBO loss: 698,818.9
+step 2400  ELBO loss: 698,203.7
+step 2500  ELBO loss: 697,669.7
+step 2600  ELBO loss: 697,560.8
+step 2700  ELBO loss: 697,237.4
+step 2800  ELBO loss: 696,921.7
+step 2900  ELBO loss: 696,762.7
+step 3000  ELBO loss: 696,748.0
+step 3100  ELBO loss: 696,537.2
+step 3200  ELBO loss: 696,407.8
+step 3300  ELBO loss: 696,338.1
+step 3400  ELBO loss: 696,318.6
+step 3500  ELBO loss: 696,114.6
+step 3600  ELBO loss: 696,183.9
+step 3700  ELBO loss: 695,996.6
+step 3800  ELBO loss: 696,104.7
+step 3900  ELBO loss: 696,033.2
+step 4000  ELBO loss: 696,029.7
+step 4100  ELBO loss: 695,915.3
+step 4200  ELBO loss: 695,864.4
+step 4300  ELBO loss: 695,873.5
+step 4400  ELBO loss: 695,634.6
+step 4500  ELBO loss: 695,694.1
+step 4600  ELBO loss: 695,664.3
+step 4700  ELBO loss: 695,585.7
+step 4800  ELBO loss: 695,706.3
+step 4900  ELBO loss: 695,450.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m topic.tfidf.train_learned_pyramidal --split year_2025 --steps 5000 --lr 0.005 --device cuda --train-posterior results/compirt/holdout/learned-topic-tfidf-all2024/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/learned-topic-tfidf-all2024/holdout/pyramidal --dimensions 5 --effect-prior-scale 1.0 --train-topic-model results/compirt/holdout/learned-topic-tfidf-all2024/train/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350  Bonuses: 1,640  Vocab: 2,000  Topics: 5  IDF vocab: 26,061
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 36,704,440.1
+step  100  ELBO loss: 12,688,924.3
+step  200  ELBO loss: 4,080,336.9
+step  300  ELBO loss: 1,813,708.3
+step  400  ELBO loss: 1,388,813.3
+step  500  ELBO loss: 1,252,282.5
+step  600  ELBO loss: 1,143,035.0
+step  700  ELBO loss: 1,055,215.8
+step  800  ELBO loss: 987,227.1
+step  900  ELBO loss: 937,484.8
+step 1000  ELBO loss: 906,168.1
+step 1100  ELBO loss: 886,926.6
+step 1200  ELBO loss: 876,228.7
+step 1300  ELBO loss: 870,629.0
+step 1400  ELBO loss: 866,471.0
+step 1500  ELBO loss: 863,590.9
+step 1600  ELBO loss: 860,755.6
+step 1700  ELBO loss: 858,611.1
+step 1800  ELBO loss: 856,956.4
+step 1900  ELBO loss: 855,306.8
+step 2000  ELBO loss: 854,193.5
+step 2100  ELBO loss: 853,120.7
+step 2200  ELBO loss: 852,536.3
+step 2300  ELBO loss: 851,996.2
+step 2400  ELBO loss: 851,522.0
+step 2500  ELBO loss: 851,146.8
+step 2600  ELBO loss: 850,868.3
+step 2700  ELBO loss: 850,691.6
+step 2800  ELBO loss: 850,631.8
+step 2900  ELBO loss: 850,544.1
+step 3000  ELBO loss: 850,430.8
+step 3100  ELBO loss: 850,302.9
+step 3200  ELBO loss: 850,386.9
+step 3300  ELBO loss: 850,283.3
+step 3400  ELBO loss: 850,224.3
+step 3500  ELBO loss: 850,193.5
+step 3600  ELBO loss: 850,167.6
+step 3700  ELBO loss: 850,265.8
+step 3800  ELBO loss: 850,246.2
+step 3900  ELBO loss: 850,168.1
+step 4000  ELBO loss: 850,172.9
+step 4100  ELBO loss: 850,261.9
+step 4200  ELBO loss: 850,107.0
+step 4300  ELBO loss: 850,148.1
+step 4400  ELBO loss: 850,134.1
+step 4500  ELBO loss: 850,050.7
+step 4600  ELBO loss: 850,023.8
+step 4700  ELBO loss: 850,400.5
+step 4800  ELBO loss: 849,939.5
+step 4900  ELBO loss: 849,926.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m topic.learned.train_joint_compositional --split year_2025 --player-skills results/compirt/holdout/learned-topic-tfidf-all2024/holdout/pyramidal/players.csv --steps 3000 --lr 0.005 --device cuda --output-dir results/compirt/holdout/learned-topic-tfidf-all2024/holdout/compositional --topic-model-dir results/compirt/holdout/learned-topic-tfidf-all2024/train/pyramidal
+Bonus part rows: 181,362  Parts: 4,716  Bonuses: 1,572  Vocab: 2,000  Topics: 5
+step    0  ELBO loss: 401,799.9
+step  100  ELBO loss: 351,374.2
+step  200  ELBO loss: 324,936.4
+step  300  ELBO loss: 307,682.2
+step  400  ELBO loss: 296,328.6
+step  500  ELBO loss: 289,789.0
+step  600  ELBO loss: 285,874.0
+step  700  ELBO loss: 283,860.9
+step  800  ELBO loss: 282,889.9
+step  900  ELBO loss: 282,338.5
+step 1000  ELBO loss: 281,986.3
+step 1100  ELBO loss: 281,882.8
+step 1200  ELBO loss: 281,760.2
+step 1300  ELBO loss: 281,638.4
+step 1400  ELBO loss: 281,570.7
+step 1500  ELBO loss: 281,529.2
+step 1600  ELBO loss: 281,495.8
+step 1700  ELBO loss: 281,516.0
+step 1800  ELBO loss: 281,530.3
+step 1900  ELBO loss: 281,398.3
+step 2000  ELBO loss: 281,474.8
+step 2100  ELBO loss: 281,438.7
+step 2200  ELBO loss: 281,430.6
+step 2300  ELBO loss: 281,370.9
+step 2400  ELBO loss: 281,423.4
+step 2500  ELBO loss: 281,519.5
+step 2600  ELBO loss: 281,366.5
+step 2700  ELBO loss: 281,395.5
+step 2800  ELBO loss: 281,472.5
+step 2900  ELBO loss: 281,414.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m topic.learned.train_joint_compositional --split year_2025 --player-skills results/compirt/holdout/learned-topic-tfidf-all2024/holdout/pyramidal/players.csv --steps 3000 --lr 0.005 --device cuda --output-dir results/compirt/holdout/learned-topic-tfidf-all2024/holdout/synergy --use-synergy --synergy-dimensions 3 --topic-model-dir results/compirt/holdout/learned-topic-tfidf-all2024/train/pyramidal
+Bonus part rows: 181,362  Parts: 4,716  Bonuses: 1,572  Vocab: 2,000  Topics: 5
+step    0  ELBO loss: 409,572.0
+step  100  ELBO loss: 356,114.1
+step  200  ELBO loss: 327,672.3
+step  300  ELBO loss: 310,010.5
+step  400  ELBO loss: 298,810.1
+step  500  ELBO loss: 291,914.4
+step  600  ELBO loss: 288,359.5
+step  700  ELBO loss: 286,380.7
+step  800  ELBO loss: 285,434.0
+step  900  ELBO loss: 284,637.0
+step 1000  ELBO loss: 284,582.6
+step 1100  ELBO loss: 284,382.0
+step 1200  ELBO loss: 284,074.8
+step 1300  ELBO loss: 283,998.3
+step 1400  ELBO loss: 284,087.2
+step 1500  ELBO loss: 283,922.6
+step 1600  ELBO loss: 283,797.6
+step 1700  ELBO loss: 283,749.1
+step 1800  ELBO loss: 283,821.6
+step 1900  ELBO loss: 283,809.5
+step 2000  ELBO loss: 283,697.1
+step 2100  ELBO loss: 283,896.6
+step 2200  ELBO loss: 283,756.7
+step 2300  ELBO loss: 283,863.3
+step 2400  ELBO loss: 283,696.8
+step 2500  ELBO loss: 283,802.3
+step 2600  ELBO loss: 283,991.3
+step 2700  ELBO loss: 283,799.5
+step 2800  ELBO loss: 283,804.7
+step 2900  ELBO loss: 283,686.6
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m topic.tfidf.evaluate --pyramidal-results results/compirt/holdout/learned-topic-tfidf-all2024/holdout/pyramidal --compositional-results results/compirt/holdout/learned-topic-tfidf-all2024/holdout/compositional --output-dir results/compirt/holdout/learned-topic-tfidf-all2024/holdout/evaluation
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m topic.tfidf.evaluate --pyramidal-results results/compirt/holdout/learned-topic-tfidf-all2024/holdout/pyramidal --compositional-results results/compirt/holdout/learned-topic-tfidf-all2024/holdout/synergy --output-dir results/compirt/holdout/learned-topic-tfidf-all2024/holdout/synergy-evaluation
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m compare_compirt --compositional-metrics results/compirt/holdout/learned-topic-tfidf-all2024/holdout/evaluation/csvs/bonus_metrics.csv --synergy-metrics results/compirt/holdout/learned-topic-tfidf-all2024/holdout/synergy-evaluation/csvs/bonus_metrics.csv --output-dir results/compirt/holdout/learned-topic-tfidf-all2024/holdout/comparison
+Finished held-out learned_tfidf run. Scenario A/B metrics in results/compirt/holdout/learned-topic-tfidf-all2024/holdout/evaluation.
+Synergy metrics in results/compirt/holdout/learned-topic-tfidf-all2024/holdout/synergy-evaluation.

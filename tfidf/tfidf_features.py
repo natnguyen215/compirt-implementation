@@ -1,9 +1,7 @@
 """TF-IDF clue features for text-aware pyramidal tossup experiments.
 
-These helpers intentionally live beside the experiment script instead of in the
-main data pipeline, so the baseline training path stays untouched. The reveal
-signal is TF-IDF: each token contributes its document-normalized term frequency
-times its corpus inverse document frequency, so both informative terms and
+The reveal signal is TF-IDF: each token contributes its document-normalized term
+frequency times its corpus inverse document frequency, so informative and
 repeated terms raise the revealed clue mass.
 """
 

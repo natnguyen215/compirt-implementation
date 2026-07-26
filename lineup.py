@@ -1,12 +1,9 @@
 """Infer the active team lineup for each game from buzz evidence.
 
-The source quizbowl data records registered team *rosters* but not the players
-who actually played a given game. CompIRT previously treated the whole roster as
-active in every game, which inflates the tossup competing-risks population and
-the bonus aggregation/synergy with players who may not have played. This module
-reconstructs a plausible active lineup (usually four players) per team per game
-from who actually buzzed, splitting a game into halves when a mid-game
-substitution is evidenced.
+The source quizbowl data records registered team *rosters* but omits the active
+players for each game. This module reconstructs a plausible active lineup
+(usually four players) per team per game from buzz evidence, splitting a game
+into halves when the evidence indicates a mid-game substitution.
 
 The inferred lineups are the model's data-stage roster. The same lineup assigned
 to a tossup is reused for the bonus in the same cycle (see 'roster_for'): a
@@ -79,9 +76,8 @@ SEGMENT_COLUMNS = [
 class LineupRecord:
     """One resolved lineup segment plus the evidence used to infer it.
 
-    Scenario C needs the inference provenance as well as the player list.  The
-    ordinary model pipeline still calls :meth:`LineupIndex.roster_for`; keeping
-    this record behind a second lookup preserves that existing interface.
+    'LineupIndex.roster_for' returns the player list, while a second lookup
+    exposes the inference provenance used by Scenario C.
     """
 
     game_id: str

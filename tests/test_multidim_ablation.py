@@ -12,7 +12,8 @@ from unittest import mock
 
 import pandas as pd
 
-from run_scripts import run_multidim_ablation as ablation
+from run_scripts.multidimensional.multidim import run_multidim_ablation as ablation
+from run_scripts.common.lib.ablation import stage_config
 
 
 def args_for(root: Path) -> SimpleNamespace:
@@ -27,13 +28,14 @@ def args_for(root: Path) -> SimpleNamespace:
         pyramidal_steps=3000,
         bonus_steps=2000,
         lr=0.01,
+        seed=42,
         device="cuda",
         new_player_prior="tier",
         synergy_dimensions=3,
         pyramidal_module="multidim",
+        difficulty_link="sigmoid",
         alpha_prior="gamma",
         calibrate_correctness=False,
-        predict_buzz_positions=True,
         save_synergy_details=False,
     )
 
@@ -51,6 +53,8 @@ class CommandConstructionTests(unittest.TestCase):
         commands = [" ".join(stage.command) for stage in stages]
         self.assertEqual(commands[0].count("multidimensional.multidim_mirt.train_pyramidal"), 1)
         self.assertEqual(commands[1].count("multidimensional.multidim_mirt.train_pyramidal"), 1)
+        self.assertIn("--difficulty-link sigmoid", commands[0])
+        self.assertIn("--difficulty-link sigmoid", commands[1])
         self.assertIn("train_compositional", commands[2])
         self.assertIn("--use-synergy", commands[2])
         self.assertIn("--synergy-dimensions 3", commands[2])
@@ -63,28 +67,80 @@ class CommandConstructionTests(unittest.TestCase):
             stages = ablation.build_stages(args_for(Path(directory)), 2)
 
         all_command_text = "\n".join(" ".join(stage.command) for stage in stages)
-        all_marker_text = "\n".join(str(stage.marker) for stage in stages)
+        all_marker_text = "\n".join(str(stage.expected_output) for stage in stages)
         self.assertNotIn("holdout/compositional", all_command_text)
         self.assertNotIn("holdout/evaluation", all_command_text)
-        self.assertNotIn("compare_compirt", all_command_text)
+        self.assertNotIn("run_scripts/common/run_synergy_comparison.py", all_command_text)
         self.assertNotIn("holdout/compositional", all_marker_text)
         self.assertNotIn("holdout/evaluation", all_marker_text)
 
+    def test_build_stages_forwards_tanh_to_both_pyramidal_fits(self):
+        with tempfile.TemporaryDirectory() as directory:
+            args = args_for(Path(directory))
+            args.difficulty_link = "tanh"
+            stages = ablation.build_stages(args, 2)
+
+        self.assertIn("--difficulty-link tanh", " ".join(stages[0].command))
+        self.assertIn("--difficulty-link tanh", " ".join(stages[1].command))
+        self.assertNotIn("--difficulty-link", " ".join(stages[2].command))
+        self.assertNotIn("--difficulty-link", " ".join(stages[3].command))
+
 
 class ConfigTests(unittest.TestCase):
+    def test_resume_accepts_dimension_subset_and_rebased_result_root(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "new" / "multidim-ablation-gamma"
+            args = args_for(root)
+            current = stage_config(ablation.build_stages(args, 36))
+            old_root = Path(directory) / "multidim-ablation-gamma"
+            saved = []
+            for stage in current:
+                saved.append(
+                    {
+                        **stage,
+                        "expected_output": stage["expected_output"].replace(
+                            str(root), str(old_root)
+                        ),
+                        "command": [
+                            value.replace(str(root), str(old_root))
+                            for value in stage["command"]
+                        ],
+                    }
+                )
+            (root).mkdir(parents=True)
+            (root / "ablation_config.json").write_text(
+                json.dumps(
+                    {
+                        "arguments": {"root": str(old_root)},
+                        "stages": saved,
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            ablation.validate_ablation_resume(
+                root,
+                ablation.build_stages(args, 36),
+                rerun=False,
+                allow_stage_subset=True,
+                allow_root_rebase=True,
+            )
+
     def test_save_ablation_config_writes_every_resolved_setting(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            config_path = ablation.save_ablation_config(root, args_for(root))
+            stages = ablation.build_stages(args_for(root), 1)
+            config_path = ablation.save_ablation_config(root, args_for(root), stages)
             config = json.loads(config_path.read_text(encoding="utf-8"))
 
         self.assertEqual(config_path.name, "ablation_config.json")
-        self.assertEqual(config["synergy_dimensions"], 3)
-        self.assertEqual(config["new_player_prior"], "tier")
-        self.assertEqual(config["pyramidal_steps"], 3000)
-        self.assertEqual(config["lr"], 0.01)
+        self.assertEqual(config["arguments"]["synergy_dimensions"], 3)
+        self.assertEqual(config["arguments"]["new_player_prior"], "tier")
+        self.assertEqual(config["arguments"]["pyramidal_steps"], 3000)
+        self.assertEqual(config["arguments"]["lr"], 0.01)
+        self.assertEqual(config["arguments"]["difficulty_link"], "sigmoid")
         # Paths must survive the JSON round-trip as strings.
-        self.assertEqual(config["python"], ".venv/bin/python")
+        self.assertEqual(config["arguments"]["python"], ".venv/bin/python")
 
     def _run_main(self, root: Path, extra_argv: list[str]) -> mock.Mock:
         """Run main() with training and aggregation stubbed out."""

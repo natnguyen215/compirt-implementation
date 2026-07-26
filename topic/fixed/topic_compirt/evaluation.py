@@ -1,11 +1,8 @@
-"""Evaluation helpers for isolated topic-weighted CompIRT runs.
+"""Evaluation helpers for topic-weighted CompIRT runs.
 
-Mirrors the root 'compirt_eval' package (Scenario A tossup metrics, Scenario
-B bonus metrics), but replays the CAIMIRA-style topic-gated difficulty curve
-and first-buzz timing math from 'topic_compirt.pyramidal' instead of the
-plain per-tossup 'alpha'/'beta' curve. The bonus stage is unaffected by topic
-weighting internally, so it is evaluated by reusing
-'compirt_eval.bonuses.evaluate_bonuses' directly.
+The tossup evaluation replays the topic-gated difficulty curve and first-buzz
+timing math from 'topic_compirt.pyramidal'. Bonus evaluation uses
+'compirt_eval.scenario_b_bonuses.evaluation.evaluate_bonuses'.
 
 'evaluate_topic_compirt' at the bottom is the entry point: it calls
 'evaluate_topic_tossups' (this module, tossup stage) and
@@ -23,9 +20,12 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, median_absolute_error
 
-from compirt_eval.bonuses import evaluate_bonuses
-from compirt_eval.eval_docs import markdown_table, write_eval_docs_summary
-from compirt_eval.figures import (
+from compirt_eval.scenario_b_bonuses.evaluation import evaluate_bonuses
+from compirt_eval.common.reports import (
+    experiment_report_markdown,
+    write_eval_docs_summary,
+)
+from compirt_eval.common.figures import (
     distribution_dashboard,
     distribution_summary,
     labeled_series,
@@ -33,12 +33,22 @@ from compirt_eval.figures import (
     reliability_plot,
     short_id,
 )
-from compirt_eval.metrics import classification_metrics, inverse_logit
-from compirt_eval.outputs import csv_path, evaluation_output_dirs, graph_path
-from compirt_eval.tossups import (
-    player_skill_stability_plot,
+from compirt_eval.common.metrics import (
+    classification_metrics,
+    inverse_logit,
+)
+from compirt_eval.common.report_paths import csv_path, evaluation_output_dirs, graph_path
+from compirt_eval.scenario_a_tossups import (
     selected_tossups,
     stratified_tossup_reliability_plot,
+)
+from compirt_eval.scenario_a_tossups.metrics import (
+    buzz_position_bias_table,
+    tossup_joint_event_scores,
+)
+from compirt_eval.scenario_a_tossups.reliability import (
+    BUZZ_POSITION_EDGES,
+    BUZZ_POSITION_LABELS,
 )
 
 
@@ -59,7 +69,7 @@ def _topic_columns(frame):
 
 
 def _validate_topic_dimensions(theta_columns, topic_columns, beta_columns, gamma_columns, mu_columns):
-    """Validate that saved CAIMIRA topic-pyramidal dimensions line up."""
+    """Validate that saved topic-pyramidal dimensions line up."""
     dimensions = {
         len(theta_columns),
         len(topic_columns),
@@ -124,7 +134,7 @@ def _weighted_mu(tossup):
 
 
 def topic_first_buzz_distribution(event, players, tossups, n_bins=12):
-    """Reconstruct first-buzz mass with CAIMIRA topic-gap saved parameters."""
+    """Reconstruct first-buzz mass with saved topic-gap parameters."""
     # Pull the saved parameters for this event's tossup and its roster of players.
     tossup_id = event["tossup_id"].iloc[0]
     tossup = tossups.loc[tossup_id]
@@ -249,7 +259,7 @@ def topic_difficulty_plot(results_dir, output_dir):
         ax.set_visible(False)
     fig.suptitle("Estimated topic-weighted difficulty and empirical buzz locations")
     fig.tight_layout()
-    fig.savefig(graph_path(output_dir, "tossup_difficulty_curves.png"), dpi=160)
+    fig.savefig(graph_path(output_dir, "tossup_difficulty_curves.png", "tossup"), dpi=160)
     plt.close(fig)
 
 
@@ -357,7 +367,7 @@ def topic_difficulty_components_plot(results_dir, output_dir, dimension_labels=N
     fig.suptitle("Per-topic difficulty curves and weighted difficulty")
     fig.tight_layout()
     fig.savefig(
-        graph_path(output_dir, "tossup_difficulty_curves_by_topic.png"), dpi=160
+        graph_path(output_dir, "tossup_difficulty_curves_by_topic.png", "tossup"), dpi=160
     )
     plt.close(fig)
 
@@ -414,7 +424,10 @@ def _topic_difficulty_curve_distribution_plot(tossups, output_dir):
     ax.legend()
     fig.tight_layout()
     fig.savefig(
-        graph_path(output_dir, "pyramidal_difficulty_curve_distribution.png"), dpi=160
+        graph_path(
+            output_dir, "pyramidal_difficulty_curve_distribution.png", "tossup"
+        ),
+        dpi=160
     )
     plt.close(fig)
 
@@ -431,9 +444,9 @@ def _positive_log_series(frame, columns, dimension_labels=None):
 def topic_pyramidal_parameter_distribution_plots(
     results_dir, output_dir, dimension_labels=None
 ):
-    """Plot saved CAIMIRA topic-pyramidal parameter distributions.
+    """Plot saved topic-pyramidal parameter distributions.
 
-    Builds one dict per panel with the keys 'compirt_eval.figures.density_panel'
+    Builds one dict per panel with the keys 'compirt_eval.common.figures.density_panel'
     expects: 'series' (label -> values), 'title', 'xlabel', 'zero_line'
     (draw a reference line at 0, for signed parameters), and 'bounds' (clamp
     the density grid, or 'None' for an unbounded parameter). Panels are only
@@ -492,7 +505,11 @@ def topic_pyramidal_parameter_distribution_plots(
         distribution_dashboard(
             player_panels,
             "Topic-pyramidal player parameter distributions",
-            graph_path(output_dir, "pyramidal_player_parameter_distributions.png"),
+            graph_path(
+                output_dir,
+                "pyramidal_player_parameter_distributions.png",
+                "parameters",
+            ),
         )
 
     tossup_panels = []
@@ -542,7 +559,11 @@ def topic_pyramidal_parameter_distribution_plots(
         distribution_dashboard(
             tossup_panels,
             "Topic-pyramidal tossup parameter distributions",
-            graph_path(output_dir, "pyramidal_tossup_parameter_distributions.png"),
+            graph_path(
+                output_dir,
+                "pyramidal_tossup_parameter_distributions.png",
+                "parameters",
+            ),
         )
 
     _topic_difficulty_curve_distribution_plot(tossups, output_dir)
@@ -598,17 +619,12 @@ def _aggregate_topic_buzz_timing(predictions, players, tossups, tossup_id, n_bin
     predicted_dead /= event_count
     observed /= event_count
     observed_dead_rate = observed_dead / event_count
-    # Total-variation distance between predicted and observed timing.
-    total_variation = 0.5 * (
-        np.abs(predicted - observed).sum() + abs(predicted_dead - observed_dead_rate)
-    )
     return {
         "event_count": event_count,
         "predicted": predicted,
         "observed": observed,
         "predicted_dead": predicted_dead,
         "observed_dead_rate": observed_dead_rate,
-        "total_variation": total_variation,
     }
 
 
@@ -652,7 +668,6 @@ def topic_buzz_density_fit_plot(results_dir, output_dir, n_bins=12):
                 "events": timing["event_count"],
                 "observed_dead_rate": timing["observed_dead_rate"],
                 "predicted_dead_rate": timing["predicted_dead"],
-                "timing_total_variation": timing["total_variation"],
             }
         )
         # Empirical mass as bars, fitted mass as a line, difficulty inflection mu as a rule.
@@ -691,8 +706,7 @@ def topic_buzz_density_fit_plot(results_dir, output_dir, n_bins=12):
             0.98,
             f"events={timing['event_count']}\n"
             f"dead: observed={timing['observed_dead_rate']:.2f}, "
-            f"predicted={timing['predicted_dead']:.2f}\n"
-            f"TV distance={timing['total_variation']:.2f}",
+            f"predicted={timing['predicted_dead']:.2f}",
             transform=ax.transAxes,
             va="top",
             fontsize=8,
@@ -704,7 +718,7 @@ def topic_buzz_density_fit_plot(results_dir, output_dir, n_bins=12):
         ax.set_visible(False)
     fig.suptitle("Predicted versus empirical first-buzz timing")
     fig.tight_layout()
-    fig.savefig(graph_path(output_dir, "tossup_buzz_density_fit.png"), dpi=160)
+    fig.savefig(graph_path(output_dir, "tossup_buzz_density_fit.png", "tossup"), dpi=160)
     plt.close(fig)
     pd.DataFrame(summaries).to_csv(
         csv_path(output_dir, "tossup_buzz_density_metrics.csv"), index=False
@@ -714,16 +728,26 @@ def topic_buzz_density_fit_plot(results_dir, output_dir, n_bins=12):
 def evaluate_topic_tossups(results_dir: Path, output_dir: Path, dimension_labels=None):
     """Evaluate topic-weighted tossup correctness and first-buzz timing."""
     # Correctness is scored only on rows that were actual buzzes.
-    buzz = pd.read_csv(results_dir / "tossup_predictions.csv")
-    buzz = buzz[buzz["z"] == "BUZZ"]
+    predictions = pd.read_csv(results_dir / "tossup_predictions.csv")
+    event_scores = tossup_joint_event_scores(predictions)
+    event_scores.to_csv(
+        csv_path(output_dir, "tossup_joint_event_scores.csv"), index=False
+    )
+    buzz = predictions[predictions["z"] == "BUZZ"].copy()
     metrics = classification_metrics(buzz["y"], buzz["predicted_correct"])
+    metrics["joint_tossup_event_log_loss"] = (
+        float(event_scores["joint_event_log_loss"].mean())
+        if not event_scores.empty
+        else float("nan")
+    )
+    metrics["joint_tossup_event_log_loss_events"] = len(event_scores)
     # Reliability, difficulty, topic-weighted density, and parameter-distribution plots.
     if not buzz.empty:
         reliability_plot(
             buzz["y"],
             buzz["predicted_correct"],
             "Tossup correctness reliability",
-            graph_path(output_dir, "tossup_reliability.png"),
+            graph_path(output_dir, "tossup_reliability.png", "tossup"),
         )
         stratified_tossup_reliability_plot(buzz, output_dir)
     topic_difficulty_plot(results_dir, output_dir)
@@ -737,6 +761,10 @@ def evaluate_topic_tossups(results_dir: Path, output_dir: Path, dimension_labels
     position_path = results_dir / "buzz_event_predictions.csv"
     if position_path.exists():
         events = pd.read_csv(position_path)
+        bias_table = buzz_position_bias_table(
+            events, BUZZ_POSITION_EDGES, BUZZ_POSITION_LABELS
+        )
+        bias_table.to_csv(csv_path(output_dir, "buzz_position_bias.csv"), index=False)
         metrics.update(
             {
                 "buzz_position_mae": mean_absolute_error(
@@ -747,6 +775,7 @@ def evaluate_topic_tossups(results_dir: Path, output_dir: Path, dimension_labels
                     events["observed_relative_position"],
                     events["predicted_relative_position"],
                 ),
+                "buzz_position_bias": float(bias_table.loc[0, "mean_signed_error"]),
             }
         )
         fig, ax = plt.subplots(figsize=(6, 6))
@@ -765,7 +794,10 @@ def evaluate_topic_tossups(results_dir: Path, output_dir: Path, dimension_labels
         )
         ax.grid(alpha=0.25)
         fig.tight_layout()
-        fig.savefig(graph_path(output_dir, "tossup_position_predictions.png"), dpi=160)
+        fig.savefig(
+            graph_path(output_dir, "tossup_position_predictions.png", "tossup"),
+            dpi=160,
+        )
         plt.close(fig)
     return metrics
 
@@ -774,7 +806,6 @@ def evaluate_topic_compirt(
     pyramidal_results: Path,
     compositional_results: Path,
     output_dir: Path,
-    comparison_pyramidal_results: Path | None = None,
     dimension_labels=None,
 ):
     """Write topic-weighted metrics, plots, and Markdown report.
@@ -785,15 +816,9 @@ def evaluate_topic_compirt(
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     evaluation_output_dirs(output_dir)
-    # Evaluate the tossup and bonus stages; optionally compare skills to a baseline run.
+    # Evaluate the tossup and bonus stages.
     tossup = evaluate_topic_tossups(pyramidal_results, output_dir, dimension_labels)
     bonus = evaluate_bonuses(compositional_results, output_dir, dimension_labels)
-    if comparison_pyramidal_results:
-        player_skill_stability_plot(
-            pyramidal_results,
-            comparison_pyramidal_results,
-            output_dir,
-        )
     # Persist the metric tables and a Markdown experiment report.
     pd.DataFrame([tossup]).to_csv(
         csv_path(output_dir, "tossup_metrics.csv"), index=False
@@ -801,15 +826,11 @@ def evaluate_topic_compirt(
     pd.DataFrame([bonus]).to_csv(
         csv_path(output_dir, "bonus_metrics.csv"), index=False
     )
-    report = (
-        "# Topic-Weighted CompIRT Experiment Report\n\n"
-        "## Tossup Metrics\n\n"
-        + markdown_table(pd.DataFrame([tossup]))
-        + "\n\n## Bonus Metrics\n\n"
-        + markdown_table(pd.DataFrame([bonus]))
-        + "\n\nGenerated figures match the standard CompIRT evaluation set. "
-        "The first-buzz timing replay uses the CAIMIRA topic-gap formula "
-        "`sum_k r_jk * (theta_ik - d_jk(t))`.\n"
+    report = experiment_report_markdown(
+        output_dir,
+        tossup,
+        bonus,
+        title="Topic-Weighted CompIRT Experiment Report",
     )
     (output_dir / "experiment_report.md").write_text(report, encoding="utf-8")
     write_eval_docs_summary(output_dir)

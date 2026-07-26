@@ -1,0 +1,43 @@
+{
+  "model": "tfidf-multidim-cumulative-difficulty-pyramidal",
+  "tfidf_variant": "cumulative-difficulty",
+  "formula": "d'_jk(t) = d_jk(t) - lambda_tfidf * tfidf_prefix_j(t); hazard_ij(t) = sum_k alpha_jk * (theta_ik - d'_jk(t)) - c_i",
+  "split": "year_2025",
+  "tournament": "",
+  "dimensions": 5,
+  "steps": 3000,
+  "lr": 0.01,
+  "seed": 42,
+  "final_loss": 447981.52778989077,
+  "calibrate_correctness": true,
+  "tfidf_features": {
+    "tossups": 1350,
+    "vocabulary_size": 26061,
+    "max_length": 168,
+    "normalized": true,
+    "token_weighting": "tf-idf",
+    "nonempty_tossups": 1350,
+    "mean_raw_final_tfidf": 4.49563774445448
+  },
+  "players": 1755,
+  "tossups": 1350,
+  "events": 65443,
+  "observation_counts": {
+    "CENSORED": 400683,
+    "BUZZ": 64834,
+    "NO-BUZZ": 4098
+  },
+  "train_posterior": "results/compirt/holdout/tfidf-multidim-cumulative-difficulty-all2024-cal/train/pyramidal/player_posterior.csv",
+  "new_player_prior": "tier",
+  "heldout_prior_summary": {
+    "players": 1755,
+    "returning": 608,
+    "new": 1147,
+    "new_player_prior": "tier"
+  },
+  "tfidf_effect_prior_scale": 1.0,
+  "tfidf_clue_effect": 0.0014899508096277714,
+  "tfidf_adjustment_curve": "alpha_weighted_aggregate",
+  "correctness_scale": 0.24030701816082,
+  "correctness_bias": 2.156604051589966
+}

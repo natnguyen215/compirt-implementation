@@ -171,10 +171,8 @@ The output tensor is stored as `data["topic_weight"]` and indexed *by tossup* or
 ### 4a. Shared `utils/` helpers
 
 These live in the repo-root `utils/` package and are shared by every model
-family (the topic pipeline no longer has its own `topic_compirt/common.py`;
-those helpers were promoted into `utils/` in the shared-utils refactor). The
-scripts run as modules from the repo root (`python -m topic.fixed...`), so there
-is no longer an `add_repo_root_to_path()` `sys.path` shim.
+family. The scripts run as modules from the repo root (`python -m topic.fixed...`),
+so imports resolve without a `sys.path` shim.
 
 - **`utils/training.py`** — **`fit_svi(model, model_args, n_steps, lr)`** is the
   standard training loop used by both stages: clears the Pyro param store, builds
@@ -260,8 +258,8 @@ Inside two Pyro plates:
 
 | Param | Prior | Shape | vs. root |
 | --- | --- | --- | --- |
-| $\theta$ | $\mathcal{N}(0, I)$ | $(n_\text{players}, n_\text{dim})$ | unchanged |
-| $c$ | $\mathcal{N}(0, 1)$ | $(n_\text{players},)$ | unchanged |
+| $\theta$ | $\mathcal{N}(0, I)$ | $(n_\text{players}, n_\text{dim})$ | same as root |
+| $c$ | $\mathcal{N}(0, 1)$ | $(n_\text{players},)$ | same as root |
 | $\beta$ | $\mathcal{N}(0, I)$ | $(n_\text{tossups}, n_\text{dim})$ | **per-topic** (root: scalar) |
 | $\gamma$ | $\text{Half-Cauchy}(5)$ | $(n_\text{tossups}, n_\text{dim})$ | **per-topic** |
 | $\mu$ | $\text{Beta}(2, 2)$ | $(n_\text{tossups}, n_\text{dim})$ | **per-topic** |
@@ -325,7 +323,7 @@ load tables → build_tossup_observations → tossup_tensors
    → align_tossup_topic_weights (attach data["topic_weight"])
    → train_model = fit_svi(competing_risks_model, …)
    → save_topic_parameters (players.csv, tossups.csv)
-   → posterior_row_predictions → tossup_predictions.csv + save_player_rankings
+   → posterior_row_predictions → tossup_predictions.csv + save_player_buzz_summary
    → [optional] expected_first_buzz_positions → buzz_event_predictions.csv
    → summary.json
 ```
@@ -352,7 +350,7 @@ $$a_{bm} = \sum_k r_{bk} \cdot \theta_{pk} \quad (\text{per roster member } m)$$
 `topic_weight` is $(n_\text{obs}, n_\text{dim})$ and gets `unsqueeze(1)` to line
 up with every roster slot.
 
-**`lse_aggregation(member_abilities, roster_mask, tau)`** (reused unchanged from
+**`lse_aggregation(member_abilities, roster_mask, tau)`** (reused from
 root `compositional_model.py`) — the **unnormalized smooth max** over the roster:
 
 $$A_b(R) = \tau \cdot \log \sum_{m \in R} \exp\!\left( \frac{a_{bm}}{\tau} \right)$$
@@ -437,16 +435,14 @@ loads dimension labels (`--topic-names`), and calls
    - **`topic_buzz_density_fit_plot`** / **`topic_first_buzz_distribution`** /
      **`_aggregate_topic_buzz_timing`** — a pure-NumPy replay of the team
      first-buzz simulation (mirrors `expected_first_buzz_positions`), comparing
-     predicted vs. empirical first-buzz mass and reporting total-variation
-     distance and dead-event rates.
+     predicted vs. empirical first-buzz mass and reporting dead-event rates.
    - **`topic_pyramidal_parameter_distribution_plots`** — dashboards of $\theta$,
      $c$, $\lVert\theta\rVert$, and per-topic $\beta/\gamma/\mu/r$ distributions,
      plus a difficulty-curve percentile-band plot and a summary CSV.
    - If `buzz_event_predictions.csv` exists, adds buzz-position MAE/median error
      and an observed-vs-predicted scatter.
 2. **`evaluate_bonuses(compositional_results, …)`** — reused root bonus eval.
-3. Optionally **`player_skill_stability_plot`** against a comparison run.
-4. Writes `tossup_metrics.csv`, `bonus_metrics.csv`, and the Markdown
+3. Writes `tossup_metrics.csv`, `bonus_metrics.csv`, and the Markdown
    `experiment_report.md`.
 
 `dimension_labels` (from `--topic-names`) only relabels plot legends — it has no
@@ -488,7 +484,7 @@ prior**:
 - **Models read optional priors.** `sample_parameters` (§5.2) now reads four
   optional keys from `data` — `theta_prior_loc/scale`, `c_prior_loc/scale` —
   defaulting to $\mathcal{N}(0,I)/\mathcal{N}(0,1)$ when absent, so an ordinary
-  in-sample run is unchanged.
+  in-sample run uses the standard priors.
 - **`holdout/player_priors.py`** (repo root) builds those tensors:
   `player_tier_map` (player→tier from `teams`×`tournaments`), `estimate_tier_priors`
   (per-tier $\mu/\Sigma$ from the training posterior), and
@@ -508,7 +504,7 @@ prediction CSVs.
 
 ### Running it
 
-Use the repo-root driver `run_scripts/run_compirt_holdout.py` with `MODEL=topic`
+Use the repo-root driver `run_scripts/common/run_compirt_holdout.py` with `MODEL=topic`
 (it chains the four steps; `TOPIC_VECTORS` selects the $r$ CSV):
 
 ```text

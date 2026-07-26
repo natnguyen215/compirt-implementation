@@ -205,6 +205,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Train PLDA from the CLI inputs and save its model and document vectors."""
     # Parse and validate the command-line arguments.
     args = parse_args()
     if args.dimensions < 1:

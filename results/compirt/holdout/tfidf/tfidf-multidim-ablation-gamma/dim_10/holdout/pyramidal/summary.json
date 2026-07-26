@@ -1,0 +1,41 @@
+{
+  "model": "tfidf-multidim-cumulative-difficulty-pyramidal",
+  "tfidf_variant": "cumulative-difficulty",
+  "formula": "d'_jk(t) = d_jk(t) - lambda_tfidf * tfidf_prefix_j(t); hazard_ij(t) = sum_k r_jk * (theta_ik - d'_jk(t)) - c_i",
+  "split": "year_2025",
+  "tournament": "",
+  "dimensions": 10,
+  "steps": 3000,
+  "lr": 0.01,
+  "seed": 42,
+  "final_loss": 481699.4278715849,
+  "calibrate_correctness": false,
+  "tfidf_features": {
+    "tossups": 1350,
+    "vocabulary_size": 26061,
+    "max_length": 168,
+    "normalized": true,
+    "token_weighting": "tf-idf",
+    "nonempty_tossups": 1350,
+    "mean_raw_final_tfidf": 4.49563774445448
+  },
+  "players": 1755,
+  "tossups": 1350,
+  "events": 65443,
+  "observation_counts": {
+    "CENSORED": 400683,
+    "BUZZ": 64834,
+    "NO-BUZZ": 4098
+  },
+  "train_posterior": "results/compirt/holdout/tfidf-multidim-ablation-gamma/dim_10/train/pyramidal/player_posterior.csv",
+  "new_player_prior": "tier",
+  "heldout_prior_summary": {
+    "players": 1755,
+    "returning": 608,
+    "new": 1147,
+    "new_player_prior": "tier"
+  },
+  "tfidf_effect_prior_scale": 1.0,
+  "tfidf_clue_effect": 0.00015394599176943302,
+  "tfidf_adjustment_curve": "r_weighted_aggregate"
+}

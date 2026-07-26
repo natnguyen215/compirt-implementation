@@ -1,14 +1,13 @@
 """Train the multidimensional cumulative TF-IDF pyramidal tossup model.
 
-This mirrors 'tfidf/train_tfidf_pyramidal.py' but imports
-'tfidf.multidim.pyramidal_model' and saves vector-valued tossup difficulty
-parameters:
+The trainer fits 'tfidf.multidim.pyramidal_model' and saves vector-valued tossup
+difficulty parameters:
 
     r_1..K, beta_1..K, gamma_1..K, mu_1..K
 
-Start reading at 'run_experiment' near the bottom; it coordinates the same
-load -> build -> tensors -> train -> predict -> save workflow. The saved
-'players.csv' remains compatible with the root 'train_compositional.py'.
+'run_experiment' coordinates the load -> build -> tensors -> train -> predict ->
+save workflow. The saved 'players.csv' is compatible with
+'train_compositional.py'.
 """
 
 from __future__ import annotations
@@ -33,10 +32,6 @@ from compirt_data import (
     tossup_tensors,
 )
 from holdout.player_priors import attach_player_priors, player_tier_map
-from tfidf.pyramidal_tfidf_model import (
-    CUMULATIVE_DIFFICULTY,
-    TFIDF_VARIANTS,
-)
 from tfidf.tfidf_features import attach_tfidf_prefix_scores
 from tfidf.multidim.pyramidal_model import (
     competing_risks_model,
@@ -52,6 +47,7 @@ from utils.saving import (
     write_summary,
 )
 from utils.training import fit_svi, require_device
+from utils.posterior import add_posterior_output_args
 
 
 DEFAULT_OUTPUT_PARENT = REPO_ROOT / "results" / "compirt"
@@ -61,9 +57,9 @@ FORMULA = (
 )
 
 
-def default_output_dir(tfidf_variant: str) -> Path:
-    """Return the cumulative TF-IDF default output directory."""
-    return DEFAULT_OUTPUT_PARENT / f"tfidf-multidim-{tfidf_variant}-pyramidal"
+# Use the "cumulative-difficulty" segment in rendered result paths and reports.
+DEFAULT_OUTPUT_DIR = DEFAULT_OUTPUT_PARENT / "tfidf-multidim-cumulative-difficulty-pyramidal"
+MODEL_NAME = "tfidf-multidim-cumulative-difficulty-pyramidal"
 
 
 def save_multidim_tfidf_parameters(output_dir, data, posterior):
@@ -87,23 +83,13 @@ def save_multidim_tfidf_parameters(output_dir, data, posterior):
     pd.DataFrame(tossups).to_csv(output_dir / "tossups.csv", index=False)
 
 
-def save_tfidf_adjustment_curves(
-    output_dir,
-    data,
-    observations,
-    posterior,
-    tfidf_variant,
-    n_points=201,
-):
-    """Persist signed aggregate difficulty deltas for 'cumulative-difficulty'.
+def save_tfidf_adjustment_curves(output_dir, data, observations, posterior, n_points=201):
+    """Persist signed aggregate cumulative TF-IDF difficulty deltas.
 
     The model applies '-lambda_tfidf * p_j(t)' inside every dimension before
     weighting by 'r'. The evaluator consumes a scalar aggregate curve, so
     the saved delta is '-lambda_tfidf * p_j(t) * sum_k r_jk'.
     """
-    if tfidf_variant != CUMULATIVE_DIFFICULTY:
-        raise ValueError("Only cumulative-difficulty is supported")
-
     lambda_tfidf = float(posterior["tfidf_clue_effect"].detach().cpu())
     relevance_mass = posterior["r"].detach().cpu().sum(dim=1).numpy()
     prefix = data["tfidf_prefix"].detach().cpu().numpy()
@@ -119,31 +105,6 @@ def save_tfidf_adjustment_curves(
     )
     frame.insert(0, "tossup_id", data["tossup_ids"])
     frame.to_csv(output_dir / "tfidf_adjustment_curves.csv", index=False)
-
-
-def train_model(
-    data,
-    n_dimensions=1,
-    n_steps=1000,
-    lr=0.02,
-    calibrate_correctness=False,
-    tfidf_effect_prior_scale=1.0,
-    tfidf_variant=CUMULATIVE_DIFFICULTY,
-):
-    """Fit the selected multidimensional TF-IDF competing-risks model."""
-    return fit_svi(
-        competing_risks_model,
-        (
-            data,
-            n_dimensions,
-            calibrate_correctness,
-            tfidf_effect_prior_scale,
-            tfidf_variant,
-        ),
-        n_steps,
-        lr,
-        return_guide=True,
-    )
 
 
 def run_experiment(args):
@@ -171,7 +132,6 @@ def run_experiment(args):
         f"Players: {len(data['player_ids']):,}  "
         f"Tossups: {len(data['tossup_ids']):,}  "
         f"Dimensions: {args.dimensions}  "
-        f"Variant: {args.tfidf_variant}  "
         f"IDF vocab: {tfidf_summary['vocabulary_size']:,}"
     )
     print(observations["z"].value_counts().to_string())
@@ -192,14 +152,19 @@ def run_experiment(args):
         )
         print(f"Held-out player priors: {prior_summary}")
 
-    posterior, guide, losses = train_model(
-        data,
-        args.dimensions,
-        args.steps,
-        args.lr,
-        args.calibrate_correctness,
-        args.tfidf_effect_prior_scale,
-        args.tfidf_variant,
+    posterior, guide, losses = fit_svi(
+        competing_risks_model,
+        model_kwargs={
+            "data": data,
+            "n_dimensions": args.dimensions,
+            "calibrate_correctness": args.calibrate_correctness,
+            "tfidf_effect_prior_scale": args.tfidf_effect_prior_scale,
+        },
+        n_steps=args.steps,
+        lr=args.lr,
+        posterior_output_dir=args.output_dir,
+        posterior_draws=args.posterior_draws,
+        posterior_seed=args.seed,
     )
 
     save_multidim_tfidf_parameters(args.output_dir, data, posterior)
@@ -208,25 +173,19 @@ def run_experiment(args):
     save_player_posterior(
         args.output_dir, data["player_ids"], guide, tier_map
     )
-    save_tfidf_adjustment_curves(
-        args.output_dir, data, observations, posterior, args.tfidf_variant
-    )
+    save_tfidf_adjustment_curves(args.output_dir, data, observations, posterior)
     save_loss_plot(
         args.output_dir,
         losses,
-        f"Multidim TF-IDF {args.tfidf_variant} pyramidal training loss",
+        "Multidim cumulative TF-IDF pyramidal training loss",
     )
 
     # Attach fitted predictions back onto the readable observation rows; the
     # TF-IDF scores at each row's 't_star' ride along as diagnostics.
     correct, hazard, survival, prefix_score = posterior_row_predictions(
-        data, posterior, args.calibrate_correctness, args.tfidf_variant
+        data, posterior, args.calibrate_correctness
     )
-    buzz_expected = (
-        expected_first_buzz_positions(data, posterior, args.tfidf_variant)
-        if args.predict_buzz_positions
-        else None
-    )
+    buzz_expected = expected_first_buzz_positions(data, posterior)
     extra_columns = {"tfidf_prefix_score": prefix_score}
     save_tossup_predictions(
         args.output_dir,
@@ -239,8 +198,7 @@ def run_experiment(args):
     )
 
     summary = {
-        "model": f"tfidf-multidim-{args.tfidf_variant}-pyramidal",
-        "tfidf_variant": args.tfidf_variant,
+        "model": MODEL_NAME,
         "formula": FORMULA,
         "split": args.split,
         "tournament": args.tournament or "",
@@ -254,7 +212,6 @@ def run_experiment(args):
         "players": len(data["player_ids"]),
         "tossups": len(data["tossup_ids"]),
         "events": len(data["event_ids"]),
-        "predicted_buzz_positions": args.predict_buzz_positions,
         "observation_counts": observations["z"].value_counts().to_dict(),
     }
     if args.train_posterior:
@@ -272,6 +229,7 @@ def run_experiment(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
+    add_posterior_output_args(parser)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--split", default="all")
     parser.add_argument("--tournament")
@@ -280,14 +238,7 @@ def parse_args():
     parser.add_argument("--lr", type=float, default=0.02)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
-    parser.add_argument("--predict-buzz-positions", action="store_true")
     parser.add_argument("--calibrate-correctness", action="store_true")
-    parser.add_argument(
-        "--tfidf-variant",
-        choices=TFIDF_VARIANTS,
-        default=CUMULATIVE_DIFFICULTY,
-        help="Cumulative TF-IDF difficulty formulation",
-    )
     parser.add_argument(
         "--tfidf-effect-prior-scale",
         type=float,
@@ -313,7 +264,7 @@ def parse_args():
     parser.add_argument("--output-dir", type=Path)
     args = parser.parse_args()
     if args.output_dir is None:
-        args.output_dir = default_output_dir(args.tfidf_variant)
+        args.output_dir = DEFAULT_OUTPUT_DIR
     if args.dimensions < 1:
         raise ValueError("--dimensions must be at least 1")
     if args.steps < 1:

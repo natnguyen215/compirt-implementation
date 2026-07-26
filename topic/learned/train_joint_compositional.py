@@ -1,21 +1,17 @@
-"""Jointly train topic-gated CompIRT bonus topics (sLDA-style) with the compositional model.
+"""Jointly train topic-gated bonus topics with the compositional model.
 
-This is the bonus-stage counterpart to 'train_joint_pyramidal'. The pyramidal
-stage first learns player skills 'theta' and the topic-word matrix 'topic_word';
-this stage freezes both and re-learns each bonus's Dirichlet topic proportions
-'theta_doc' inside one SVI, so the bonus's part-correctness outcomes (not just
-its words) reshape its place in topic space (sLDA-style supervision for bonuses).
-It is supervised-LDA in spirit, not the canonical Blei-McAuliffe form: 'r_b' =
-'theta_doc' doubles as the compositional weight rather than feeding a separate
-response regression. The objective is the topic-weighted bonus-part log-likelihood
-plus the ('--bow-weight' scaled) LDA word likelihood with 'topic_word' held fixed.
+The trainer freezes player skills 'theta' and the pyramidal topic-word matrix,
+then learns each bonus's Dirichlet topic proportions 'theta_doc' inside one SVI.
+Part-correctness outcomes and words jointly shape the bonus's place in topic
+space, and 'r_b = theta_doc' acts directly as the compositional weight. The
+objective combines the topic-weighted bonus-part log-likelihood with the
+'--bow-weight'-scaled LDA word likelihood.
 
-Outputs match the topic-compositional stage ('bonus_parts.csv', 'tau.txt',
-'bonus_part_predictions.csv', 'team_predictions.csv', 'summary.json', loss
-plot) plus a 'document_latent_vectors.csv' of the learned bonus topic weights,
-so the downstream evaluation and profiling stages reuse it.
+Outputs include 'bonus_parts.csv', 'tau.txt', 'bonus_part_predictions.csv',
+'team_predictions.csv', 'summary.json', the loss plot, and
+'document_latent_vectors.csv' for the learned bonus topic weights.
 
-Start reading at 'run_experiment' near the bottom; it coordinates the full
+'run_experiment' coordinates the
 load -> build -> train -> predict -> save workflow.
 """
 
@@ -62,6 +58,7 @@ from utils.saving import (
     write_summary,
 )
 from utils.training import fit_svi, require_device
+from utils.posterior import add_posterior_output_args
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -118,8 +115,8 @@ def load_topic_model(topic_model_dir, device):
 def save_bonus_part_parameters(output_dir, data, posterior, part_topic_weight):
     """Write bonus-part parameters, including the learned per-bonus topic weights."""
     part_parameters = {"bonus_part_id": data["part_ids"]}
-    # This is CompIRT difficulty_beta, not LDA beta/topic_word. The column prefix
-    # stays "beta" because topic_compirt evaluation already consumes beta_*.
+    # The beta_* columns store CompIRT difficulty_beta; LDA topic-word
+    # parameters are saved separately.
     add_numbered_tensor_columns(part_parameters, "beta", posterior["beta"])
     add_numbered_tensor_columns(part_parameters, "topic_weight", part_topic_weight)
     pd.DataFrame(part_parameters).to_csv(output_dir / "bonus_parts.csv", index=False)
@@ -188,12 +185,24 @@ def run_experiment(args):
 
     # Joint SVI: one AutoNormal guide covers theta_doc + bonus-part parameters.
     # The topic dimension is read from theta inside the model.
-    model_args = (
-        data, theta, topic_word, args.bow_weight,
-        args.topic_concentration, args.use_synergy, args.synergy_dimensions,
-        args.calibrate_correctness,
+    posterior, _guide, losses = fit_svi(
+        joint_compositional_model,
+        model_kwargs={
+            "data": data,
+            "theta": theta,
+            "topic_word": topic_word,
+            "bow_weight": args.bow_weight,
+            "topic_concentration": args.topic_concentration,
+            "use_synergy": args.use_synergy,
+            "synergy_dimensions": args.synergy_dimensions,
+            "calibrate_correctness": args.calibrate_correctness,
+        },
+        n_steps=args.steps,
+        lr=args.lr,
+        posterior_output_dir=args.output_dir,
+        posterior_draws=args.posterior_draws,
+        posterior_seed=args.seed,
     )
-    posterior, losses = fit_svi(joint_compositional_model, model_args, args.steps, args.lr)
 
     # Learned per-bonus topic weights, then the per-part view (parts share a bonus).
     document_weights = posterior["theta_doc"].detach().cpu()
@@ -266,6 +275,7 @@ def run_experiment(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
+    add_posterior_output_args(parser)
     parser.add_argument("--database", type=Path, default=DEFAULT_DATABASE)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--split", default="all")

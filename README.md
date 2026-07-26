@@ -12,14 +12,20 @@ The root CompIRT files are separated by responsibility through their names:
 - `compirt_data.py`: observation and tensor construction.
 - `train_pyramidal.py` and `train_compositional.py`: experiment training.
 - `evaluate_compirt.py` and the `compirt_eval/` package: the executed evaluation code
-   plus its metrics, figures, and per-scenario (tossup/bonus) modules.
+   plus its metrics, figures, and per-scenario (tossup/bonus) modules. See
+   [`compirt_eval/METRICS.md`](compirt_eval/METRICS.md) for the scored populations,
+   aggregation order, equations, graphs, and interpretation limits.
 - `data_pipeline/`: source-database to Hugging Face dataset builder and validator.
-- `run_scripts/run_compirt.py`: end to end configurable experiment (train,
-  evaluate, and compare in one pass). `run_scripts/run_compirt.sh` is a thin
+- `run_scripts/common/run_compirt.py`: end to end configurable experiment (train,
+  evaluate, and compare in one pass). `run_scripts/common/run_compirt.sh` is a thin
   wrapper around it.
-- `run_scripts/run_compirt_2024.py`: full-2024 reproducibility wrapper. It runs
+- `run_scripts/common/run_compirt_2024.py`: full-2024 reproducibility wrapper. It runs
   dataset validation, then calls the configurable runner with all-2024
-  defaults. `run_scripts/run_compirt_2024.sh` is a thin wrapper around it.
+  defaults. `run_scripts/common/run_compirt_2024.sh` is a thin wrapper around it.
+- `run_scripts/common/run_compirt_round_holdout.py`: derives linked train/test data by
+  holding out the final 20% of complete rounds in every tournament, then reuses
+  the standard transductive holdout runner. Its `.sh` file is the shell entry
+  point.
 - `topic/`: topic-model experiments — `topic/fixed/` (topics fit upstream via
   LDA/PLDA/categories and fed in as fixed weights), `topic/learned/` (topics
   learned jointly with the IRT model), and shared topic helpers in `topic/utils/`.
@@ -33,14 +39,18 @@ The root CompIRT files are separated by responsibility through their names:
   embedding variant reuses `multidim_mirt`'s tossup math and the root
   `compositional_model.py` rather than duplicating them. Both name the weight
   `r` rather than the baseline's `alpha` because their difficulty is
-  per-dimension; see the naming convention in `CLAUDE.md`.
+  per-dimension: `alpha` weights a scalar-difficulty dot product, while `r`
+  weights per-dimension skill-minus-difficulty gaps.
+- `polynomial_compirt/`: isolated multidimensional Stage-1 variant whose
+  per-tossup difficulty coordinates are strictly decreasing degree 3--6
+  Bernstein polynomials, plus the resumable 1D/5D degree sweep launcher.
 
 Variant scripts run as modules from the repo root, e.g.
 `.venv/bin/python -m topic.fixed.train_topic_pyramidal --help`.
 
-See `docs/compirt-experiments.md` for setup, commands, assumptions, and
-limitations, including the opt-in temporal C1--C4 roster-generalization
-evaluation (`RUN_C1_C4=1`).
+Start with the [documentation index](docs/README.md). For reproduction commands,
+see [the experiment guide](docs/compirt-experiments.md); for scored populations
+and equations, see [the evaluation metric contract](compirt_eval/METRICS.md).
 
 # CompIRT Paper Implementation
 
@@ -83,8 +93,12 @@ The full table schema is documented in `docs/dataset-schema.md`.
 ## Tests
 
 ```bash
-.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python -B run_scripts/common/check_repo.py
 ```
+
+The aggregate check runs the root and model-family suites without writing under
+`results/`. Add `--include-data-validation` when the local generated dataset is
+available. Individual suite commands are listed in [tests/README.md](tests/README.md).
 
 ## Important Implementation Details
 

@@ -1,0 +1,35 @@
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,140,662.7
+step  100  ELBO loss: 519,955.1
+step  200  ELBO loss: 481,477.9
+step  300  ELBO loss: 448,593.2
+step  400  ELBO loss: 413,518.2
+step  500  ELBO loss: 390,239.8
+step  600  ELBO loss: 379,065.8
+step  700  ELBO loss: 372,922.5
+step  800  ELBO loss: 369,822.4
+step  900  ELBO loss: 367,886.1
+step 1000  ELBO loss: 366,384.6
+step 1100  ELBO loss: 365,440.7
+step 1200  ELBO loss: 364,688.3
+step 1300  ELBO loss: 364,182.6
+step 1400  ELBO loss: 364,011.1
+step 1500  ELBO loss: 363,558.8
+step 1600  ELBO loss: 363,265.9
+step 1700  ELBO loss: 362,702.6
+step 1800  ELBO loss: 362,834.2
+step 1900  ELBO loss: 362,800.7
+step 2000  ELBO loss: 362,278.7
+step 2100  ELBO loss: 362,799.4
+step 2200  ELBO loss: 362,326.6
+step 2300  ELBO loss: 362,278.9
+step 2400  ELBO loss: 362,627.7
+step 2500  ELBO loss: 361,849.4
+step 2600  ELBO loss: 362,784.4
+step 2700  ELBO loss: 361,701.4
+step 2800  ELBO loss: 361,799.8
+step 2900  ELBO loss: 361,939.5

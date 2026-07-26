@@ -1,0 +1,19 @@
+{
+  "model": "plain-irt",
+  "formula": "P(convert) = sigmoid(alpha_j^T theta_i - d_j)",
+  "split": "year_2024",
+  "tournament": "",
+  "dimensions": 1,
+  "steps": 1000,
+  "lr": 0.02,
+  "seed": 42,
+  "final_loss": 109322.62129211426,
+  "players": 1455,
+  "tossups": 1259,
+  "observed_cells": 329133,
+  "drop_events_file": "results/compirt/in_sample/drop-robustness/droplists/frac_0.05/rep_2.txt",
+  "dropped_events": 2430,
+  "dropped_rows": 17477,
+  "remaining_events": 46182,
+  "remaining_rows": 330927
+}

@@ -1,0 +1,2 @@
+-r compirt.txt
+pyflakes

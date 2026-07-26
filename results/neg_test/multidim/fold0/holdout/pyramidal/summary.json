@@ -1,0 +1,20 @@
+{
+  "model": "multidimensional-difficulty-competing-risks",
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))",
+  "tournament": "",
+  "dimensions": 5,
+  "difficulty_link": "sigmoid",
+  "seed": 42,
+  "steps": 3000,
+  "final_loss": 74091.33086395264,
+  "players": 1186,
+  "tossups": 1240,
+  "events": 9420,
+  "calibrate_correctness": false,
+  "include_bounceback": false,
+  "observation_counts": {
+    "CENSORED": 56885,
+    "BUZZ": 9295,
+    "NO-BUZZ": 900
+  }
+}

@@ -1,0 +1,181 @@
+# CompIRT Run Log
+
+Generated: 2026-07-23T12:20:31-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- BONUS_STEPS: 2000
+- C1_C4_ITEM_STEPS: unknown
+- C1_C4_MIN_CROSS_TEAM_GAMES: unknown
+- C1_C4_SEED: unknown
+- CALIBRATE_CORRECTNESS: 0
+- DATABASE: unknown
+- DEVICE: cuda
+- DIFFICULTY_LINK: sigmoid
+- DIFFICULTY_SCALE: unknown
+- DIMENSIONS: 5
+- FROZEN_PREDICT: 1
+- GPU: 1
+- HOLDOUT_COMPARISON_OUTPUT: results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/comparison
+- HOLDOUT_COMPOSITIONAL_OUTPUT: results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/compositional
+- HOLDOUT_EVALUATION_OUTPUT: results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/evaluation
+- HOLDOUT_PYRAMIDAL_OUTPUT: results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/pyramidal
+- HOLDOUT_SYNERGY_EVALUATION_OUTPUT: results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/synergy-evaluation
+- HOLDOUT_SYNERGY_OUTPUT: results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/synergy
+- LR: 0.01
+- MODEL: multidim
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- NEW_PLAYER_PRIOR: tier
+- NO_NORMALIZE_TFIDF: unknown
+- PYRAMIDAL_STEPS: 3000
+- PYTHON: /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python
+- ROOT: results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3
+- RUNNER: run_scripts/common/run_compirt_holdout.py
+- RUN_C1_C4: 0
+- RUN_SYNERGY: 1
+- SAVE_SYNERGY_DETAILS: 0
+- SEED: 42
+- SYNERGY_DIMENSIONS: 3
+- TEST_SPLIT: game-holdout:year_2024:test:5:3:42
+- TFIDF_EFFECT_PRIOR_SCALE: unknown
+- TFIDF_PLOT_COUNT: unknown
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: <all>
+- TRAIN_PYRAMIDAL_OUTPUT: results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/train/pyramidal
+- TRAIN_SPLIT: game-holdout:year_2024:train:5:3:42
+
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split game-holdout:year_2024:train:5:3:42 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/train/pyramidal --dimensions 5 --difficulty-link sigmoid
+Rows: 282,044  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239288
+BUZZ         38834
+NO-BUZZ       3922
+step    0  ELBO loss: 16,952,156.3
+step  100  ELBO loss: 461,588.6
+step  200  ELBO loss: 400,213.5
+step  300  ELBO loss: 370,215.3
+step  400  ELBO loss: 345,357.7
+step  500  ELBO loss: 325,110.3
+step  600  ELBO loss: 315,694.6
+step  700  ELBO loss: 310,917.8
+step  800  ELBO loss: 308,043.7
+step  900  ELBO loss: 306,062.0
+step 1000  ELBO loss: 305,287.6
+step 1100  ELBO loss: 304,661.9
+step 1200  ELBO loss: 303,430.8
+step 1300  ELBO loss: 302,949.1
+step 1400  ELBO loss: 302,879.1
+step 1500  ELBO loss: 302,293.7
+step 1600  ELBO loss: 301,492.5
+step 1700  ELBO loss: 301,583.6
+step 1800  ELBO loss: 301,239.6
+step 1900  ELBO loss: 301,216.7
+step 2000  ELBO loss: 301,312.8
+step 2100  ELBO loss: 300,472.3
+step 2200  ELBO loss: 300,738.0
+step 2300  ELBO loss: 299,913.5
+step 2400  ELBO loss: 300,136.4
+step 2500  ELBO loss: 300,156.2
+step 2600  ELBO loss: 300,964.3
+step 2700  ELBO loss: 300,160.2
+step 2800  ELBO loss: 299,776.3
+step 2900  ELBO loss: 300,139.8
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m train_compositional --split game-holdout:year_2024:train:5:3:42 --player-skills results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/train/pyramidal/players.csv --steps 2000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/train/compositional
+Bonus part rows: 108,096  Parts: 3,768
+step    0  ELBO loss: 139,880.0
+step  100  ELBO loss: 75,501.7
+step  200  ELBO loss: 61,124.5
+step  300  ELBO loss: 57,308.2
+step  400  ELBO loss: 56,329.5
+step  500  ELBO loss: 56,045.3
+step  600  ELBO loss: 55,898.8
+step  700  ELBO loss: 56,039.1
+step  800  ELBO loss: 56,002.6
+step  900  ELBO loss: 55,862.2
+step 1000  ELBO loss: 56,022.4
+step 1100  ELBO loss: 55,870.2
+step 1200  ELBO loss: 55,841.7
+step 1300  ELBO loss: 55,808.5
+step 1400  ELBO loss: 55,933.4
+step 1500  ELBO loss: 55,942.1
+step 1600  ELBO loss: 55,880.0
+step 1700  ELBO loss: 56,009.2
+step 1800  ELBO loss: 55,914.9
+step 1900  ELBO loss: 55,965.1
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m train_compositional --split game-holdout:year_2024:train:5:3:42 --player-skills results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/train/pyramidal/players.csv --steps 2000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/train/synergy --use-synergy --synergy-dimensions 3 --save-synergy-details
+Bonus part rows: 108,096  Parts: 3,768
+step    0  ELBO loss: 135,081.3
+step  100  ELBO loss: 75,410.6
+step  200  ELBO loss: 60,559.1
+step  300  ELBO loss: 56,608.2
+step  400  ELBO loss: 55,849.4
+step  500  ELBO loss: 55,744.4
+step  600  ELBO loss: 55,516.6
+step  700  ELBO loss: 55,445.9
+step  800  ELBO loss: 55,223.8
+step  900  ELBO loss: 55,355.3
+step 1000  ELBO loss: 55,108.5
+step 1100  ELBO loss: 55,312.3
+step 1200  ELBO loss: 55,241.8
+step 1300  ELBO loss: 55,383.1
+step 1400  ELBO loss: 55,141.7
+step 1500  ELBO loss: 55,078.0
+step 1600  ELBO loss: 55,122.5
+step 1700  ELBO loss: 54,968.4
+step 1800  ELBO loss: 55,073.7
+step 1900  ELBO loss: 55,002.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:3:42 --train-pyramidal results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/train/pyramidal --dimensions 5 --difficulty-link sigmoid --device cuda --output-dir results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/pyramidal
+Rows: 66,360  Players: 1,133  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict bonus --split game-holdout:year_2024:test:5:3:42 --train-pyramidal results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/train/pyramidal --train-compositional results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/train/compositional --device cuda --output-dir results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/compositional
+Bonus part rows: 25,365  Parts: 3,639
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict bonus --split game-holdout:year_2024:test:5:3:42 --train-pyramidal results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/train/pyramidal --train-compositional results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/train/synergy --use-synergy --device cuda --output-dir results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/synergy
+Bonus part rows: 25,365  Parts: 3,639
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/pyramidal --compositional-results results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/compositional --output-dir results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/evaluation
+Game simulation: 461 games, 500 replicas per game
+Game simulation: 24/461 games complete (5%)
+Game simulation: 47/461 games complete (10%)
+Game simulation: 70/461 games complete (15%)
+Game simulation: 93/461 games complete (20%)
+Game simulation: 116/461 games complete (25%)
+Game simulation: 139/461 games complete (30%)
+Game simulation: 162/461 games complete (35%)
+Game simulation: 185/461 games complete (40%)
+Game simulation: 208/461 games complete (45%)
+Game simulation: 231/461 games complete (50%)
+Game simulation: 254/461 games complete (55%)
+Game simulation: 277/461 games complete (60%)
+Game simulation: 300/461 games complete (65%)
+Game simulation: 323/461 games complete (70%)
+Game simulation: 346/461 games complete (75%)
+Game simulation: 369/461 games complete (80%)
+Game simulation: 392/461 games complete (85%)
+Game simulation: 415/461 games complete (90%)
+Game simulation: 438/461 games complete (95%)
+Game simulation: 461/461 games complete (100%)
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/pyramidal --compositional-results results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/synergy --output-dir results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/synergy-evaluation
+Game simulation: 461 games, 500 replicas per game
+Game simulation: 24/461 games complete (5%)
+Game simulation: 47/461 games complete (10%)
+Game simulation: 70/461 games complete (15%)
+Game simulation: 93/461 games complete (20%)
+Game simulation: 116/461 games complete (25%)
+Game simulation: 139/461 games complete (30%)
+Game simulation: 162/461 games complete (35%)
+Game simulation: 185/461 games complete (40%)
+Game simulation: 208/461 games complete (45%)
+Game simulation: 231/461 games complete (50%)
+Game simulation: 254/461 games complete (55%)
+Game simulation: 277/461 games complete (60%)
+Game simulation: 300/461 games complete (65%)
+Game simulation: 323/461 games complete (70%)
+Game simulation: 346/461 games complete (75%)
+Game simulation: 369/461 games complete (80%)
+Game simulation: 392/461 games complete (85%)
+Game simulation: 415/461 games complete (90%)
+Game simulation: 438/461 games complete (95%)
+Game simulation: 461/461 games complete (100%)
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python run_scripts/common/run_synergy_comparison.py --compositional-metrics results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/evaluation/csvs/bonus_metrics.csv --synergy-metrics results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/synergy-evaluation/csvs/bonus_metrics.csv --output-dir results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/comparison
+Finished held-out multidim run. Scenario A/B metrics in results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/evaluation.
+Synergy metrics in results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold/fold_3/holdout/synergy-evaluation.

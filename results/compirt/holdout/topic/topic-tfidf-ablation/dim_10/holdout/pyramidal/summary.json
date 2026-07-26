@@ -1,0 +1,51 @@
+{
+  "model": "joint-slda-topic-tfidf-pyramidal",
+  "formula": "d'_jk(t) = d_jk(t) - lambda_k * tfidf_prefix_j(t); logit_ij(t) = sum_k r_jk * (theta_ik - d'_jk(t)), r_j = theta_doc_j (Dirichlet)",
+  "split": "year_2025",
+  "tournament": "",
+  "dimensions": 10,
+  "vocab_size": 2000,
+  "vocab_size_limit": 2000,
+  "min_df": 2,
+  "rm_top": 20,
+  "bow_weight": 0.1,
+  "topic_concentration": 1.0,
+  "topic_tfidf_lambdas": {
+    "latent_topic_00": 2.853492259979248,
+    "latent_topic_01": 3.2216169834136963,
+    "latent_topic_02": 3.5332674980163574,
+    "latent_topic_03": 2.731858491897583,
+    "latent_topic_04": 3.0108211040496826,
+    "latent_topic_05": 2.5986266136169434,
+    "latent_topic_06": 1.1273226737976074,
+    "latent_topic_07": 1.0726901292800903,
+    "latent_topic_08": 0.1395128071308136,
+    "latent_topic_09": 0.08185108751058578
+  },
+  "topic_tfidf_effect_prior_scale": 1.0,
+  "tfidf_features": {
+    "tossups": 1350,
+    "vocabulary_size": 26061,
+    "max_length": 168,
+    "normalized": true,
+    "token_weighting": "tf-idf",
+    "nonempty_tossups": 1350,
+    "mean_raw_final_tfidf": 4.49563774445448
+  },
+  "tfidf_adjustment_curve": "topic_weighted_aggregate",
+  "steps": 3000,
+  "lr": 0.01,
+  "seed": 42,
+  "new_player_prior": "tier",
+  "final_loss": 515585.64688158035,
+  "calibrate_correctness": false,
+  "players": 1755,
+  "tossups": 1350,
+  "bonuses": 1640,
+  "events": 65443,
+  "observation_counts": {
+    "CENSORED": 400683,
+    "BUZZ": 64834,
+    "NO-BUZZ": 4098
+  }
+}

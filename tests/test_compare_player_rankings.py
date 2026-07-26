@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from compare_player_rankings import actual_tournament_stats, tournament_overlap_summary
+from compirt_eval.player_rankings import actual_tournament_stats, tournament_overlap_summary
 
 
 class ActualTournamentStatsTests(unittest.TestCase):

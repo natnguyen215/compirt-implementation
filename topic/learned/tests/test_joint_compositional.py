@@ -69,10 +69,21 @@ def tiny_problem(seed=0):
 class ModelSmokeTests(unittest.TestCase):
     def _fit(self, use_synergy):
         data, theta, topic_word = tiny_problem()
-        model_args = (
-            data, theta, topic_word, 1.0, 1.0, use_synergy, 2, False,
+        posterior, _guide, losses = fit_svi(
+            joint_compositional_model,
+            model_kwargs={
+                "data": data,
+                "theta": theta,
+                "topic_word": topic_word,
+                "bow_weight": 1.0,
+                "topic_concentration": 1.0,
+                "use_synergy": use_synergy,
+                "synergy_dimensions": 2,
+                "calibrate_correctness": False,
+            },
+            n_steps=5,
+            lr=0.05,
         )
-        posterior, losses = fit_svi(joint_compositional_model, model_args, 5, 0.05)
         return data, theta, posterior, losses
 
     def test_trains_without_synergy(self):

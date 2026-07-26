@@ -3,14 +3,13 @@
 
 Reads each run's synergy-evaluation/bonus_metrics.csv (falling back to
 evaluation/bonus_metrics.csv) and prints the columns that matter for the
-points-per-bonus question, so the new all-2024 topic+synergy run can be
-compared head-to-head with the existing baselines.
+points-per-bonus comparison.
 
 Usage:
     python -m topic.fixed.compare_bonus_runs \
-        results/compirt/in_sample/plda-all2024 \
-        results/compirt/in_sample/baseline-all2024 \
-        results/compirt/in_sample/topic_compirt_5d_syn
+        results/compirt/in_sample/topic/plda-all2024 \
+        results/compirt/in_sample/baseline/baseline-all2024 \
+        results/compirt/in_sample/topic/topic_compirt_5d_syn
 """
 
 from __future__ import annotations
@@ -22,15 +21,14 @@ import pandas as pd
 
 COLUMNS = [
     "ppb_mae",
-    "per_bonus_points_mae",
     "exact_acc",
     "auc",
     "ece",
 ]
 DEFAULT_RUNS = [
-    "results/compirt/in_sample/plda-all2024",
-    "results/compirt/in_sample/baseline-all2024",
-    "results/compirt/in_sample/topic_compirt_5d_syn",
+    "results/compirt/in_sample/topic/plda-all2024",
+    "results/compirt/in_sample/baseline/baseline-all2024",
+    "results/compirt/in_sample/topic/topic_compirt_5d_syn",
 ]
 
 

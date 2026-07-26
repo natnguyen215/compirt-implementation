@@ -1,0 +1,14 @@
+{
+  "model": "plain-irt",
+  "formula": "P(convert) = sigmoid(alpha_j^T theta_i - d_j)",
+  "split": "year_2024",
+  "tournament": "",
+  "dimensions": 1,
+  "steps": 1000,
+  "lr": 0.02,
+  "seed": 42,
+  "final_loss": 114678.2056350708,
+  "players": 1455,
+  "tossups": 1260,
+  "observed_cells": 346384
+}

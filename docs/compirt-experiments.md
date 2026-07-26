@@ -33,8 +33,11 @@ Create the project-local environment:
 
 ```bash
 python -m venv --system-site-packages .venv
-.venv/bin/pip install -r requirements/compirt.txt
+.venv/bin/pip install -r requirements/dev.txt
 ```
+
+`requirements/compirt.txt` contains runtime dependencies only. The development
+requirements add the static checker used by the repository verification command.
 
 Rebuild the local HuggingFace data after adding `games.packet_id`:
 
@@ -60,14 +63,8 @@ Fit the competing-risks model with dead tossups:
   --output-dir results/compirt/cornell/pyramidal
 ```
 
-Expected first-buzz positions are slower to calculate and optional:
-
-```bash
-.venv/bin/python train_pyramidal.py \
-  --tournament 2024-acf-regionals-cornell \
-  --predict-buzz-positions \
-  --output-dir results/compirt/cornell/pyramidal
-```
+Every pyramidal run also writes expected first-buzz positions to
+`buzz_event_predictions.csv`.
 
 ## Compositional IRT
 
@@ -117,6 +114,10 @@ visible. Interpret synergy only after held-out recombined-roster evaluation.
   --output-dir results/compirt/cornell/evaluation
 ```
 
+The evaluator runs the seeded match-winner diagnostic when the generated local
+dataset is available. Add `--skip-game-simulation` when evaluating copied result
+artifacts without `data/hf/`.
+
 Training directories contain parameter CSV files, prediction CSV files, loss
 plots, and `summary.json`. The evaluator owns the remaining diagnostic plots.
 It reconstructs fitted first-buzz distributions from saved posterior medians,
@@ -135,32 +136,25 @@ difficulty curve with 25th--75th and 5th--95th percentile bands. The companion
 parameter-distribution CSV files contain exact quantiles. A single fitted
 scalar such as `tau` is omitted because it does not define a distribution.
 
-To compare player skill magnitude and rank across two independently fitted
-pyramidal runs, add:
-
-```bash
-  --comparison-pyramidal-results results/compirt/other-run/pyramidal
-```
-
 ## Full CUDA Run
 
 Start with all 2024 ACF Regionals mirrors:
 
 ```bash
-./run_scripts/run_compirt.sh
+./run_scripts/common/run_compirt.sh
 ```
 
 The same script handles every available 2024 tournament:
 
 ```bash
-TOURNAMENT= ROOT=results/compirt/cuda-all-2024 LR=0.005 ./run_scripts/run_compirt.sh
+TOURNAMENT= ROOT=results/compirt/cuda-all-2024 LR=0.005 ./run_scripts/common/run_compirt.sh
 ```
 
 Run data validation, then fit and evaluate both model variants across every
 available 2024 tournament:
 
 ```bash
-./run_scripts/run_compirt_2024.sh
+./run_scripts/common/run_compirt_2024.sh
 ```
 
 Environment variables override the defaults:
@@ -168,14 +162,46 @@ Environment variables override the defaults:
 ```bash
 GPU=1 PYRAMIDAL_STEPS=5000 BONUS_STEPS=3000 DIMENSIONS=5 \
   RUN_SYNERGY=1 SYNERGY_DIMENSIONS=3 SAVE_SYNERGY_DETAILS=1 \
-  LR=0.005 ./run_scripts/run_compirt.sh
+  LR=0.005 ./run_scripts/common/run_compirt.sh
 ```
 
 The full-data script fits and evaluates on the same selected observations. Its
 metrics are useful for checking optimization, calibration, and output shape,
 but are not held-out estimates of paper performance.
 
-When `RUN_SYNERGY=1`, `run_scripts/run_compirt.sh` writes separate reports for the two
+### Final-round-fraction holdout
+
+To train on the early rounds of every tournament and evaluate on the final 20
+percent of rounds, run:
+
+```bash
+DEVICE=cuda ./run_scripts/common/run_compirt_round_holdout.sh
+```
+
+The wrapper defaults to `BASE_SPLIT=all` and
+`ROUND_HOLDOUT_FRACTION=0.2`. For example, restrict the source data to 2024
+with:
+
+```bash
+BASE_SPLIT=year_2024 ROUND_HOLDOUT_FRACTION=0.2 DEVICE=cuda \
+  ./run_scripts/common/run_compirt_round_holdout.sh
+```
+
+For each tournament, the split holds out
+`ceil(number_of_numbered_rounds * fraction)` complete rounds, with at least one
+held-out round. Games in an unparseable round such as `roundNone` are assigned
+to test so their unknown schedule position cannot leak into training. Related
+tossup-buzz and bonus-response rows follow their game, so outcome tables are
+disjoint even though question metadata may be shared.
+
+This wrapper uses the repository's existing **transductive** holdout workflow:
+training-player posteriors become priors, then test-player and test-item
+parameters are co-estimated from the held-out outcomes being scored. It measures
+late-round psychometric estimation, not a frozen pre-game forecast. The active
+lineups are also inferred from each game's buzz evidence under the repository's
+standard data convention.
+
+When `RUN_SYNERGY=1`, `run_scripts/common/run_compirt.sh` writes separate reports for the two
 bonus-model variants:
 
 - `ROOT/evaluation/experiment_report.md`: no-synergy compositional model;
@@ -184,8 +210,10 @@ bonus-model variants:
 - `ROOT/comparison/bonus_model_comparison.png`: visual overall metric comparison.
 
 The evaluator reports PPB MAE after averaging observed and predicted bonus
-points within each game/team, matching the paper's game-level definition. It
-also reports per-bonus point MAE separately.
+points within each game/team, matching the paper's game-level definition. The
+discrete per-bonus comparison is `exact_acc` (do the predicted-correct parts
+match the actual ones); a per-bonus expected-points MAE is intentionally not
+reported.
 
 ## Dimension Ablations
 
@@ -197,13 +225,13 @@ writes a `holdout/compositional` branch.
 
 ```bash
 # multidim MIRT: sweeps the latent skill dimension m
-.venv/bin/python -m run_scripts.run_multidim_ablation --dimensions 1 2 3 4 5
+.venv/bin/python -m run_scripts.multidimensional.multidim.run_multidim_ablation --dimensions 1 2 3 4 5
 
 # learned topic (joint sLDA): sweeps the topic count K, which *is* the skill dimension
-.venv/bin/python -m run_scripts.run_learned_topic_ablation --dimensions 1 2 3 4 5
+.venv/bin/python -m run_scripts.topic.run_learned_topic_ablation --dimensions 1 2 3 4 5
 
 # baseline: a 2-D grid over skill dimension m and synergy rank s
-.venv/bin/python -m run_scripts.run_baseline_ablation \
+.venv/bin/python -m run_scripts.baseline.run_baseline_ablation \
     --dimensions 1 2 3 4 5 --synergy-dimensions 0 1 2 3
 ```
 
@@ -235,12 +263,10 @@ whole synergy column, so an `|m| x |s|` grid costs only `|m|` Stage-1 fits; and
 the tossup metrics are constant in `s`, so they are written into every CSV row
 but plotted only against `m`. Only the bonus metrics get the 2-D heatmaps.
 
-Baseline sweeps are seeded (`--seed`, default 42, threaded into both baseline
-trainers and recorded in each `summary.json`), as are learned-topic sweeps. The
-`multidim` Stage-1 trainer is **not** seeded, so adjacent points on the committed
-`m`-curve under `results/compirt/holdout/multidim-ablation/` differ partly by SVI
-initialization noise rather than by dimensionality alone; read that curve for its
-trend, not for small gaps between neighbours.
+Baseline, multidimensional, and learned-topic sweeps are seeded (`--seed`,
+default 42), thread that seed into their training stages, and record it in run
+metadata. Small gaps between adjacent ablation points should still be read
+cautiously because a single seed does not measure optimization variability.
 
 The learned runner additionally exposes `--bow-weight`, `--topic-concentration`,
 `--vocab-size`, `--min-df`, `--rm-top`, and `--seed`; every value it used is
@@ -249,8 +275,67 @@ columns of the aggregate CSV. **Read the `K` curve with `--bow-weight` in mind.*
 At its default of `1.0` the LDA word likelihood dominates the outcome likelihood
 (~50--150 word tokens per document against a handful of buzzes), so topics come
 out nearly unsupervised and a flat metric-vs-`K` curve is a plausible artifact
-rather than evidence that topic count does not matter. `topic/learned/CLAUDE.md`
-recommends sweeping it over roughly `0.05--1.0` against a held-out IRT metric.
+rather than evidence that topic count does not matter. When diagnosing this
+tradeoff, sweep `--bow-weight` over roughly `0.05--1.0` against a held-out IRT
+metric rather than interpreting the default alone.
+
+## Drop Robustness (Ranking Sensitivity)
+
+How stable is the player ranking when a small fraction of buzz events is
+deleted? Following the data-dropping methodology of arXiv 2508.11847 (which
+flipped Chatbot Arena's top model by removing 0.003% of its preferences), two
+runners compare four ranking methods on identical dropped-event sets: raw
+actual PPG (no model, no refit), plain IRT
+(`simple_mirt/train_plain_irt.py`, the classical `sigmoid(alpha·theta − d)`
+model), baseline CompIRT, and multidim CompIRT. The hypothesis under test is
+that the CompIRT rankings degrade more gracefully than the simpler methods.
+The full mathematical contract (functionals, agreement metrics, AMIP
+relation) is `compirt_eval/drop_robustness/README.md`; this section covers commands
+and interpretation. A completed Tier-1 run and its reading — including each
+family's measured noise floor and the top-25 fragility asymmetry — is
+`results/compirt/in_sample/common/drop-robustness/README.md`.
+
+```bash
+# Tier 1: random-drop robustness curves (average case)
+./run_scripts/common/run_drop_robustness.sh
+# equivalently
+.venv/bin/python run_scripts/common/run_drop_robustness.py \
+    --fractions 0.001 0.005 0.01 0.05 --replicates 3
+
+# Tier 2: targeted worst-case drops (minimal refit-confirmed flip counts),
+# reusing Tier 1's full and noise-floor fits
+.venv/bin/python run_scripts/common/run_targeted_drop.py \
+    --reuse-full results/compirt/in_sample/common/drop-robustness
+```
+
+Every fit is Stage-1 only (player ranking never touches Stage 2), in-sample on
+`--split year_2024`, and uses **one fixed model seed** so full-vs-dropped
+differences isolate the data effect. A drop list is a plain text file of
+`event_id`s under `<root>/droplists/`; all three trainers accept it via
+`--drop-events`, and the same list is applied to every method. Rankings are
+rotation-invariant predicted-PPG scalars (see
+`compirt_eval/common/player_scoring.py`), never raw `theta_k` coordinates.
+
+Tier 1 writes `<root>/csvs/drop_robustness_metrics.csv` (one row per model x
+fraction x replicate: Kendall tau, Spearman, top-5/10/25 Jaccard, top-25
+displacement vs that model's own full-data ranking) and two curve plots under
+`<root>/graphs/`. Tier 2 ranks a target player's events most-influential-first
+(earliest correct buzzes for `--direction demote`), refits at increasing
+prefix sizes, and reports each method's flip bracket in
+`csvs/targeted_flip_metrics.csv` / `csvs/actual_flip_curve.csv` plus
+`graphs/gap_vs_dropped.png`.
+
+**Read every effect against the same model's own noise floor.** Each family
+gets alternate-seed full-data fits (`--noise-seeds`, recorded as fraction-0
+rows and shaded bands): SVI seed jitter alone moves these rankings (see
+`results/compirt/in_sample/multidim/multidim-tanh-all2024-noisefloor/README.md` — note
+that committed floor is for the tanh link, while this study defaults to
+sigmoid, so the runners fit their own floors), and a drop-induced change
+smaller than a family's own seed jitter is not a finding. Raw actual PPG is
+deterministic, so its curve is pure data effect. The targeted selector is a
+heuristic influence proxy, not the paper's exact AMIP: flips it finds are
+refit-confirmed and therefore definitive, but a "no flip" result is not proof
+that no flipping subset exists.
 
 ## Other Info
 
@@ -277,7 +362,7 @@ implementation protocol, classification rules, and output schema.
 
 ```bash
 RUN_C1_C4=1 MODEL=baseline DEVICE=cuda \
-  .venv/bin/python -m run_scripts.run_compirt_holdout
+  .venv/bin/python -m run_scripts.common.run_compirt_holdout
 ```
 
 Scenario C is disabled by default and does not change the existing Scenario A/B

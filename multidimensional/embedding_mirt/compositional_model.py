@@ -1,17 +1,13 @@
 """Embedding-relevance compositional bonus model.
 
-Mirrors 'topic/fixed/topic_compirt/compositional.py', but 'r' comes from the
-frozen projection fit during pyramidal (tossup) training rather than a fixed
-topic CSV. The member score inside the Eq. 8 aggregation is:
+The member score inside the Eq. 8 aggregation is:
 
-    root CompIRT:      sum_k theta_pk * alpha_bk
-    embedding CompIRT: sum_k r_bk * theta_pk
+    sum_k r_bk * theta_pk
 
-'r_b' is computed once in 'train_compositional.py' from each bonus's frozen
-embedding and the pyramidal run's fitted projection -- it is passed into this
-model as a fixed tensor, not sampled or re-fit here. Bonus-part difficulty
-becomes a per-dimension vector 'difficulty_beta_bk', shared by all three parts
-of a bonus like the topic variant.
+'r_b' is computed by 'train_compositional.py' from each bonus's frozen embedding
+and the fitted projection. The model receives it as a fixed tensor. The
+per-dimension bonus-part difficulty 'difficulty_beta_bk' is shared by all three
+parts of a bonus.
 """
 
 from __future__ import annotations

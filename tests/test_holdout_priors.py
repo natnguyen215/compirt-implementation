@@ -2,7 +2,6 @@
 
 import unittest
 
-import numpy as np
 import pandas as pd
 import torch
 
@@ -104,8 +103,7 @@ class TestPlayerTierMap(unittest.TestCase):
 
 class TestModelDefaultPriors(unittest.TestCase):
     def test_absent_prior_keys_keep_standard_normal(self):
-        # When the optional prior keys are missing, sample_parameters must use the
-        # standard N(0, I)/N(0, 1) priors so existing single-split runs are intact.
+        # Missing optional keys use the standard N(0, I)/N(0, 1) priors.
         import pyro
         from pyramidal_model import sample_parameters
 

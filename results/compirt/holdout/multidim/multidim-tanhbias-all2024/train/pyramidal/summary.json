@@ -1,0 +1,19 @@
+{
+  "model": "multidim-tanhbias-competing-risks",
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - tanh(gamma_jk * (mu_jk - t / T_j) + bias_jk) * scale)",
+  "tournament": "",
+  "dimensions": 5,
+  "difficulty_scale": 5.0,
+  "seed": 42,
+  "steps": 5000,
+  "final_loss": 413271.8611755371,
+  "players": 1455,
+  "tossups": 1260,
+  "events": 48612,
+  "calibrate_correctness": false,
+  "observation_counts": {
+    "CENSORED": 295555,
+    "BUZZ": 47914,
+    "NO-BUZZ": 4935
+  }
+}

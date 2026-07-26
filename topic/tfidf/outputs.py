@@ -48,7 +48,7 @@ def save_adjustment_curves(
     """Write signed aggregate difficulty adjustments for evaluator replay.
 
     The topic-weighted effective curve receives
-    ``-tfidf_prefix_j(t) * sum_k r_jk * lambda_k``. Sampling that scalar on a
+    '-tfidf_prefix_j(t) * sum_k r_jk * lambda_k'. Sampling that scalar on a
     relative-position grid lets evaluation reproduce adjusted difficulty and
     first-buzz timing without reconstructing the original text corpus.
     """

@@ -1,10 +1,9 @@
 """Train the second-stage CompIRT model for team bonus performance.
 
-Unlike pyramidal training, this file does not learn player skill from scratch.
-It loads fitted 'theta' vectors from the pyramidal model, holds them fixed,
-and learns how those individual skills combine for bonus parts.
+The trainer loads fitted 'theta' vectors from the pyramidal model, holds them
+fixed, and learns how those individual skills combine for bonus parts.
 
-Start reading at 'run_experiment' to see the complete workflow.
+'run_experiment' coordinates the complete workflow.
 """
 
 from __future__ import annotations
@@ -25,6 +24,7 @@ from compirt_data import (
     load_hf_tables,
 )
 from compositional_model import compositional_model, posterior_predictions
+from compirt_eval.diagnostics.posterior_predictive import save_bonus_ppc
 from utils.saving import (
     add_numbered_tensor_columns,
     save_bonus_predictions,
@@ -33,6 +33,7 @@ from utils.saving import (
     tensor_values,
     write_summary,
 )
+from utils.posterior import add_posterior_output_args
 from utils.training import fit_svi, require_device
 
 
@@ -61,25 +62,6 @@ def load_player_skills(path, device):
         players[theta_columns].to_numpy(), dtype=torch.float32, device=device
     )
     return players["player_id"].astype(str).tolist(), theta
-
-
-def train_model(
-    data,
-    theta,
-    use_synergy,
-    synergy_dimensions,
-    n_steps,
-    lr,
-    calibrate_correctness=False,
-    alpha_prior="normal",
-):
-    """Fit bonus-part parameters while treating 'theta' as fixed input."""
-    return fit_svi(
-        compositional_model,
-        (data, theta, use_synergy, synergy_dimensions, calibrate_correctness, alpha_prior),
-        n_steps,
-        lr,
-    )
 
 
 def run_experiment(args):
@@ -114,15 +96,22 @@ def run_experiment(args):
         f"Bonus part rows: {len(observations):,}  "
         f"Parts: {len(data['part_ids']):,}"
     )
-    posterior, losses = train_model(
-        data,
-        theta,
-        args.use_synergy,
-        args.synergy_dimensions,
-        args.steps,
-        args.lr,
-        args.calibrate_correctness,
-        args.alpha_prior,
+    model_kwargs = {
+        "data": data,
+        "theta": theta,
+        "use_synergy": args.use_synergy,
+        "synergy_dimensions": args.synergy_dimensions,
+        "calibrate_correctness": args.calibrate_correctness,
+        "alpha_prior": args.alpha_prior,
+    }
+    posterior, guide, losses = fit_svi(
+        compositional_model,
+        model_kwargs=model_kwargs,
+        n_steps=args.steps,
+        lr=args.lr,
+        posterior_output_dir=args.output_dir,
+        posterior_draws=args.posterior_draws,
+        posterior_seed=args.seed,
     )
     probabilities, aggregates, synergy = posterior_predictions(
         data, theta, posterior, args.use_synergy, args.calibrate_correctness
@@ -143,6 +132,17 @@ def run_experiment(args):
 
     save_bonus_predictions(
         args.output_dir, observations, probabilities, aggregates, synergy
+    )
+    save_bonus_ppc(
+        args.output_dir,
+        observations,
+        data,
+        theta,
+        guide,
+        model_kwargs,
+        draws=args.ppc_draws,
+        max_responses=args.ppc_max_responses,
+        seed=args.seed,
     )
 
     save_loss_plot(args.output_dir, losses, "Compositional IRT training loss")
@@ -188,6 +188,7 @@ def run_experiment(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
+    add_posterior_output_args(parser)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--split", default="all")
     parser.add_argument("--tournament")
@@ -200,6 +201,8 @@ def parse_args():
     parser.add_argument("--synergy-dimensions", type=int, default=1)
     parser.add_argument("--save-synergy-details", action="store_true")
     parser.add_argument("--calibrate-correctness", action="store_true")
+    parser.add_argument("--ppc-draws", type=int, default=0)
+    parser.add_argument("--ppc-max-responses", type=int, default=500)
     parser.add_argument(
         "--alpha-prior",
         choices=("normal", "gamma"),

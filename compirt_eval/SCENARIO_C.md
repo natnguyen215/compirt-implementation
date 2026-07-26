@@ -14,7 +14,7 @@ From the repository root:
 
 ```bash
 RUN_C1_C4=1 MODEL=baseline DEVICE=cuda \
-  .venv/bin/python -m run_scripts.run_compirt_holdout
+  .venv/bin/python -m run_scripts.common.run_compirt_holdout
 ```
 
 The shared implementation supports `baseline`, `multidim`, `tfidf`, and
@@ -57,8 +57,9 @@ The holdout runner performs these additional steps only when `RUN_C1_C4=1`:
    Markdown report.
 
 The orchestration lives in
-[`run_scripts/run_scenario_c.py`](../run_scripts/run_scenario_c.py). Shared
-classification and metric logic lives in [`scenario_c.py`](scenario_c.py), and
+[`run_scripts/common/run_scenario_c.py`](../run_scripts/common/run_scenario_c.py). Shared
+classification and metric logic lives in
+[`scenario_c_rosters/classification.py`](scenario_c_rosters/classification.py), and
 the restricted Pyro model lives in
 [`scenario_c_model.py`](../scenario_c_model.py).
 

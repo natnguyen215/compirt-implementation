@@ -1,7 +1,5 @@
-"""Topic-specific TF-IDF pyramidal experiments.
+"""Topic-specific TF-IDF likelihoods, trainers, evaluation replay, and outputs.
 
-This package is deliberately separate from the fixed and learned topic-model
-packages. It reuses their data conventions while keeping the text-conditioned
-likelihood, trainers, evaluation replay, and outputs isolated from baseline
-topic runs.
+The package follows the fixed and learned topic data conventions and keeps its
+text-conditioned run artifacts in a separate result branch.
 """

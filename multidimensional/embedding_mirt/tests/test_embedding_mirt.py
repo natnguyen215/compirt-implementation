@@ -82,9 +82,7 @@ class ProjectRelevanceTests(unittest.TestCase):
         self.assertTrue((r >= 0).all())
 
     def test_shares_math_with_multidim_mirt(self):
-        # The whole point of this variant is reusing multidim_mirt's competing-
-        # risks math unchanged -- guard that the imports really are the same
-        # functions, not accidental reimplementations that could drift apart.
+        # Guard that embedding relevance uses the shared competing-risks helpers.
         self.assertIs(correctness_logit, multidim_pyramidal_model.correctness_logit)
         self.assertIs(hazard_logit, multidim_pyramidal_model.hazard_logit)
 

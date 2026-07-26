@@ -46,9 +46,8 @@ def train_model(
 ):
     """Train a plain LDA model on the documents and return it with the kept docs.
 
-    Every topic is free and latent. Category labels carried by the loaded
-    documents are intentionally ignored by the model and only exported later as
-    metadata.
+    Every topic is free and latent. Category labels are exported as metadata
+    and remain outside the model inputs.
     """
     # Create a plain LDA model with 'dimensions' latent topics and no labels.
     model = tp.LDAModel(
@@ -180,6 +179,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Train LDA from the CLI inputs and save its model and document vectors."""
     # Parse and validate the command-line arguments.
     args = parse_args()
     if args.dimensions < 1:

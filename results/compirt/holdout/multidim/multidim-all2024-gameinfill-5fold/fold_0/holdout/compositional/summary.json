@@ -1,0 +1,14 @@
+{
+  "frozen_predict": true,
+  "split": "game-holdout:year_2024:test:5:0:42",
+  "tournament": "",
+  "use_synergy": false,
+  "calibrate_correctness": false,
+  "skill_dimensions": 5,
+  "bonus_part_observations": 25818,
+  "bonus_parts": 3633,
+  "tau": 0.14337559044361115,
+  "dropped_responses": 0,
+  "missing_parts": [],
+  "dropped_rows_unknown_roster": 0
+}

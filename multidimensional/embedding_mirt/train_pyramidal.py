@@ -1,15 +1,11 @@
 """Train the embedding-relevance CompIRT tossup model.
 
-This mirrors 'multidimensional/multidim_mirt/train_pyramidal.py' but imports
-'multidimensional.embedding_mirt.pyramidal_model' and attaches each tossup's frozen Qwen3
-embedding (from 'embed_questions.py') so 'r' is computed from question content
-instead of sampled as a free Gamma vector. In addition to the usual player/tossup
-CSVs, it saves the fitted 'r' projection ('r_projection.npz') so
-'train_compositional.py' can reuse the exact same transform on bonus text.
+The trainer attaches each tossup's frozen Qwen3 embedding, projects it into the
+relevance vector 'r', and saves the fitted projection as 'r_projection.npz' for
+the bonus stage.
 
-Start reading at 'run_experiment' near the bottom; it coordinates the same
-load -> build -> tensors -> train -> predict -> save workflow as
-'multidimensional/multidim_mirt/train_pyramidal.py'.
+'run_experiment' coordinates the load -> build -> tensors -> train -> predict ->
+save workflow.
 """
 
 from __future__ import annotations
@@ -20,6 +16,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pyro
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
@@ -55,6 +52,7 @@ from utils.saving import (
     write_summary,
 )
 from utils.training import fit_svi, require_device
+from utils.posterior import add_posterior_output_args
 
 
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "results" / "compirt" / "embedding-pyramidal"
@@ -88,27 +86,35 @@ def save_embedding_parameters(output_dir, data, posterior):
     pd.DataFrame(tossups).to_csv(output_dir / "tossups.csv", index=False)
 
 
-def train_model(
+def fit_embedding_model(
     data,
+    *,
     n_dimensions=5,
     n_steps=1000,
     lr=0.02,
     calibrate_correctness=False,
     projection_hidden_dim=DEFAULT_PROJECTION_HIDDEN_DIM,
+    posterior_output_dir=None,
+    posterior_draws=0,
+    posterior_seed=42,
 ):
     """Fit the model and return posterior medians (plus fitted 'r'), guide, and losses."""
     data["projection_hidden_dim"] = projection_hidden_dim
     posterior, guide, losses = fit_svi(
         competing_risks_model,
-        (data, n_dimensions, calibrate_correctness),
-        n_steps,
-        lr,
-        return_guide=True,
+        model_kwargs={
+            "data": data,
+            "n_dimensions": n_dimensions,
+            "calibrate_correctness": calibrate_correctness,
+        },
+        n_steps=n_steps,
+        lr=lr,
+        posterior_output_dir=posterior_output_dir,
+        posterior_draws=posterior_draws,
+        posterior_seed=posterior_seed,
     )
-    # 'r' is a deterministic function of the fixed embedding and the
-    # point-estimated projection, not a pyro.sample site, so it does not appear
-    # in guide.median(); pull the fitted FFN from the param store directly
-    # (same pattern as topic/learned/joint_pyramidal.py's topic_word_distributions).
+    # Read the point-estimated FFN from the parameter store and use it to derive
+    # deterministic relevance vectors.
     projection = fitted_projection()
     posterior["r"] = project_relevance(data["embedding"], projection)
     return posterior, guide, losses, projection
@@ -118,7 +124,10 @@ def run_experiment(args):
     """Run the complete embedding-relevance training pipeline."""
     args.output_dir.mkdir(parents=True, exist_ok=True)
     require_device(args.device)
+    pyro.set_rng_seed(args.seed)
 
+    # Build tossup tensors, align cached embeddings, and center them using the
+    # mean that will be saved with the fitted projection.
     tables = filter_tournament(load_hf_tables(args.data_dir, args.split), args.tournament)
     observations = build_tossup_observations(tables)
     if observations.empty:
@@ -135,6 +144,7 @@ def run_experiment(args):
     )
     print(observations["z"].value_counts().to_string())
 
+    # Attach held-out player priors when replaying from a training posterior.
     tier_map = player_tier_map(tables)
     if args.train_posterior:
         prior_summary = attach_player_priors(
@@ -148,15 +158,20 @@ def run_experiment(args):
         )
         print(f"Held-out player priors: {prior_summary}")
 
-    posterior, guide, losses, projection = train_model(
+    # Fit player/tossup parameters and the embedding-to-relevance projection.
+    posterior, guide, losses, projection = fit_embedding_model(
         data,
-        args.dimensions,
-        args.steps,
-        args.lr,
-        args.calibrate_correctness,
-        args.projection_hidden_dim,
+        n_dimensions=args.dimensions,
+        n_steps=args.steps,
+        lr=args.lr,
+        calibrate_correctness=args.calibrate_correctness,
+        projection_hidden_dim=args.projection_hidden_dim,
+        posterior_output_dir=args.output_dir,
+        posterior_draws=args.posterior_draws,
+        posterior_seed=args.seed,
     )
 
+    # Save fitted parameters, the centered projection, and training diagnostics.
     save_embedding_parameters(args.output_dir, data, posterior)
     save_projection(
         args.output_dir / "r_projection.npz",
@@ -168,18 +183,16 @@ def run_experiment(args):
         args.output_dir, losses, "Embedding-relevance IRT training loss"
     )
 
+    # Replay row and event predictions at the fitted posterior medians.
     correct, hazard, survival = posterior_row_predictions(
         data, posterior, args.calibrate_correctness
     )
-    buzz_expected = (
-        expected_first_buzz_positions(data, posterior)
-        if args.predict_buzz_positions
-        else None
-    )
+    buzz_expected = expected_first_buzz_positions(data, posterior)
     save_tossup_predictions(
         args.output_dir, observations, correct, hazard, survival, buzz_expected=buzz_expected
     )
 
+    # Record the inputs, fit settings, and realized dataset sizes.
     summary = {
         "model": "embedding-relevance-competing-risks",
         "formula": FORMULA,
@@ -191,11 +204,12 @@ def run_experiment(args):
         "centered_embeddings": True,
         "embedding_mean_norm": float(embedding_mean.norm().detach().cpu()),
         "steps": args.steps,
+        "lr": args.lr,
+        "seed": args.seed,
         "final_loss": losses[-1],
         "players": len(data["player_ids"]),
         "tossups": len(data["tossup_ids"]),
         "events": len(data["event_ids"]),
-        "predicted_buzz_positions": args.predict_buzz_positions,
         "calibrate_correctness": args.calibrate_correctness,
         "observation_counts": observations["z"].value_counts().to_dict(),
     }
@@ -205,6 +219,7 @@ def run_experiment(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
+    add_posterior_output_args(parser)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--split", default="all")
     parser.add_argument("--tournament")
@@ -218,8 +233,8 @@ def parse_args():
     )
     parser.add_argument("--steps", type=int, default=1000)
     parser.add_argument("--lr", type=float, default=0.02)
+    parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
-    parser.add_argument("--predict-buzz-positions", action="store_true")
     parser.add_argument("--calibrate-correctness", action="store_true")
     parser.add_argument(
         "--train-posterior",

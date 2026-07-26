@@ -1,12 +1,10 @@
-"""Train the isolated topic-weighted compositional bonus model.
+"""Train the topic-weighted compositional bonus model.
 
-This is the topic-weighted counterpart to the root 'train_compositional.py'.
-Like that script, it does not learn player skill from scratch: it loads the
-fixed 'theta' vectors from the pyramidal stage, holds them fixed, and learns
+The trainer loads fixed 'theta' vectors from the pyramidal stage and learns
 per-topic bonus-part difficulty. Each bonus part's fixed PLDA topic vector
-weights both member skill and part difficulty coordinates.
+weights member skill and part difficulty coordinates.
 
-Start reading at 'run_experiment' near the bottom; it coordinates the full
+'run_experiment' coordinates the
 load -> build -> train -> predict -> save workflow.
 """
 
@@ -17,6 +15,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pyro
 
 from compirt_data import (
     DEFAULT_DATA_DIR,
@@ -38,23 +37,11 @@ from utils.saving import (
     write_summary,
 )
 from utils.training import fit_svi, require_device
+from utils.posterior import add_posterior_output_args
 
 
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "results" / "compirt" / "topic-compositional"
 FORMULA = "logit_rb = LSE_m(sum_k r_bk * theta_pmk; tau) - sum_k r_bk * beta_bk"
-
-
-def train_model(
-    data, theta, use_synergy, synergy_dimensions, n_steps, lr,
-    calibrate_correctness=False,
-):
-    """Fit topic-weighted bonus-part parameters while theta is fixed."""
-    return fit_svi(
-        compositional_model,
-        (data, theta, use_synergy, synergy_dimensions, calibrate_correctness),
-        n_steps,
-        lr,
-    )
 
 
 def save_bonus_part_parameters(output_dir, data, posterior):
@@ -66,10 +53,11 @@ def save_bonus_part_parameters(output_dir, data, posterior):
 
 
 def run_experiment(args):
-    """Run the complete isolated topic-weighted compositional pipeline."""
+    """Run the complete topic-weighted compositional pipeline."""
     # Set up the output directory and validate the requested device.
     args.output_dir.mkdir(parents=True, exist_ok=True)
     require_device(args.device)
+    pyro.set_rng_seed(args.seed)
 
     # Load the fixed player skills (theta) learned by the pyramidal stage.
     player_ids, theta = load_player_skills(args.player_skills, args.device)
@@ -105,9 +93,20 @@ def run_experiment(args):
     )
 
     # Train the topic-weighted bonus-part parameters (theta stays fixed).
-    posterior, losses = train_model(
-        data, theta, args.use_synergy, args.synergy_dimensions, args.steps, args.lr,
-        args.calibrate_correctness,
+    posterior, _guide, losses = fit_svi(
+        compositional_model,
+        model_kwargs={
+            "data": data,
+            "theta": theta,
+            "use_synergy": args.use_synergy,
+            "synergy_dimensions": args.synergy_dimensions,
+            "calibrate_correctness": args.calibrate_correctness,
+        },
+        n_steps=args.steps,
+        lr=args.lr,
+        posterior_output_dir=args.output_dir,
+        posterior_draws=args.posterior_draws,
+        posterior_seed=args.seed,
     )
     # Replay predictions at the fitted posterior medians.
     probabilities, aggregates, synergy = posterior_predictions(
@@ -147,6 +146,8 @@ def run_experiment(args):
         "topic_columns": topic_columns,
         "tournament": args.tournament or "",
         "steps": args.steps,
+        "lr": args.lr,
+        "seed": args.seed,
         "final_loss": losses[-1],
         "use_synergy": args.use_synergy,
         "synergy_dimensions": args.synergy_dimensions if args.use_synergy else 0,
@@ -174,6 +175,7 @@ def run_experiment(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
+    add_posterior_output_args(parser)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--split", default="all")
     parser.add_argument("--tournament")
@@ -181,6 +183,7 @@ def parse_args():
     parser.add_argument("--player-skills", type=Path, required=True)
     parser.add_argument("--steps", type=int, default=1000)
     parser.add_argument("--lr", type=float, default=0.02)
+    parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     parser.add_argument("--use-synergy", action="store_true")
     parser.add_argument("--synergy-dimensions", type=int, default=1)

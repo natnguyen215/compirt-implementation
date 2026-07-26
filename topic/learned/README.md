@@ -54,9 +54,9 @@ directory, use this map first:
   covers every latent (including `theta_doc`), so training reuses the existing
   `utils.training.fit_svi`.
 
-The competing-risks math is reused unchanged from
-`topic/fixed/topic_compirt/pyramidal.py`; only the source of the topic weight
-differs (a learned Dirichlet latent vs. a fixed CSV).
+The competing-risks math is reused from
+`topic/fixed/topic_compirt/pyramidal.py`; the source of the topic weight is the
+only difference (a learned Dirichlet latent in place of a fixed CSV).
 
 ## Files
 
@@ -76,7 +76,7 @@ differs (a learned Dirichlet latent vs. a fixed CSV).
 # 1. Jointly train topics + pyramidal tossup IRT.
 .venv/bin/python -m topic.learned.train_joint_pyramidal \
   --split year_2024 --dimensions 5 --steps 2000 \
-  --output-dir results/compirt/in_sample/joint-slda-2024
+  --output-dir results/compirt/in_sample/topic/joint-slda-2024
 
 # 2. Bonus stage (learned / sLDA): freeze the joint run's player skills + topic
 #    axes (topic_word), and re-learn each bonus's topics supervised by its part-
@@ -84,27 +84,27 @@ differs (a learned Dirichlet latent vs. a fixed CSV).
 #    topic_word_matrix.npy + vocabulary.json); --dimensions is inferred from theta.
 .venv/bin/python -m topic.learned.train_joint_compositional \
   --split year_2024 \
-  --player-skills results/compirt/in_sample/joint-slda-2024/players.csv \
-  --topic-model-dir results/compirt/in_sample/joint-slda-2024 \
-  --output-dir results/compirt/in_sample/joint-slda-2024/compositional
+  --player-skills results/compirt/in_sample/topic/joint-slda-2024/players.csv \
+  --topic-model-dir results/compirt/in_sample/topic/joint-slda-2024 \
+  --output-dir results/compirt/in_sample/topic/joint-slda-2024/compositional
 
 #    (Alternative) original fixed-vector bonus stage: reuse the word-only bonus
 #    vectors as fixed weights, with no bonus-correctness supervision of topics.
 .venv/bin/python -m topic.fixed.train_topic_compositional \
   --split year_2024 \
-  --player-skills results/compirt/in_sample/joint-slda-2024/players.csv \
-  --topic-vectors results/compirt/in_sample/joint-slda-2024/document_latent_vectors.csv \
-  --output-dir results/compirt/in_sample/joint-slda-2024/compositional-fixed
+  --player-skills results/compirt/in_sample/topic/joint-slda-2024/players.csv \
+  --topic-vectors results/compirt/in_sample/topic/joint-slda-2024/document_latent_vectors.csv \
+  --output-dir results/compirt/in_sample/topic/joint-slda-2024/compositional-fixed
 
 # 3. Evaluate both stages together.
 .venv/bin/python -m topic.fixed.evaluate_topic_compirt \
-  --pyramidal-results results/compirt/in_sample/joint-slda-2024 \
-  --compositional-results results/compirt/in_sample/joint-slda-2024/compositional \
-  --output-dir results/compirt/in_sample/joint-slda-2024/evaluation
+  --pyramidal-results results/compirt/in_sample/topic/joint-slda-2024 \
+  --compositional-results results/compirt/in_sample/topic/joint-slda-2024/compositional \
+  --output-dir results/compirt/in_sample/topic/joint-slda-2024/evaluation
 
 # 4. (Optional) profile what each learned topic captures.
 .venv/bin/python -m topic.learned.topic_response_profiles \
-  --vectors results/compirt/in_sample/joint-slda-2024/document_latent_vectors.csv \
+  --vectors results/compirt/in_sample/topic/joint-slda-2024/document_latent_vectors.csv \
   --split year_2024
 ```
 

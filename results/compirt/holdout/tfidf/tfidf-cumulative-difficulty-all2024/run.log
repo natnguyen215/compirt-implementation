@@ -1,0 +1,165 @@
+# CompIRT Run Log
+
+Generated: 2026-07-07T19:00:14-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- BONUS_STEPS: 2000
+- CALIBRATE_CORRECTNESS: 0
+- DATABASE: unknown
+- DEVICE: cuda
+- DIMENSIONS: 5
+- GPU: 0
+- HOLDOUT_COMPARISON_OUTPUT: results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/comparison
+- HOLDOUT_COMPOSITIONAL_OUTPUT: results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/compositional
+- HOLDOUT_EVALUATION_OUTPUT: results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/evaluation
+- HOLDOUT_PYRAMIDAL_OUTPUT: results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/pyramidal
+- HOLDOUT_SYNERGY_EVALUATION_OUTPUT: results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/synergy-evaluation
+- HOLDOUT_SYNERGY_OUTPUT: results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/synergy
+- LR: 0.01
+- MODEL: tfidf
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- NEW_PLAYER_PRIOR: tier
+- NO_NORMALIZE_TFIDF: 0
+- PYRAMIDAL_STEPS: 3000
+- PYTHON: .venv/bin/python
+- ROOT: results/compirt/holdout/tfidf-cumulative-difficulty-all2024
+- RUNNER: run_scripts/run_compirt_holdout.py
+- RUN_SYNERGY: 1
+- SAVE_SYNERGY_DETAILS: 1
+- SYNERGY_DIMENSIONS: 3
+- TEST_SPLIT: year_2025
+- TFIDF_EFFECT_PRIOR_SCALE: 1.0
+- TFIDF_PLOT_COUNT: 6
+- TFIDF_VARIANT: cumulative-difficulty
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: <all>
+- TRAIN_PYRAMIDAL_OUTPUT: results/compirt/holdout/tfidf-cumulative-difficulty-all2024/train/pyramidal
+- TRAIN_SPLIT: year_2024
+
++ .venv/bin/python -m tfidf.train_tfidf_pyramidal --split year_2024 --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/tfidf-cumulative-difficulty-all2024/train/pyramidal --dimensions 5 --tfidf-variant cumulative-difficulty --tfidf-effect-prior-scale 1.0
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Variant: cumulative-difficulty  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 28,219,254.1
+step  100  ELBO loss: 751,856.0
+step  200  ELBO loss: 482,856.6
+step  300  ELBO loss: 425,450.1
+step  400  ELBO loss: 391,404.0
+step  500  ELBO loss: 373,270.9
+step  600  ELBO loss: 365,008.8
+step  700  ELBO loss: 361,071.9
+step  800  ELBO loss: 359,729.7
+step  900  ELBO loss: 358,595.8
+step 1000  ELBO loss: 358,055.7
+step 1100  ELBO loss: 357,530.9
+step 1200  ELBO loss: 357,505.8
+step 1300  ELBO loss: 357,155.8
+step 1400  ELBO loss: 357,168.0
+step 1500  ELBO loss: 356,982.2
+step 1600  ELBO loss: 356,984.5
+step 1700  ELBO loss: 356,894.1
+step 1800  ELBO loss: 356,813.0
+step 1900  ELBO loss: 356,817.2
+step 2000  ELBO loss: 356,867.4
+step 2100  ELBO loss: 356,840.2
+step 2200  ELBO loss: 356,555.4
+step 2300  ELBO loss: 356,497.7
+step 2400  ELBO loss: 356,678.0
+step 2500  ELBO loss: 356,487.0
+step 2600  ELBO loss: 356,568.8
+step 2700  ELBO loss: 356,515.1
+step 2800  ELBO loss: 356,299.9
+step 2900  ELBO loss: 356,277.3
++ .venv/bin/python -m tfidf.train_tfidf_pyramidal --split year_2025 --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/tfidf-cumulative-difficulty-all2024/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/pyramidal --dimensions 5 --tfidf-variant cumulative-difficulty --tfidf-effect-prior-scale 1.0
+Rows: 469,615  Players: 1,755  Tossups: 1,350  Variant: cumulative-difficulty  IDF vocab: 26,061
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 36,718,940.4
+step  100  ELBO loss: 1,172,591.7
+step  200  ELBO loss: 860,172.5
+step  300  ELBO loss: 666,093.7
+step  400  ELBO loss: 552,426.3
+step  500  ELBO loss: 494,194.4
+step  600  ELBO loss: 474,336.1
+step  700  ELBO loss: 469,187.0
+step  800  ELBO loss: 467,197.2
+step  900  ELBO loss: 465,809.1
+step 1000  ELBO loss: 464,868.3
+step 1100  ELBO loss: 464,287.9
+step 1200  ELBO loss: 464,070.8
+step 1300  ELBO loss: 463,766.0
+step 1400  ELBO loss: 463,564.2
+step 1500  ELBO loss: 463,389.0
+step 1600  ELBO loss: 463,319.3
+step 1700  ELBO loss: 463,168.6
+step 1800  ELBO loss: 463,278.3
+step 1900  ELBO loss: 463,197.0
+step 2000  ELBO loss: 463,097.3
+step 2100  ELBO loss: 463,249.9
+step 2200  ELBO loss: 463,028.2
+step 2300  ELBO loss: 463,000.2
+step 2400  ELBO loss: 463,106.4
+step 2500  ELBO loss: 462,960.8
+step 2600  ELBO loss: 462,917.5
+step 2700  ELBO loss: 463,009.8
+step 2800  ELBO loss: 462,817.9
+step 2900  ELBO loss: 462,880.8
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/compositional
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 237,897.4
+step  100  ELBO loss: 118,001.7
+step  200  ELBO loss: 97,771.6
+step  300  ELBO loss: 92,986.6
+step  400  ELBO loss: 91,657.6
+step  500  ELBO loss: 91,263.9
+step  600  ELBO loss: 91,255.7
+step  700  ELBO loss: 91,234.6
+step  800  ELBO loss: 91,094.3
+step  900  ELBO loss: 91,238.7
+step 1000  ELBO loss: 91,110.0
+step 1100  ELBO loss: 91,262.9
+step 1200  ELBO loss: 91,220.0
+step 1300  ELBO loss: 91,239.5
+step 1400  ELBO loss: 91,157.3
+step 1500  ELBO loss: 91,125.4
+step 1600  ELBO loss: 91,110.6
+step 1700  ELBO loss: 91,081.5
+step 1800  ELBO loss: 91,241.4
+step 1900  ELBO loss: 91,067.6
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/synergy --use-synergy --synergy-dimensions 3 --save-synergy-details
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 240,083.5
+step  100  ELBO loss: 112,438.9
+step  200  ELBO loss: 92,715.0
+step  300  ELBO loss: 89,133.0
+step  400  ELBO loss: 88,141.9
+step  500  ELBO loss: 88,009.0
+step  600  ELBO loss: 87,803.6
+step  700  ELBO loss: 87,760.4
+step  800  ELBO loss: 87,646.9
+step  900  ELBO loss: 87,774.4
+step 1000  ELBO loss: 87,704.1
+step 1100  ELBO loss: 87,438.3
+step 1200  ELBO loss: 87,465.2
+step 1300  ELBO loss: 87,650.8
+step 1400  ELBO loss: 87,495.3
+step 1500  ELBO loss: 87,667.5
+step 1600  ELBO loss: 87,531.6
+step 1700  ELBO loss: 87,452.1
+step 1800  ELBO loss: 87,384.6
+step 1900  ELBO loss: 87,653.0
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/pyramidal --compositional-results results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/compositional --output-dir results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/evaluation
++ .venv/bin/python -m tfidf.plot_tfidf_difficulty_curves --results-dir results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/pyramidal --output-dir results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/evaluation/graphs --count 6
+results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/evaluation/graphs/tfidf_effective_difficulty_curves.png
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/pyramidal --compositional-results results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/synergy --output-dir results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/synergy-evaluation
++ .venv/bin/python -m compare_compirt --compositional-metrics results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/evaluation/csvs/bonus_metrics.csv --synergy-metrics results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/synergy-evaluation/csvs/bonus_metrics.csv --output-dir results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/comparison
+Finished held-out tfidf run. Scenario A/B metrics in results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/evaluation.
+Synergy metrics in results/compirt/holdout/tfidf-cumulative-difficulty-all2024/holdout/synergy-evaluation.

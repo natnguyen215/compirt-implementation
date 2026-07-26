@@ -1,0 +1,157 @@
+neg_test | configs=['multidim', 'multidim-cal', 'per-position-cal', 'ta-timing', 'ta-timing-cal', 'ta-both', 'bernstein-drop2'] folds=[0, 1, 2, 3, 4] device=cuda steps=3000 dim=5 root=results/neg_test
+
+===== multidim | fold 0 | TRAIN =====
+Rows: 281,324  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238670
+BUZZ         38619
+NO-BUZZ       4035
+step    0  ELBO loss: 16,930,762.3
+step  100  ELBO loss: 459,602.3
+step  200  ELBO loss: 398,179.7
+step  300  ELBO loss: 368,284.4
+step  400  ELBO loss: 343,855.9
+step  500  ELBO loss: 323,815.2
+step  600  ELBO loss: 314,044.9
+step  700  ELBO loss: 309,402.5
+step  800  ELBO loss: 306,450.1
+step  900  ELBO loss: 304,556.8
+step 1000  ELBO loss: 303,622.9
+step 1100  ELBO loss: 302,918.1
+step 1200  ELBO loss: 301,937.5
+step 1300  ELBO loss: 301,456.3
+step 1400  ELBO loss: 301,263.7
+step 1500  ELBO loss: 300,718.9
+step 1600  ELBO loss: 299,910.2
+step 1700  ELBO loss: 299,907.9
+step 1800  ELBO loss: 299,864.8
+step 1900  ELBO loss: 299,744.3
+step 2000  ELBO loss: 299,787.1
+step 2100  ELBO loss: 298,878.9
+step 2200  ELBO loss: 299,055.5
+step 2300  ELBO loss: 298,710.8
+step 2400  ELBO loss: 298,605.5
+step 2500  ELBO loss: 298,661.2
+step 2600  ELBO loss: 299,824.0
+step 2700  ELBO loss: 298,570.2
+step 2800  ELBO loss: 298,261.0
+step 2900  ELBO loss: 298,429.8
+===== multidim | fold 0 | HELD-OUT =====
+Rows: 67,080  Players: 1,186  Tossups: 1,240
+z
+CENSORED    56885
+BUZZ         9295
+NO-BUZZ       900
+Held-out player priors: {'players': 1186, 'returning': 1186, 'new': 0, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 4,794,292.7
+step  100  ELBO loss: 598,114.9
+step  200  ELBO loss: 344,725.8
+step  300  ELBO loss: 215,095.3
+step  400  ELBO loss: 132,151.1
+step  500  ELBO loss: 90,083.1
+step  600  ELBO loss: 78,093.2
+step  700  ELBO loss: 76,254.5
+step  800  ELBO loss: 75,519.1
+step  900  ELBO loss: 74,813.0
+step 1000  ELBO loss: 75,246.6
+step 1100  ELBO loss: 74,763.2
+step 1200  ELBO loss: 74,536.2
+step 1300  ELBO loss: 74,534.7
+step 1400  ELBO loss: 74,957.0
+step 1500  ELBO loss: 74,546.6
+step 1600  ELBO loss: 74,167.6
+step 1700  ELBO loss: 75,286.9
+step 1800  ELBO loss: 74,130.4
+step 1900  ELBO loss: 74,608.7
+step 2000  ELBO loss: 74,295.2
+step 2100  ELBO loss: 74,020.3
+step 2200  ELBO loss: 74,409.6
+step 2300  ELBO loss: 74,058.6
+step 2400  ELBO loss: 74,229.7
+step 2500  ELBO loss: 74,615.9
+step 2600  ELBO loss: 74,352.6
+step 2700  ELBO loss: 74,585.9
+step 2800  ELBO loss: 74,212.2
+step 2900  ELBO loss: 74,357.3
+
+===== multidim | fold 1 | TRAIN =====
+Rows: 282,124  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239379
+BUZZ         38821
+NO-BUZZ       3924
+step    0  ELBO loss: 16,907,984.3
+step  100  ELBO loss: 461,488.6
+step  200  ELBO loss: 399,942.8
+step  300  ELBO loss: 369,708.1
+step  400  ELBO loss: 344,184.3
+step  500  ELBO loss: 324,026.7
+step  600  ELBO loss: 314,797.3
+step  700  ELBO loss: 310,163.8
+step  800  ELBO loss: 306,994.5
+step  900  ELBO loss: 305,205.0
+step 1000  ELBO loss: 304,341.2
+step 1100  ELBO loss: 303,891.9
+step 1200  ELBO loss: 302,899.5
+step 1300  ELBO loss: 302,145.7
+step 1400  ELBO loss: 302,096.4
+step 1500  ELBO loss: 301,477.9
+step 1600  ELBO loss: 300,671.1
+step 1700  ELBO loss: 300,725.6
+step 1800  ELBO loss: 300,419.0
+step 1900  ELBO loss: 300,325.8
+step 2000  ELBO loss: 300,343.3
+step 2100  ELBO loss: 299,567.6
+step 2200  ELBO loss: 299,745.5
+step 2300  ELBO loss: 299,310.0
+step 2400  ELBO loss: 299,360.5
+step 2500  ELBO loss: 299,463.8
+step 2600  ELBO loss: 300,239.1
+step 2700  ELBO loss: 299,460.9
+step 2800  ELBO loss: 299,138.7
+step 2900  ELBO loss: 299,174.0
+===== multidim | fold 1 | HELD-OUT =====
+Rows: 66,280  Players: 1,167  Tossups: 1,220
+z
+CENSORED    56176
+BUZZ         9093
+NO-BUZZ      1011
+Held-out player priors: {'players': 1167, 'returning': 1167, 'new': 0, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 4,762,277.9
+step  100  ELBO loss: 595,713.3
+step  200  ELBO loss: 343,231.3
+step  300  ELBO loss: 212,797.6
+step  400  ELBO loss: 131,107.3
+step  500  ELBO loss: 89,015.1
+step  600  ELBO loss: 76,808.7
+step  700  ELBO loss: 75,056.6
+step  800  ELBO loss: 74,482.4
+step  900  ELBO loss: 73,717.6
+step 1000  ELBO loss: 73,780.2
+step 1100  ELBO loss: 73,777.0
+step 1200  ELBO loss: 73,434.3
+step 1300  ELBO loss: 73,427.6
+step 1400  ELBO loss: 73,593.6
+step 1500  ELBO loss: 73,718.4
+step 1600  ELBO loss: 73,201.9
+step 1700  ELBO loss: 73,279.1
+step 1800  ELBO loss: 73,061.9
+step 1900  ELBO loss: 73,482.1
+step 2000  ELBO loss: 73,323.6
+step 2100  ELBO loss: 72,964.1
+step 2200  ELBO loss: 73,182.7
+step 2300  ELBO loss: 73,013.5
+step 2400  ELBO loss: 73,219.4
+step 2500  ELBO loss: 73,062.4
+step 2600  ELBO loss: 73,170.2
+step 2700  ELBO loss: 74,093.0
+step 2800  ELBO loss: 72,824.7
+step 2900  ELBO loss: 72,923.2
+
+===== multidim | fold 2 | TRAIN =====
+Rows: 281,564  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238862
+BUZZ         38657
+NO-BUZZ       4045
+step    0  ELBO loss: 16,926,244.3

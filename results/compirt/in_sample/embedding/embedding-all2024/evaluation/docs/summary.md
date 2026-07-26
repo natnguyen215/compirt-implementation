@@ -1,0 +1,118 @@
+# CompIRT Evaluation Summary
+
+Evaluation folder: `/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/in_sample/embedding-all2024/evaluation`
+Result root: `/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/in_sample/embedding-all2024`
+
+This file consolidates the metric CSVs, bonus-model comparison deltas, and fitted-parameter distribution summaries for quick review.
+
+**Evaluation regime: in-sample fit.** Player and question parameters were estimated on the same observations these metrics score, so they are optimization and inspection diagnostics, not generalization estimates.
+
+## Run Variables And Stage Scalars
+
+| stage | field | value |
+| --- | --- | --- |
+| pyramidal | tournament | all 2024 |
+| pyramidal | dimensions | 5 |
+| pyramidal | steps | 5000 |
+| pyramidal | final_loss | 361726 |
+| pyramidal | calibrate_correctness | False |
+| compositional | tournament | all 2024 |
+| compositional | dimensions | 5 |
+| compositional | steps | 3000 |
+| compositional | final_loss | 65085.4 |
+| compositional | calibrate_correctness | False |
+| compositional | synergy_dimensions | 0 |
+
+## Bonus Stage Scalars
+
+| field | value |
+| --- | --- |
+| tau | 0.100477 |
+
+## Stage 2 Bonus Metrics
+
+| metric | value |
+| --- | --- |
+| auc | 0.910852 |
+| log_loss | 0.390789 |
+| ece | 0.0536683 |
+| part_accuracy | 0.825312 |
+| part_accuracy_macro_team | 0.828182 |
+| part_accuracy_macro_game | 0.825204 |
+| part_accuracy_macro_bonus | 0.81442 |
+| exact_acc | 0.548969 |
+| ppb_mae | 1.84142 |
+
+## Stage 1 Tossup Metrics
+
+| metric | value |
+| --- | --- |
+| auc | 0.672207 |
+| log_loss | 0.607395 |
+| ece | 0.172414 |
+| accuracy | 0.683349 |
+| buzz_position_mae | 0.151419 |
+| buzz_position_median_absolute_error | 0.135049 |
+
+## No-Synergy Versus Synergy Deltas
+
+| metric | no_synergy | synergy | synergy_minus_no_synergy | better_in_sample |
+| --- | --- | --- | --- | --- |
+| auc | 0.910852 | 0.917969 | 0.00711632 | synergy |
+| log_loss | 0.390789 | 0.373174 | -0.0176158 | synergy |
+| ece | 0.0536683 | 0.0410241 | -0.0126442 | synergy |
+| part_accuracy | 0.825312 | 0.837818 | 0.0125055 | synergy |
+| part_accuracy_macro_team | 0.828182 | 0.839702 | 0.0115201 | synergy |
+| part_accuracy_macro_game | 0.825204 | 0.837968 | 0.0127639 | synergy |
+| part_accuracy_macro_bonus | 0.81442 | 0.83599 | 0.0215697 | synergy |
+| exact_acc | 0.548969 | 0.576213 | 0.0272439 | synergy |
+| ppb_mae | 1.84142 | 0.716918 | -1.1245 | synergy |
+
+## Pyramidal Player And Tossup Parameters
+
+| group | parameter | observations | mean | standard_deviation | minimum | p05 | p25 | median | p75 | p95 | maximum |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| player | c | 1455 | 5.05985 | 0.629308 | 2.61277 | 3.68992 | 4.81284 | 5.14191 | 5.45956 | 5.95642 | 6.73837 |
+| player | theta_1 | 1455 | 0.193458 | 1.07946 | -1.91766 | -1.36768 | -0.693992 | 0.136761 | 0.955367 | 2.07331 | 3.57638 |
+| player | theta_2 | 1455 | 0.0157545 | 0.345924 | -1.62275 | -0.422084 | -0.153416 | -0.0464344 | 0.136652 | 0.670407 | 2.09974 |
+| player | theta_3 | 1455 | 0.033372 | 1.26878 | -2.26194 | -1.55644 | -0.983686 | -0.220035 | 0.821383 | 2.52573 | 4.13967 |
+| player | theta_4 | 1455 | 0.0951733 | 1.00091 | -1.77851 | -1.15269 | -0.729565 | -0.0914146 | 0.705327 | 2.04146 | 3.56057 |
+| player | theta_5 | 1455 | 0.156871 | 1.13426 | -2.3144 | -1.60268 | -0.730488 | 0.133308 | 1.02734 | 2.04962 | 3.33948 |
+| player | theta_norm | 1455 | 2.12582 | 0.856346 | 0.423986 | 0.969049 | 1.57271 | 1.98125 | 2.54156 | 3.81499 | 6.69182 |
+| tossup | beta_1 | 1260 | 1.07253 | 1.6169 | -2.12212 | -0.0681393 | -0.0143743 | 0.031165 | 2.91436 | 3.97665 | 5.52083 |
+| tossup | beta_2 | 1260 | 0.000927255 | 0.0939972 | -0.910544 | -0.0824594 | -0.0351307 | -0.00246975 | 0.0294517 | 0.081725 | 1.13029 |
+| tossup | beta_3 | 1260 | 0.820047 | 1.43399 | -3.12122 | -0.0686683 | -0.0125393 | 0.0393701 | 0.868195 | 4.05132 | 4.97271 |
+| tossup | beta_4 | 1260 | 0.522126 | 1.25012 | -1.76501 | -0.0689508 | -0.0235043 | 0.0142846 | 0.0626851 | 3.71789 | 4.84718 |
+| tossup | beta_5 | 1260 | 1.28842 | 1.60668 | -2.68782 | -0.0675239 | -0.00273909 | 0.0928906 | 3.02109 | 3.89271 | 4.63946 |
+| tossup | gamma_1 | 1260 | 18.6497 | 70.1872 | 4.18421 | 4.58634 | 4.89475 | 5.19688 | 9.0368 | 57.6822 | 1599.42 |
+| tossup | gamma_2 | 1260 | 4.99621 | 0.325913 | 2.05957 | 4.53424 | 4.80727 | 4.9955 | 5.19545 | 5.4913 | 6.80518 |
+| tossup | gamma_3 | 1260 | 12.4201 | 53.2493 | 0.311872 | 4.59815 | 4.9021 | 5.17106 | 6.09798 | 19.2021 | 1007.8 |
+| tossup | gamma_4 | 1260 | 13.3097 | 76.6811 | 3.54429 | 4.57873 | 4.85954 | 5.07573 | 5.37872 | 19.6904 | 1635.19 |
+| tossup | gamma_5 | 1260 | 26.7472 | 134.571 | 2.21481 | 4.63064 | 4.9757 | 5.38005 | 11.4132 | 56.5808 | 2276.91 |
+| tossup | mu_1 | 1260 | 0.536676 | 0.103593 | 0.194391 | 0.441745 | 0.491442 | 0.503741 | 0.523804 | 0.780911 | 0.954793 |
+| tossup | mu_2 | 1260 | 0.500153 | 0.0137347 | 0.407848 | 0.479073 | 0.491996 | 0.500359 | 0.50854 | 0.520422 | 0.611226 |
+| tossup | mu_3 | 1260 | 0.526581 | 0.0864302 | 0.200843 | 0.458238 | 0.490766 | 0.502538 | 0.519123 | 0.739633 | 0.939558 |
+| tossup | mu_4 | 1260 | 0.520351 | 0.0730911 | 0.205203 | 0.475786 | 0.492255 | 0.502211 | 0.513373 | 0.697803 | 0.92054 |
+| tossup | mu_5 | 1260 | 0.532845 | 0.103533 | 0.206348 | 0.411911 | 0.489961 | 0.503731 | 0.533557 | 0.765511 | 0.928674 |
+| tossup | r_1 | 1260 | 0.275613 | 0.416996 | 9.10391e-14 | 4.36738e-10 | 3.51914e-07 | 8.86678e-05 | 0.717677 | 0.999972 | 1 |
+| tossup | r_2 | 1260 | 0.00659634 | 0.0483556 | 1.86262e-19 | 2.87424e-14 | 1.56152e-10 | 4.81372e-07 | 3.8144e-05 | 0.00196625 | 0.781746 |
+| tossup | r_3 | 1260 | 0.217564 | 0.363742 | 1.07996e-08 | 6.16163e-07 | 2.33386e-05 | 0.000922344 | 0.266836 | 0.999824 | 1 |
+| tossup | r_4 | 1260 | 0.129772 | 0.311891 | 5.83458e-17 | 5.96864e-12 | 2.64042e-08 | 2.63745e-06 | 0.000590465 | 0.999129 | 0.999999 |
+| tossup | r_5 | 1260 | 0.370454 | 0.440747 | 8.54672e-10 | 2.91513e-07 | 4.7194e-05 | 0.0229465 | 0.976426 | 0.999993 | 1 |
+| tossup | r_norm | 1260 | 0.930404 | 0.106606 | 0.582781 | 0.710055 | 0.867547 | 0.998655 | 0.999941 | 0.999997 | 1 |
+
+## Bonus And Synergy Parameters
+
+| group | parameter | observations | mean | standard_deviation | minimum | p05 | p25 | median | p75 | p95 | maximum |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| bonus_part | beta_1 | 3768 | 0.399906 | 1.14797 | -2.36894 | -0.803257 | -0.0351135 | 0.0156306 | 0.105019 | 3.26035 | 4.49109 |
+| bonus_part | beta_2 | 3768 | 0.0041992 | 0.137291 | -2.76209 | -0.0862978 | -0.0336203 | 0.0017248 | 0.0358548 | 0.0911792 | 2.9311 |
+| bonus_part | beta_3 | 3768 | 0.347177 | 1.07895 | -2.40802 | -0.511522 | -0.037252 | 0.0172158 | 0.103417 | 3.11787 | 4.96358 |
+| bonus_part | beta_4 | 3768 | 0.182231 | 0.796663 | -2.50618 | -0.114884 | -0.0354907 | 0.00599204 | 0.0511307 | 2.19286 | 4.3798 |
+| bonus_part | beta_5 | 3768 | 0.48845 | 1.262 | -2.45335 | -1.19085 | -0.0390903 | 0.0304297 | 0.752087 | 3.36382 | 4.52539 |
+| bonus_part | r_1 | 3768 | 0.269399 | 0.41755 | 2.22959e-13 | 1.56492e-10 | 2.23675e-07 | 0.000104269 | 0.684189 | 0.999968 | 1 |
+| bonus_part | r_2 | 3768 | 0.00428659 | 0.0413567 | 9.39534e-18 | 2.03442e-14 | 5.00272e-11 | 3.12474e-07 | 2.91771e-05 | 0.00316757 | 0.773007 |
+| bonus_part | r_3 | 3768 | 0.220006 | 0.374981 | 8.11376e-10 | 2.24994e-07 | 1.23825e-05 | 0.000797829 | 0.242925 | 0.9996 | 1 |
+| bonus_part | r_4 | 3768 | 0.126024 | 0.314387 | 7.43921e-16 | 7.7156e-12 | 2.75933e-08 | 2.92835e-06 | 0.000869614 | 0.999481 | 1 |
+| bonus_part | r_5 | 3768 | 0.380285 | 0.45142 | 1.01951e-11 | 2.88808e-07 | 0.000100644 | 0.0288486 | 0.990117 | 0.999998 | 1 |
+| bonus_part | r_norm | 3768 | 0.9439 | 0.0983608 | 0.571557 | 0.709894 | 0.939587 | 0.997659 | 0.999941 | 0.999999 | 1 |

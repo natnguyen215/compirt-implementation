@@ -1,16 +1,12 @@
 """Topic-weighted compositional bonus model (Eq. 8, 10, 11, 14).
 
-This mirrors the root 'compositional_model.py' bonus stage. The pyramidal
-stage first learns player skills 'theta'; this stage keeps those skills fixed
-and learns per-topic bonus-part difficulty. The member score inside the Eq. 8
-aggregation is:
+The model keeps the player skills 'theta' fixed and learns per-topic bonus-part
+difficulty. The member score inside the Eq. 8 aggregation is:
 
-    root CompIRT:  sum_k theta_pk * alpha_bk
-    topic CompIRT: sum_k r_bk * theta_pk
+    sum_k r_bk * theta_pk
 
-The fixed bonus topic weights 'r_bk' replace learned discrimination 'alpha_bk',
-and bonus-part difficulty becomes a per-topic vector 'difficulty_beta_bk'. The bonus topic
-vector 'r_b' is shared by all three parts of a bonus.
+Bonus-part difficulty is the per-topic vector 'difficulty_beta_bk'. The bonus
+topic vector 'r_b' is shared by all three parts of a bonus.
 """
 
 from __future__ import annotations
@@ -49,9 +45,8 @@ def compositional_model(
     vector_zero = theta.new_zeros(n_dimensions)
     vector_one = theta.new_ones(n_dimensions)
 
-    # Eq. 14 bonus-part prior, now per-topic and with no 'alpha'.
-    # The sample site stays "beta" for backwards-compatible posterior keys and
-    # CSV columns, but this is CompIRT difficulty_beta, not LDA beta.
+    # Eq. 14 per-topic bonus-part difficulty prior. The "beta" site supplies the
+    # difficulty_beta posterior and CSV columns.
     # difficulty_beta_bk ~ N(0, 1), shape (n_parts, n_dimensions).
     with pyro.plate("bonus_parts", n_parts):
         difficulty_beta = pyro.sample(
@@ -64,8 +59,8 @@ def compositional_model(
     part_topic_weight = data["topic_weight"][data["part"]]
     member_theta = theta[data["roster"]]
     member_abilities = topic_weighted_member_abilities(member_theta, part_topic_weight)
-    # Eq. 8 smooth maximum, reused unchanged. Topic weighting affects the member
-    # scores; tau still controls how they combine into one team score A_b(R).
+    # Eq. 8: topic weighting forms member scores, and tau combines them into the
+    # team score A_b(R).
     aggregate = lse_aggregation(member_abilities, data["roster_mask"], tau)
     weighted_difficulty = topic_weighted_part_difficulty(
         part_difficulty_beta, part_topic_weight
@@ -75,8 +70,8 @@ def compositional_model(
     logits = aggregate - weighted_difficulty
 
     if use_synergy:
-        # Eq. 14 synergy prior psi_i ~ N(0, 0.5 I). Synergy stays the root
-        # CompIRT pairwise term (Eq. 10), independent of topic weights and theta.
+        # Eq. 14 synergy prior psi_i ~ N(0, 0.5 I), followed by the Eq. 10
+        # pairwise roster term.
         with pyro.plate("synergy_players", theta.shape[0]):
             psi = pyro.sample(
                 "psi",

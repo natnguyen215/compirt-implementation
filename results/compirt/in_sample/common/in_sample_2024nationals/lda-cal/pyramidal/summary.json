@@ -1,0 +1,28 @@
+{
+  "model": "topic-weighted-pyramidal",
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))",
+  "topic_vectors": "topic/fixed/outputs/lda/document_latent_vectors.csv",
+  "topic_dimensions": 5,
+  "topic_columns": [
+    "latent_topic_00",
+    "latent_topic_01",
+    "latent_topic_02",
+    "latent_topic_03",
+    "latent_topic_04"
+  ],
+  "tournament": "2024-acf-nationals",
+  "dimensions": 5,
+  "steps": 5000,
+  "final_loss": 61875.83538866043,
+  "calibrate_correctness": true,
+  "players": 189,
+  "tossups": 360,
+  "events": 8132,
+  "observation_counts": {
+    "CENSORED": 53533,
+    "BUZZ": 7940,
+    "NO-BUZZ": 1431
+  },
+  "correctness_scale": 0.3388937711715698,
+  "correctness_bias": 1.494454264640808
+}

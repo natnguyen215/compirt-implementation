@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from compirt_eval.eval_docs import (
+from compirt_eval.common.reports import (
     result_root_for_evaluation,
     write_eval_docs_summary,
 )

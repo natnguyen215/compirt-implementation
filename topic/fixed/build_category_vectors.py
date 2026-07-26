@@ -7,9 +7,8 @@ of a learned PLDA topic. Feeding this to the same topic-weighted pipeline gives
 the *upper bound* on how much category-conditioning can help: if perfect
 categories don't beat the global-skill model, no learned-topic method will.
 
-The existing PLDA file is reused only for its document_id set (which already
-covers every 2024 tossup/bonus the model uses) and the 'labels' column; the
-latent_topic_* columns are replaced with the one-hot encoding.
+The source PLDA file supplies the document IDs and labels used to build the
+one-hot encoding.
 """
 
 from __future__ import annotations
@@ -34,7 +33,7 @@ def main() -> None:
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_CATEGORY_OUTPUT_DIR)
     args = parser.parse_args()
 
-    # Load the existing topic-vector file just for its document_id set and labels.
+    # Load document IDs and labels from the topic-vector file.
     frame = pd.read_csv(args.source, dtype={"document_id": str})
     if "labels" not in frame or "document_id" not in frame:
         raise ValueError("source must contain document_id and labels columns")

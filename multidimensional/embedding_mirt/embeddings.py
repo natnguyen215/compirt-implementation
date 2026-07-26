@@ -1,16 +1,11 @@
 """Load and align cached question embeddings, and save/load the fitted projection.
 
 'embed_questions.py' precomputes a frozen Qwen3-Embedding-8B vector per tossup
-and per bonus and caches them to '.npz' files (embedding dimensionality runs
-into the thousands, unlike the topic model's handful of 'latent_topic_N'
-columns, so a wide CSV would be impractical). This module loads those caches
-and orders them to match a training run's tossup/bonus-part ids, the same
-fail-loud alignment contract as
-'topic/fixed/topic_compirt/topics.py:align_tossup_topic_weights'.
+and per bonus and caches them to '.npz' files. This module loads those caches
+and orders them to match a training run's tossup or bonus-part IDs.
 
 It also saves and loads the fitted relevance projection so the compositional
-(bonus) stage can reuse the exact transform fit during pyramidal (tossup)
-training instead of learning its own.
+(bonus) stage can apply the transform fitted during pyramidal training.
 """
 
 from __future__ import annotations
@@ -26,9 +21,8 @@ from topic.fixed.topic_compirt.topics import bonus_id_from_part_id
 
 def load_embedding_cache(path: str | Path) -> tuple[list[str], np.ndarray]:
     """Return '(ids, embeddings)' from an '.npz' file written by 'embed_questions.py'."""
-    # allow_pickle=True is required because 'ids' is an object array of strings;
-    # the file is one this codebase produces itself (embed_questions.py), not
-    # untrusted input.
+    # Cache IDs are trusted object arrays produced by embed_questions.py, which
+    # require allow_pickle=True.
     cache = np.load(path, allow_pickle=True)
     ids = [str(value) for value in cache["ids"]]
     embeddings = cache["embeddings"].astype(np.float32)
@@ -142,9 +136,9 @@ def _load_tensor(cache, key: str, device) -> torch.Tensor:
 def load_projection(path: str | Path, device="cpu"):
     """Load a frozen 'r' projection saved by the pyramidal training run.
 
-    Old linear projections return '(weight, bias)' for backward compatibility.
-    New FFN projections return a projection dict; use 'load_projection_state'
-    when the caller also needs the saved embedding mean.
+    Linear projections return '(weight, bias)'. FFN projections return a
+    projection dictionary; use 'load_projection_state' when the caller also
+    needs the saved embedding mean.
     """
     projection, _ = load_projection_state(path, device)
     if projection["kind"] == "linear":

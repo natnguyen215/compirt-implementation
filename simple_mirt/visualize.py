@@ -274,6 +274,7 @@ def parse_args():
 
 
 def main():
+    """Load fitted MIRT outputs and generate the diagnostic plot set."""
     args = parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)
     long, players, questions = load_long_form(args.responses, args.results_dir)

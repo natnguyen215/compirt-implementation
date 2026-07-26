@@ -25,8 +25,8 @@ the standard `document_latent_vectors.csv` schema.
   --dimensions 5 --steps 5000
 ```
 
-The end-to-end fixed-topic runner has its own output root and uses the
-unchanged topic compositional bonus stage:
+The end-to-end fixed-topic runner has its own output root and reuses the topic
+compositional bonus stage:
 
 ```bash
 DIMENSIONS=5 \
@@ -44,7 +44,7 @@ Held-out temporal splits use the shared runner with `MODEL=topic_tfidf`
 
 ```bash
 MODEL=topic_tfidf TOPIC_VECTORS=topic/fixed/outputs/plda/document_latent_vectors.csv \
-  RUN_SYNERGY=1 .venv/bin/python run_scripts/run_compirt_holdout.py
+  RUN_SYNERGY=1 .venv/bin/python run_scripts/common/run_compirt_holdout.py
 ```
 
 ## Learned-topic runs
@@ -58,8 +58,8 @@ learns topics and their TF-IDF effects in the same SVI:
 ```
 
 Its output retains `topic_word_matrix.npy`, `vocabulary.json`, and
-`document_latent_vectors.csv`, so the existing learned compositional Stage 2
-can consume it unchanged.
+`document_latent_vectors.csv`, so the learned compositional Stage 2 consumes it
+directly.
 
 ## Outputs and evaluation
 

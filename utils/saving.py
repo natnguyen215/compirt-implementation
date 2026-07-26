@@ -112,13 +112,18 @@ def save_player_posterior(output_dir, player_ids, guide, tier_map=None):
     )
 
 
-def save_player_rankings(output_dir, predictions):
-    """Save a descriptive ranking based on fitted correctness of observed buzzes.
+def save_player_buzz_summary(output_dir, predictions):
+    """Save per-player observed and fitted correctness over observed buzzes.
 
-    This is not a pure ranking of theta: it summarizes the probabilities for
-    the particular tossups and buzz positions each player actually encountered.
+    This is a descriptive per-player calibration diagnostic, not a skill
+    ranking: 'fitted_correctness' averages P(correct | the player buzzed where
+    they did), so it is conditioned on each player's own shot selection.
+    Cautious late buzzers score high and aggressive early buzzers score low
+    regardless of theta, and buzz volume never enters. For a PPG-comparable
+    model quantity use a competing-risks expected-points summary instead
+    (see 'compirt_eval.noise_floor').
     """
-    ranking = (
+    summary = (
         predictions[predictions["z"] == "BUZZ"]
         .groupby("player_id", as_index=False)
         .agg(
@@ -127,9 +132,9 @@ def save_player_rankings(output_dir, predictions):
             fitted_correctness=("predicted_correct", "mean"),
             average_relative_position=("relative_position", "mean"),
         )
-        .sort_values(["fitted_correctness", "buzzes"], ascending=False)
+        .sort_values("buzzes", ascending=False)
     )
-    ranking.to_csv(output_dir / "top_players.csv", index=False)
+    summary.to_csv(output_dir / "player_buzz_summary.csv", index=False)
 
 
 def save_tossup_predictions(
@@ -139,15 +144,16 @@ def save_tossup_predictions(
     hazard,
     survival,
     *,
-    buzz_expected=None,
+    buzz_expected,
     extra_columns=None,
 ):
     """Attach fitted tossup predictions to the observation rows and save them.
 
     Writes 'tossup_predictions.csv' (the fitted correctness/hazard/survival for
-    every row) and the derived 'top_players.csv'. When 'buzz_expected' (an
-    event_id -> expected relative position mapping) is given it also writes
-    'buzz_event_predictions.csv'. 'extra_columns' maps extra column names to
+    every row), the derived 'player_buzz_summary.csv', and
+    'buzz_event_predictions.csv' from the required event_id -> expected
+    relative position mapping.
+    'extra_columns' maps extra column names to
     tensors for model-specific outputs (e.g. the TF-IDF baseline's prefix
     score). Returns the predictions frame for any further per-run use.
     """
@@ -158,16 +164,15 @@ def save_tossup_predictions(
     for name, column in (extra_columns or {}).items():
         predictions[name] = tensor_values(column)
     predictions.to_csv(output_dir / "tossup_predictions.csv", index=False)
-    save_player_rankings(output_dir, predictions)
+    save_player_buzz_summary(output_dir, predictions)
 
-    if buzz_expected is not None:
-        buzz_events = predictions[predictions["z"] == "BUZZ"][
-            ["event_id", "relative_position"]
-        ].rename(columns={"relative_position": "observed_relative_position"})
-        buzz_events["predicted_relative_position"] = buzz_events["event_id"].map(
-            buzz_expected
-        )
-        buzz_events.to_csv(output_dir / "buzz_event_predictions.csv", index=False)
+    buzz_events = predictions[predictions["z"] == "BUZZ"][
+        ["event_id", "relative_position"]
+    ].rename(columns={"relative_position": "observed_relative_position"})
+    buzz_events["predicted_relative_position"] = buzz_events["event_id"].map(
+        buzz_expected
+    )
+    buzz_events.to_csv(output_dir / "buzz_event_predictions.csv", index=False)
     return predictions
 
 

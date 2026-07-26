@@ -1,4 +1,4 @@
-"""Evaluate outputs from the dedicated topic-specific TF-IDF experiment."""
+"""Evaluate topic-specific TF-IDF outputs."""
 
 from __future__ import annotations
 
@@ -14,7 +14,6 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--pyramidal-results", type=Path, required=True)
     parser.add_argument("--compositional-results", type=Path, required=True)
-    parser.add_argument("--comparison-pyramidal-results", type=Path)
     parser.add_argument("--topic-names", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
@@ -25,7 +24,6 @@ def main():
         args.pyramidal_results,
         args.compositional_results,
         args.output_dir,
-        args.comparison_pyramidal_results,
         dimension_labels,
     )
 

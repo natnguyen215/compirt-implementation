@@ -82,11 +82,10 @@ is a quizbowl-specific IRT with two stages:
 - **Compositional stage (bonuses).** Holds player skills fixed and learns how
   three-part bonus questions reward those skills.
 
-This repo's `topic/fixed/` already had a *topic-weighted* CompIRT where each
-question carried a **fixed** topic vector `r_j` (loaded from a CSV produced by an
-unsupervised LDA). The novelty here: **`r_j` is no longer fixed — it's a latent
-of the model, learned jointly, so the IRT outcomes shape it.** That makes the
-whole thing an sLDA.
+In `topic/fixed/`, each question carries a **fixed** topic vector `r_j` loaded
+from a CSV produced by an unsupervised LDA. Here **`r_j` is a latent of the
+model, learned jointly, so the IRT outcomes shape it.** That makes the whole
+thing an sLDA.
 
 ---
 
@@ -245,7 +244,7 @@ event factorizes into:
 
 Dead tossups (nobody buzzed) contribute survival all the way to `T_j`. In code
 this is the hand-built `pyro.factor("...competing_risks_likelihood", ...)`,
-reused unchanged from `topic_compirt/pyramidal.py`.
+reused from `topic_compirt/pyramidal.py`.
 
 This is **not** a Normal regression on buzz time. Buzz timing is modeled through
 a discrete-time survival process:

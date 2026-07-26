@@ -12,7 +12,7 @@ from unittest import mock
 
 import pandas as pd
 
-from run_scripts import run_learned_topic_ablation as ablation
+from run_scripts.topic import run_learned_topic_ablation as ablation
 
 
 def args_for(root: Path) -> SimpleNamespace:
@@ -39,7 +39,6 @@ def args_for(root: Path) -> SimpleNamespace:
         synergy_dimensions=3,
         pyramidal_module="learned",
         calibrate_correctness=False,
-        predict_buzz_positions=True,
         save_synergy_details=False,
     )
 
@@ -75,8 +74,6 @@ class CommandConstructionTests(unittest.TestCase):
         self.assertIn("--bow-weight 1.0", train)
         self.assertIn("--topic-concentration 1.0", train)
         self.assertIn("--seed 42", train)
-        self.assertIn("--predict-buzz-positions", train)
-        self.assertNotIn("--no-predict-buzz-positions", train)
 
     def test_holdout_pyramidal_freezes_the_trained_topic_model(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -124,10 +121,10 @@ class CommandConstructionTests(unittest.TestCase):
             stages = ablation.build_stages(args_for(Path(directory)), 2)
 
         all_command_text = "\n".join(" ".join(stage.command) for stage in stages)
-        all_marker_text = "\n".join(str(stage.marker) for stage in stages)
+        all_marker_text = "\n".join(str(stage.expected_output) for stage in stages)
         self.assertNotIn("holdout/compositional", all_command_text)
         self.assertNotIn("holdout/evaluation", all_command_text)
-        self.assertNotIn("compare_compirt", all_command_text)
+        self.assertNotIn("run_scripts/common/run_synergy_comparison.py", all_command_text)
         self.assertNotIn("holdout/compositional", all_marker_text)
         self.assertNotIn("holdout/evaluation", all_marker_text)
 
@@ -246,19 +243,21 @@ class ConfigTests(unittest.TestCase):
     def test_save_ablation_config_writes_every_resolved_setting(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            config_path = ablation.save_ablation_config(root, args_for(root))
+            stages = ablation.build_stages(args_for(root), 1)
+            config_path = ablation.save_ablation_config(root, args_for(root), stages)
             config = json.loads(config_path.read_text(encoding="utf-8"))
 
         self.assertEqual(config_path.name, "ablation_config.json")
-        self.assertEqual(config["bow_weight"], 1.0)
-        self.assertEqual(config["topic_concentration"], 1.0)
-        self.assertEqual(config["seed"], 42)
-        self.assertEqual(config["synergy_dimensions"], 3)
-        self.assertEqual(config["new_player_prior"], "tier")
-        self.assertEqual(config["train_split"], "year_2024")
-        self.assertEqual(config["test_split"], "year_2025")
+        arguments = config["arguments"]
+        self.assertEqual(arguments["bow_weight"], 1.0)
+        self.assertEqual(arguments["topic_concentration"], 1.0)
+        self.assertEqual(arguments["seed"], 42)
+        self.assertEqual(arguments["synergy_dimensions"], 3)
+        self.assertEqual(arguments["new_player_prior"], "tier")
+        self.assertEqual(arguments["train_split"], "year_2024")
+        self.assertEqual(arguments["test_split"], "year_2025")
         # Paths must survive the JSON round-trip as strings.
-        self.assertEqual(config["python"], ".venv/bin/python")
+        self.assertEqual(arguments["python"], ".venv/bin/python")
 
     def _run_main(self, root: Path, extra_argv: list[str]) -> mock.Mock:
         """Run main() with training and aggregation stubbed out."""

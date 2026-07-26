@@ -32,8 +32,8 @@ multidimensional/multidim_mirt/train_pyramidal.py
 Convenience runs:
 
 ```bash
-./run_scripts/run_multidim_all2024.sh
-./run_scripts/run_multidim_holdout.sh
+./run_scripts/multidimensional/multidim/run_multidim_all2024.sh
+./run_scripts/multidimensional/multidim/run_multidim_holdout.sh
 ```
 
 Both wrappers run no-calibration and calibration variants, and both include the

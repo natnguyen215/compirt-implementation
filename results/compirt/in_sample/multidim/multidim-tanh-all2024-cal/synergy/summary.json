@@ -1,0 +1,23 @@
+{
+  "split": "year_2024",
+  "tournament": "",
+  "steps": 2000,
+  "lr": 0.01,
+  "seed": 42,
+  "final_loss": 64476.69733339548,
+  "use_synergy": true,
+  "synergy_dimensions": 3,
+  "saved_synergy_details": false,
+  "calibrate_correctness": true,
+  "alpha_prior": "normal",
+  "skill_dimensions": 5,
+  "bonus_part_observations": 133461,
+  "bonus_parts": 3768,
+  "tau": 0.3477611839771271,
+  "mean_synergy_contribution": 0.5060005784034729,
+  "median_synergy_contribution": 0.3067578971385956,
+  "negative_synergy_fraction": 0.32753388630386404,
+  "positive_synergy_fraction": 0.6410636815249399,
+  "correctness_scale": 0.5267674326896667,
+  "correctness_bias": -0.735084593296051
+}

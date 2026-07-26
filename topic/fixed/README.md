@@ -115,7 +115,6 @@ export SAVE_SYNERGY_DETAILS=1
 export PYRAMIDAL_STEPS=5000
 export BONUS_STEPS=3000
 export LR=0.005
-export PREDICT_BUZZ_POSITIONS=1
 export EVALUATE=1
 export DEVICE=cuda  # use DEVICE=cpu if no GPU
 export GPU=0
@@ -123,14 +122,14 @@ export GPU=0
 
 > To run a calibrated version of any command below, prepend
 > `CALIBRATE_CORRECTNESS=1` and change `ROOT` to something like
-> `results/compirt/in_sample/plda-all2024-cal`.
+> `results/compirt/in_sample/topic/plda-all2024-cal`.
 
 ### plda-all2024
 
 ```bash
 DIMENSIONS=5 \
 TOPIC_VECTORS=topic/fixed/outputs/plda/document_latent_vectors.csv \
-ROOT=results/compirt/in_sample/plda-all2024 \
+ROOT=results/compirt/in_sample/topic/plda-all2024 \
 topic/fixed/run_topic_compirt.sh
 ```
 
@@ -139,7 +138,7 @@ topic/fixed/run_topic_compirt.sh
 ```bash
 DIMENSIONS=5 \
 TOPIC_VECTORS=topic/fixed/outputs/lda/document_latent_vectors.csv \
-ROOT=results/compirt/in_sample/lda-all2024 \
+ROOT=results/compirt/in_sample/topic/lda-all2024 \
 topic/fixed/run_topic_compirt.sh
 ```
 
@@ -149,7 +148,7 @@ topic/fixed/run_topic_compirt.sh
 DIMENSIONS=13 \
 TOPIC_VECTORS=topic/fixed/outputs/category/document_latent_vectors.csv \
 TOPIC_NAMES=topic/fixed/outputs/category/category_index.csv \
-ROOT=results/compirt/in_sample/category-all2024 \
+ROOT=results/compirt/in_sample/topic/category-all2024 \
 topic/fixed/run_topic_compirt.sh
 ```
 
@@ -212,7 +211,7 @@ Compare bonus metrics across topic sources:
 
 ```bash
 .venv/bin/python -m topic.fixed.compare_bonus_runs \
-  results/compirt/in_sample/plda-all2024 \
-  results/compirt/in_sample/lda-all2024 \
-  results/compirt/in_sample/category-all2024
+  results/compirt/in_sample/topic/plda-all2024 \
+  results/compirt/in_sample/topic/lda-all2024 \
+  results/compirt/in_sample/topic/category-all2024
 ```

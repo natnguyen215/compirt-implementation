@@ -145,9 +145,13 @@ class TopicTfidfSviTests(unittest.TestCase):
         }
 
     def test_fixed_topic_svi_learns_a_nonnegative_lambda_per_topic(self):
-        posterior, _ = fit_svi(
+        posterior, _guide, _losses = fit_svi(
             competing_risks_model,
-            (self._fixed_data(), 2, False, 1.0),
+            model_kwargs={
+                "data": self._fixed_data(),
+                "calibrate_correctness": False,
+                "prior_scale": 1.0,
+            },
             n_steps=2,
             lr=0.01,
         )
@@ -157,9 +161,16 @@ class TopicTfidfSviTests(unittest.TestCase):
     def test_learned_topic_svi_learns_a_nonnegative_lambda_per_topic(self):
         data = self._fixed_data()
         data["bow"] = torch.tensor([[1.0, 1.0, 0.0]])
-        posterior, losses = fit_svi(
+        posterior, _guide, losses = fit_svi(
             joint_model,
-            (data, 2, 3, 1.0, 1.0, False, 1.0),
+            model_kwargs={
+                "data": data,
+                "n_dimensions": 2,
+                "bow_weight": 1.0,
+                "topic_concentration": 1.0,
+                "calibrate_correctness": False,
+                "prior_scale": 1.0,
+            },
             n_steps=2,
             lr=0.01,
         )

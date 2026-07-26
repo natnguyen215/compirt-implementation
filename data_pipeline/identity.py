@@ -2,9 +2,8 @@
 
 The source SQLite database identifies teams, players, and bonus-part scores
 with auto-increment integer primary keys that are meaningless across
-tournaments and occasionally collide or duplicate in ways the output dataset
-needs to paper over. Each function here takes a batch of raw source rows and
-returns:
+tournaments and occasionally collide or duplicate. Each function here
+reconciles a batch of raw source rows and returns:
 
 * a mapping from source integer ID to the readable string ID used in the
   output tables, and

@@ -1,1 +1,1 @@
-"""Tests for the isolated topic-specific TF-IDF experiment package."""
+"""Tests for the topic-specific TF-IDF package."""

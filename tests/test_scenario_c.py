@@ -12,7 +12,7 @@ import torch
 from pyro import poutine
 from pyro.infer.autoguide import AutoNormal
 
-from compirt_eval.scenario_c import (
+from compirt_eval.scenario_c_rosters.classification import (
     build_training_context,
     canonical_roster,
     classify_observations,

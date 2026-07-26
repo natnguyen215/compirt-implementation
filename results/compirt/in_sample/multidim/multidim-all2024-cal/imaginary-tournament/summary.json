@@ -1,0 +1,14 @@
+{
+  "seed": 42,
+  "games": 1000,
+  "players_per_team": 4,
+  "tossups_per_game": 20,
+  "eligible_players": 1455,
+  "players_appearing": 1452,
+  "eligible_tossups": 1260,
+  "aggregate_ppg": 14.509375,
+  "mean_team_score": 160.3975,
+  "dead_tossup_rate": 0.09405,
+  "top_player_id": "matt-jackson",
+  "top_player_ppg": 113.75
+}

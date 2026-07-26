@@ -1,23 +1,20 @@
 """Topic-weighted pyramidal likelihood with per-topic TF-IDF effects.
 
-This isolated Stage 1 variant learns one nonnegative global ``lambda_k`` for
-each topic. At token position ``t`` its per-topic difficulty is
+Stage 1 learns one nonnegative global 'lambda_k' for each topic. At token
+position 't' its per-topic difficulty is
 
     d'_jk(t) = d_jk(t) - lambda_k * tfidf_prefix_j(t)
 
 so fixed or learned topic weights combine the effect as
-``tfidf_prefix_j(t) * sum_k r_jk * lambda_k``. Baseline topic-model helpers
-remain unmodified; this module owns all text-conditioned likelihood and replay
-math for the experiment family. It is a near-copy of
-'topic/fixed/topic_compirt/pyramidal.py' -- diff against that file when
-reconciling changes; the TF-IDF ``prefix``/``lambdas`` arguments are the only
-departure.
+'tfidf_prefix_j(t) * sum_k r_jk * lambda_k'. This module owns the
+text-conditioned likelihood and replay math for the experiment family.
 """
 
 from __future__ import annotations
 
 import torch
 import torch.nn.functional as F
+from torch.utils.checkpoint import checkpoint
 
 import pyro
 import pyro.distributions as dist
@@ -28,6 +25,7 @@ from topic.fixed.topic_compirt.pyramidal import (
     sample_correctness_calibration,
     sample_parameters,
 )
+from utils.training import survival_chunk_size
 
 
 def tfidf_prefix_score_at(score_matrix, position):
@@ -47,7 +45,7 @@ def effective_difficulty(difficulty_beta, gamma, mu, t, T_j, prefix, lambdas):
 def correctness_logit(
     theta, topic_weight, difficulty_beta, gamma, mu, t, T_j, prefix, lambdas
 ):
-    """Return the TF-IDF-adjusted topic-weighted correctness logit at ``t``."""
+    """Return the TF-IDF-adjusted topic-weighted correctness logit at 't'."""
     gap = theta - effective_difficulty(
         difficulty_beta, gamma, mu, t, T_j, prefix, lambdas
     )
@@ -57,21 +55,47 @@ def correctness_logit(
 def hazard_logit(
     theta, topic_weight, difficulty_beta, gamma, mu, c, t, T_j, prefix, lambdas
 ):
-    """Return the TF-IDF-adjusted topic-weighted buzz hazard logit at ``t``."""
+    """Return the TF-IDF-adjusted topic-weighted buzz hazard logit at 't'."""
     return correctness_logit(
         theta, topic_weight, difficulty_beta, gamma, mu, t, T_j, prefix, lambdas
     ) - c
 
 
 def log_survival(
-    theta, topic_weight, difficulty_beta, gamma, mu, c, t_star, T_j, prefix, lambdas
+    theta, topic_weight, difficulty_beta, gamma, mu, c, t_star, T_j, prefix, lambdas,
+    chunk_size=None,
 ):
     """Return strict-before survival using the adjusted topic-weighted hazard."""
+    if chunk_size is None:
+        chunk_size = survival_chunk_size()
+    if chunk_size and t_star.shape[0] > chunk_size:
+        # Each row's survival term is independent, so summing the grid in row
+        # chunks under gradient checkpointing caps peak memory at one chunk's
+        # (rows, positions, topics) grid while leaving the result identical to
+        # the full-batch computation. Only 'lambdas' is global (not row-sliced).
+        parts = [
+            checkpoint(
+                log_survival,
+                theta[lo:lo + chunk_size],
+                topic_weight[lo:lo + chunk_size],
+                difficulty_beta[lo:lo + chunk_size],
+                gamma[lo:lo + chunk_size],
+                mu[lo:lo + chunk_size],
+                c[lo:lo + chunk_size],
+                t_star[lo:lo + chunk_size],
+                T_j[lo:lo + chunk_size],
+                prefix[lo:lo + chunk_size],
+                lambdas,
+                use_reentrant=False,
+            )
+            for lo in range(0, t_star.shape[0], chunk_size)
+        ]
+        return torch.cat(parts)
     max_t = int(t_star.max().item())
     positions = torch.arange(1, max_t + 1, device=t_star.device).unsqueeze(0)
-    # Eq. 6 is strict-before survival, and Eq. 13 deliberately uses S(T_j) for
-    # dead tossups. NO-BUZZ rows therefore stop at T_j - 1 under the paper's
-    # indexing convention; an inclusive mask would define a different model.
+    # Eq. 6 is strict-before survival, and Eq. 13 uses S(T_j) for dead tossups.
+    # The published indexing stops NO-BUZZ rows at T_j - 1, so this comparison
+    # must stay strict.
     before_stop = positions < t_star.unsqueeze(1)
     prefix_at_positions = tfidf_prefix_score_at(
         prefix.unsqueeze(1), positions.expand_as(before_stop)
@@ -106,12 +130,9 @@ def prefix_by_row(data):
     return data["tfidf_prefix"][data["tossup"]]
 
 
-def competing_risks_model(
-    data, n_dimensions=None, calibrate_correctness=False, prior_scale=1.0
-):
+def competing_risks_model(data, calibrate_correctness=False, prior_scale=1.0):
     """Define the fixed-topic TF-IDF-adjusted competing-risks likelihood."""
-    if n_dimensions is None:
-        n_dimensions = data["topic_weight"].shape[1]
+    n_dimensions = data["topic_weight"].shape[1]
     theta, c, difficulty_beta, gamma, mu = sample_parameters(data, n_dimensions)
     (
         row_theta,
@@ -166,12 +187,10 @@ def competing_risks_model(
         lambdas,
     )
     if calibrate_correctness:
-        # Recalibrate ONLY the correctness logit, leaving the hazard/timing
-        # (which also calls correctness_logit) untouched.
+        # Apply calibration to correctness; hazard/timing keeps its base logit.
         scale, bias = sample_correctness_calibration(data)
         correctness = scale * correctness + bias
-    # Competing risks are not a single built-in distribution, so the joint
-    # log-likelihood is hand-computed and attached with pyro.factor.
+    # Attach the hand-computed competing-risks log-likelihood with pyro.factor.
     log_likelihood = (
         survival.sum()
         + F.logsigmoid(buzz_logits).sum()
@@ -242,12 +261,16 @@ def posterior_row_predictions(data, posterior, calibrate_correctness=False):
 
 
 def row_tfidf_prefix_scores(data):
-    """Return the cumulative TF-IDF value at each observation's ``t_star``."""
+    """Return the cumulative TF-IDF value at each observation's 't_star'."""
     return tfidf_prefix_score_at(prefix_by_row(data), data["t_star"])
 
 
 def expected_first_buzz_positions(data, posterior):
-    """Replay expected team first-buzz positions with TF-IDF-adjusted hazards."""
+    """Replay expected team first-buzz positions with TF-IDF-adjusted hazards.
+
+    The returned position is E[t | a buzz occurs], since the evaluation
+    compares it only against events with an observed buzz.
+    """
     n_events = len(data["event_ids"])
     counts = torch.bincount(data["event"], minlength=n_events)
     max_roster = int(counts.max().item())
@@ -309,6 +332,13 @@ def expected_first_buzz_positions(data, posterior):
         first_probability = event_survival * total_hazard
         expected = expected + position * first_probability
         event_survival = event_survival * (1.0 - total_hazard)
-    expected = expected + event_T * event_survival
-    relative = (expected / event_T).detach().cpu().tolist()
+    # Condition the prediction on a buzz occurring:
+    #   E[t | buzz] = sum_t t * P(first buzz at t) / P(any buzz).
+    # Use the question end when the fitted buzz mass is numerically zero.
+    buzz_mass = 1.0 - event_survival
+    end_position = event_T.to(expected.dtype)
+    expected = torch.where(
+        buzz_mass > 1e-9, expected / buzz_mass.clamp(min=1e-9), end_position
+    )
+    relative = (expected / end_position).detach().cpu().tolist()
     return dict(zip(data["event_ids"], relative))

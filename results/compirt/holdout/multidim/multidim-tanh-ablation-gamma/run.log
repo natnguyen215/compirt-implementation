@@ -1,0 +1,1320 @@
+# CompIRT Run Log
+
+Generated: 2026-07-14T14:33:11-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- ALPHA_PRIOR: gamma
+- BONUS_STEPS: 2000
+- CALIBRATE_CORRECTNESS: False
+- COLLECT_ONLY: False
+- DATA_DIR: unknown
+- DEVICE: cuda
+- DIFFICULTY_LINK: tanh
+- DIMENSIONS: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 20, 24, 28, 32, 36, 40
+- GPU: 0
+- LR: 0.01
+- MODEL: multidim-ablation
+- NEW_PLAYER_PRIOR: tier
+- PLOT_DIMENSIONS: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 20, 24, 28, 32, 36, 40
+- PYRAMIDAL_MODULE: multidimensional.multidim_mirt.train_pyramidal
+- PYRAMIDAL_STEPS: 3000
+- PYTHON: .venv/bin/python
+- RERUN: False
+- ROOT: results/compirt/holdout/multidim-tanh-ablation-gamma
+- RUNNER: run_scripts/run_multidim_ablation.py
+- SAVE_SYNERGY_DETAILS: False
+- SYNERGY_DIMENSIONS: 1
+- TEST_SPLIT: year_2025
+- TOURNAMENT: <all>
+- TRAIN_SPLIT: year_2024
+
+Wrote run configuration to results/compirt/holdout/multidim-tanh-ablation-gamma/ablation_config.json
+
+
+=== multidim ablation: dimension 1 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 1 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_1/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,866,132.1
+step  100  ELBO loss: 716,232.2
+step  200  ELBO loss: 438,516.3
+step  300  ELBO loss: 406,879.5
+step  400  ELBO loss: 384,500.5
+step  500  ELBO loss: 371,230.2
+step  600  ELBO loss: 364,835.3
+step  700  ELBO loss: 362,392.9
+step  800  ELBO loss: 361,422.1
+step  900  ELBO loss: 360,701.5
+step 1000  ELBO loss: 360,576.3
+step 1100  ELBO loss: 360,432.2
+step 1200  ELBO loss: 360,209.4
+step 1300  ELBO loss: 360,264.9
+step 1400  ELBO loss: 360,311.3
+step 1500  ELBO loss: 360,163.2
+step 1600  ELBO loss: 360,043.6
+step 1700  ELBO loss: 360,420.5
+step 1800  ELBO loss: 360,129.6
+step 1900  ELBO loss: 360,229.2
+step 2000  ELBO loss: 360,158.8
+step 2100  ELBO loss: 360,186.7
+step 2200  ELBO loss: 360,261.4
+step 2300  ELBO loss: 360,179.9
+step 2400  ELBO loss: 360,189.5
+step 2500  ELBO loss: 360,118.0
+step 2600  ELBO loss: 360,362.9
+step 2700  ELBO loss: 360,177.0
+step 2800  ELBO loss: 360,062.6
+step 2900  ELBO loss: 360,231.0
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 1 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_1/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_1/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 27,258,299.4
+step  100  ELBO loss: 1,411,498.5
+step  200  ELBO loss: 851,554.9
+step  300  ELBO loss: 677,229.6
+step  400  ELBO loss: 567,204.5
+step  500  ELBO loss: 505,815.9
+step  600  ELBO loss: 481,738.1
+step  700  ELBO loss: 475,098.8
+step  800  ELBO loss: 473,697.6
+step  900  ELBO loss: 473,067.3
+step 1000  ELBO loss: 472,774.9
+step 1100  ELBO loss: 472,324.3
+step 1200  ELBO loss: 472,466.7
+step 1300  ELBO loss: 472,306.3
+step 1400  ELBO loss: 472,163.7
+step 1500  ELBO loss: 472,092.0
+step 1600  ELBO loss: 472,024.9
+step 1700  ELBO loss: 472,034.0
+step 1800  ELBO loss: 471,930.9
+step 1900  ELBO loss: 472,141.1
+step 2000  ELBO loss: 472,079.1
+step 2100  ELBO loss: 472,276.3
+step 2200  ELBO loss: 471,963.9
+step 2300  ELBO loss: 471,942.3
+step 2400  ELBO loss: 471,936.7
+step 2500  ELBO loss: 471,907.2
+step 2600  ELBO loss: 472,022.9
+step 2700  ELBO loss: 471,942.3
+step 2800  ELBO loss: 471,895.1
+step 2900  ELBO loss: 471,822.2
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanh-ablation-gamma/dim_1/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_1/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 159,382.4
+step  100  ELBO loss: 95,996.4
+step  200  ELBO loss: 84,387.9
+step  300  ELBO loss: 81,738.3
+step  400  ELBO loss: 81,181.2
+step  500  ELBO loss: 80,911.6
+step  600  ELBO loss: 81,047.5
+step  700  ELBO loss: 80,981.0
+step  800  ELBO loss: 80,869.9
+step  900  ELBO loss: 80,933.1
+step 1000  ELBO loss: 80,894.4
+step 1100  ELBO loss: 80,887.2
+step 1200  ELBO loss: 80,820.7
+step 1300  ELBO loss: 80,945.2
+step 1400  ELBO loss: 80,735.9
+step 1500  ELBO loss: 80,919.7
+step 1600  ELBO loss: 80,839.1
+step 1700  ELBO loss: 80,985.3
+step 1800  ELBO loss: 80,868.5
+step 1900  ELBO loss: 80,837.6
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_1/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_1/holdout/synergy --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_1/holdout/synergy-evaluation
+
+=== multidim ablation: dimension 2 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 2 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_2/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,814,777.9
+step  100  ELBO loss: 497,805.2
+step  200  ELBO loss: 448,394.5
+step  300  ELBO loss: 418,307.5
+step  400  ELBO loss: 394,969.0
+step  500  ELBO loss: 377,456.5
+step  600  ELBO loss: 368,543.3
+step  700  ELBO loss: 364,761.5
+step  800  ELBO loss: 362,582.3
+step  900  ELBO loss: 361,616.5
+step 1000  ELBO loss: 360,876.4
+step 1100  ELBO loss: 360,206.9
+step 1200  ELBO loss: 359,568.8
+step 1300  ELBO loss: 359,064.6
+step 1400  ELBO loss: 359,320.0
+step 1500  ELBO loss: 359,126.4
+step 1600  ELBO loss: 358,741.4
+step 1700  ELBO loss: 358,441.6
+step 1800  ELBO loss: 358,456.2
+step 1900  ELBO loss: 358,286.3
+step 2000  ELBO loss: 358,222.2
+step 2100  ELBO loss: 358,303.4
+step 2200  ELBO loss: 358,228.6
+step 2300  ELBO loss: 358,090.6
+step 2400  ELBO loss: 357,842.8
+step 2500  ELBO loss: 357,989.8
+step 2600  ELBO loss: 357,647.6
+step 2700  ELBO loss: 357,889.4
+step 2800  ELBO loss: 357,952.7
+step 2900  ELBO loss: 357,836.3
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 2 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_2/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_2/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 27,364,675.6
+step  100  ELBO loss: 1,120,889.0
+step  200  ELBO loss: 832,552.5
+step  300  ELBO loss: 668,915.3
+step  400  ELBO loss: 560,909.8
+step  500  ELBO loss: 502,178.3
+step  600  ELBO loss: 479,443.4
+step  700  ELBO loss: 472,956.2
+step  800  ELBO loss: 470,902.7
+step  900  ELBO loss: 469,591.8
+step 1000  ELBO loss: 468,812.9
+step 1100  ELBO loss: 468,046.3
+step 1200  ELBO loss: 468,003.2
+step 1300  ELBO loss: 467,409.4
+step 1400  ELBO loss: 467,143.0
+step 1500  ELBO loss: 466,928.8
+step 1600  ELBO loss: 466,780.6
+step 1700  ELBO loss: 466,655.9
+step 1800  ELBO loss: 466,582.2
+step 1900  ELBO loss: 466,493.8
+step 2000  ELBO loss: 466,695.4
+step 2100  ELBO loss: 466,339.0
+step 2200  ELBO loss: 466,151.4
+step 2300  ELBO loss: 466,377.7
+step 2400  ELBO loss: 465,908.4
+step 2500  ELBO loss: 466,266.1
+step 2600  ELBO loss: 465,935.5
+step 2700  ELBO loss: 466,004.7
+step 2800  ELBO loss: 465,872.6
+step 2900  ELBO loss: 465,938.1
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanh-ablation-gamma/dim_2/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_2/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 161,411.0
+step  100  ELBO loss: 98,281.4
+step  200  ELBO loss: 85,291.3
+step  300  ELBO loss: 82,132.4
+step  400  ELBO loss: 81,528.2
+step  500  ELBO loss: 81,140.1
+step  600  ELBO loss: 81,280.9
+step  700  ELBO loss: 81,224.7
+step  800  ELBO loss: 81,010.2
+step  900  ELBO loss: 81,070.1
+step 1000  ELBO loss: 81,097.8
+step 1100  ELBO loss: 81,089.5
+step 1200  ELBO loss: 81,091.9
+step 1300  ELBO loss: 81,035.4
+step 1400  ELBO loss: 80,976.8
+step 1500  ELBO loss: 81,153.5
+step 1600  ELBO loss: 81,012.4
+step 1700  ELBO loss: 81,362.9
+step 1800  ELBO loss: 81,078.9
+step 1900  ELBO loss: 80,988.5
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_2/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_2/holdout/synergy --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_2/holdout/synergy-evaluation
+
+=== multidim ablation: dimension 3 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 3 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_3/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,921,229.7
+step  100  ELBO loss: 498,501.9
+step  200  ELBO loss: 459,889.4
+step  300  ELBO loss: 429,168.9
+step  400  ELBO loss: 401,392.3
+step  500  ELBO loss: 379,598.8
+step  600  ELBO loss: 369,394.4
+step  700  ELBO loss: 365,428.0
+step  800  ELBO loss: 363,080.0
+step  900  ELBO loss: 361,612.8
+step 1000  ELBO loss: 360,614.9
+step 1100  ELBO loss: 359,646.9
+step 1200  ELBO loss: 359,303.5
+step 1300  ELBO loss: 359,088.8
+step 1400  ELBO loss: 358,573.3
+step 1500  ELBO loss: 358,383.9
+step 1600  ELBO loss: 358,033.5
+step 1700  ELBO loss: 357,889.4
+step 1800  ELBO loss: 358,097.6
+step 1900  ELBO loss: 357,576.8
+step 2000  ELBO loss: 357,388.1
+step 2100  ELBO loss: 357,648.1
+step 2200  ELBO loss: 357,465.0
+step 2300  ELBO loss: 357,428.0
+step 2400  ELBO loss: 357,076.1
+step 2500  ELBO loss: 357,245.3
+step 2600  ELBO loss: 357,221.1
+step 2700  ELBO loss: 356,790.6
+step 2800  ELBO loss: 356,897.0
+step 2900  ELBO loss: 356,768.2
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 3 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_3/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_3/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 27,435,513.4
+step  100  ELBO loss: 1,081,821.7
+step  200  ELBO loss: 820,970.3
+step  300  ELBO loss: 659,276.8
+step  400  ELBO loss: 555,495.7
+step  500  ELBO loss: 498,824.0
+step  600  ELBO loss: 478,434.2
+step  700  ELBO loss: 472,724.9
+step  800  ELBO loss: 469,988.1
+step  900  ELBO loss: 468,640.1
+step 1000  ELBO loss: 467,226.7
+step 1100  ELBO loss: 466,685.7
+step 1200  ELBO loss: 466,134.2
+step 1300  ELBO loss: 465,872.4
+step 1400  ELBO loss: 465,649.2
+step 1500  ELBO loss: 465,445.4
+step 1600  ELBO loss: 464,948.6
+step 1700  ELBO loss: 464,342.5
+step 1800  ELBO loss: 464,622.3
+step 1900  ELBO loss: 464,336.2
+step 2000  ELBO loss: 464,715.9
+step 2100  ELBO loss: 464,460.1
+step 2200  ELBO loss: 463,986.3
+step 2300  ELBO loss: 463,966.6
+step 2400  ELBO loss: 464,065.4
+step 2500  ELBO loss: 463,830.4
+step 2600  ELBO loss: 463,903.4
+step 2700  ELBO loss: 463,688.4
+step 2800  ELBO loss: 463,779.5
+step 2900  ELBO loss: 463,898.9
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanh-ablation-gamma/dim_3/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_3/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 167,572.1
+step  100  ELBO loss: 100,383.5
+step  200  ELBO loss: 86,197.0
+step  300  ELBO loss: 82,633.7
+step  400  ELBO loss: 81,906.1
+step  500  ELBO loss: 81,452.3
+step  600  ELBO loss: 81,484.7
+step  700  ELBO loss: 81,552.8
+step  800  ELBO loss: 81,314.4
+step  900  ELBO loss: 81,280.2
+step 1000  ELBO loss: 81,175.2
+step 1100  ELBO loss: 81,449.3
+step 1200  ELBO loss: 81,239.1
+step 1300  ELBO loss: 81,329.3
+step 1400  ELBO loss: 81,147.9
+step 1500  ELBO loss: 81,349.6
+step 1600  ELBO loss: 81,227.5
+step 1700  ELBO loss: 81,429.9
+step 1800  ELBO loss: 81,373.3
+step 1900  ELBO loss: 81,218.5
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_3/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_3/holdout/synergy --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_3/holdout/synergy-evaluation
+
+=== multidim ablation: dimension 4 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 4 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_4/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,689,875.4
+step  100  ELBO loss: 508,862.9
+step  200  ELBO loss: 471,204.8
+step  300  ELBO loss: 439,775.2
+step  400  ELBO loss: 407,866.4
+step  500  ELBO loss: 383,732.3
+step  600  ELBO loss: 373,367.8
+step  700  ELBO loss: 368,327.8
+step  800  ELBO loss: 365,568.2
+step  900  ELBO loss: 363,474.6
+step 1000  ELBO loss: 362,860.0
+step 1100  ELBO loss: 362,067.5
+step 1200  ELBO loss: 361,298.5
+step 1300  ELBO loss: 361,288.8
+step 1400  ELBO loss: 360,644.0
+step 1500  ELBO loss: 360,503.9
+step 1600  ELBO loss: 360,328.2
+step 1700  ELBO loss: 360,527.5
+step 1800  ELBO loss: 359,429.3
+step 1900  ELBO loss: 359,560.1
+step 2000  ELBO loss: 359,845.5
+step 2100  ELBO loss: 359,393.5
+step 2200  ELBO loss: 359,206.2
+step 2300  ELBO loss: 359,285.8
+step 2400  ELBO loss: 358,955.9
+step 2500  ELBO loss: 359,556.2
+step 2600  ELBO loss: 359,342.4
+step 2700  ELBO loss: 358,919.2
+step 2800  ELBO loss: 358,915.0
+step 2900  ELBO loss: 358,721.3
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 4 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_4/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_4/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 27,394,000.6
+step  100  ELBO loss: 1,071,964.4
+step  200  ELBO loss: 824,094.0
+step  300  ELBO loss: 663,489.4
+step  400  ELBO loss: 560,370.2
+step  500  ELBO loss: 503,491.5
+step  600  ELBO loss: 481,824.3
+step  700  ELBO loss: 475,630.7
+step  800  ELBO loss: 473,069.5
+step  900  ELBO loss: 471,301.1
+step 1000  ELBO loss: 469,431.4
+step 1100  ELBO loss: 469,137.2
+step 1200  ELBO loss: 468,699.6
+step 1300  ELBO loss: 468,011.0
+step 1400  ELBO loss: 467,680.0
+step 1500  ELBO loss: 467,085.6
+step 1600  ELBO loss: 467,139.4
+step 1700  ELBO loss: 466,416.0
+step 1800  ELBO loss: 466,589.2
+step 1900  ELBO loss: 466,266.9
+step 2000  ELBO loss: 465,681.8
+step 2100  ELBO loss: 466,196.6
+step 2200  ELBO loss: 465,899.0
+step 2300  ELBO loss: 465,874.5
+step 2400  ELBO loss: 465,970.5
+step 2500  ELBO loss: 465,475.1
+step 2600  ELBO loss: 466,181.7
+step 2700  ELBO loss: 465,844.2
+step 2800  ELBO loss: 465,336.1
+step 2900  ELBO loss: 465,659.4
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanh-ablation-gamma/dim_4/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_4/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 177,457.3
+step  100  ELBO loss: 103,412.2
+step  200  ELBO loss: 87,285.1
+step  300  ELBO loss: 83,383.0
+step  400  ELBO loss: 82,491.1
+step  500  ELBO loss: 82,120.7
+step  600  ELBO loss: 82,131.1
+step  700  ELBO loss: 82,182.2
+step  800  ELBO loss: 81,913.7
+step  900  ELBO loss: 81,867.6
+step 1000  ELBO loss: 81,966.6
+step 1100  ELBO loss: 81,881.6
+step 1200  ELBO loss: 81,692.8
+step 1300  ELBO loss: 81,916.6
+step 1400  ELBO loss: 81,760.0
+step 1500  ELBO loss: 81,914.7
+step 1600  ELBO loss: 81,889.3
+step 1700  ELBO loss: 81,869.1
+step 1800  ELBO loss: 81,761.1
+step 1900  ELBO loss: 81,800.5
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_4/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_4/holdout/synergy --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_4/holdout/synergy-evaluation
+
+=== multidim ablation: dimension 5 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 5 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_5/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,950,074.4
+step  100  ELBO loss: 519,362.1
+step  200  ELBO loss: 482,013.2
+step  300  ELBO loss: 449,675.1
+step  400  ELBO loss: 414,497.8
+step  500  ELBO loss: 390,862.9
+step  600  ELBO loss: 379,081.1
+step  700  ELBO loss: 373,106.4
+step  800  ELBO loss: 370,382.9
+step  900  ELBO loss: 367,954.1
+step 1000  ELBO loss: 366,696.9
+step 1100  ELBO loss: 365,541.7
+step 1200  ELBO loss: 364,839.7
+step 1300  ELBO loss: 364,860.8
+step 1400  ELBO loss: 363,933.2
+step 1500  ELBO loss: 363,317.7
+step 1600  ELBO loss: 362,878.8
+step 1700  ELBO loss: 362,995.5
+step 1800  ELBO loss: 363,395.6
+step 1900  ELBO loss: 362,765.2
+step 2000  ELBO loss: 362,415.1
+step 2100  ELBO loss: 362,412.5
+step 2200  ELBO loss: 362,596.6
+step 2300  ELBO loss: 362,678.0
+step 2400  ELBO loss: 361,916.4
+step 2500  ELBO loss: 362,244.8
+step 2600  ELBO loss: 362,088.9
+step 2700  ELBO loss: 362,357.5
+step 2800  ELBO loss: 361,682.8
+step 2900  ELBO loss: 362,154.0
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 5 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_5/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_5/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 27,682,801.4
+step  100  ELBO loss: 1,065,297.8
+step  200  ELBO loss: 831,511.0
+step  300  ELBO loss: 671,737.8
+step  400  ELBO loss: 568,059.1
+step  500  ELBO loss: 509,096.0
+step  600  ELBO loss: 487,856.1
+step  700  ELBO loss: 481,139.3
+step  800  ELBO loss: 477,922.2
+step  900  ELBO loss: 476,319.5
+step 1000  ELBO loss: 474,751.8
+step 1100  ELBO loss: 473,999.8
+step 1200  ELBO loss: 473,267.6
+step 1300  ELBO loss: 472,088.7
+step 1400  ELBO loss: 471,940.8
+step 1500  ELBO loss: 471,313.7
+step 1600  ELBO loss: 471,414.1
+step 1700  ELBO loss: 471,326.7
+step 1800  ELBO loss: 471,250.8
+step 1900  ELBO loss: 470,734.4
+step 2000  ELBO loss: 470,504.7
+step 2100  ELBO loss: 470,546.7
+step 2200  ELBO loss: 470,535.3
+step 2300  ELBO loss: 470,037.5
+step 2400  ELBO loss: 469,567.4
+step 2500  ELBO loss: 470,271.5
+step 2600  ELBO loss: 469,724.7
+step 2700  ELBO loss: 470,006.9
+step 2800  ELBO loss: 469,575.5
+step 2900  ELBO loss: 469,147.0
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanh-ablation-gamma/dim_5/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_5/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 186,565.2
+step  100  ELBO loss: 106,437.2
+step  200  ELBO loss: 88,365.5
+step  300  ELBO loss: 83,968.2
+step  400  ELBO loss: 82,949.5
+step  500  ELBO loss: 82,618.3
+step  600  ELBO loss: 82,479.8
+step  700  ELBO loss: 82,567.5
+step  800  ELBO loss: 82,372.5
+step  900  ELBO loss: 82,280.3
+step 1000  ELBO loss: 82,420.9
+step 1100  ELBO loss: 82,418.1
+step 1200  ELBO loss: 82,218.6
+step 1300  ELBO loss: 82,459.2
+step 1400  ELBO loss: 82,276.8
+step 1500  ELBO loss: 82,294.2
+step 1600  ELBO loss: 82,427.3
+step 1700  ELBO loss: 82,376.3
+step 1800  ELBO loss: 82,178.0
+step 1900  ELBO loss: 82,312.1
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_5/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_5/holdout/synergy --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_5/holdout/synergy-evaluation
+
+=== multidim ablation: dimension 6 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 6 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_6/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,102,336.9
+step  100  ELBO loss: 531,377.2
+step  200  ELBO loss: 493,765.0
+step  300  ELBO loss: 459,200.7
+step  400  ELBO loss: 421,689.9
+step  500  ELBO loss: 396,859.6
+step  600  ELBO loss: 383,891.6
+step  700  ELBO loss: 377,659.5
+step  800  ELBO loss: 373,510.0
+step  900  ELBO loss: 371,246.0
+step 1000  ELBO loss: 369,261.5
+step 1100  ELBO loss: 370,045.3
+step 1200  ELBO loss: 367,874.8
+step 1300  ELBO loss: 367,398.5
+step 1400  ELBO loss: 367,227.7
+step 1500  ELBO loss: 366,503.9
+step 1600  ELBO loss: 365,888.7
+step 1700  ELBO loss: 365,986.4
+step 1800  ELBO loss: 366,700.7
+step 1900  ELBO loss: 366,242.9
+step 2000  ELBO loss: 365,676.9
+step 2100  ELBO loss: 365,216.0
+step 2200  ELBO loss: 365,099.4
+step 2300  ELBO loss: 365,092.7
+step 2400  ELBO loss: 364,920.8
+step 2500  ELBO loss: 364,016.1
+step 2600  ELBO loss: 364,221.9
+step 2700  ELBO loss: 364,299.8
+step 2800  ELBO loss: 364,089.7
+step 2900  ELBO loss: 363,498.3
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 6 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_6/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_6/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 27,703,409.6
+step  100  ELBO loss: 1,066,949.3
+step  200  ELBO loss: 831,897.7
+step  300  ELBO loss: 673,725.5
+step  400  ELBO loss: 569,523.0
+step  500  ELBO loss: 512,001.2
+step  600  ELBO loss: 489,843.8
+step  700  ELBO loss: 482,248.3
+step  800  ELBO loss: 478,798.9
+step  900  ELBO loss: 476,251.1
+step 1000  ELBO loss: 475,044.1
+step 1100  ELBO loss: 474,655.4
+step 1200  ELBO loss: 473,140.2
+step 1300  ELBO loss: 472,927.9
+step 1400  ELBO loss: 472,607.2
+step 1500  ELBO loss: 472,543.7
+step 1600  ELBO loss: 471,744.1
+step 1700  ELBO loss: 471,431.9
+step 1800  ELBO loss: 471,206.4
+step 1900  ELBO loss: 470,868.8
+step 2000  ELBO loss: 471,046.0
+step 2100  ELBO loss: 470,242.9
+step 2200  ELBO loss: 471,027.6
+step 2300  ELBO loss: 470,688.4
+step 2400  ELBO loss: 470,513.1
+step 2500  ELBO loss: 470,364.1
+step 2600  ELBO loss: 470,415.7
+step 2700  ELBO loss: 469,762.8
+step 2800  ELBO loss: 469,911.9
+step 2900  ELBO loss: 470,131.8
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanh-ablation-gamma/dim_6/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_6/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 200,520.6
+step  100  ELBO loss: 109,556.9
+step  200  ELBO loss: 89,629.5
+step  300  ELBO loss: 84,717.0
+step  400  ELBO loss: 83,763.2
+step  500  ELBO loss: 83,284.7
+step  600  ELBO loss: 83,219.7
+step  700  ELBO loss: 83,146.1
+step  800  ELBO loss: 82,939.2
+step  900  ELBO loss: 83,031.8
+step 1000  ELBO loss: 83,068.3
+step 1100  ELBO loss: 82,940.4
+step 1200  ELBO loss: 82,974.4
+step 1300  ELBO loss: 82,937.7
+step 1400  ELBO loss: 82,920.7
+step 1500  ELBO loss: 83,096.2
+step 1600  ELBO loss: 82,980.9
+step 1700  ELBO loss: 83,023.7
+step 1800  ELBO loss: 82,895.7
+step 1900  ELBO loss: 82,921.5
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_6/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_6/holdout/synergy --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_6/holdout/synergy-evaluation
+
+=== multidim ablation: dimension 7 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 7 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_7/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 20,820,127.9
+step  100  ELBO loss: 542,894.2
+step  200  ELBO loss: 505,014.8
+step  300  ELBO loss: 468,121.1
+step  400  ELBO loss: 428,444.7
+step  500  ELBO loss: 402,130.6
+step  600  ELBO loss: 389,008.5
+step  700  ELBO loss: 382,009.0
+step  800  ELBO loss: 376,734.0
+step  900  ELBO loss: 374,545.9
+step 1000  ELBO loss: 372,819.3
+step 1100  ELBO loss: 372,274.6
+step 1200  ELBO loss: 370,723.6
+step 1300  ELBO loss: 370,794.7
+step 1400  ELBO loss: 369,560.9
+step 1500  ELBO loss: 369,630.9
+step 1600  ELBO loss: 369,163.4
+step 1700  ELBO loss: 368,573.7
+step 1800  ELBO loss: 368,704.7
+step 1900  ELBO loss: 368,194.9
+step 2000  ELBO loss: 368,299.3
+step 2100  ELBO loss: 367,959.7
+step 2200  ELBO loss: 367,994.8
+step 2300  ELBO loss: 367,563.2
+step 2400  ELBO loss: 368,288.2
+step 2500  ELBO loss: 367,507.9
+step 2600  ELBO loss: 367,912.3
+step 2700  ELBO loss: 367,196.1
+step 2800  ELBO loss: 366,947.0
+step 2900  ELBO loss: 368,338.5
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 7 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_7/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_7/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 27,591,661.9
+step  100  ELBO loss: 1,076,107.0
+step  200  ELBO loss: 838,794.3
+step  300  ELBO loss: 678,774.4
+step  400  ELBO loss: 575,593.5
+step  500  ELBO loss: 517,444.9
+step  600  ELBO loss: 494,959.2
+step  700  ELBO loss: 487,417.2
+step  800  ELBO loss: 483,504.7
+step  900  ELBO loss: 481,860.5
+step 1000  ELBO loss: 480,147.2
+step 1100  ELBO loss: 478,941.3
+step 1200  ELBO loss: 478,240.2
+step 1300  ELBO loss: 477,225.7
+step 1400  ELBO loss: 476,881.8
+step 1500  ELBO loss: 475,942.0
+step 1600  ELBO loss: 476,148.1
+step 1700  ELBO loss: 475,817.6
+step 1800  ELBO loss: 474,823.8
+step 1900  ELBO loss: 476,222.4
+step 2000  ELBO loss: 475,146.7
+step 2100  ELBO loss: 474,824.8
+step 2200  ELBO loss: 474,346.3
+step 2300  ELBO loss: 474,557.1
+step 2400  ELBO loss: 474,222.2
+step 2500  ELBO loss: 473,139.1
+step 2600  ELBO loss: 473,948.9
+step 2700  ELBO loss: 474,136.6
+step 2800  ELBO loss: 473,824.7
+step 2900  ELBO loss: 473,824.0
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanh-ablation-gamma/dim_7/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_7/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 211,603.3
+step  100  ELBO loss: 111,590.3
+step  200  ELBO loss: 90,641.2
+step  300  ELBO loss: 85,584.5
+step  400  ELBO loss: 84,291.5
+step  500  ELBO loss: 83,880.9
+step  600  ELBO loss: 83,740.3
+step  700  ELBO loss: 83,892.9
+step  800  ELBO loss: 83,583.0
+step  900  ELBO loss: 83,570.5
+step 1000  ELBO loss: 83,842.0
+step 1100  ELBO loss: 83,543.5
+step 1200  ELBO loss: 83,573.1
+step 1300  ELBO loss: 83,580.8
+step 1400  ELBO loss: 83,519.6
+step 1500  ELBO loss: 83,587.9
+step 1600  ELBO loss: 83,453.0
+step 1700  ELBO loss: 83,641.4
+step 1800  ELBO loss: 83,514.3
+step 1900  ELBO loss: 83,374.9
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_7/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_7/holdout/synergy --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_7/holdout/synergy-evaluation
+
+=== multidim ablation: dimension 8 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 8 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_8/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,050,415.6
+step  100  ELBO loss: 557,094.2
+step  200  ELBO loss: 515,465.0
+step  300  ELBO loss: 478,004.4
+step  400  ELBO loss: 434,374.9
+step  500  ELBO loss: 408,062.9
+step  600  ELBO loss: 392,410.3
+step  700  ELBO loss: 385,249.4
+step  800  ELBO loss: 380,195.2
+step  900  ELBO loss: 377,166.3
+step 1000  ELBO loss: 375,323.9
+step 1100  ELBO loss: 374,046.2
+step 1200  ELBO loss: 373,448.5
+step 1300  ELBO loss: 373,484.1
+step 1400  ELBO loss: 372,972.4
+step 1500  ELBO loss: 372,941.0
+step 1600  ELBO loss: 371,483.3
+step 1700  ELBO loss: 372,099.6
+step 1800  ELBO loss: 371,539.7
+step 1900  ELBO loss: 371,622.6
+step 2000  ELBO loss: 371,003.4
+step 2100  ELBO loss: 370,360.5
+step 2200  ELBO loss: 370,788.1
+step 2300  ELBO loss: 370,531.2
+step 2400  ELBO loss: 370,955.9
+step 2500  ELBO loss: 370,253.6
+step 2600  ELBO loss: 370,924.8
+step 2700  ELBO loss: 370,265.9
+step 2800  ELBO loss: 369,906.8
+step 2900  ELBO loss: 369,852.4
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 8 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_8/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_8/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 27,882,645.4
+step  100  ELBO loss: 1,088,576.2
+step  200  ELBO loss: 846,537.4
+step  300  ELBO loss: 686,145.8
+step  400  ELBO loss: 581,861.6
+step  500  ELBO loss: 524,287.7
+step  600  ELBO loss: 500,487.2
+step  700  ELBO loss: 492,350.2
+step  800  ELBO loss: 488,862.3
+step  900  ELBO loss: 484,784.3
+step 1000  ELBO loss: 483,630.9
+step 1100  ELBO loss: 483,724.3
+step 1200  ELBO loss: 481,715.9
+step 1300  ELBO loss: 481,313.8
+step 1400  ELBO loss: 481,568.7
+step 1500  ELBO loss: 480,155.7
+step 1600  ELBO loss: 479,836.8
+step 1700  ELBO loss: 479,622.7
+step 1800  ELBO loss: 479,481.9
+step 1900  ELBO loss: 478,653.0
+step 2000  ELBO loss: 479,338.0
+step 2100  ELBO loss: 478,202.2
+step 2200  ELBO loss: 480,298.4
+step 2300  ELBO loss: 478,723.5
+step 2400  ELBO loss: 478,110.0
+step 2500  ELBO loss: 477,491.8
+step 2600  ELBO loss: 476,998.4
+step 2700  ELBO loss: 477,709.1
+step 2800  ELBO loss: 478,162.8
+step 2900  ELBO loss: 477,806.4
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanh-ablation-gamma/dim_8/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_8/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 225,510.1
+step  100  ELBO loss: 113,709.5
+step  200  ELBO loss: 91,812.1
+step  300  ELBO loss: 86,256.1
+step  400  ELBO loss: 84,843.7
+step  500  ELBO loss: 84,604.9
+step  600  ELBO loss: 84,283.2
+step  700  ELBO loss: 84,210.6
+step  800  ELBO loss: 84,193.3
+step  900  ELBO loss: 84,153.8
+step 1000  ELBO loss: 84,404.3
+step 1100  ELBO loss: 84,019.3
+step 1200  ELBO loss: 84,153.7
+step 1300  ELBO loss: 84,230.8
+step 1400  ELBO loss: 84,102.2
+step 1500  ELBO loss: 84,543.4
+step 1600  ELBO loss: 84,277.8
+step 1700  ELBO loss: 84,295.6
+step 1800  ELBO loss: 84,312.5
+step 1900  ELBO loss: 84,020.3
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_8/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_8/holdout/synergy --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_8/holdout/synergy-evaluation
+
+=== multidim ablation: dimension 9 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 9 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_9/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,114,698.2
+step  100  ELBO loss: 567,083.0
+step  200  ELBO loss: 526,664.1
+step  300  ELBO loss: 485,715.0
+step  400  ELBO loss: 440,327.1
+step  500  ELBO loss: 413,735.5
+step  600  ELBO loss: 397,893.5
+step  700  ELBO loss: 388,028.7
+step  800  ELBO loss: 383,752.9
+step  900  ELBO loss: 380,610.3
+step 1000  ELBO loss: 378,439.0
+step 1100  ELBO loss: 376,930.3
+step 1200  ELBO loss: 376,758.3
+step 1300  ELBO loss: 377,120.2
+step 1400  ELBO loss: 376,287.2
+step 1500  ELBO loss: 374,942.9
+step 1600  ELBO loss: 375,241.3
+step 1700  ELBO loss: 374,149.7
+step 1800  ELBO loss: 373,992.4
+step 1900  ELBO loss: 373,925.4
+step 2000  ELBO loss: 373,427.5
+step 2100  ELBO loss: 373,401.5
+step 2200  ELBO loss: 373,585.2
+step 2300  ELBO loss: 373,647.4
+step 2400  ELBO loss: 372,993.1
+step 2500  ELBO loss: 372,468.3
+step 2600  ELBO loss: 372,516.1
+step 2700  ELBO loss: 372,803.5
+step 2800  ELBO loss: 372,845.3
+step 2900  ELBO loss: 373,186.0
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 9 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_9/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_9/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 28,117,783.4
+step  100  ELBO loss: 1,085,846.6
+step  200  ELBO loss: 847,900.3
+step  300  ELBO loss: 686,223.4
+step  400  ELBO loss: 584,253.9
+step  500  ELBO loss: 525,517.7
+step  600  ELBO loss: 502,814.0
+step  700  ELBO loss: 495,161.0
+step  800  ELBO loss: 489,963.8
+step  900  ELBO loss: 487,549.5
+step 1000  ELBO loss: 486,746.2
+step 1100  ELBO loss: 484,406.5
+step 1200  ELBO loss: 483,527.0
+step 1300  ELBO loss: 482,046.5
+step 1400  ELBO loss: 482,783.7
+step 1500  ELBO loss: 485,010.7
+step 1600  ELBO loss: 481,715.8
+step 1700  ELBO loss: 481,420.6
+step 1800  ELBO loss: 481,373.6
+step 1900  ELBO loss: 481,083.8
+step 2000  ELBO loss: 480,382.1
+step 2100  ELBO loss: 479,844.4
+step 2200  ELBO loss: 479,766.9
+step 2300  ELBO loss: 478,621.1
+step 2400  ELBO loss: 479,685.6
+step 2500  ELBO loss: 479,893.7
+step 2600  ELBO loss: 479,940.2
+step 2700  ELBO loss: 479,166.3
+step 2800  ELBO loss: 479,310.1
+step 2900  ELBO loss: 478,658.9
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanh-ablation-gamma/dim_9/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_9/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 240,183.0
+step  100  ELBO loss: 116,869.5
+step  200  ELBO loss: 92,851.4
+step  300  ELBO loss: 86,866.3
+step  400  ELBO loss: 85,324.6
+step  500  ELBO loss: 84,920.9
+step  600  ELBO loss: 84,848.6
+step  700  ELBO loss: 84,946.3
+step  800  ELBO loss: 84,653.8
+step  900  ELBO loss: 84,498.3
+step 1000  ELBO loss: 84,738.7
+step 1100  ELBO loss: 84,592.3
+step 1200  ELBO loss: 84,710.8
+step 1300  ELBO loss: 84,680.8
+step 1400  ELBO loss: 84,702.2
+step 1500  ELBO loss: 84,787.7
+step 1600  ELBO loss: 84,607.1
+step 1700  ELBO loss: 84,721.3
+step 1800  ELBO loss: 84,758.3
+step 1900  ELBO loss: 84,502.2
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_9/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_9/holdout/synergy --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_9/holdout/synergy-evaluation
+
+=== multidim ablation: dimension 10 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 10 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_10/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,171,177.5
+step  100  ELBO loss: 579,871.0
+step  200  ELBO loss: 537,331.3
+step  300  ELBO loss: 495,034.6
+step  400  ELBO loss: 447,909.1
+step  500  ELBO loss: 420,471.0
+step  600  ELBO loss: 403,235.6
+step  700  ELBO loss: 393,500.6
+step  800  ELBO loss: 387,347.0
+step  900  ELBO loss: 385,551.9
+step 1000  ELBO loss: 382,470.2
+step 1100  ELBO loss: 381,199.0
+step 1200  ELBO loss: 380,323.8
+step 1300  ELBO loss: 380,585.3
+step 1400  ELBO loss: 378,430.2
+step 1500  ELBO loss: 378,889.6
+step 1600  ELBO loss: 378,892.9
+step 1700  ELBO loss: 377,966.7
+step 1800  ELBO loss: 377,982.9
+step 1900  ELBO loss: 377,499.2
+step 2000  ELBO loss: 377,820.2
+step 2100  ELBO loss: 378,448.9
+step 2200  ELBO loss: 376,838.6
+step 2300  ELBO loss: 377,321.7
+step 2400  ELBO loss: 376,305.8
+step 2500  ELBO loss: 376,044.6
+step 2600  ELBO loss: 376,737.2
+step 2700  ELBO loss: 376,415.3
+step 2800  ELBO loss: 377,624.8
+step 2900  ELBO loss: 375,342.1
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 10 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_10/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_10/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 27,775,818.4
+step  100  ELBO loss: 1,100,069.5
+step  200  ELBO loss: 856,503.4
+step  300  ELBO loss: 696,658.5
+step  400  ELBO loss: 592,064.7
+step  500  ELBO loss: 533,560.4
+step  600  ELBO loss: 509,871.8
+step  700  ELBO loss: 500,579.9
+step  800  ELBO loss: 496,745.4
+step  900  ELBO loss: 493,430.6
+step 1000  ELBO loss: 491,969.8
+step 1100  ELBO loss: 490,377.8
+step 1200  ELBO loss: 488,412.5
+step 1300  ELBO loss: 488,656.5
+step 1400  ELBO loss: 487,197.6
+step 1500  ELBO loss: 486,444.0
+step 1600  ELBO loss: 486,781.2
+step 1700  ELBO loss: 485,783.0
+step 1800  ELBO loss: 486,423.9
+step 1900  ELBO loss: 485,333.2
+step 2000  ELBO loss: 485,731.8
+step 2100  ELBO loss: 485,787.8
+step 2200  ELBO loss: 485,700.4
+step 2300  ELBO loss: 484,913.7
+step 2400  ELBO loss: 484,596.6
+step 2500  ELBO loss: 484,498.5
+step 2600  ELBO loss: 484,692.6
+step 2700  ELBO loss: 484,562.9
+step 2800  ELBO loss: 484,700.0
+step 2900  ELBO loss: 483,473.2
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanh-ablation-gamma/dim_10/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_10/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 256,770.5
+step  100  ELBO loss: 118,941.0
+step  200  ELBO loss: 93,922.0
+step  300  ELBO loss: 87,925.5
+step  400  ELBO loss: 86,284.4
+step  500  ELBO loss: 85,813.8
+step  600  ELBO loss: 85,697.0
+step  700  ELBO loss: 85,660.2
+step  800  ELBO loss: 85,423.0
+step  900  ELBO loss: 85,374.3
+step 1000  ELBO loss: 85,653.4
+step 1100  ELBO loss: 85,605.6
+step 1200  ELBO loss: 85,353.3
+step 1300  ELBO loss: 85,478.4
+step 1400  ELBO loss: 85,386.5
+step 1500  ELBO loss: 85,735.5
+step 1600  ELBO loss: 85,417.2
+step 1700  ELBO loss: 85,515.8
+step 1800  ELBO loss: 85,467.0
+step 1900  ELBO loss: 85,271.5
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_10/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_10/holdout/synergy --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_10/holdout/synergy-evaluation
+
+=== multidim ablation: dimension 12 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 12 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_12/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,561,480.1
+step  100  ELBO loss: 604,926.4
+step  200  ELBO loss: 559,656.0
+step  300  ELBO loss: 512,102.2
+step  400  ELBO loss: 465,001.2
+step  500  ELBO loss: 433,013.8
+step  600  ELBO loss: 413,974.1
+step  700  ELBO loss: 401,972.2
+step  800  ELBO loss: 396,243.0
+step  900  ELBO loss: 392,776.1
+step 1000  ELBO loss: 389,463.8
+step 1100  ELBO loss: 389,132.7
+step 1200  ELBO loss: 386,562.6
+step 1300  ELBO loss: 385,916.1
+step 1400  ELBO loss: 386,148.6
+step 1500  ELBO loss: 386,306.6
+step 1600  ELBO loss: 385,017.8
+step 1700  ELBO loss: 385,927.2
+step 1800  ELBO loss: 383,582.9
+step 1900  ELBO loss: 384,155.5
+step 2000  ELBO loss: 384,976.5
+step 2100  ELBO loss: 385,401.4
+step 2200  ELBO loss: 384,343.6
+step 2300  ELBO loss: 383,648.3
+step 2400  ELBO loss: 383,604.2
+step 2500  ELBO loss: 384,189.2
+step 2600  ELBO loss: 382,741.0
+step 2700  ELBO loss: 383,974.3
+step 2800  ELBO loss: 384,346.7
+step 2900  ELBO loss: 383,719.5
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 12 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_12/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_12/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 28,163,459.7
+step  100  ELBO loss: 1,115,807.8
+step  200  ELBO loss: 870,884.3
+step  300  ELBO loss: 711,096.7
+step  400  ELBO loss: 606,171.7
+step  500  ELBO loss: 544,993.7
+step  600  ELBO loss: 519,055.6
+step  700  ELBO loss: 510,397.4
+step  800  ELBO loss: 506,457.2
+step  900  ELBO loss: 502,541.4
+step 1000  ELBO loss: 499,618.9
+step 1100  ELBO loss: 497,298.9
+step 1200  ELBO loss: 497,921.2
+step 1300  ELBO loss: 497,377.2
+step 1400  ELBO loss: 495,620.5
+step 1500  ELBO loss: 496,294.6
+step 1600  ELBO loss: 495,861.0
+step 1700  ELBO loss: 495,474.0
+step 1800  ELBO loss: 493,426.7
+step 1900  ELBO loss: 493,217.4
+step 2000  ELBO loss: 496,696.0
+step 2100  ELBO loss: 493,980.2
+step 2200  ELBO loss: 492,869.2
+step 2300  ELBO loss: 493,349.9
+step 2400  ELBO loss: 493,065.7
+step 2500  ELBO loss: 493,297.4
+step 2600  ELBO loss: 495,500.1
+step 2700  ELBO loss: 492,510.8
+step 2800  ELBO loss: 491,991.0
+step 2900  ELBO loss: 491,624.8
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanh-ablation-gamma/dim_12/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_12/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 299,992.4
+step  100  ELBO loss: 124,487.0
+step  200  ELBO loss: 96,344.1
+step  300  ELBO loss: 89,421.5
+step  400  ELBO loss: 87,877.2
+step  500  ELBO loss: 87,298.6
+step  600  ELBO loss: 87,229.1
+step  700  ELBO loss: 87,130.8
+step  800  ELBO loss: 86,755.0
+step  900  ELBO loss: 86,790.3
+step 1000  ELBO loss: 86,911.2
+step 1100  ELBO loss: 86,681.7
+step 1200  ELBO loss: 86,921.7
+step 1300  ELBO loss: 86,966.8
+step 1400  ELBO loss: 86,868.0
+step 1500  ELBO loss: 87,360.9
+step 1600  ELBO loss: 86,907.7
+step 1700  ELBO loss: 86,869.3
+step 1800  ELBO loss: 86,754.2
+step 1900  ELBO loss: 86,885.8
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_12/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_12/holdout/synergy --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_12/holdout/synergy-evaluation
+
+=== multidim ablation: dimension 14 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 14 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_14/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,348,419.7
+step  100  ELBO loss: 629,747.4
+step  200  ELBO loss: 581,484.1
+step  300  ELBO loss: 530,238.6
+step  400  ELBO loss: 478,909.6
+step  500  ELBO loss: 446,237.8
+step  600  ELBO loss: 424,901.7
+step  700  ELBO loss: 412,438.9
+step  800  ELBO loss: 404,749.8
+step  900  ELBO loss: 400,535.0
+step 1000  ELBO loss: 397,470.7
+step 1100  ELBO loss: 396,356.3
+step 1200  ELBO loss: 394,384.0
+step 1300  ELBO loss: 392,700.7
+step 1400  ELBO loss: 391,648.6
+step 1500  ELBO loss: 390,883.7
+step 1600  ELBO loss: 391,482.8
+step 1700  ELBO loss: 391,519.5
+step 1800  ELBO loss: 390,703.9
+step 1900  ELBO loss: 391,391.1
+step 2000  ELBO loss: 391,423.7
+step 2100  ELBO loss: 390,320.9
+step 2200  ELBO loss: 390,054.6
+step 2300  ELBO loss: 391,182.6
+step 2400  ELBO loss: 390,694.4
+step 2500  ELBO loss: 392,430.2
+step 2600  ELBO loss: 389,619.1
+step 2700  ELBO loss: 389,822.5
+step 2800  ELBO loss: 391,236.8
+step 2900  ELBO loss: 390,584.2
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 14 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_14/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_14/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 28,235,285.2
+step  100  ELBO loss: 1,139,372.0
+step  200  ELBO loss: 892,172.6
+step  300  ELBO loss: 728,036.5
+step  400  ELBO loss: 618,561.0
+step  500  ELBO loss: 556,941.8
+step  600  ELBO loss: 531,405.3
+step  700  ELBO loss: 519,137.0
+step  800  ELBO loss: 514,639.8
+step  900  ELBO loss: 509,785.0
+step 1000  ELBO loss: 506,574.2
+step 1100  ELBO loss: 506,154.3
+step 1200  ELBO loss: 504,467.8
+step 1300  ELBO loss: 504,084.2
+step 1400  ELBO loss: 503,711.3
+step 1500  ELBO loss: 502,690.7
+step 1600  ELBO loss: 500,678.8
+step 1700  ELBO loss: 505,304.8
+step 1800  ELBO loss: 503,341.4
+step 1900  ELBO loss: 502,487.5
+step 2000  ELBO loss: 503,252.1
+step 2100  ELBO loss: 501,519.3
+step 2200  ELBO loss: 499,392.7
+step 2300  ELBO loss: 500,984.8
+step 2400  ELBO loss: 500,767.3
+step 2500  ELBO loss: 499,629.5
+step 2600  ELBO loss: 500,779.3
+step 2700  ELBO loss: 502,178.1
+step 2800  ELBO loss: 499,805.2
+step 2900  ELBO loss: 500,403.2
++ .venv/bin/python -m train_compositional --split year_2025 --player-skills results/compirt/holdout/multidim-tanh-ablation-gamma/dim_14/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --device cuda --use-synergy --synergy-dimensions 1 --alpha-prior gamma --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_14/holdout/synergy
+Bonus part rows: 181,362  Parts: 4,716
+step    0  ELBO loss: 343,653.4
+step  100  ELBO loss: 131,845.3
+step  200  ELBO loss: 99,160.9
+step  300  ELBO loss: 91,259.2
+step  400  ELBO loss: 89,422.0
+step  500  ELBO loss: 89,137.8
+step  600  ELBO loss: 88,622.4
+step  700  ELBO loss: 88,956.1
+step  800  ELBO loss: 88,650.0
+step  900  ELBO loss: 88,310.3
+step 1000  ELBO loss: 88,411.3
+step 1100  ELBO loss: 88,830.5
+step 1200  ELBO loss: 88,537.0
+step 1300  ELBO loss: 88,572.0
+step 1400  ELBO loss: 88,458.5
+step 1500  ELBO loss: 88,893.3
+step 1600  ELBO loss: 88,435.2
+step 1700  ELBO loss: 88,459.3
+step 1800  ELBO loss: 88,567.6
+step 1900  ELBO loss: 88,318.0
++ .venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_14/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-tanh-ablation-gamma/dim_14/holdout/synergy --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_14/holdout/synergy-evaluation
+
+=== multidim ablation: dimension 16 ===
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2024 --dimensions 16 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_16/train/pyramidal
+Rows: 348,404  Players: 1,455  Tossups: 1,260
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 21,560,460.9
+step  100  ELBO loss: 653,005.7
+step  200  ELBO loss: 600,422.9
+step  300  ELBO loss: 548,931.0
+step  400  ELBO loss: 495,558.3
+step  500  ELBO loss: 457,780.4
+step  600  ELBO loss: 435,809.3
+step  700  ELBO loss: 424,218.3
+step  800  ELBO loss: 416,076.3
+step  900  ELBO loss: 407,492.2
+step 1000  ELBO loss: 404,594.7
+step 1100  ELBO loss: 404,992.1
+step 1200  ELBO loss: 401,296.7
+step 1300  ELBO loss: 401,023.7
+step 1400  ELBO loss: 399,307.7
+step 1500  ELBO loss: 401,051.7
+step 1600  ELBO loss: 400,063.4
+step 1700  ELBO loss: 396,787.7
+step 1800  ELBO loss: 401,186.9
+step 1900  ELBO loss: 398,895.8
+step 2000  ELBO loss: 397,450.9
+step 2100  ELBO loss: 398,704.8
+step 2200  ELBO loss: 399,404.1
+step 2300  ELBO loss: 397,621.9
+step 2400  ELBO loss: 399,176.1
+step 2500  ELBO loss: 401,124.1
+step 2600  ELBO loss: 399,554.0
+step 2700  ELBO loss: 399,442.1
+step 2800  ELBO loss: 401,731.8
+step 2900  ELBO loss: 402,615.2
++ .venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split year_2025 --dimensions 16 --difficulty-link tanh --steps 3000 --lr 0.01 --device cuda --train-posterior results/compirt/holdout/multidim-tanh-ablation-gamma/dim_16/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-tanh-ablation-gamma/dim_16/holdout/pyramidal
+Rows: 469,615  Players: 1,755  Tossups: 1,350
+z
+CENSORED    400683
+BUZZ         64834
+NO-BUZZ       4098
+Held-out player priors: {'players': 1755, 'returning': 608, 'new': 1147, 'new_player_prior': 'tier'}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/teapot/students/natnguyen/CompIRT-Implementation/multidimensional/multidim_mirt/train_pyramidal.py", line 217, in <module>
+    run_experiment(parse_args())
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/teapot/students/natnguyen/CompIRT-Implementation/multidimensional/multidim_mirt/train_pyramidal.py", line 130, in run_experiment
+    posterior, guide, losses = train_model(
+                               ~~~~~~~~~~~^
+        data,
+        ^^^^^
+    ...<4 lines>...
+        args.difficulty_link,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/teapot/students/natnguyen/CompIRT-Implementation/multidimensional/multidim_mirt/train_pyramidal.py", line 88, in train_model
+    return fit_svi(
+        competing_risks_model,
+    ...<3 lines>...
+        return_guide=True,
+    )
+  File "/teapot/students/natnguyen/CompIRT-Implementation/utils/training.py", line 38, in fit_svi
+    loss = svi.step(*model_args)
+  File "/teapot/students/natnguyen/CompIRT-Implementation/.venv/lib/python3.13/site-packages/pyro/infer/svi.py", line 145, in step
+    loss = self.loss_and_grads(self.model, self.guide, *args, **kwargs)
+  File "/teapot/students/natnguyen/CompIRT-Implementation/.venv/lib/python3.13/site-packages/pyro/infer/trace_elbo.py", line 157, in loss_and_grads
+    surrogate_loss_particle.backward(retain_graph=self.retain_graph)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/site-packages/torch/_tensor.py", line 631, in backward
+    torch.autograd.backward(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        self, gradient, retain_graph, create_graph, inputs=inputs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/lib/python3.13/site-packages/torch/autograd/__init__.py", line 379, in backward
+    _engine_run_backward(
+    ~~~~~~~~~~~~~~~~~~~~^
+        tensors,
+        ^^^^^^^^
+    ...<5 lines>...
+        accumulate_grad=True,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/lib/python3.13/site-packages/torch/autograd/graph.py", line 882, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        t_outputs, *args, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )  # Calls into the C++ engine to run the backward pass
+    ^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 4.68 GiB. GPU 0 has a total capacity of 23.52 GiB of which 3.75 GiB is free. Including non-PyTorch memory, this process has 19.76 GiB memory in use. Of the allocated memory 19.24 GiB is allocated by PyTorch, and 85.22 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/teapot/students/natnguyen/CompIRT-Implementation/run_scripts/run_multidim_ablation.py", line 544, in <module>
+  File "/teapot/students/natnguyen/CompIRT-Implementation/run_scripts/run_multidim_ablation.py", line 535, in main
+  File "/teapot/students/natnguyen/CompIRT-Implementation/run_scripts/run_multidim_ablation.py", line 227, in run_stage
+    save_metric_plot(
+  File "/teapot/students/natnguyen/CompIRT-Implementation/utils/run_logging.py", line 196, in run_logged
+    raise subprocess.CalledProcessError(return_code, printable)
+subprocess.CalledProcessError: Command '['.venv/bin/python', '-m', 'multidimensional.multidim_mirt.train_pyramidal', '--split', 'year_2025', '--dimensions', '16', '--difficulty-link', 'tanh', '--steps', '3000', '--lr', '0.01', '--device', 'cuda', '--train-posterior', 'results/compirt/holdout/multidim-tanh-ablation-gamma/dim_16/train/pyramidal/player_posterior.csv', '--new-player-prior', 'tier', '--output-dir', 'results/compirt/holdout/multidim-tanh-ablation-gamma/dim_16/holdout/pyramidal']' returned non-zero exit status 1.

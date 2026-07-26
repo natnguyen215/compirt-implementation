@@ -23,9 +23,6 @@ try:
     )
     from tfidf.multidim.train_pyramidal import save_tfidf_adjustment_curves
     from tfidf.plot_tfidf_difficulty_curves import curve_components
-    from tfidf.pyramidal_tfidf_model import (
-        CUMULATIVE_DIFFICULTY,
-    )
 except ModuleNotFoundError as error:
     if error.name != "pyro":
         raise
@@ -57,7 +54,6 @@ class MultidimTfidfFormulaTests(unittest.TestCase):
             self.T,
             torch.tensor([0.25]),
             effect,
-            CUMULATIVE_DIFFICULTY,
         )
         late = correctness_logit(
             self.theta,
@@ -69,7 +65,6 @@ class MultidimTfidfFormulaTests(unittest.TestCase):
             self.T,
             torch.tensor([0.75]),
             effect,
-            CUMULATIVE_DIFFICULTY,
         )
         hazard = hazard_logit(
             self.theta,
@@ -82,7 +77,6 @@ class MultidimTfidfFormulaTests(unittest.TestCase):
             self.T,
             torch.tensor([0.75]),
             effect,
-            CUMULATIVE_DIFFICULTY,
         )
 
         self.assertAlmostEqual(float(early), 1.0)
@@ -112,8 +106,8 @@ class MultidimTfidfFormulaTests(unittest.TestCase):
             loss=Trace_ELBO(),
         )
 
-        svi.step(data, 2, False, 1.0, CUMULATIVE_DIFFICULTY)
-        posterior = guide.median(data, 2, False, 1.0, CUMULATIVE_DIFFICULTY)
+        svi.step(data, 2, False, 1.0)
+        posterior = guide.median(data, 2, False, 1.0)
 
         self.assertEqual(tuple(posterior["r"].shape), (1, 2))
         self.assertTrue(torch.all(posterior["r"] > 0))
@@ -142,7 +136,6 @@ class MultidimTfidfOutputTests(unittest.TestCase):
                 data,
                 observations,
                 posterior,
-                CUMULATIVE_DIFFICULTY,
                 n_points=3,
             )
             frame = pd.read_csv(output_dir / "tfidf_adjustment_curves.csv")
@@ -167,10 +160,7 @@ class MultidimTfidfOutputTests(unittest.TestCase):
             "T": 3,
             "prefix": torch.tensor([0.0, 0.5, 1.0]),
         }
-        summary = {
-            "tfidf_variant": CUMULATIVE_DIFFICULTY,
-            "tfidf_clue_effect": 1.0,
-        }
+        summary = {"tfidf_clue_effect": 1.0}
         curves = curve_components(row, features, summary, np.array([0.0, 0.5, 1.0]))
 
         self.assertTrue(np.allclose(curves["base"], np.array([0.0, 0.0, 0.0])))

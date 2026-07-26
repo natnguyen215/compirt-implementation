@@ -1,20 +1,16 @@
 """Jointly train topic-gated CompIRT topics (sLDA-style) with the pyramidal model.
 
-This replaces the fixed-CSV topic weights of 'topic/fixed/train_topic_pyramidal'
-with a Dirichlet topic model trained *inside* the same SVI: each tossup's topic
-proportions 'theta_doc' gate the competing-risks likelihood, so buzz/answer
-outcomes propagate into the topics. It is supervised-LDA in spirit, not the
-canonical Blei-McAuliffe form -- 'r_j' = 'theta_doc' doubles as the IRT weight
-rather than feeding a separate response regression. Bonuses are included as
-word-only documents sharing the topic-word matrix, so their vectors come out of
-the same fit for the downstream compositional stage. The objective is the topic-
-weighted competing-risks log-likelihood plus the ('--bow-weight' scaled) LDA
-word likelihood.
+A Dirichlet topic model is trained inside the same SVI. Each tossup's topic
+proportions 'theta_doc' gate the competing-risks likelihood, so buzz and answer
+outcomes shape the topics. The model uses 'r_j = theta_doc' directly as the IRT
+weight. Bonuses enter as word-only documents sharing the topic-word matrix,
+which places their vectors in the same space for the compositional stage. The
+objective combines the topic-weighted competing-risks log-likelihood with the
+'--bow-weight'-scaled LDA word likelihood.
 
-Outputs match the topic-pyramidal stage ('players.csv', 'tossups.csv',
-'tossup_predictions.csv', 'summary.json', loss plot) plus a
-'document_latent_vectors.csv' of the learned topic weights for tossups and
-bonuses, so the downstream compositional and evaluation stages reuse it.
+Outputs include 'players.csv', 'tossups.csv', 'tossup_predictions.csv',
+'summary.json', the loss plot, and 'document_latent_vectors.csv' for the learned
+tossup and bonus topic weights.
 """
 
 from __future__ import annotations
@@ -59,6 +55,7 @@ from utils.saving import (
     write_summary,
 )
 from utils.training import fit_svi, require_device
+from utils.posterior import add_posterior_output_args
 from holdout.player_priors import attach_player_priors, player_tier_map
 
 
@@ -106,8 +103,8 @@ def save_parameters(output_dir, data, posterior):
     player_df.to_csv(output_dir / "players.csv", index=False)
 
     tossups = {"tossup_id": data["tossup_ids"]}
-    # This is CompIRT difficulty_beta, not LDA beta/topic_word. The column prefix
-    # stays "beta" because topic_compirt evaluation already consumes beta_*.
+    # The beta_* columns store CompIRT difficulty_beta; LDA topic-word
+    # parameters are saved separately.
     add_numbered_tensor_columns(tossups, "beta", posterior["beta"])
     add_numbered_tensor_columns(tossups, "gamma", posterior["gamma"])
     add_numbered_tensor_columns(tossups, "mu", posterior["mu"])
@@ -173,9 +170,8 @@ def run_experiment(args):
     documents, documents_by_id, combined_ids, bonus_ids = build_corpus(
         args.database, data["tossup_ids"], tables["bonuses"]["bonus_id"]
     )
-    # Held-out evaluation reuses the training run's frozen topic-word matrix so
-    # 2025 documents are scored against trained topics; that requires the training
-    # vocabulary (same column order) rather than a freshly built one.
+    # Held-out documents use the frozen training topic-word matrix and its
+    # vocabulary column order.
     frozen_topic_word = None
     if args.train_posterior and args.train_topic_model:
         vocabulary = json.loads(
@@ -218,12 +214,20 @@ def run_experiment(args):
         print(f"Held-out player priors: {prior_summary}")
 
     # Joint SVI: one AutoNormal guide covers every latent (incl. theta_doc).
-    model_args = (
-        data, args.dimensions, len(vocabulary), args.bow_weight,
-        args.topic_concentration, args.calibrate_correctness,
-    )
     posterior, guide, losses = fit_svi(
-        joint_model, model_args, args.steps, args.lr, return_guide=True
+        joint_model,
+        model_kwargs={
+            "data": data,
+            "n_dimensions": args.dimensions,
+            "bow_weight": args.bow_weight,
+            "topic_concentration": args.topic_concentration,
+            "calibrate_correctness": args.calibrate_correctness,
+        },
+        n_steps=args.steps,
+        lr=args.lr,
+        posterior_output_dir=args.output_dir,
+        posterior_draws=args.posterior_draws,
+        posterior_seed=args.seed,
     )
 
     # Split the document topic proportions into tossup and bonus weights.
@@ -233,8 +237,8 @@ def run_experiment(args):
 
     save_parameters(args.output_dir, data, posterior)
     save_player_posterior(args.output_dir, data["player_ids"], guide, tier_map)
-    # The topic-word matrix is only re-learned on a from-scratch run; a held-out
-    # pass reuses the frozen training matrix, so there is nothing new to persist.
+    # Persist the topic-word matrix when this run learns it. Held-out passes use
+    # the frozen training matrix supplied above.
     if frozen_topic_word is None:
         write_topics(args.output_dir, vocabulary, args.top_n)
         write_topic_model(args.output_dir, vocabulary)
@@ -247,11 +251,7 @@ def run_experiment(args):
     correct, hazard, survival = posterior_row_predictions(
         data, posterior, args.calibrate_correctness
     )
-    buzz_expected = (
-        expected_first_buzz_positions(data, posterior)
-        if args.predict_buzz_positions
-        else None
-    )
+    buzz_expected = expected_first_buzz_positions(data, posterior)
     save_tossup_predictions(
         args.output_dir, observations, correct, hazard, survival, buzz_expected=buzz_expected
     )
@@ -288,6 +288,7 @@ def run_experiment(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
+    add_posterior_output_args(parser)
     parser.add_argument("--database", type=Path, default=DEFAULT_DATABASE)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--split", default="all")
@@ -313,7 +314,6 @@ def parse_args():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--top-n", type=int, default=15)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
-    parser.add_argument("--predict-buzz-positions", action="store_true")
     parser.add_argument("--calibrate-correctness", action="store_true")
     parser.add_argument(
         "--train-posterior",

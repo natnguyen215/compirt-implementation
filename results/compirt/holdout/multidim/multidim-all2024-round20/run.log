@@ -1,0 +1,211 @@
+# CompIRT Run Log
+
+Generated: 2026-07-20T23:33:57-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- BONUS_STEPS: 2000
+- C1_C4_ITEM_STEPS: unknown
+- C1_C4_MIN_CROSS_TEAM_GAMES: unknown
+- C1_C4_SEED: unknown
+- CALIBRATE_CORRECTNESS: 0
+- DATABASE: unknown
+- DEVICE: cuda
+- DIFFICULTY_LINK: sigmoid
+- DIFFICULTY_SCALE: unknown
+- DIMENSIONS: 5
+- GPU: unknown
+- HOLDOUT_COMPARISON_OUTPUT: results/compirt/holdout/multidim-all2024-round20/holdout/comparison
+- HOLDOUT_COMPOSITIONAL_OUTPUT: results/compirt/holdout/multidim-all2024-round20/holdout/compositional
+- HOLDOUT_EVALUATION_OUTPUT: results/compirt/holdout/multidim-all2024-round20/holdout/evaluation
+- HOLDOUT_PYRAMIDAL_OUTPUT: results/compirt/holdout/multidim-all2024-round20/holdout/pyramidal
+- HOLDOUT_SYNERGY_EVALUATION_OUTPUT: results/compirt/holdout/multidim-all2024-round20/holdout/synergy-evaluation
+- HOLDOUT_SYNERGY_OUTPUT: results/compirt/holdout/multidim-all2024-round20/holdout/synergy
+- LR: 0.01
+- MODEL: multidim
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- NEW_PLAYER_PRIOR: tier
+- NO_NORMALIZE_TFIDF: unknown
+- PYRAMIDAL_STEPS: 3000
+- PYTHON: /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python
+- ROOT: results/compirt/holdout/multidim-all2024-round20
+- RUNNER: run_scripts/run_compirt_holdout.py
+- RUN_C1_C4: 0
+- RUN_SYNERGY: 1
+- SAVE_SYNERGY_DETAILS: 0
+- SEED: 42
+- SYNERGY_DIMENSIONS: 3
+- TEST_SPLIT: round-holdout:year_2024:test:0.2
+- TFIDF_EFFECT_PRIOR_SCALE: unknown
+- TFIDF_PLOT_COUNT: unknown
+- TOPIC_VECTORS: unknown
+- TOURNAMENT: <all>
+- TRAIN_PYRAMIDAL_OUTPUT: results/compirt/holdout/multidim-all2024-round20/train/pyramidal
+- TRAIN_SPLIT: round-holdout:year_2024:train:0.2
+
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split round-holdout:year_2024:train:0.2 --steps 3000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/multidim-all2024-round20/train/pyramidal --dimensions 5 --difficulty-link sigmoid
+Rows: 292,784  Players: 1,444  Tossups: 1,100
+z
+CENSORED    248446
+BUZZ         40296
+NO-BUZZ       4042
+step    0  ELBO loss: 17,553,246.2
+step  100  ELBO loss: 470,625.5
+step  200  ELBO loss: 408,476.5
+step  300  ELBO loss: 379,095.7
+step  400  ELBO loss: 352,698.2
+step  500  ELBO loss: 332,189.4
+step  600  ELBO loss: 322,545.3
+step  700  ELBO loss: 317,741.6
+step  800  ELBO loss: 314,980.2
+step  900  ELBO loss: 313,215.5
+step 1000  ELBO loss: 312,606.0
+step 1100  ELBO loss: 311,620.4
+step 1200  ELBO loss: 310,383.6
+step 1300  ELBO loss: 310,022.0
+step 1400  ELBO loss: 309,661.2
+step 1500  ELBO loss: 309,159.7
+step 1600  ELBO loss: 308,482.8
+step 1700  ELBO loss: 308,373.9
+step 1800  ELBO loss: 307,997.6
+step 1900  ELBO loss: 307,819.3
+step 2000  ELBO loss: 307,480.7
+step 2100  ELBO loss: 306,877.3
+step 2200  ELBO loss: 307,238.4
+step 2300  ELBO loss: 306,730.8
+step 2400  ELBO loss: 306,915.8
+step 2500  ELBO loss: 306,489.2
+step 2600  ELBO loss: 306,870.7
+step 2700  ELBO loss: 306,723.5
+step 2800  ELBO loss: 306,470.6
+step 2900  ELBO loss: 306,334.0
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --split round-holdout:year_2024:test:0.2 --steps 3000 --lr 0.01 --seed 42 --device cuda --train-posterior results/compirt/holdout/multidim-all2024-round20/train/pyramidal/player_posterior.csv --new-player-prior tier --output-dir results/compirt/holdout/multidim-all2024-round20/holdout/pyramidal --dimensions 5 --difficulty-link sigmoid
+Rows: 55,620  Players: 1,131  Tossups: 780
+z
+CENSORED    47109
+BUZZ         7618
+NO-BUZZ       893
+Held-out player priors: {'players': 1131, 'returning': 1120, 'new': 11, 'new_player_prior': 'tier'}
+step    0  ELBO loss: 4,218,882.1
+step  100  ELBO loss: 579,310.5
+step  200  ELBO loss: 321,874.5
+step  300  ELBO loss: 194,998.5
+step  400  ELBO loss: 112,813.7
+step  500  ELBO loss: 72,343.5
+step  600  ELBO loss: 61,634.3
+step  700  ELBO loss: 59,815.1
+step  800  ELBO loss: 59,550.0
+step  900  ELBO loss: 59,053.4
+step 1000  ELBO loss: 59,231.1
+step 1100  ELBO loss: 59,129.7
+step 1200  ELBO loss: 58,561.6
+step 1300  ELBO loss: 58,776.8
+step 1400  ELBO loss: 59,153.5
+step 1500  ELBO loss: 58,694.4
+step 1600  ELBO loss: 58,834.6
+step 1700  ELBO loss: 58,569.7
+step 1800  ELBO loss: 58,575.2
+step 1900  ELBO loss: 58,675.3
+step 2000  ELBO loss: 58,594.2
+step 2100  ELBO loss: 58,297.1
+step 2200  ELBO loss: 58,528.4
+step 2300  ELBO loss: 58,367.8
+step 2400  ELBO loss: 58,424.5
+step 2500  ELBO loss: 58,581.6
+step 2600  ELBO loss: 58,351.3
+step 2700  ELBO loss: 58,701.8
+step 2800  ELBO loss: 58,344.7
+step 2900  ELBO loss: 58,494.0
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m train_compositional --split round-holdout:year_2024:test:0.2 --player-skills results/compirt/holdout/multidim-all2024-round20/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/multidim-all2024-round20/holdout/compositional
+Bonus part rows: 21,162  Parts: 2,304
+step    0  ELBO loss: 44,660.0
+step  100  ELBO loss: 23,879.4
+step  200  ELBO loss: 15,978.7
+step  300  ELBO loss: 13,456.3
+step  400  ELBO loss: 12,950.9
+step  500  ELBO loss: 12,831.2
+step  600  ELBO loss: 12,856.4
+step  700  ELBO loss: 12,867.5
+step  800  ELBO loss: 12,829.1
+step  900  ELBO loss: 12,745.0
+step 1000  ELBO loss: 12,871.9
+step 1100  ELBO loss: 12,805.9
+step 1200  ELBO loss: 12,846.6
+step 1300  ELBO loss: 12,795.0
+step 1400  ELBO loss: 12,840.4
+step 1500  ELBO loss: 12,753.9
+step 1600  ELBO loss: 12,752.1
+step 1700  ELBO loss: 12,816.8
+step 1800  ELBO loss: 12,868.3
+step 1900  ELBO loss: 12,831.1
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m train_compositional --split round-holdout:year_2024:test:0.2 --player-skills results/compirt/holdout/multidim-all2024-round20/holdout/pyramidal/players.csv --steps 2000 --lr 0.01 --seed 42 --device cuda --output-dir results/compirt/holdout/multidim-all2024-round20/holdout/synergy --use-synergy --synergy-dimensions 3
+Bonus part rows: 21,162  Parts: 2,304
+step    0  ELBO loss: 47,408.0
+step  100  ELBO loss: 25,763.7
+step  200  ELBO loss: 16,843.0
+step  300  ELBO loss: 14,084.2
+step  400  ELBO loss: 13,699.0
+step  500  ELBO loss: 13,586.5
+step  600  ELBO loss: 13,658.8
+step  700  ELBO loss: 13,643.1
+step  800  ELBO loss: 13,358.8
+step  900  ELBO loss: 13,444.5
+step 1000  ELBO loss: 13,489.4
+step 1100  ELBO loss: 13,425.3
+step 1200  ELBO loss: 13,515.4
+step 1300  ELBO loss: 13,563.5
+step 1400  ELBO loss: 13,464.7
+step 1500  ELBO loss: 13,499.4
+step 1600  ELBO loss: 13,349.8
+step 1700  ELBO loss: 13,458.1
+step 1800  ELBO loss: 13,334.2
+step 1900  ELBO loss: 13,448.6
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-all2024-round20/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-all2024-round20/holdout/compositional --output-dir results/compirt/holdout/multidim-all2024-round20/holdout/evaluation
+Game simulation: 387 games, 500 replicas per game
+Game simulation: 20/387 games complete (5%)
+Game simulation: 39/387 games complete (10%)
+Game simulation: 59/387 games complete (15%)
+Game simulation: 78/387 games complete (20%)
+Game simulation: 97/387 games complete (25%)
+Game simulation: 117/387 games complete (30%)
+Game simulation: 136/387 games complete (35%)
+Game simulation: 155/387 games complete (40%)
+Game simulation: 175/387 games complete (45%)
+Game simulation: 194/387 games complete (50%)
+Game simulation: 213/387 games complete (55%)
+Game simulation: 233/387 games complete (60%)
+Game simulation: 252/387 games complete (65%)
+Game simulation: 271/387 games complete (70%)
+Game simulation: 291/387 games complete (75%)
+Game simulation: 310/387 games complete (80%)
+Game simulation: 329/387 games complete (85%)
+Game simulation: 349/387 games complete (90%)
+Game simulation: 368/387 games complete (95%)
+Game simulation: 387/387 games complete (100%)
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m evaluate_compirt --pyramidal-results results/compirt/holdout/multidim-all2024-round20/holdout/pyramidal --compositional-results results/compirt/holdout/multidim-all2024-round20/holdout/synergy --output-dir results/compirt/holdout/multidim-all2024-round20/holdout/synergy-evaluation
+Game simulation: 387 games, 500 replicas per game
+Game simulation: 20/387 games complete (5%)
+Game simulation: 39/387 games complete (10%)
+Game simulation: 59/387 games complete (15%)
+Game simulation: 78/387 games complete (20%)
+Game simulation: 97/387 games complete (25%)
+Game simulation: 117/387 games complete (30%)
+Game simulation: 136/387 games complete (35%)
+Game simulation: 155/387 games complete (40%)
+Game simulation: 175/387 games complete (45%)
+Game simulation: 194/387 games complete (50%)
+Game simulation: 213/387 games complete (55%)
+Game simulation: 233/387 games complete (60%)
+Game simulation: 252/387 games complete (65%)
+Game simulation: 271/387 games complete (70%)
+Game simulation: 291/387 games complete (75%)
+Game simulation: 310/387 games complete (80%)
+Game simulation: 329/387 games complete (85%)
+Game simulation: 349/387 games complete (90%)
+Game simulation: 368/387 games complete (95%)
+Game simulation: 387/387 games complete (100%)
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m compirt_eval.compare --compositional-metrics results/compirt/holdout/multidim-all2024-round20/holdout/evaluation/csvs/bonus_metrics.csv --synergy-metrics results/compirt/holdout/multidim-all2024-round20/holdout/synergy-evaluation/csvs/bonus_metrics.csv --output-dir results/compirt/holdout/multidim-all2024-round20/holdout/comparison
+Finished held-out multidim run. Scenario A/B metrics in results/compirt/holdout/multidim-all2024-round20/holdout/evaluation.
+Synergy metrics in results/compirt/holdout/multidim-all2024-round20/holdout/synergy-evaluation.

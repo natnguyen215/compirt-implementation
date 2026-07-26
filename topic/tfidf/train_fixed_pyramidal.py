@@ -1,15 +1,16 @@
-"""Train the dedicated fixed-topic TF-IDF pyramidal experiment.
+"""Train the fixed-topic TF-IDF pyramidal model.
 
-The trainer accepts every existing fixed topic-vector source (PLDA, LDA, or
-category one-hots). Unlike the baseline topic trainer, cumulative TF-IDF is
-always part of this isolated model and one nonnegative lambda is learned for
-each topic coordinate.
+The trainer accepts fixed PLDA, LDA, or category one-hot topic vectors.
+Cumulative TF-IDF contributes one learned nonnegative lambda per topic
+coordinate.
 """
 
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
+
+import pyro
 
 from compirt_data import (
     DEFAULT_DATA_DIR,
@@ -37,6 +38,7 @@ from utils.saving import (
     write_summary,
 )
 from utils.training import fit_svi, require_device
+from utils.posterior import add_posterior_output_args
 
 
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "results" / "compirt" / "topic-tfidf-pyramidal"
@@ -46,28 +48,14 @@ FORMULA = (
 )
 
 
-def train_model(
-    data,
-    n_dimensions,
-    n_steps=1000,
-    lr=0.02,
-    calibrate_correctness=False,
-    prior_scale=1.0,
-):
-    """Fit the isolated fixed-topic TF-IDF competing-risks model."""
-    return fit_svi(
-        competing_risks_model,
-        (data, n_dimensions, calibrate_correctness, prior_scale),
-        n_steps,
-        lr,
-        return_guide=True,
-    )
-
-
 def run_experiment(args):
-    """Run feature construction, fitting, replay, and dedicated output writing."""
+    """Build features, fit the model, replay predictions, and save outputs."""
     args.output_dir.mkdir(parents=True, exist_ok=True)
     require_device(args.device)
+    pyro.set_rng_seed(args.seed)
+
+    # Build competing-risks rows, cumulative TF-IDF features, and fixed topic
+    # weights in the same tossup order.
     tables = filter_tournament(
         load_hf_tables(args.data_dir, args.split), args.tournament
     )
@@ -93,6 +81,7 @@ def run_experiment(args):
 
     tier_map = player_tier_map(tables)
     if args.train_posterior:
+        # Transfer returning-player and tier-conditioned priors into held-out fits.
         prior_summary = attach_player_priors(
             data,
             tables,
@@ -104,14 +93,21 @@ def run_experiment(args):
         )
         print(f"Held-out player priors: {prior_summary}")
 
-    posterior, guide, losses = train_model(
-        data,
-        dimensions,
-        args.steps,
-        args.lr,
-        args.calibrate_correctness,
-        args.effect_prior_scale,
+    # Fit the topic-weighted likelihood and one nonnegative TF-IDF effect per topic.
+    posterior, guide, losses = fit_svi(
+        competing_risks_model,
+        model_kwargs={
+            "data": data,
+            "calibrate_correctness": args.calibrate_correctness,
+            "prior_scale": args.effect_prior_scale,
+        },
+        n_steps=args.steps,
+        lr=args.lr,
+        posterior_output_dir=args.output_dir,
+        posterior_draws=args.posterior_draws,
+        posterior_seed=args.seed,
     )
+    # Save parameters and adjustment curves needed by downstream evaluation.
     save_topic_parameters(args.output_dir, data, posterior)
     save_player_posterior(args.output_dir, data["player_ids"], guide, tier_map)
     save_lambdas(args.output_dir, topic_columns, posterior["topic_tfidf_lambdas"])
@@ -126,14 +122,11 @@ def run_experiment(args):
         args.output_dir, losses, "Topic-specific TF-IDF pyramidal IRT training loss"
     )
 
+    # Replay row-level and event-level predictions at the fitted medians.
     correct, hazard, survival = posterior_row_predictions(
         data, posterior, args.calibrate_correctness
     )
-    buzz_expected = (
-        expected_first_buzz_positions(data, posterior)
-        if args.predict_buzz_positions
-        else None
-    )
+    buzz_expected = expected_first_buzz_positions(data, posterior)
     save_tossup_predictions(
         args.output_dir,
         observations,
@@ -144,6 +137,7 @@ def run_experiment(args):
         extra_columns={"tfidf_prefix_score": row_tfidf_prefix_scores(data)},
     )
 
+    # Record the data selection, model settings, and realized dataset sizes.
     summary = {
         "model": "topic-tfidf-pyramidal",
         "formula": FORMULA,
@@ -160,12 +154,12 @@ def run_experiment(args):
         "dimensions": dimensions,
         "steps": args.steps,
         "lr": args.lr,
+        "seed": args.seed,
         "final_loss": losses[-1],
         "calibrate_correctness": args.calibrate_correctness,
         "players": len(data["player_ids"]),
         "tossups": len(data["tossup_ids"]),
         "events": len(data["event_ids"]),
-        "predicted_buzz_positions": args.predict_buzz_positions,
         "observation_counts": observations["z"].value_counts().to_dict(),
     }
     write_summary(args.output_dir, summary, posterior)
@@ -173,8 +167,9 @@ def run_experiment(args):
 
 
 def parse_args():
-    """Parse options for the dedicated fixed-topic TF-IDF experiment."""
+    """Parse options for the fixed-topic TF-IDF run."""
     parser = argparse.ArgumentParser(description=__doc__)
+    add_posterior_output_args(parser)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--split", default="all")
     parser.add_argument("--tournament")
@@ -187,8 +182,8 @@ def parse_args():
     )
     parser.add_argument("--steps", type=int, default=1000)
     parser.add_argument("--lr", type=float, default=0.02)
+    parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
-    parser.add_argument("--predict-buzz-positions", action="store_true")
     parser.add_argument("--calibrate-correctness", action="store_true")
     parser.add_argument(
         "--effect-prior-scale",

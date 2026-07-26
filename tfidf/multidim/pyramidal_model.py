@@ -9,19 +9,17 @@ This combines the cumulative TF-IDF clue-timing model from
     hazard_ij(t) = correctness_ij(t) - c_i
 
 The cumulative TF-IDF signal lowers each dimension's base difficulty before
-the relevance-weighted sum. Stage 2 remains the root compositional model
-because these TF-IDF features are tossup clue-timing features, not bonus-part
-features.
+the relevance-weighted sum. These features apply to tossup clue timing, while
+Stage 2 uses the compositional bonus model.
 
-Important Shapes (this is where the model differs from the scalar TF-IDF copy):
+Important shapes:
 
-* Player parameters are unchanged: 'theta' has shape
+* 'theta' has shape
   '(n_players, n_dimensions)' and 'c' has shape '(n_players,)'.
-* Every tossup difficulty parameter is vector-valued, as in 'multidim_mirt':
-  'r', 'beta', 'gamma', and 'mu' each have shape
+* 'r', 'beta', 'gamma', and 'mu' each have shape
   '(n_tossups, n_dimensions)', with 'r ~ Gamma(2, 2)' kept positive. The weight
-  vector is 'r', not the scalar model's 'alpha', because per-dimension
-  difficulty puts it outside the skill gap.
+  vector is named 'r' because per-dimension difficulty puts it outside the
+  skill gap.
 * The TF-IDF feature matrix stays scalar per position — 'tfidf_prefix' is
   '(n_tossups, max_T)' — so '_as_dimension_position' broadcasts each looked-up
   score across the trailing dimension axis.
@@ -31,17 +29,17 @@ from __future__ import annotations
 
 import torch
 import torch.nn.functional as F
+from torch.utils.checkpoint import checkpoint
 
 import pyro
 import pyro.distributions as dist
 
 from tfidf.pyramidal_tfidf_model import (
-    CUMULATIVE_DIFFICULTY,
     posterior_tfidf_effect,
     sample_tfidf_effect,
     tfidf_score_at,
-    validate_tfidf_variant,
 )
+from utils.training import survival_chunk_size
 
 
 def _as_dimension_position(position, beta):
@@ -62,18 +60,8 @@ def difficulty_curve(beta, gamma, mu, t, T_j):
     return beta * torch.sigmoid(gamma * (mu - position))
 
 
-def effective_difficulty(
-    beta,
-    gamma,
-    mu,
-    t,
-    T_j,
-    tfidf_prefix,
-    tfidf_effect,
-    tfidf_variant=CUMULATIVE_DIFFICULTY,
-):
+def effective_difficulty(beta, gamma, mu, t, T_j, tfidf_prefix, tfidf_effect):
     """Return per-dimension difficulty after cumulative TF-IDF reduction."""
-    validate_tfidf_variant(tfidf_variant)
     base = difficulty_curve(beta, gamma, mu, t, T_j)
     return base - tfidf_effect * _as_dimension_position(tfidf_prefix, beta)
 
@@ -88,11 +76,10 @@ def correctness_logit(
     T_j,
     tfidf_prefix=None,
     tfidf_effect=None,
-    tfidf_variant=CUMULATIVE_DIFFICULTY,
 ):
-    """Return log-odds of a correct buzz under the selected TF-IDF variant.
+    """Return log-odds of a correct buzz under the cumulative TF-IDF model.
 
-    Each dimension's (variant-adjusted) difficulty is subtracted from that
+    Each dimension's (TF-IDF-adjusted) difficulty is subtracted from that
     dimension's skill first, then the relevance-weighted sum collapses the
     dimension axis, exactly as in 'multidim_mirt'.
     """
@@ -110,7 +97,6 @@ def correctness_logit(
         T_j,
         tfidf_prefix,
         tfidf_effect,
-        tfidf_variant,
     )
     return (r * gap).sum(-1)
 
@@ -126,7 +112,6 @@ def hazard_logit(
     T_j,
     tfidf_prefix=None,
     tfidf_effect=None,
-    tfidf_variant=CUMULATIVE_DIFFICULTY,
 ):
     """Return the buzz hazard logit at 't': correctness minus confidence 'c_i'."""
     logit = (
@@ -140,7 +125,6 @@ def hazard_logit(
             T_j,
             tfidf_prefix,
             tfidf_effect,
-            tfidf_variant,
         )
         - c
     )
@@ -158,7 +142,7 @@ def log_survival(
     T_j,
     tfidf_prefix,
     tfidf_effect,
-    tfidf_variant=CUMULATIVE_DIFFICULTY,
+    chunk_size=None,
 ):
     """Return log probability of not buzzing at any position before 't_star'.
 
@@ -167,12 +151,37 @@ def log_survival(
     for every row-position pair, and sum the stable 'log(1 - hazard)' over
     positions strictly before each row's stopping token.
     """
+    if chunk_size is None:
+        chunk_size = survival_chunk_size()
+    if chunk_size and t_star.shape[0] > chunk_size:
+        # Each row's survival term is independent, so summing the grid in row
+        # chunks under gradient checkpointing caps peak memory at one chunk's
+        # (rows, positions, dimensions) grid while leaving the result identical
+        # to the full-batch computation. 'tfidf_effect' is global (not sliced).
+        parts = [
+            checkpoint(
+                log_survival,
+                theta[lo:lo + chunk_size],
+                r[lo:lo + chunk_size],
+                beta[lo:lo + chunk_size],
+                gamma[lo:lo + chunk_size],
+                mu[lo:lo + chunk_size],
+                c[lo:lo + chunk_size],
+                t_star[lo:lo + chunk_size],
+                T_j[lo:lo + chunk_size],
+                tfidf_prefix[lo:lo + chunk_size],
+                tfidf_effect,
+                use_reentrant=False,
+            )
+            for lo in range(0, t_star.shape[0], chunk_size)
+        ]
+        return torch.cat(parts)
     # Shared token-position grid [1, ..., max_t], broadcast to '(n_rows, max_t)'.
     max_t = int(t_star.max().item())
     positions = torch.arange(1, max_t + 1, device=t_star.device).unsqueeze(0)
-    # Eq. 6 is strict-before survival, and Eq. 13 deliberately uses S(T_j) for
-    # dead tossups. NO-BUZZ rows therefore stop at T_j - 1 under the paper's
-    # indexing convention; an inclusive mask would define a different model.
+    # Eq. 6 is strict-before survival, and Eq. 13 uses S(T_j) for dead tossups.
+    # The published indexing stops NO-BUZZ rows at T_j - 1, so this comparison
+    # must stay strict.
     before_stop = positions < t_star.unsqueeze(1)
     expanded_positions = positions.expand_as(before_stop)
     prefix = tfidf_score_at(tfidf_prefix.unsqueeze(1), expanded_positions)
@@ -187,7 +196,6 @@ def log_survival(
         T_j.unsqueeze(1),
         prefix,
         tfidf_effect,
-        tfidf_variant,
     )
     # sum_{s < t*} log(1 - h_ij(s)); F.logsigmoid(-logits) is log(1 - hazard).
     return (F.logsigmoid(-logits) * before_stop).sum(1)
@@ -215,9 +223,9 @@ def row_parameters(data, theta, c, r, beta, gamma, mu):
 def sample_parameters(data, n_dimensions):
     """Sample player parameters and vector-valued tossup parameters.
 
-    Player priors match the baseline (Eq. 14): 'theta ~ N(0, I)', 'c ~ N(0, 1)',
-    with optional held-out overrides attached to 'data'. The tossup priors match
-    'multidim_mirt' because every difficulty parameter is per-dimension.
+    Player priors follow Eq. 14: 'theta ~ N(0, I)' and 'c ~ N(0, 1)', with
+    optional held-out overrides attached to 'data'. Every tossup difficulty
+    parameter is per-dimension.
     """
     n_players = len(data["player_ids"])
     n_tossups = len(data["tossup_ids"])
@@ -226,8 +234,8 @@ def sample_parameters(data, n_dimensions):
     vector_zero = data["y"].new_zeros(n_dimensions)
     vector_one = data["y"].new_ones(n_dimensions)
 
-    # Held-out evaluation can attach informative per-player priors to 'data';
-    # when those keys are absent the defaults reproduce the standard model.
+    # Held-out evaluation can attach informative per-player priors to 'data'.
+    # Absent keys use the standard zero-location, unit-scale priors.
     theta_loc = data.get("theta_prior_loc", vector_zero)
     theta_scale = data.get("theta_prior_scale", vector_one)
     c_loc = data.get("c_prior_loc", zero)
@@ -281,16 +289,14 @@ def competing_risks_model(
     n_dimensions=1,
     calibrate_correctness=False,
     tfidf_effect_prior_scale=1.0,
-    tfidf_variant=CUMULATIVE_DIFFICULTY,
 ):
     """Define the multidimensional TF-IDF competing-risks likelihood.
 
-    Structurally identical to the baseline: every rostered player contributes
-    survival before the stopping position, the actual first buzzer additionally
+    Every rostered player contributes survival before the stopping position. The
+    actual first buzzer additionally
     contributes a hazard-at-'t_star' factor and an observed correctness factor,
     and the hand-computed joint log-likelihood is added with 'pyro.factor'.
     """
-    tfidf_variant = validate_tfidf_variant(tfidf_variant)
     _require_tfidf_features(data)
 
     theta, c, r, beta, gamma, mu = sample_parameters(data, n_dimensions)
@@ -303,9 +309,7 @@ def competing_risks_model(
         row_mu,
         row_tfidf_prefix,
     ) = row_parameters(data, theta, c, r, beta, gamma, mu)
-    tfidf_effect = sample_tfidf_effect(
-        data, tfidf_effect_prior_scale, tfidf_variant
-    )
+    tfidf_effect = sample_tfidf_effect(data, tfidf_effect_prior_scale)
 
     # Survival: every BUZZ, CENSORED, and NO-BUZZ row contributes.
     survival = log_survival(
@@ -319,7 +323,6 @@ def competing_risks_model(
         data["T_j"],
         row_tfidf_prefix,
         tfidf_effect,
-        tfidf_variant,
     )
 
     # Event term: only observed first buzzers contribute hazard and correctness,
@@ -339,7 +342,6 @@ def competing_risks_model(
         data["T_j"][buzz],
         buzz_tfidf_prefix,
         tfidf_effect,
-        tfidf_variant,
     )
     correctness = correctness_logit(
         row_theta[buzz],
@@ -351,10 +353,9 @@ def competing_risks_model(
         data["T_j"][buzz],
         buzz_tfidf_prefix,
         tfidf_effect,
-        tfidf_variant,
     )
     if calibrate_correctness:
-        # Recalibrate correctness only; hazard/timing keep the original logit.
+        # Apply calibration to correctness; hazard/timing keeps its base logit.
         scale, bias = sample_correctness_calibration(data)
         correctness = scale * correctness + bias
 
@@ -365,28 +366,17 @@ def competing_risks_model(
         + F.logsigmoid(buzz_logits).sum()
         + dist.Bernoulli(logits=correctness).log_prob(data["y"][buzz]).sum()
     )
+    # Attach the hand-computed competing-risks log-likelihood with pyro.factor.
     pyro.factor("multidim_tfidf_competing_risks_likelihood", log_likelihood)
 
 
-def row_tfidf_scores(data):
-    """Return row-level cumulative TF-IDF scores at 't_star'."""
-    tossup = data["tossup"]
-    return tfidf_score_at(data["tfidf_prefix"][tossup], data["t_star"])
-
-
-def posterior_row_predictions(
-    data,
-    posterior,
-    calibrate_correctness=False,
-    tfidf_variant=CUMULATIVE_DIFFICULTY,
-):
+def posterior_row_predictions(data, posterior, calibrate_correctness=False):
     """Return fitted correctness, hazard, survival, and cumulative TF-IDF score.
 
     Indexing each fitted parameter by the row's player and tossup recreates the
     row-level inputs used during training; the cumulative TF-IDF score is returned
     as a prediction diagnostic.
     """
-    tfidf_variant = validate_tfidf_variant(tfidf_variant)
     (
         theta,
         c,
@@ -404,7 +394,7 @@ def posterior_row_predictions(
         posterior["gamma"],
         posterior["mu"],
     )
-    tfidf_effect = posterior_tfidf_effect(posterior, tfidf_variant)
+    tfidf_effect = posterior_tfidf_effect(posterior)
     prefix_score = tfidf_score_at(tfidf_prefix, data["t_star"])
 
     correctness_logits = correctness_logit(
@@ -417,7 +407,6 @@ def posterior_row_predictions(
         data["T_j"],
         prefix_score,
         tfidf_effect,
-        tfidf_variant,
     )
     if calibrate_correctness:
         correctness_logits = (
@@ -437,7 +426,6 @@ def posterior_row_predictions(
             data["T_j"],
             prefix_score,
             tfidf_effect,
-            tfidf_variant,
         )
     )
     survival = torch.exp(
@@ -452,25 +440,19 @@ def posterior_row_predictions(
             data["T_j"],
             tfidf_prefix,
             tfidf_effect,
-            tfidf_variant,
         )
     )
     return correctness, hazard, survival, prefix_score
 
 
-def expected_first_buzz_positions(
-    data,
-    posterior,
-    tfidf_variant=CUMULATIVE_DIFFICULTY,
-):
+def expected_first_buzz_positions(data, posterior):
     """Compute the expected first-buzz relative position for each event.
 
     Observation rows are first regrouped into padded event rosters, then the
-    function walks token by token and accumulates 't * P(first buzz at t)',
-    using the same team first-buzz derivation as the baseline model but with
-    the variant-specific hazards.
+    function walks token by token using TF-IDF-adjusted hazards and accumulates
+    't * P(first buzz at t)'. The returned position is E[t | a buzz occurs],
+    matching the observed-buzz events used for evaluation.
     """
-    tfidf_variant = validate_tfidf_variant(tfidf_variant)
     n_events = len(data["event_ids"])
     counts = torch.bincount(data["event"], minlength=n_events)
     max_roster = int(counts.max().item())
@@ -501,7 +483,7 @@ def expected_first_buzz_positions(
     mu = posterior["mu"][event_tossup].unsqueeze(1)
     c = posterior["c"][roster]
     tfidf_prefix = data["tfidf_prefix"][event_tossup].unsqueeze(1)
-    tfidf_effect = posterior_tfidf_effect(posterior, tfidf_variant)
+    tfidf_effect = posterior_tfidf_effect(posterior)
 
     # event_survival is P(nobody has buzzed yet); expected accumulates
     # t * P(first buzz at t).
@@ -524,7 +506,6 @@ def expected_first_buzz_positions(
                 T,
                 prefix,
                 tfidf_effect,
-                tfidf_variant,
             )
         )
         hazard = torch.where(roster_mask, hazard, torch.zeros_like(hazard))
@@ -537,6 +518,13 @@ def expected_first_buzz_positions(
         first_probability = event_survival * total_hazard
         expected = expected + position * first_probability
         event_survival = event_survival * (1.0 - total_hazard)
-    expected = expected + event_T * event_survival
-    relative = (expected / event_T).detach().cpu().tolist()
+    # Condition the prediction on a buzz occurring:
+    #   E[t | buzz] = sum_t t * P(first buzz at t) / P(any buzz).
+    # Use the question end when the fitted buzz mass is numerically zero.
+    buzz_mass = 1.0 - event_survival
+    end_position = event_T.to(expected.dtype)
+    expected = torch.where(
+        buzz_mass > 1e-9, expected / buzz_mass.clamp(min=1e-9), end_position
+    )
+    relative = (expected / end_position).detach().cpu().tolist()
     return dict(zip(data["event_ids"], relative))

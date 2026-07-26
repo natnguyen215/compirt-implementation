@@ -1,0 +1,189 @@
+# CompIRT Run Log
+
+Generated: 2026-07-07T17:21:00-07:00
+Placeholder: no
+Captured stdout/stderr: yes
+
+## Run Variables
+
+- RUNNER: run_scripts/run_tfidf_compirt_2024.sh
+- ROOT: results/compirt/in_sample/tfidf-cumulative-difficulty-all2024-cal
+- MODEL: tfidf-cumulative-difficulty-pyramidal
+- TFIDF_VARIANT: cumulative-difficulty
+- SPLIT: year_2024
+- TOURNAMENT: <all>
+- DEVICE: cuda
+- GPU: 0
+- DIMENSIONS: 5
+- PYRAMIDAL_STEPS: 5000
+- BONUS_STEPS: 3000
+- LR: 0.005
+- RUN_SYNERGY: 1
+- SYNERGY_DIMENSIONS: 3
+- SAVE_SYNERGY_DETAILS: 1
+- CALIBRATE_CORRECTNESS: 1
+- RUN_VALIDATION: 1
+- TFIDF_EFFECT_PRIOR_SCALE: 1.0
+- NO_NORMALIZE_TFIDF: 0
+- MPLCONFIGDIR: /tmp/matplotlib-compirt
+- PYRAMIDAL_OUTPUT: results/compirt/in_sample/tfidf-cumulative-difficulty-all2024-cal/pyramidal
+- COMPOSITIONAL_OUTPUT: results/compirt/in_sample/tfidf-cumulative-difficulty-all2024-cal/compositional
+- SYNERGY_OUTPUT: results/compirt/in_sample/tfidf-cumulative-difficulty-all2024-cal/synergy
+- SYNERGY_EVALUATION_OUTPUT: results/compirt/in_sample/tfidf-cumulative-difficulty-all2024-cal/synergy-evaluation
+- COMPARISON_OUTPUT: results/compirt/in_sample/tfidf-cumulative-difficulty-all2024-cal/comparison
+- EVALUATION_OUTPUT: results/compirt/in_sample/tfidf-cumulative-difficulty-all2024-cal/evaluation
+
+NVIDIA GeForce RTX 4090
+{
+  "checks": [
+    "schemas",
+    "primary_ids",
+    "year_splits",
+    "foreign_keys",
+    "three_part_bonuses",
+    "intermediate_score_timelines",
+    "reconstructed_final_scores",
+    "source_counts",
+    "irt_response_derivation",
+    "response_matrix"
+  ],
+  "counts": {
+    "bonus_responses": 104941,
+    "bonuses": 2935,
+    "games": 5704,
+    "irt_responses": 888338,
+    "players": 2661,
+    "teams": 1054,
+    "tossup_buzzes": 136586,
+    "tossups": 2686,
+    "tournaments": 68
+  },
+  "status": "ok"
+}
+Tossup rows: 348,404  events: 48,612
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+Bonus part rows: 133,461
+Rows: 348,404  Players: 1,455  Tossups: 1,260  Variant: cumulative-difficulty  IDF vocab: 26,222
+z
+CENSORED    295555
+BUZZ         47914
+NO-BUZZ       4935
+step    0  ELBO loss: 28,081,163.4
+step  100  ELBO loss: 6,775,627.6
+step  200  ELBO loss: 638,927.0
+step  300  ELBO loss: 409,464.5
+step  400  ELBO loss: 383,109.3
+step  500  ELBO loss: 372,729.6
+step  600  ELBO loss: 367,121.2
+step  700  ELBO loss: 362,550.4
+step  800  ELBO loss: 358,325.5
+step  900  ELBO loss: 355,239.2
+step 1000  ELBO loss: 353,203.7
+step 1100  ELBO loss: 351,537.8
+step 1200  ELBO loss: 350,055.8
+step 1300  ELBO loss: 349,137.4
+step 1400  ELBO loss: 348,178.3
+step 1500  ELBO loss: 347,347.8
+step 1600  ELBO loss: 347,147.9
+step 1700  ELBO loss: 346,393.1
+step 1800  ELBO loss: 346,420.8
+step 1900  ELBO loss: 345,935.2
+step 2000  ELBO loss: 345,842.7
+step 2100  ELBO loss: 345,804.2
+step 2200  ELBO loss: 345,619.1
+step 2300  ELBO loss: 345,612.2
+step 2400  ELBO loss: 345,454.9
+step 2500  ELBO loss: 345,322.7
+step 2600  ELBO loss: 344,932.9
+step 2700  ELBO loss: 345,331.1
+step 2800  ELBO loss: 345,276.7
+step 2900  ELBO loss: 345,025.3
+step 3000  ELBO loss: 344,590.6
+step 3100  ELBO loss: 344,610.1
+step 3200  ELBO loss: 344,690.6
+step 3300  ELBO loss: 344,443.1
+step 3400  ELBO loss: 344,921.9
+step 3500  ELBO loss: 344,425.5
+step 3600  ELBO loss: 344,480.7
+step 3700  ELBO loss: 344,306.4
+step 3800  ELBO loss: 344,333.4
+step 3900  ELBO loss: 344,404.1
+step 4000  ELBO loss: 344,471.1
+step 4100  ELBO loss: 344,180.5
+step 4200  ELBO loss: 344,238.0
+step 4300  ELBO loss: 344,280.6
+step 4400  ELBO loss: 343,832.4
+step 4500  ELBO loss: 344,097.8
+step 4600  ELBO loss: 344,292.6
+step 4700  ELBO loss: 343,748.0
+step 4800  ELBO loss: 344,079.4
+step 4900  ELBO loss: 343,945.4
+Bonus part rows: 133,461  Parts: 3,768
+step    0  ELBO loss: 160,066.5
+step  100  ELBO loss: 97,915.5
+step  200  ELBO loss: 82,460.0
+step  300  ELBO loss: 75,933.3
+step  400  ELBO loss: 72,472.7
+step  500  ELBO loss: 70,460.8
+step  600  ELBO loss: 69,423.3
+step  700  ELBO loss: 69,073.5
+step  800  ELBO loss: 68,725.9
+step  900  ELBO loss: 68,703.4
+step 1000  ELBO loss: 68,717.1
+step 1100  ELBO loss: 68,562.4
+step 1200  ELBO loss: 68,489.5
+step 1300  ELBO loss: 68,610.2
+step 1400  ELBO loss: 68,672.6
+step 1500  ELBO loss: 68,518.7
+step 1600  ELBO loss: 68,568.4
+step 1700  ELBO loss: 68,473.8
+step 1800  ELBO loss: 68,444.0
+step 1900  ELBO loss: 68,454.2
+step 2000  ELBO loss: 68,594.2
+step 2100  ELBO loss: 68,408.2
+step 2200  ELBO loss: 68,515.2
+step 2300  ELBO loss: 68,483.3
+step 2400  ELBO loss: 68,927.6
+step 2500  ELBO loss: 68,458.2
+step 2600  ELBO loss: 68,615.6
+step 2700  ELBO loss: 68,441.5
+step 2800  ELBO loss: 68,612.3
+step 2900  ELBO loss: 68,397.6
+Bonus part rows: 133,461  Parts: 3,768
+step    0  ELBO loss: 171,899.5
+step  100  ELBO loss: 97,813.8
+step  200  ELBO loss: 80,124.8
+step  300  ELBO loss: 73,168.2
+step  400  ELBO loss: 70,136.0
+step  500  ELBO loss: 68,161.9
+step  600  ELBO loss: 67,355.6
+step  700  ELBO loss: 67,166.7
+step  800  ELBO loss: 66,423.5
+step  900  ELBO loss: 66,361.6
+step 1000  ELBO loss: 66,257.7
+step 1100  ELBO loss: 66,243.3
+step 1200  ELBO loss: 66,081.2
+step 1300  ELBO loss: 65,694.1
+step 1400  ELBO loss: 65,873.4
+step 1500  ELBO loss: 66,108.2
+step 1600  ELBO loss: 66,072.9
+step 1700  ELBO loss: 65,821.1
+step 1800  ELBO loss: 65,974.7
+step 1900  ELBO loss: 65,993.1
+step 2000  ELBO loss: 65,860.6
+step 2100  ELBO loss: 65,983.0
+step 2200  ELBO loss: 65,990.4
+step 2300  ELBO loss: 65,814.0
+step 2400  ELBO loss: 66,001.6
+step 2500  ELBO loss: 65,885.4
+step 2600  ELBO loss: 66,063.4
+step 2700  ELBO loss: 66,055.4
+step 2800  ELBO loss: 65,825.8
+step 2900  ELBO loss: 65,831.2
+results/compirt/in_sample/tfidf-cumulative-difficulty-all2024-cal/evaluation/graphs/tfidf_effective_difficulty_curves.png
+Finished. Inspect results/compirt/in_sample/tfidf-cumulative-difficulty-all2024-cal/evaluation/experiment_report.md
+Compare it with results/compirt/in_sample/tfidf-cumulative-difficulty-all2024-cal/synergy-evaluation/experiment_report.md
+Direct comparison: results/compirt/in_sample/tfidf-cumulative-difficulty-all2024-cal/comparison/bonus_model_comparison.md

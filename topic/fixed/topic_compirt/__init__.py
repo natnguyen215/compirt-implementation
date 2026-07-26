@@ -1,2 +1,1 @@
-"""Topic-weighted CompIRT variants isolated from the root implementation."""
-
+"""Topic-weighted CompIRT models and evaluation helpers."""

@@ -27,14 +27,14 @@ Sampled in `pyramidal.sample_parameters` and `compositional.compositional_model`
 
 | Parameter | Prior | Shape | Note vs. root |
 | --- | --- | --- | --- |
-| $\theta_i$ | $\mathcal{N}(0, I)$ | $(n_\text{players},\; n_\text{dim})$ | unchanged |
-| $c_i$ | $\mathcal{N}(0, 1)$ | $(n_\text{players},)$ | unchanged |
+| $\theta_i$ | $\mathcal{N}(0, I)$ | $(n_\text{players},\; n_\text{dim})$ | same as root |
+| $c_i$ | $\mathcal{N}(0, 1)$ | $(n_\text{players},)$ | same as root |
 | $\beta_{jk}$ | $\mathcal{N}(0, 1)$ | $(n_\text{tossups},\; n_\text{dim})$ | **per-topic** (root: scalar) |
 | $\gamma_{jk}$ | $\text{Half-Cauchy}(5)$ | $(n_\text{tossups},\; n_\text{dim})$ | **per-topic** |
 | $\mu_{jk}$ | $\text{Beta}(2, 2)$ | $(n_\text{tossups},\; n_\text{dim})$ | **per-topic** |
 | $\beta_{bk}$ | $\mathcal{N}(0, 1)$ | $(n_\text{parts},\; n_\text{dim})$ | **per-topic** bonus-part difficulty |
-| $\tau$ | $\text{Half-Cauchy}(1)$ | scalar | unchanged |
-| $\psi_i$ | $\mathcal{N}(0,\; 0.5\,I)$ | $(n_\text{players},\; n_\text{syn})$ | unchanged |
+| $\tau$ | $\text{Half-Cauchy}(1)$ | scalar | same as root |
+| $\psi_i$ | $\mathcal{N}(0,\; 0.5\,I)$ | $(n_\text{players},\; n_\text{syn})$ | same as root |
 
 There is **no $\alpha$ prior** in either stage: the fixed $r$ is the relevance
 weight. The topic mixtures $r_j$ / $r_b$ are not sampled; they are loaded by
@@ -122,7 +122,7 @@ $$\text{root:} \quad \sum_k \theta_{pk} \cdot \alpha_{bk}$$
 $$\text{topic:} \quad \sum_k r_{bk} \cdot \theta_{pk}$$
 
 Aggregated across the roster by the unnormalized smooth maximum
-(`lse_aggregation`, reused unchanged from root CompIRT):
+(`lse_aggregation`, reused from root CompIRT):
 
 $$A_b(R) = \tau \log \sum_{m \in R} \exp\!\left(\frac{a_{bm}}{\tau}\right)$$
 

@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import atexit
 import codecs
+import difflib
 import json
+import os
+import re
 import subprocess
 import sys
 from datetime import datetime
@@ -14,16 +17,64 @@ from typing import Mapping
 
 _ACTIVE_LOG_HANDLES = []
 
+# Every knob name resolved through env_default/env_unset_only, so typo
+# detection can compare set variables against what the runner actually reads.
+_ENV_KNOBS: set[str] = set()
+
+# Environment variables CompIRT processes consume outside the runners' knob
+# resolution; a set variable matching one of these is not a typo.
+_PASS_THROUGH_ENV = {
+    "PYTHON",
+    "GPU",
+    "COMPIRT_LOG_ACTIVE",
+    "COMPIRT_SURVIVAL_CHUNK",
+    "CUDA_VISIBLE_DEVICES",
+    "PYTHONUNBUFFERED",
+    "PYTORCH_CUDA_ALLOC_CONF",
+    "MPLCONFIGDIR",
+}
+
+
+def env_default(name: str, default: str) -> str:
+    """Return an environment knob, treating unset or empty as missing."""
+    _ENV_KNOBS.add(name)
+    value = os.environ.get(name)
+    return default if value in (None, "") else value
+
+
+def env_unset_only(name: str, default: str) -> str:
+    """Return an environment knob, treating only unset as missing."""
+    _ENV_KNOBS.add(name)
+    return os.environ.get(name, default)
+
+
+def warn_env_knob_typos() -> None:
+    """Warn about set environment variables that look like misspelled knobs.
+
+    Runner configuration is env-var driven, so a misspelling like RUN_SYNGERY
+    is silently ignored and the RUN_SYNERGY default applies. Call this after
+    every knob has been resolved through env_default/env_unset_only.
+    """
+    recognized = _ENV_KNOBS | _PASS_THROUGH_ENV
+    for name in sorted(os.environ):
+        if name in recognized or not re.fullmatch(r"[A-Z][A-Z0-9_]+", name):
+            continue
+        close = difflib.get_close_matches(name, recognized, n=1, cutoff=0.8)
+        if close:
+            print(
+                f"WARNING: environment variable {name} is set but not a "
+                f"recognized knob of this runner; did you mean {close[0]}?",
+                file=sys.stderr,
+            )
+
 _RESULT_MARKER = "results/compirt/"
 _RESULT_TIERS = ("in_sample", "holdout")
 
 
 def resolve_result_root(candidate, tier: str) -> str:
-    """Keep experiment outputs under 'results/compirt/{in_sample,holdout}/'.
+    """Normalize experiment outputs under 'results/compirt/{tier}/'.
 
-    Run roots are supplied by hand through the 'ROOT' env var, and dropping the
-    'in_sample/'/'holdout/' segment used to scatter full runs directly under
-    'results/compirt/'. This normalizes them:
+    Run roots are supplied through the 'ROOT' environment variable:
 
     * a root already under a tier is returned unchanged;
     * a bare 'results/compirt/<name>' is redirected into '<tier>/<name>' with
@@ -31,8 +82,8 @@ def resolve_result_root(candidate, tier: str) -> str:
     * a path that is not under 'results/compirt/' (tests, custom dirs) is left
       untouched.
 
-    Keys on the 'results/compirt/' marker so it works for both repo-relative
-    and absolute paths, and is idempotent (safe to apply more than once).
+    The 'results/compirt/' marker supports both repo-relative and absolute
+    paths. Applying the normalization more than once produces the same path.
     """
     if tier not in _RESULT_TIERS:
         raise ValueError(f"tier must be one of {_RESULT_TIERS}, got {tier!r}")

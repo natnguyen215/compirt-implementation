@@ -58,8 +58,8 @@ def build_bow_matrix(
     """Return a '(len(ordered_ids), vocab_size)' float32 count matrix.
 
     Rows follow 'ordered_ids' exactly so the matrix aligns with the model's
-    tossup/bonus order. Raises if any requested id has no matching document, the
-    same fail-loud contract as the fixed-vector alignment in 'topics.py'.
+    tossup/bonus order. Every requested ID is validated against the source
+    documents before matrix construction.
     """
     documents_by_id = {str(document[id_key]): document for document in documents}
     missing = [str(value) for value in ordered_ids if str(value) not in documents_by_id]
