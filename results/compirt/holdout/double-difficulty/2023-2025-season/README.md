@@ -1,9 +1,9 @@
 # Data splits
 
-The reference configuration refit on a different population. **Metrics here
-cannot be compared with the `year_2024` runs elsewhere in this tree** — the
-event population, its no-buzz rate and its all-correct baseline all differ.
+This directory contains the reference configuration refit on ACF 2023–25 data.
+Its event population, no-buzz rate, and always-correct baseline differ from the
+`year_2024` runs, so their metrics are not directly comparable.
 
 | Folder | Split | Notes |
 | --- | --- | --- |
-| [`season-2023-25/`](season-2023-25/) | `base_split=all` (ACF 2023-25) | Same model as [`../reference-model/`](../reference-model/); 3x the data. Its joint event LL of 5.5353 is lower than the 2024 runs because the population changed, not because the model improved. |
+| [`season-2023-25/`](season-2023-25/) | `base_split=all` (ACF 2023–25) | Same model as [`../reference-model/`](../reference-model/), with three times the data. The lower joint event LL (5.5353) does not establish a model improvement across populations. |

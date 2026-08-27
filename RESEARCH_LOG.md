@@ -4,12 +4,11 @@ _Last reviewed: 2026-08-26._
 
 ## 1. Scope and evaluation protocol
 
-This log reports Stage-1 tossup results from the **frozen matrix-infill
-holdout** protocol. For each five-fold split, the model is trained on four
-whole-game folds. Saved player and question posterior medians are then replayed
-on the fifth fold by `holdout/frozen_predict.py`; no parameters are fitted to
-held-out outcomes. A run is included only when its holdout `summary.json`
-records `frozen_predict: true`.
+This log reports Stage-1 tossup results from frozen matrix-infill holdouts. For
+each five-fold split, the model trains on four whole-game folds. Saved player
+and question posterior medians are replayed on the fifth fold by
+`holdout/frozen_predict.py`; held-out outcomes do not update parameters. A run
+is included only when its holdout `summary.json` records `frozen_predict: true`.
 
 Unless noted otherwise, the results use `year_2024`, game-split seed 42,
 optimization seed 42, 3,000 training steps, and no bouncebacks. The five held-out
@@ -24,10 +23,8 @@ The evaluation population has the following reference rates:
 - 1.38% of player-question events end with no buzz.
 - 17.56% of all events, or 17.80% of buzzes, occur in the final question decile.
 
-In-sample fits, transductive dimension ablations, the refit-based neg-test,
-drop-robustness experiments, the seed noise floor, ranking comparisons, and
-Stage-2 bonus models are outside this log's scope. They use different evaluation
-protocols and should not be combined with the frozen results below.
+Results from other evaluation protocols, including in-sample fits and Stage-2
+bonus models, are excluded.
 
 Model equations are documented in
 [`docs/compirt_deep_dive.md`](docs/compirt_deep_dive.md), and reproducible
@@ -84,7 +81,7 @@ distributed across control-point steps; it is unrelated to the relevance prior.
 
 ### 2.2 Terminal intercepts versus learned locations
 
-**Terminal intercepts** modify only the final cell:
+Terminal intercepts modify only the final cell:
 
 $$
 z^C_{ijt}\mathrel{+}=e_C\mathbf{1}[t=T_j],
@@ -96,7 +93,7 @@ The final cell includes the post-reading buzz window. `e_H` corrects late-buzz
 and no-buzz mass; `e_C` allows a separate final-cell correctness shift. “No
 terminal” fixes both to zero.
 
-**Learned locations** change the prior center of each curve's starting
+Learned locations change the prior center of each curve's starting
 difficulty:
 
 $$
@@ -126,7 +123,7 @@ argument is a rate. Sites are independent across players, items, dimensions,
 and correctness/hazard branches unless the equation or a learned location
 shares them.
 
-**Players**
+Player priors:
 
 $$
 \theta_{ik}\sim N(0,1),\qquad c_i\sim N(0,1).
@@ -149,7 +146,7 @@ fold; frozen replay fits no held-out parameters. Other temporal workflows can
 replace the player Normal locations/scales with a saved posterior or a
 tier-conditioned population prior.
 
-**Relevance / skill direction**
+Relevance and skill-direction priors:
 
 | Model | Prior | Meaning |
 | --- | --- | --- |
@@ -163,7 +160,7 @@ Bernstein curve under the same priors, rather than separate branch draws.
 In the main results table, plain `DD-Bernstein` rows use Gamma relevance;
 `Simplex relevance` rows use `Dirichlet(1)`.
 
-**Bernstein curves**
+Bernstein-curve priors:
 
 For branch $b\in\{C,H\}$,
 
@@ -189,7 +186,7 @@ $$
 e_C,e_H\sim N(0,2).
 $$
 
-**Perceived transforms**
+Perception-transform priors:
 
 $$
 \alpha\sim\operatorname{LogNormal}(0,1)>0,
@@ -200,7 +197,7 @@ $$
 logit. `beta` is unconstrained. Historical unconstrained runs instead used
 `alpha ~ Normal(1,1)`; their results are retained only for comparison.
 
-**Other curve families**
+Other curve families:
 
 | Family | Curve priors |
 | --- | --- |
@@ -225,7 +222,7 @@ logit. `beta` is unconstrained. Historical unconstrained runs instead used
 
 ## 3. Current evidence
 
-There is no model that is best on every objective:
+Results differ by objective:
 
 | Objective | Strongest result in the current runs |
 | --- | --- |
@@ -257,20 +254,12 @@ The main five-fold means are:
 | DD linear spline | 73.45% | **46.28%** | −3.25 pp | 6.4596 | 0.5651 | **0.7228** | 0.1185 | **0.1359** | 39.74% | +3.37 pp | 17.76% |
 | Monotone DD linear spline | 63.40% | 43.01% | −13.30 pp | 8.1446 | 0.8367 | 0.6571 | 0.2265 | 0.1510 | 32.47% | +18.22 pp | 16.39% |
 
-The threshold-accuracy gains are still modest, but both concentration-2
-learned-location simplex arms raise the best lift to +1.25 percentage points;
-the concentration-0.67 arm is effectively tied at +1.24 points. The three
-original simplex specifications beat the always-correct baseline in all five folds:
-+1.25 points with locations and terminal intercepts, +0.61 with terminal
-intercepts alone, and +0.46 without either. Adding player propensity preserves
-the +1.25-point mean lift, although its fold-level accuracy changes are mixed.
-The historical unconstrained perceived-difficulty fit is positive in three of
-five folds (+0.13 points on average); the positive-`alpha` perceived fits are
-far below the baseline. Every other model in the table is at or below the
-baseline on average.
+The learned-location simplex models improve on the always-correct baseline by
+1.24–1.25 percentage points. The earlier simplex models improve it by 0.46–0.61
+points. Most other models remain at or below the baseline.
 
 No frozen single-difficulty Bernstein 3/3/2 fit is saved in the repository. The
-table therefore uses the available single-difficulty Bernstein 5/5/2 model
+table uses the available single-difficulty Bernstein 5/5/2 model
 (degree 5, five latent dimensions, drop concentration 2). Its values are the
 unweighted means of the same five fold-level metric files used for the other
 main-table rows. This is a legacy fit under older training conventions, so its
@@ -304,11 +293,11 @@ neg average precision by 0.104, correctness log loss by 0.201, and accuracy by
 loss by 0.264, ECE by 0.143, and accuracy by 11.4 points. The source report
 confirms that each of these improvements has the same sign in all five folds.
 
-The timing evidence is more qualified. Bernstein places substantially more mass
-in the late-question tail, but separating the curves does not improve
+Bernstein places more mass in the late-question tail, but separating the curves
+does not improve
 first-buzzer top-1 accuracy: the Bernstein comparison moves from 0.401 to 0.395.
-The main benefit is therefore correctness prediction and the shape of the timing
-distribution, not player ordering.
+The measured benefit is in correctness prediction and the timing distribution,
+not player ordering.
 
 This is not a controlled ablation of decoupling alone. The saved single-curve
 baselines were replayed through the current evaluator but were not retrained
@@ -342,21 +331,20 @@ under distinct relevance priors, isolate the terminal-intercept flag:
 | Neg F1 at 0.5 | 40.07% | **41.11%** | 36.84% | **37.34%** |
 | AUC | 0.7114 | **0.7166** | 0.7115 | **0.7140** |
 
-The central finding is consistent across priors: terminal intercepts nearly
-eliminate no-buzz overprediction, restore final-decile mass, and improve joint
-event log loss and position MAE. They also produce modest accuracy and AUC gains.
+Under both priors, terminal intercepts reduce no-buzz error, restore
+final-decile mass, and improve joint event log loss and position MAE. Accuracy
+and AUC also improve slightly.
 
 The benefit is targeted rather than universal. Under the simplex prior, ECE
 worsens from 0.0673 to 0.0707 and integrated Brier from 0.1078 to 0.1103.
 First-buzzer top-1 accuracy also falls slightly under both priors (0.3808 to
-0.3799 for Gamma and 0.3404 to 0.3367 for simplex). The earlier claim that every
-metric improved was therefore not supported by the saved results.
+0.3799 for Gamma and 0.3404 to 0.3367 for simplex).
 
 The no-terminal Gamma model has also been run on `season_2024_25`, with 51,600
 held-out events. It again overpredicts no-buzz events by 4.27 percentage points,
 against a lower observed rate of 0.97%. Accuracy is 76.40% versus a 76.54%
 all-correct baseline, and joint event log loss is 6.4737. This reproduces the
-calibration problem on a second split; it does **not** yet replicate the benefit
+calibration problem on a second split; it does not test the benefit
 of terminal intercepts, because the matching terminal arm has not been run.
 
 For evaluation validity, the NumPy replay path applies the same learned
@@ -378,11 +366,10 @@ global parameters: two curve-location means and two terminal intercepts.
 | Compact, terminal only | 11 | 6.4776 | 0.5302 | 0.7091 | 0.0812 | 74.93% | **41.57%** | 39.41% |
 | Compact, locations + terminal | 11 | **6.4157** | 0.5151 | 0.7045 | **0.0550** | **76.64%** | 35.64% | **39.50%** |
 
-The selected compact model has the best joint event log loss in this log and
-improves ECE, accuracy, and first-buzzer top-1 slightly over the full model while
-using fewer item parameters. It does not dominate the full model: correctness
-log loss, AUC, and position MAE are worse (0.5151 vs 0.5059, 0.7045 vs 0.7166,
-and 0.1411 vs 0.1364, respectively).
+The compact locations-plus-terminal model has the lowest joint event log loss
+and uses fewer item parameters. It improves ECE, accuracy, and first-buzzer
+top-1, but has worse correctness log loss, AUC, and position MAE than the full
+model.
 
 Learned curve locations improve the terminal-only compact model by 0.0619 joint
 event log loss, 0.0262 ECE, and 1.71 accuracy points. This attribution is
@@ -413,10 +400,9 @@ ablation. The spline uses five dimensions, learning rate 0.01, and 114,520 total
 effective parameters; Bernstein uses three dimensions, learning rate 0.005, and
 43,620 parameters.
 
-The monotone linear-spline configuration performs poorly: 8.1446 joint event
-log loss, 0.8367 correctness log loss, 0.2265 ECE, and 63.40% accuracy. This rules
-out the current clamped-landmark implementation as a competitive specification;
-it does not establish that all monotone splines must fail.
+The current monotone linear-spline implementation has 8.1446 joint event log
+loss, 0.8367 correctness log loss, 0.2265 ECE, and 63.40% accuracy. These results
+apply to this implementation, not to monotone splines in general.
 
 ### 3.5 Relevance prior
 
@@ -483,14 +469,9 @@ The configuration has 28 effective item parameters plus four globals (the two
 locations and two terminal intercepts), only two globals more than the earlier
 simplex-terminal arm.
 
-At concentration 2.0, this is the strongest threshold-accuracy result, but not
-the best whole-event or timing model. Its 6.6123 joint LL remains worse than
-compact locations + terminal (6.4157) and Gamma + terminal (6.4375), and its
-0.1519 position MAE remains worse than Gamma + terminal (0.1364). All five fits
-have finite losses, but their final-100-step slopes
-average −4.25, so the 3,000-step optimization has not fully plateaued. The
-location gain should be replicated across optimization seeds before being
-treated as settled.
+At concentration 2.0, this model has the highest threshold accuracy, but its
+joint LL and position MAE trail the compact and Gamma alternatives. The mean
+final-100-step slope is −4.25, so the 3,000-step fits have not plateaued.
 
 Artifacts are under
 [`dd-bernstein-332-simplex-locations-terminal`](results/compirt/holdout/double-difficulty/reference-model/),
@@ -529,7 +510,7 @@ the same qualitative result:
 | DD-Bernstein 3/3/2 | 0.6480 | **77.86%** | **60.60%** | 14.24% | 23.06% |
 | Simplex locations + terminal | 0.4944 | **77.86%** | 60.24% | **14.69%** | **23.62%** |
 
-Thus much of the fixed-threshold difference is an operating-point choice. The
+Much of the fixed-threshold difference is an operating-point choice. The
 unconstrained DD-Bernstein model trades accuracy for neg recall at 0.5; moving
 its threshold near 0.65 produces almost the same transferred accuracy,
 precision, recall, and F1 as the simplex locations + terminal model near 0.5.
@@ -565,8 +546,8 @@ in all five matched folds. It improves correctness LL, Brier, AUC, and ECE in
 four of five. Threshold accuracy and first-buzzer identification are
 effectively tied, while no-buzz Brier is slightly worse in every fold. The
 average final-100-step loss slope is still −4.39, so the fits have not fully
-plateaued at 3,000 steps. This is evidence for a small advantage at an equal
-optimization budget, not a decisive concentration selection; the existing
+plateaued at 3,000 steps. This is a small equal-budget advantage, not a firm
+concentration selection; the existing
 6,000- and 20,000-step concentration-2.0 runs also show that training duration
 materially affects joint event LL.
 
@@ -585,7 +566,7 @@ Dirichlet drop concentration 0.67–2.0.
 - The selected configuration is degree 3, four dimensions, concentration 2.0,
   with pooled joint event log loss 6.48525.
 - The top 20 configurations span 6.48525–6.49971. These small differences should
-  not be treated as decisive without optimizer-seed replication or an explicit
+  require optimizer-seed replication or an explicit
   matched-fold uncertainty analysis.
 - Degree 3 occupies the top four ranks, but its advantage is not uniform at
   matched dimension and concentration. Degree 5 wins some three-dimensional
@@ -597,8 +578,8 @@ Dirichlet drop concentration 0.67–2.0.
   concentration-2 model reaches 6.4375, better than every no-terminal grid arm.
 - Grid accuracy ranges from 72.74% to 76.71%. The highest-accuracy configurations
   are one-dimensional and remain essentially at the always-correct baseline
-  while having among the worst joint event losses. Accuracy alone is therefore
-  not an appropriate selection metric.
+  while having among the worst joint event losses. Accuracy is not sufficient
+  for model selection.
 
 The reported winner was selected on the same cross-validation folds used to
 score it. It is a model-selection result, not an unbiased test estimate.
@@ -634,8 +615,7 @@ $$
 Timing improves and correctness worsens in all five matched folds. Mean fitted
 `alpha` is 8.27 and mean `beta` is −1.48. With `alpha > 0`, the joint objective
 uses the shared `theta,d,r` to fit hazard, distorting the same logit used for
-correctness. The model is therefore not competitive without further
-decoupling or loss rebalancing.
+correctness. This formulation underperforms the reference model.
 
 #### Three-slice perception follow-up
 
@@ -672,12 +652,12 @@ as the one-slice positive-`alpha` arm.
 | First-buzzer top-1 | **39.18%** | 37.50% | −1.68 pp |
 | No-buzz error | **+3.43 pp** | +3.76 pp | +0.33 pp |
 
-The extra flexibility hurts every headline held-out objective and increases the
+The extra flexibility worsens the main held-out objectives and increases the
 effective parameter count from 30,735 to 48,195. Pooled over the five training
 fold posterior medians, fitted `(mean alpha, mean beta)` moves from
 `(5.24, −0.40)` in the first third to `(4.97, −0.69)` in the middle and
-`(4.73, −0.87)` in the last third. The model therefore uses the slices, but the
-position-specific transforms do not generalize better. All five fits have
+`(4.73, −0.87)` in the last third. The fitted transforms vary by slice but do
+not generalize better. All five fits have
 finite losses; their final-100-step slopes average −3.34, so the optimization
 is still descending slightly at 3,000 steps, as in several other arms.
 
@@ -709,19 +689,13 @@ run provides the matched optimization-budget control.
 | Position MAE | **0.1383** | 0.1392 | 0.1389 | 0.1389 |
 | Integrated Brier | **0.09434** | 0.09500 | 0.09497 | 0.09493 |
 
-At 3,000 steps, alternating optimization is worse than simultaneous updates on
-every correctness metric. At 10,000 steps, it improves correctness LL, AUC,
-accuracy, calibration, Brier score, and joint event LL relative to both 3,000-
-step fits. These gains occur in all five folds for the headline correctness
-metrics. Its mean final-100-step loss slope is 0.32, compared with -9.05 for
-the 3,000-step alternating run and -3.34 for the standard run, so the longer
-fit is substantially closer to convergence. The matched standard 10,000-step
-run improves further on every listed correctness metric except negative-class
-F1, and also has the best joint event LL. Its mean final-100-step loss slope is
--0.57, indicating a small remaining descent. Position MAE and integrated Brier
-remain essentially tied with alternating 10,000 steps and slightly worse than
-the standard 3,000-step fit. The matched-budget result therefore attributes
-the headline gains primarily to longer training, not to alternating updates.
+At 3,000 steps, alternating updates worsen every correctness metric. At 10,000
+steps, both schedules improve, but simultaneous updates have better correctness
+metrics except negative-class F1 and lower joint event LL. Their mean
+final-100-step slopes are −0.57 for simultaneous updates and 0.32 for
+alternating updates. Position MAE and integrated Brier are nearly equal. The
+matched-budget comparison attributes the gains to training duration, not the
+alternating schedule.
 
 Artifacts: [alternating 3k](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/three-slice-alternating/configuration.json),
 [alternating 10k](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/three-slice-alternating-10000-steps/configuration.json),
@@ -759,8 +733,8 @@ $$
 Timing and AUC improve in all five matched folds, while correctness LL, ECE,
 and accuracy worsen in all five. Mean fitted `alpha` is 5.32 and mean `beta` is
 −2.74. The constraint removes the sign reversal, but the hazard-heavy joint
-objective then reshapes shared `z^C` at the expense of correctness. This scalar
-coupling is not viable as fitted.
+objective then reshapes shared `z^C` at the expense of correctness. This fitted
+scalar coupling underperforms the reference model.
 
 Artifacts: [unconstrained](results/compirt/holdout/double-difficulty/variants/perceived-logit/unconstrained/configuration.json),
 [positive `alpha`](results/compirt/holdout/double-difficulty/variants/perceived-logit/positive-alpha/configuration.json).
@@ -791,7 +765,7 @@ and 3,000 SVI steps.
 | First-buzzer top-1 | 35.16% | **36.09%** | +0.92 pp |
 | No-buzz error | +0.09 pp | **+0.07 pp** | −0.02 pp |
 
-Threshold selection gives a somewhat clearer, but still small, neg benefit.
+Threshold selection gives a small neg benefit.
 For each held-out fold, the accuracy-maximizing threshold was selected using
 the other four folds. The mean threshold moved from 0.506 to 0.511; held-out
 accuracy rose from 77.865% to 77.993%, neg precision from 60.27% to 60.46%, neg
@@ -801,9 +775,8 @@ The learned population scale is stable across folds (`sigma_a = 0.328--0.349`).
 Posterior-median player effects have standard deviations of 0.134--0.153,
 showing substantial shrinkage toward zero. The ranking gains are not fully
 consistent: AUC and neg average precision improve in three of five folds,
-while joint event LL improves in four. The hierarchy therefore adds modest
-useful signal and improves the joint model, but the AUC/AP changes are too small
-to call a decisive improvement without optimization-seed replication.
+while joint event LL improves in four. The hierarchy has a small effect; AUC
+and average-precision changes require optimization-seed replication.
 
 Artifacts: [configuration](results/compirt/holdout/double-difficulty/variants/player-neg-propensity/configuration.json)
 and [aggregate results](results/compirt/holdout/double-difficulty/variants/player-neg-propensity/aggregate/).
@@ -817,7 +790,7 @@ relevance, learned curve locations, terminal intercepts, the five frozen
 game-holdout folds, seed 42, and 3,000 SVI steps. The tables below pool the
 out-of-fold predictions.
 
-At the same fixed threshold of 0.5, higher weights produce many more predicted
+At the same fixed threshold of 0.5, higher weights produce more predicted
 negs. Neg recall rises, but neg precision, accuracy, probability calibration,
 and the joint likelihood worsen. Ranking also does not improve: both AUC and
 neg average precision decline slightly.
@@ -829,8 +802,8 @@ neg average precision decline slightly.
 | 2× | 74.89% | 45.74% | 41.67% | 43.61% | 0.7130 | 0.4470 | 0.5256 | 0.1128 | 6.6441 |
 | 3× | 69.07% | 39.04% | **58.36%** | **46.78%** | 0.7105 | 0.4440 | 0.5880 | 0.1870 | 6.7070 |
 
-The simple explanation is that weighting mostly **changes the probability
-ruler**. If the ordinary probability of correctness is $p$, weighted binary
+Weighting mainly changes the probability scale. If the ordinary probability
+of correctness is $p$, weighted binary
 cross-entropy is minimized at
 
 $$
@@ -842,7 +815,7 @@ $$
 This transformation lowers correctness scores while mostly preserving their
 ordering. For example, a 2× model score near 0.33 represents approximately the
 same decision boundary as an unweighted score of 0.50. Comparing every model
-at 0.50 therefore compares different operating points, not just different
+at 0.50 compares different operating points, not just different
 models. The theoretical and empirical accuracy thresholds show this shift:
 
 | Incorrect weight | Theoretical threshold equivalent to ordinary 0.5 | Cross-fitted accuracy threshold |
@@ -876,14 +849,11 @@ Those operating points are also very similar across loss weights.
 | 2× | 0.651 | 64.77% | 65.48% | 36.15% | 66.79% | 46.91% |
 | 3× | 0.535 | 66.34% | 65.32% | 37.02% | 63.40% | 46.75% |
 
-The conclusion is that incorrect-response weighting mainly moves the score
-scale and lets a fixed 0.5 cutoff trade precision for recall. It does not add
-meaningful neg-discriminating signal: AUC and neg AP do not rise, and after
-threshold correction the models behave almost identically. If calibrated
-probabilities or maximum accuracy matter, retain the ordinary likelihood and
-tune the deployment threshold. Improving neg precision and recall together
-requires better predictive structure or features, rather than class weighting
-alone.
+Incorrect-response weighting moves the score scale and changes the
+precision-recall tradeoff at a fixed 0.5 cutoff. It does not improve AUC or neg
+average precision, and the models are similar after threshold correction. For
+calibrated probabilities or maximum accuracy, retain the ordinary likelihood
+and tune the deployment threshold.
 
 Artifacts: [1× baseline](results/compirt/holdout/double-difficulty/reference-model/configuration.json),
 [1.5× incorrect loss](results/compirt/holdout/double-difficulty/ablations/incorrect-loss-weight/weight-1.5/configuration.json),
@@ -892,47 +862,33 @@ and [3× incorrect loss](results/compirt/holdout/double-difficulty/ablations/inc
 
 ## 4. Limits on interpretation
 
-- **One optimization seed.** The five folds are held-out data partitions, not
+- One optimization seed: the five folds are held-out data partitions, not
   independent training replications. Fold standard deviations describe split
   variation but omit optimizer-seed variation.
-- **Several comparisons change more than one feature.** The spline comparison
+- Confounded comparisons: the spline comparison
   changes dimensionality and learning rate; the legacy single-curve baselines
   were not retrained under current conventions; and the compact 2×2 is incomplete.
-- **Cross-validation selection bias.** The Bernstein grid winner was chosen and
+- Cross-validation selection bias: the Bernstein grid winner was chosen and
   reported on the same folds. It needs nested cross-validation or a separate
   test set for an unbiased final estimate.
-- **Limited dataset coverage.** Most arms use the `year_2024` split. The
+- Limited dataset coverage: most arms use the `year_2024` split. The
   `season_2024_25` run reproduces the no-terminal calibration problem only.
-- **Small threshold-accuracy margins.** The best lift is 1.25 percentage points.
+- Small threshold-accuracy margins: the best lift is 1.25 percentage points.
   Its five-fold consistency is encouraging, but it has not been tested across
   optimization seeds.
-- **Stage 1 only.** These results do not support claims about bonuses, PPB, or
+- Stage 1 only: these results do not support claims about bonuses, PPB, or
   team synergy.
 
 ## 5. Recommended next experiments
 
-1. Run the `season_2024_25` Gamma model with terminal intercepts. This is the
-   direct test of whether the terminal-cell benefit generalizes to the second
-   split where the no-terminal problem has already replicated.
-2. Complete the compact 2×2 with `compact-base` and `compact-locations` so that
-   curve-location and terminal-intercept effects can be attributed separately.
-3. Repeat the principal contenders across several optimization seeds:
-   compact locations + terminal, Gamma + terminal, simplex locations + terminal,
-   and the unconstrained linear spline. Include the earlier simplex + terminal
-   arm to verify the location effect. Aggregate uncertainty across complete
-   five-fold repetitions.
-4. Run the standard simultaneous-update three-slice model for 10,000 steps to
-   separate the benefit of alternating optimization from the larger training
-   budget. Then repeat the standard and alternating 10,000-step arms across
-   optimization seeds. The alternating 10,000-step result improves correctness
-   and joint event LL, but its timing metrics remain mixed; loss rebalancing or
-   separate correctness/hazard parameters remain possible follow-ups.
+1. Run the `season_2024_25` Gamma model with terminal intercepts to test the
+   terminal-cell result on the second split.
+2. Complete the compact 2×2 with `compact-base` and `compact-locations` to
+   separate location and terminal-intercept effects.
+3. Repeat the main models across optimization seeds: compact
+   locations-plus-terminal, Gamma-plus-terminal, both simplex terminal arms,
+   and the unconstrained linear spline.
+4. Repeat the standard and alternating three-slice 10,000-step runs across
+   optimization seeds. The matched seed-42 result favors standard updates.
 5. Retrain the single-curve baselines under the current survival convention,
    amplitude prior, learning rate, and checkpoint policy.
-6. Choose the primary objective before selecting a final model. Joint marked-event
-   likelihood, correctness probability, threshold accuracy, and buzz timing
-   currently favor different specifications.
-7. Repeat the hierarchical player-neg-propensity arm across optimization seeds.
-   Its joint event and cross-fitted neg-F1 gains are promising, but its AUC and
-   neg-average-precision improvements are small and occur in only three of five
-   folds.
