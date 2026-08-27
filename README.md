@@ -3,7 +3,6 @@
 This project builds linked quizbowl datasets and uses Pyro to model player and
 team performance.
 
-
 ## Repository Layout
 
 The root CompIRT files are separated by responsibility through their names:
@@ -26,6 +25,18 @@ The root CompIRT files are separated by responsibility through their names:
   holding out the final 20% of complete rounds in every tournament, then reuses
   the standard transductive holdout runner. Its `.sh` file is the shell entry
   point.
+- `holdout/`: held-out evaluation infrastructure — the round/game split builders,
+  the cross-split player priors used by the transductive runners, and
+  `frozen_predict.py`, which replays both stages at the training posterior
+  medians for a pure "matrix infill" forward pass with no test-set learning.
+- `lineup.py`: per-game active-lineup inference from buzz evidence.
+- `scenario_c_model.py`: the paper's Scenario C fit — new bonus-item parameters
+  learned while player/team parameters stay frozen.
+- `utils/`: shared saving, training, posterior, and run-logging helpers.
+- `simple_mirt/`: legacy/pedagogical MIRT baseline outside the two-stage
+  pipeline; also supplies the plain-IRT comparator for the drop-robustness study.
+- `neg_test/`: 5-fold cross-validated neg/buzz comparison across difficulty-curve
+  families.
 - `topic/`: topic-model experiments — `topic/fixed/` (topics fit upstream via
   LDA/PLDA/categories and fed in as fixed weights), `topic/learned/` (topics
   learned jointly with the IRT model), and shared topic helpers in `topic/utils/`.
@@ -70,9 +81,9 @@ them together.
 5. `train_compositional.py`: fits Stage 2 from the saved `theta`; start at
    `run_experiment`.
 6. `evaluate_compirt.py`: turns saved predictions into metrics and figures; start
-   at `main`, which calls the two scenario modules in `compirt_eval/`
-   (`tossups/` is paper Scenario A, `bonuses.py` is Scenario B; `metrics.py`
-   and `figures.py` hold the shared math and plotting helpers).
+   at `main`, which calls `compirt_eval/scenario_a_tossups/` for paper Scenario A
+   and `compirt_eval/scenario_b_bonuses/` for Scenario B. Cross-scenario metrics,
+   figures, report paths, and report builders live in `compirt_eval/common/`.
 
 
 ## Dataset Pipeline
@@ -103,11 +114,15 @@ available. Individual suite commands are listed in [tests/README.md](tests/READM
 ## Important Implementation Details
 
 - Eq. 9 (Noisy-OR) not implemented
-- Neg handling/bounce back not implemented
+- Only the first buzz is modeled by default. The paper's neg-then-bounceback
+  derivation (Section 3.1 / Appendix A) is available as an opt-in
+  `--include-bounceback` flag on the baseline and `multidim_mirt` Stage 1
+  trainers; with the flag off the fitted model is unchanged.
 - Game-specific lineups are inferred from buzz evidence (`lineup.py`, cached under
   `data/lineups/`) rather than taken from the full registered roster, so the tossup
   competing-risks population and the bonus aggregation/synergy run over the ~4 players
   who plausibly played each game. Games with no buzz evidence fall back to the full
   roster. Each bonus reuses the inferred lineup of the tossup in the same cycle.
 - SVI used instead of MCMC
-- Current local data covers 2024-2025 and links players by exact raw slug, not the paper's proposed 2023-2025 fuzzy/manual linking procedure.
+- Current local data covers 2024-2025 and links players by exact raw slug, not
+  the paper's proposed 2023-2025 fuzzy/manual linking procedure.

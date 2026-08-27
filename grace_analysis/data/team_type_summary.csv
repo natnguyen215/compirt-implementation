@@ -1,0 +1,3 @@
+team_type,buzz_events,correct_buzzes,median_position_pct,mean_position_pct,q1_position_pct,q3_position_pct,incorrect_buzzes,accuracy
+Human,1371,1079,78.9474,73.3708,55.2786,98.8506,292,0.7870
+Model,378,268,46.8304,56.1165,30.6306,96.9245,110,0.7090

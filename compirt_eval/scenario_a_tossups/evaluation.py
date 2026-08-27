@@ -18,6 +18,7 @@ import pandas as pd
 from compirt_eval.common.figures import reliability_plot
 from compirt_eval.common.metrics import (
     classification_metrics,
+    negative_class_metrics,
     stratified_prediction_metrics,
 )
 from compirt_eval.common.report_paths import csv_path, graph_path
@@ -50,6 +51,7 @@ def evaluate_tossups(results_dir, output_dir):
     # Only actual buzzers have an observed correctness outcome.
     buzz = predictions[predictions["z"] == "BUZZ"].copy()
     metrics = classification_metrics(buzz["y"], buzz["predicted_correct"])
+    metrics.update(negative_class_metrics(buzz["y"], buzz["predicted_correct"]))
     metrics["joint_tossup_event_log_loss"] = (
         float(event_scores["joint_event_log_loss"].mean())
         if not event_scores.empty

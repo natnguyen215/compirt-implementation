@@ -30,11 +30,7 @@ from run_scripts.common.lib.ablation import (
     repo_path,
     tournament_args as optional_tournament_args,
 )
-from run_scripts.common.lib.nationals_matrix import build_run_matrix, calibration_values
-from run_scripts.common.lib.nationals_report import (
-    aggregate_markdown,
-    markdown_table as _markdown_table,
-)
+from run_scripts.common.lib.nationals_report import aggregate_markdown
 from utils.run_logging import (
     format_run_log_header,
     resolve_result_root,
@@ -534,16 +530,18 @@ def build_model_run(
 
 def selected_calibrations(args: argparse.Namespace) -> tuple[bool, ...]:
     """Return calibration settings in the established no-cal, cal order."""
-    return calibration_values(args.calibration)
+    if args.calibration == "both":
+        return (False, True)
+    return (True,) if args.calibration == "cal" else (False,)
 
 
 def build_model_runs(args: argparse.Namespace) -> list[ModelRun]:
-    """Build the selected model/calibration command matrix."""
-    return build_run_matrix(
-        selected_model_specs(args),
-        selected_calibrations(args),
-        lambda spec, calibrate: build_model_run(args, spec, calibrate),
-    )
+    """Build the model/calibration command matrix, model-major."""
+    return [
+        build_model_run(args, spec, calibrate)
+        for spec in selected_model_specs(args)
+        for calibrate in selected_calibrations(args)
+    ]
 
 
 def build_setup_stages(args: argparse.Namespace) -> list[Stage]:
@@ -666,11 +664,6 @@ def overlap_from_ranking_csv(
             if int(row["actual_rank"]) <= actual_top and int(model_rank) <= model_top:
                 overlap += 1
     return f"{overlap}/{actual_top}"
-
-
-def markdown_table(rows: list[dict[str, object]], columns: list[str]) -> str:
-    """Compatibility re-export for callers that use the runner helper."""
-    return _markdown_table(rows, columns)
 
 
 def write_aggregate_outputs(

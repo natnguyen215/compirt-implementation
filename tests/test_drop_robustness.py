@@ -1,4 +1,4 @@
-"""Tests for the data-dropping helpers, selectors, and robustness runners."""
+"""Tests for the data-dropping helpers and target selectors."""
 
 from __future__ import annotations
 
@@ -10,7 +10,6 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 
-from run_scripts.common import run_drop_robustness as tier1
 from run_scripts.common import run_targeted_drop as tier2
 from compirt_eval.drop_robustness.perturbations import (
     drop_tossup_events,
@@ -19,10 +18,6 @@ from compirt_eval.drop_robustness.perturbations import (
     rank_events_for_target,
     select_drop_events,
     write_drop_list,
-)
-from compirt_eval.drop_robustness.figures import (
-    save_targeted_outputs,
-    save_tier1_outputs,
 )
 
 
@@ -100,78 +95,6 @@ class DropSelectionTests(unittest.TestCase):
             select_drop_events(frame, "a", "demote", 3)
 
 
-def tier1_args(root: Path) -> SimpleNamespace:
-    return SimpleNamespace(
-        root=root,
-        python=Path(".venv/bin/python"),
-        data_dir=None,
-        tournament=None,
-        split="year_2024",
-        models=["plain", "baseline", "multidim"],
-        fractions=[0.01],
-        replicates=2,
-        noise_seeds=[7],
-        seed=42,
-        drop_seed=2025,
-        difficulty_link="sigmoid",
-        dimensions=None,
-        steps=None,
-        lr=None,
-        device="cuda",
-    )
-
-
-class Tier1CommandTests(unittest.TestCase):
-    def test_full_fit_has_no_drop_flag_and_cells_do(self):
-        with tempfile.TemporaryDirectory() as directory:
-            args = tier1_args(Path(directory))
-            stages = tier1.build_stages(args)
-
-        by_name = {stage.name: " ".join(stage.command) for stage in stages}
-        self.assertNotIn("--drop-events", by_name["multidim-full"])
-        cell = by_name["multidim-frac0.01-rep1"]
-        self.assertIn("--drop-events", cell)
-        self.assertIn("droplists/frac_0.01/rep_1.txt", cell)
-        self.assertIn("--seed 42", cell)
-        # The noise fit uses the alternate seed on full data.
-        noise = by_name["multidim-noise-seed7"]
-        self.assertIn("--seed 7", noise)
-        self.assertNotIn("--drop-events", noise)
-
-    def test_family_invocation_forms_and_defaults(self):
-        with tempfile.TemporaryDirectory() as directory:
-            stages = tier1.build_stages(tier1_args(Path(directory)))
-
-        by_name = {stage.name: " ".join(stage.command) for stage in stages}
-        baseline = by_name["baseline-full"]
-        self.assertIn("train_pyramidal.py", baseline.split()[1])
-        self.assertNotIn("-m", baseline.split())
-        self.assertIn("--steps 5000", baseline)
-        self.assertIn("--lr 0.005", baseline)
-        multidim = by_name["multidim-full"]
-        self.assertIn("-m multidimensional.multidim_mirt.train_pyramidal", multidim)
-        self.assertIn("--difficulty-link sigmoid", multidim)
-        self.assertIn("--steps 3000", multidim)
-        plain = by_name["plain-full"]
-        self.assertIn("-m simple_mirt.train_plain_irt", plain)
-        self.assertIn("--dimensions 1", plain)
-
-    def test_global_overrides_apply_to_every_family(self):
-        with tempfile.TemporaryDirectory() as directory:
-            args = tier1_args(Path(directory))
-            args.steps = 30
-            stages = tier1.build_stages(args)
-
-        for stage in stages:
-            self.assertIn("--steps 30", " ".join(stage.command))
-
-    def test_stage_count_matches_the_grid(self):
-        with tempfile.TemporaryDirectory() as directory:
-            stages = tier1.build_stages(tier1_args(Path(directory)))
-        # Per family: 1 full + 1 noise seed + 1 fraction x 2 replicates.
-        self.assertEqual(len(stages), 3 * (1 + 1 + 2))
-
-
 class TargetedPairTests(unittest.TestCase):
     def test_default_pair_is_smallest_gap_in_top10(self):
         ppg = pd.Series(
@@ -194,40 +117,6 @@ class TargetedPairTests(unittest.TestCase):
         args = SimpleNamespace(target_player="zz", target_rank=None, rival=None)
         with self.assertRaises(ValueError):
             tier2.resolve_pair(args, ppg)
-
-
-class DropArtifactTests(unittest.TestCase):
-    def test_tier1_keeps_canonical_csv_and_graph_names(self):
-        frame = pd.DataFrame(
-            [
-                {"model": "baseline", "fraction": 0.0, "kendall_tau": 0.9, "jaccard_top10": 0.8},
-                {"model": "baseline", "fraction": 0.01, "kendall_tau": 0.8, "jaccard_top10": 0.7},
-                {"model": "actual", "fraction": 0.01, "kendall_tau": 0.95, "jaccard_top10": 0.9},
-            ]
-        )
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            output = save_tier1_outputs(root, frame)
-            self.assertEqual(output, root / "csvs" / "drop_robustness_metrics.csv")
-            self.assertTrue((root / "graphs" / "kendall_tau_vs_fraction.png").exists())
-            self.assertTrue((root / "graphs" / "topk_jaccard_vs_fraction.png").exists())
-
-    def test_targeted_keeps_canonical_csv_and_graph_names(self):
-        frame = pd.DataFrame(
-            [
-                {"model": "baseline", "n_dropped": 0, "gap": 1.0, "noise_gap_std": 0.1},
-                {"model": "baseline", "n_dropped": 5, "gap": -0.2, "noise_gap_std": 0.1},
-            ]
-        )
-        actual = pd.DataFrame(
-            [{"n_dropped": 0, "gap": 1.0}, {"n_dropped": 1, "gap": 0.5}]
-        )
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            save_targeted_outputs(root, frame, actual)
-            self.assertTrue((root / "csvs" / "targeted_flip_metrics.csv").exists())
-            self.assertTrue((root / "csvs" / "actual_flip_curve.csv").exists())
-            self.assertTrue((root / "graphs" / "gap_vs_dropped.png").exists())
 
 
 if __name__ == "__main__":

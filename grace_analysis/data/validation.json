@@ -1,0 +1,33 @@
+{
+  "archive_sha256_matches_known_release": true,
+  "archive_questions": 240,
+  "archive_buzz_events": 1749,
+  "all_positions_within_question": true,
+  "all_results_binary": true,
+  "team_ids": [
+    "H1",
+    "H2",
+    "H3",
+    "H4",
+    "H5",
+    "H6",
+    "H7",
+    "H8",
+    "H9",
+    "H10",
+    "H11",
+    "H12",
+    "H13",
+    "H14",
+    "H15",
+    "H16",
+    "H17",
+    "M1",
+    "M2",
+    "M3"
+  ],
+  "player_mapping_bytes": 0,
+  "human_model_mapping_records": 239,
+  "tossup_128_collision": "archive rows=2, mapping entries=1",
+  "buzzers_absent_from_seen_roster": "159 questions; 309 team-question memberships"
+}

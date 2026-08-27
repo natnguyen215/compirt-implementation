@@ -1,0 +1,5 @@
+tier,tier_label,player_ids,seen_earlier_ids,seen_earlier_id_share,buzz_events,seen_earlier_buzz_share
+fall,ACF Fall,542,0,0.000000,17682,0.000000
+winter,ACF Winter,674,136,0.201780,18136,0.180856
+regionals,ACF Regionals,504,295,0.585317,18050,0.560055
+nationals,ACF Nationals,182,132,0.725275,10169,0.721015

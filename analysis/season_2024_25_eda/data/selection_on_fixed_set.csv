@@ -1,0 +1,10 @@
+fixed_set_tier,furthest_tier,players,mean_scored_accuracy,mean_position_pct
+fall,fall,170,0.811106,68.090360
+fall,winter,64,0.840418,66.386604
+fall,regionals,105,0.830816,65.084031
+fall,nationals,17,0.871109,60.034717
+winter,winter,185,0.813292,75.113727
+winter,regionals,116,0.811129,70.491837
+winter,nationals,69,0.852421,62.426340
+regionals,regionals,255,0.796918,80.053339
+regionals,nationals,105,0.842050,70.033619

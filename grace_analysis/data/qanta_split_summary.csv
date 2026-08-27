@@ -1,0 +1,3 @@
+split,questions,categories,tournaments,min_year,max_year,mean_question_words,median_question_words,mean_clue_segments,missing_pages,gameplay_questions
+buzzdev,1152,11,5,2015,2015,129.8733,127.0000,6.5260,22,433
+buzztrain,18460,11,191,1997,2015,107.2480,105.0000,5.0318,629,18460

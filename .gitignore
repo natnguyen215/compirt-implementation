@@ -7,6 +7,7 @@ logs/
 # Stray nohup/console logs dropped in the repo root.
 /nohup.out
 /*nohup.out
+/*.out
 /*.log
 
 # Local agent context notes. Public documentation under docs/ is tracked.
@@ -31,8 +32,6 @@ data/hf/
 # Inferred per-game lineup cache (rebuild with `python lineup.py --rebuild`).
 data/lineups/
 
-
-
 results/compirt/**/tossup_predictions.csv
 results/compirt/**/bonus_part_predictions.csv
 results/**/*.csv
@@ -49,3 +48,7 @@ results/compirt/**/polynomial/
 
 # Source paper PDFs and other binaries — kept out of version control.
 *.pdf
+
+# Double-difficulty hyperparameter/ablation sweep outputs: ~2.8 GB of
+# per-fold loss curves and quantile summaries, regenerable from the runners.
+results/compirt/holdout/double-difficulty/ablations/

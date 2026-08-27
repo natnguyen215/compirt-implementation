@@ -1,0 +1,34 @@
+tournament_id,name,site,tier,tier_label,mds1,mds2
+2024-acf-winter-at-uc-berkeley,2024 ACF Winter at UC Berkeley,UC Berkeley,winter,ACF Winter,-4.065431,0.213278
+2024-acf-winter-at-brandeis,2024 ACF Winter at Brandeis,Brandeis,winter,ACF Winter,1.058835,0.411462
+2024-acf-winter-at-clemson,2024 ACF Winter at Clemson,Clemson,winter,ACF Winter,0.653319,-0.403164
+2024-acf-winter-at-lehigh,2024 ACF Winter at Lehigh,Lehigh,winter,ACF Winter,-1.138602,-0.068913
+2024-acf-winter-at-northwestern,2024 ACF Winter at Northwestern,Northwestern,winter,ACF Winter,-1.583432,0.020870
+2024-acf-winter-at-ohio-state,2024 ACF Winter at Ohio State,Ohio State,winter,ACF Winter,-0.107803,-0.082557
+2024-acf-winter-at-online,2024 ACF Winter at Online,Online,winter,ACF Winter,0.133382,0.272512
+2024-acf-winter-at-ubc,2024 ACF Winter at UBC,UBC,winter,ACF Winter,-2.110653,-1.379157
+2024-acf-winter-at-central-florida,2024 ACF Winter at Central Florida,Central Florida,winter,ACF Winter,1.878848,1.833599
+2024-acf-winter-at-oxford,2024 ACF Winter at Oxford,Oxford,winter,ACF Winter,-1.495647,-0.170287
+2024-acf-fall-at-claremont-colleges,2024 ACF Fall at Claremont Colleges,Claremont Colleges,fall,ACF Fall,-4.211231,0.853635
+2024-acf-fall-at-cornell,2024 ACF Fall at Cornell,Cornell,fall,ACF Fall,-0.548271,-0.574159
+2024-acf-fall-at-illinois,2024 ACF Fall at Illinois,Illinois,fall,ACF Fall,-3.985798,-0.577973
+2024-acf-fall-at-rutgers,2024 ACF Fall at Rutgers,Rutgers,fall,ACF Fall,-2.838158,0.292038
+california,California,California,regionals,ACF Regionals,-0.947045,2.454553
+overflow,Overflow,Overflow,regionals,ACF Regionals,1.195590,-1.320250
+pacific-northwest,Pacific Northwest,Pacific Northwest,regionals,ACF Regionals,2.488290,-3.666100
+2025-acf-nationals,2025 ACF Nationals,2025 ACF Nationals,nationals,ACF Nationals,0.530363,-0.983943
+2024-acf-fall-at-ohio-state,2024 ACF Fall at Ohio State,Ohio State,fall,ACF Fall,-2.925667,-0.400261
+2024-acf-fall-at-washington,2024 ACF Fall at Washington,Washington,fall,ACF Fall,-2.733557,-1.733014
+2024-acf-fall-at-georgia,2024 ACF Fall at Georgia,Georgia,fall,ACF Fall,-2.066510,-0.170383
+2024-acf-fall-at-north-carolina,2024 ACF Fall at North Carolina,North Carolina,fall,ACF Fall,-1.603694,0.145974
+2025-acf-regionals-north,2025 ACF Regionals North,North,regionals,ACF Regionals,2.308142,1.774665
+2025-acf-regionals-florida,2025 ACF Regionals Florida,Florida,regionals,ACF Regionals,3.698586,1.854740
+2025-acf-regionals-great-lakes,2025 ACF Regionals Great Lakes,Great Lakes,regionals,ACF Regionals,2.512080,-1.009186
+2025-acf-regionals-lower-mid-atlantic,2025 ACF Regionals Lower Mid-Atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,2.772590,2.206962
+2025-acf-regionals-midwest,2025 ACF Regionals Midwest,Midwest,regionals,ACF Regionals,-1.853581,0.390343
+2025-acf-regionals-northeast,2025 ACF Regionals Northeast,Northeast,regionals,ACF Regionals,1.207808,1.414627
+2025-acf-regionals-south-central,2025 ACF Regionals South Central,South Central,regionals,ACF Regionals,-0.397798,-0.439111
+2025-acf-regionals-southeast,2025 ACF Regionals Southeast,Southeast,regionals,ACF Regionals,3.353538,-1.310783
+2025-acf-regionals-uk,2025 ACF Regionals UK,UK,regionals,ACF Regionals,1.481779,0.750589
+2025-acf-regionals-upper-mid-atlantic,2025 ACF Regionals Upper Mid-Atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,1.711869,0.763225
+2025-acf-regionals-upstate-ny,2025 ACF Regionals Upstate NY,Upstate NY,regionals,ACF Regionals,7.627858,-1.363829

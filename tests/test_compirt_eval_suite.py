@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import io
 import tempfile
 import unittest
-from contextlib import redirect_stdout
 from pathlib import Path
 
 import numpy as np
@@ -17,12 +15,14 @@ from compirt_eval.synergy_comparison import LOWER_IS_BETTER, NON_COMPARATIVE_MET
 from compirt_eval.common.metrics import (
     binary_brier_score,
     classification_metrics,
+    negative_class_metrics,
     ranked_probability_score,
     stratified_prediction_metrics,
 )
-from compirt_eval.diagnostics.match_simulation import _game_model, _print_game_progress, simulate_match_winners
+from compirt_eval.diagnostics.match_simulation import _game_model, simulate_match_winners
 from compirt_eval.parameter_recovery import generate_recovery_data
 from compirt_eval.scenario_a_tossups.timing import (
+    _full_pmf_score_row,
     buzz_density_fit_plot,
     evaluate_survival_and_first_buzzer,
     event_first_buzz_components,
@@ -35,6 +35,29 @@ from compirt_eval.scenario_b_bonuses.metrics import (
 
 
 class ProperScoreTests(unittest.TestCase):
+    def test_full_pmf_uses_saved_calibrated_correctness(self):
+        event = pd.DataFrame(
+            {
+                "player_id": ["p1"],
+                "z": ["BUZZ"],
+                "y": [1],
+                "t_star": [1],
+                "predicted_correct": [0.9],
+            }
+        )
+        components = {
+            "dead_mass": 0.8,
+            "player_first_buzz_mass": np.asarray([[0.2]]),
+            "first_buzz_mass": np.asarray([0.2]),
+            "correctness_probability": np.asarray([[0.1]]),
+            "player_ids": np.asarray(["p1"]),
+            "relative_position": np.asarray([1.0]),
+        }
+
+        score = _full_pmf_score_row("e", event, components)
+
+        self.assertAlmostEqual(score["observed_probability"], 0.18)
+
     def test_comparison_directions_handle_new_metrics(self):
         self.assertTrue(
             {
@@ -54,6 +77,13 @@ class ProperScoreTests(unittest.TestCase):
             metrics["accuracy"] - 0.75,
         )
         self.assertIn("probability_std", metrics)
+
+    def test_negative_class_metrics_reverse_labels_and_probabilities(self):
+        metrics = negative_class_metrics([1, 0, 0], [0.8, 0.3, 0.6])
+
+        self.assertAlmostEqual(metrics["neg_auroc"], 1.0)
+        self.assertEqual(metrics["neg_precision"], 1.0)
+        self.assertEqual(metrics["neg_recall"], 0.5)
 
     def test_bonus_distribution_and_rps_extremes(self):
         np.testing.assert_allclose(bonus_score_distribution([0, 0, 0]), [1, 0, 0, 0])
@@ -118,38 +148,6 @@ class ProperScoreTests(unittest.TestCase):
         )
         self.assertEqual(set(result["stratum"]), {"aggregate", "tier"})
         self.assertIn("mean_predictive_variance", result)
-
-
-class GameProgressTests(unittest.TestCase):
-    def test_progress_prints_each_five_percent_milestone_once(self):
-        output = io.StringIO()
-        next_percentage = 5
-        with redirect_stdout(output):
-            for completed in range(1, 101):
-                next_percentage = _print_game_progress(
-                    completed, 100, next_percentage
-                )
-        lines = output.getvalue().splitlines()
-        self.assertEqual(next_percentage, 105)
-        self.assertEqual(len(lines), 20)
-        self.assertEqual(lines[0], "Game simulation: 5/100 games complete (5%)")
-        self.assertEqual(lines[1], "Game simulation: 10/100 games complete (10%)")
-        self.assertEqual(lines[-1], "Game simulation: 100/100 games complete (100%)")
-
-    def test_small_game_sets_do_not_repeat_crossed_milestones(self):
-        output = io.StringIO()
-        next_percentage = 5
-        with redirect_stdout(output):
-            next_percentage = _print_game_progress(1, 2, next_percentage)
-            next_percentage = _print_game_progress(2, 2, next_percentage)
-        self.assertEqual(
-            output.getvalue().splitlines(),
-            [
-                "Game simulation: 1/2 games complete (50%)",
-                "Game simulation: 2/2 games complete (100%)",
-            ],
-        )
-        self.assertEqual(next_percentage, 105)
 
 
 class SeededGameSimulationTests(unittest.TestCase):

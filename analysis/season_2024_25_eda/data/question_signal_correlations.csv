@@ -1,0 +1,6 @@
+tier,questions,mean_scored_position_vs_scored_accuracy,zero_rate_vs_scored_accuracy,mean_scored_position_vs_zero_rate,mean_scored_position_vs_all_attempt_accuracy
+pooled,1360,-0.278787,-0.398879,0.226478,-0.324776
+fall,280,-0.410909,-0.259095,0.265442,-0.451453
+winter,320,-0.183895,-0.432067,0.189548,-0.233541
+regionals,320,-0.133248,-0.320086,0.100674,-0.153769
+nationals,440,-0.328299,-0.490059,0.194096,-0.344947

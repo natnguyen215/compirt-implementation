@@ -1,0 +1,481 @@
+team_id,team_name,tournament_id,site,tier,tier_label,mds1,mds2
+2024-acf-winter-at-uc-berkeley::berkeley-b,Berkeley B,2024-acf-winter-at-uc-berkeley,UC Berkeley,winter,ACF Winter,-2.329842,-0.499351
+2024-acf-winter-at-uc-berkeley::stanford-l,Stanford L,2024-acf-winter-at-uc-berkeley,UC Berkeley,winter,ACF Winter,-2.397592,-0.327147
+2024-acf-winter-at-uc-berkeley::berkeley-c,Berkeley C,2024-acf-winter-at-uc-berkeley,UC Berkeley,winter,ACF Winter,-4.242169,-1.523943
+2024-acf-winter-at-uc-berkeley::stanford-a,Stanford A,2024-acf-winter-at-uc-berkeley,UC Berkeley,winter,ACF Winter,-1.149264,0.970499
+2024-acf-winter-at-uc-berkeley::stanford-m::db-110,Stanford M,2024-acf-winter-at-uc-berkeley,UC Berkeley,winter,ACF Winter,-2.450559,0.857275
+2024-acf-winter-at-uc-berkeley::berkeley-a,Berkeley A,2024-acf-winter-at-uc-berkeley,UC Berkeley,winter,ACF Winter,-4.888177,0.108893
+2024-acf-winter-at-brandeis::boston-university-b,Boston University B,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,3.532945,-3.430033
+2024-acf-winter-at-brandeis::brandeises-brew,Brandeises Brew,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,3.062147,-1.563701
+2024-acf-winter-at-brandeis::bowdoin-a,Bowdoin A,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,1.554210,-1.154629
+2024-acf-winter-at-brandeis::tufts-b,Tufts B,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,0.188128,-0.902008
+2024-acf-winter-at-brandeis::bowdoin-b,Bowdoin B,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,4.232478,-1.924454
+2024-acf-winter-at-brandeis::carabrandeis,Carabrandeis,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,4.304138,0.011746
+2024-acf-winter-at-brandeis::brown-a,Brown A,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,-0.294733,-1.574375
+2024-acf-winter-at-brandeis::boston-university-a,Boston University A,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,0.760206,0.081506
+2024-acf-winter-at-brandeis::northeastern-a,Northeastern A,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,3.214401,0.815886
+2024-acf-winter-at-brandeis::williams-a,Williams A,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,2.030607,1.696694
+2024-acf-winter-at-brandeis::tufts-a,Tufts A,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,1.045575,-1.458274
+2024-acf-winter-at-brandeis::clark-a,Clark A,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,1.355235,-1.272690
+2024-acf-winter-at-brandeis::yale-a,Yale A,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,-3.989083,0.318374
+2024-acf-winter-at-brandeis::yale-b,Yale B,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,-1.638764,-0.633303
+2024-acf-winter-at-brandeis::yale-c,Yale C,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,3.259499,0.945561
+2024-acf-winter-at-brandeis::diamond-brandeis,Diamond Brandeis,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,2.637878,-2.261531
+2024-acf-winter-at-brandeis::amherst-a,Amherst A,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,-2.100087,-0.397916
+2024-acf-winter-at-brandeis::a-brandeis-supreme,A Brandeis Supreme,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,0.250498,-0.072113
+2024-acf-winter-at-brandeis::harvard-a,Harvard A,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,-3.705068,3.357591
+2024-acf-winter-at-brandeis::mit-a,MIT A,2024-acf-winter-at-brandeis,Brandeis,winter,ACF Winter,-2.786375,0.929267
+2024-acf-winter-at-clemson::alabama-a,Alabama A,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,1.280209,-0.206010
+2024-acf-winter-at-clemson::emory-b,Emory B,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,0.790701,-0.492936
+2024-acf-winter-at-clemson::clemson-a,Clemson A,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,3.497149,4.171146
+2024-acf-winter-at-clemson::georgia-tech-f,Georgia Tech F,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,-1.541903,-0.912021
+2024-acf-winter-at-clemson::emory-a,Emory A,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,-1.695113,-0.850825
+2024-acf-winter-at-clemson::auburn-a,Auburn A,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,-2.776854,-0.163623
+2024-acf-winter-at-clemson::georgia-tech-b,Georgia Tech B,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,-3.544798,1.425845
+2024-acf-winter-at-clemson::georgia-tech-a,Georgia Tech A,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,-0.407400,0.507527
+2024-acf-winter-at-clemson::georgia-tech-c,Georgia Tech C,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,-0.224245,0.584302
+2024-acf-winter-at-clemson::georgia-a,Georgia A,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,-0.313687,1.377221
+2024-acf-winter-at-clemson::georgia-tech-e,Georgia Tech E,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,-0.868161,2.281174
+2024-acf-winter-at-clemson::georgia-tech-d,Georgia Tech D,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,-1.643164,-0.240152
+2024-acf-winter-at-clemson::tusculum-a,Tusculum A,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,4.139828,-0.696355
+2024-acf-winter-at-clemson::auburn-c,Auburn C,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,5.525713,-0.897118
+2024-acf-winter-at-clemson::auburn-b,Auburn B,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,5.739152,-2.950331
+2024-acf-winter-at-clemson::south-carolina-a,South Carolina A,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,3.310833,-0.559603
+2024-acf-winter-at-clemson::tennesse-b,Tennesse B,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,3.495817,2.806283
+2024-acf-winter-at-clemson::tennesse-a,Tennesse A,2024-acf-winter-at-clemson,Clemson,winter,ACF Winter,-0.463250,-0.542769
+2024-acf-winter-at-lehigh::bard-a,Bard A,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,-1.761287,0.036756
+2024-acf-winter-at-lehigh::columbia-a,Columbia A,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,-6.274460,0.566121
+2024-acf-winter-at-lehigh::columbia-b,Columbia B,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,-0.967559,0.106448
+2024-acf-winter-at-lehigh::penn-b,Penn B,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,0.642346,2.229016
+2024-acf-winter-at-lehigh::haverford-a,Haverford A,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,0.815217,1.711436
+2024-acf-winter-at-lehigh::lehigh-a,Lehigh A,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,1.654853,1.110442
+2024-acf-winter-at-lehigh::johns-hopkins-b,Johns Hopkins B,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,0.669481,-0.132507
+2024-acf-winter-at-lehigh::penn-state-b,Penn State B,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,2.105755,0.130362
+2024-acf-winter-at-lehigh::penn-a,Penn A,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,-2.767433,-2.003973
+2024-acf-winter-at-lehigh::johns-hopkins-a,Johns Hopkins A,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,-4.757948,-0.718230
+2024-acf-winter-at-lehigh::rowan-a,Rowan A,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,1.200262,-0.041436
+2024-acf-winter-at-lehigh::penn-state-a,Penn State A,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,-3.989441,0.951570
+2024-acf-winter-at-lehigh::rutgers-a,Rutgers A,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,2.353918,0.029002
+2024-acf-winter-at-lehigh::rutgers-c,Rutgers C,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,2.825942,2.221018
+2024-acf-winter-at-lehigh::princeton-a,Princeton A,2024-acf-winter-at-lehigh,Lehigh,winter,ACF Winter,0.414498,0.836656
+2024-acf-winter-at-northwestern::indiana-a,Indiana A,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,-3.954395,1.445564
+2024-acf-winter-at-northwestern::purdue-a,Purdue A,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,-1.970164,-0.116310
+2024-acf-winter-at-northwestern::miami,Miami,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,0.479479,-1.094237
+2024-acf-winter-at-northwestern::uiuc-d,UIUC D,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,0.348175,0.453143
+2024-acf-winter-at-northwestern::notre-dame,Notre Dame,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,-0.630411,1.144392
+2024-acf-winter-at-northwestern::northwestern-a,Northwestern A,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,-2.204949,1.388140
+2024-acf-winter-at-northwestern::purdue-b,Purdue B,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,0.313153,0.095599
+2024-acf-winter-at-northwestern::siue-a,SIUE A,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,0.293504,-0.974861
+2024-acf-winter-at-northwestern::purdue-c,Purdue C,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,1.066702,1.436909
+2024-acf-winter-at-northwestern::washu-c,WashU C,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,2.159627,0.472243
+2024-acf-winter-at-northwestern::uchicago-d,UChicago D,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,1.989775,-1.018870
+2024-acf-winter-at-northwestern::indiana-b,Indiana B,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,1.908719,-1.107263
+2024-acf-winter-at-northwestern::uiuc-a,UIUC A,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,-5.338909,0.278130
+2024-acf-winter-at-northwestern::uchicago-c,UChicago C,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,-2.371526,-0.257781
+2024-acf-winter-at-northwestern::uiuc-b,UIUC B,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,-3.256412,0.630311
+2024-acf-winter-at-northwestern::washu-b,WashU B,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,-4.925519,-1.512574
+2024-acf-winter-at-northwestern::uiuc-c,UIUC C,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,-0.664171,1.288857
+2024-acf-winter-at-northwestern::uchicago-b,UChicago B,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,-1.844253,0.884448
+2024-acf-winter-at-northwestern::uchicago-a,UChicago A,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,-2.978723,0.328655
+2024-acf-winter-at-northwestern::purdue-d,Purdue D,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,3.255790,1.862211
+2024-acf-winter-at-northwestern::washu-d,WashU D,2024-acf-winter-at-northwestern,Northwestern,winter,ACF Winter,1.532287,-2.148670
+2024-acf-winter-at-ohio-state::cwru-d,CWRU D,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,4.906841,-2.261868
+2024-acf-winter-at-ohio-state::cwru-c,CWRU C,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,3.771572,3.537710
+2024-acf-winter-at-ohio-state::kenyon-a,Kenyon A,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,0.915647,-2.698030
+2024-acf-winter-at-ohio-state::michigan-state-c,Michigan State C,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,1.433770,-2.720368
+2024-acf-winter-at-ohio-state::kenyon-b,Kenyon B,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,4.452386,-0.371446
+2024-acf-winter-at-ohio-state::michigan-d,Michigan D,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,0.904526,-0.493195
+2024-acf-winter-at-ohio-state::michigan-a,Michigan A,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,-4.210034,1.743849
+2024-acf-winter-at-ohio-state::michigan-b,Michigan B,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,-1.388582,-0.403255
+2024-acf-winter-at-ohio-state::michigan-state-b,Michigan State B,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,1.082474,-0.633186
+2024-acf-winter-at-ohio-state::michigan-c,Michigan C,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,-1.204008,-0.126649
+2024-acf-winter-at-ohio-state::ohio-state-a,Ohio State A,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,-3.181558,0.429058
+2024-acf-winter-at-ohio-state::michigan-state-a,Michigan State A,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,-0.664106,2.660911
+2024-acf-winter-at-ohio-state::pitt-a,Pitt A,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,-3.337696,0.084141
+2024-acf-winter-at-ohio-state::ohio-state-b,Ohio State B,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,-1.643927,0.598993
+2024-acf-winter-at-ohio-state::cwru-b,CWRU B,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,1.250606,-0.494957
+2024-acf-winter-at-ohio-state::pitt-b,Pitt B,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,1.895790,0.987789
+2024-acf-winter-at-ohio-state::ohio-state-c,Ohio State C,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,1.568848,2.509852
+2024-acf-winter-at-ohio-state::cwru-a,CWRU A,2024-acf-winter-at-ohio-state,Ohio State,winter,ACF Winter,-1.267084,-0.212289
+2024-acf-winter-at-online::central-oklahoma,Central Oklahoma,2024-acf-winter-at-online,Online,winter,ACF Winter,-1.092384,0.480699
+2024-acf-winter-at-online::wustl-a,WUSTL A,2024-acf-winter-at-online,Online,winter,ACF Winter,0.340846,-1.101035
+2024-acf-winter-at-online::mcgill-e,McGill E,2024-acf-winter-at-online,Online,winter,ACF Winter,2.214368,2.626272
+2024-acf-winter-at-online::mississippi-state,Mississippi State,2024-acf-winter-at-online,Online,winter,ACF Winter,0.935937,0.198866
+2024-acf-winter-at-online::vassar-a,Vassar A,2024-acf-winter-at-online,Online,winter,ACF Winter,-0.433057,0.817002
+2024-acf-winter-at-online::arkansas,Arkansas,2024-acf-winter-at-online,Online,winter,ACF Winter,3.599207,-0.987186
+2024-acf-winter-at-online::texas-d,Texas D,2024-acf-winter-at-online,Online,winter,ACF Winter,3.973694,0.222773
+2024-acf-winter-at-online::iowa,Iowa,2024-acf-winter-at-online,Online,winter,ACF Winter,-1.440098,-0.335794
+2024-acf-winter-at-online::texas-b,Texas B,2024-acf-winter-at-online,Online,winter,ACF Winter,-0.073674,1.579267
+2024-acf-winter-at-online::oregon-state,Oregon State,2024-acf-winter-at-online,Online,winter,ACF Winter,1.481456,2.029786
+2024-acf-winter-at-online::nyu-b,NYU B,2024-acf-winter-at-online,Online,winter,ACF Winter,0.652894,-0.533105
+2024-acf-winter-at-online::texas-a,Texas A,2024-acf-winter-at-online,Online,winter,ACF Winter,-3.592625,-1.891604
+2024-acf-winter-at-online::nyu-a,NYU A,2024-acf-winter-at-online,Online,winter,ACF Winter,-2.935737,-0.148528
+2024-acf-winter-at-online::texas-c,Texas C,2024-acf-winter-at-online,Online,winter,ACF Winter,0.054377,-1.448978
+2024-acf-winter-at-online::colorado-college,Colorado College,2024-acf-winter-at-online,Online,winter,ACF Winter,3.164187,-0.389869
+2024-acf-winter-at-online::missouri,Missouri,2024-acf-winter-at-online,Online,winter,ACF Winter,-3.975916,-0.655561
+2024-acf-winter-at-online::vassar-b,Vassar B,2024-acf-winter-at-online,Online,winter,ACF Winter,2.655235,-1.215593
+2024-acf-winter-at-online::ole-miss,Ole Miss,2024-acf-winter-at-online,Online,winter,ACF Winter,1.988480,-0.153321
+2024-acf-winter-at-ubc::alberta,Alberta,2024-acf-winter-at-ubc,UBC,winter,ACF Winter,-0.478198,-0.498924
+2024-acf-winter-at-ubc::ubc-b,UBC B,2024-acf-winter-at-ubc,UBC,winter,ACF Winter,-0.509161,0.307294
+2024-acf-winter-at-ubc::ubc-a,UBC A,2024-acf-winter-at-ubc,UBC,winter,ACF Winter,-3.230339,0.477373
+2024-acf-winter-at-ubc::uw-b,UW B,2024-acf-winter-at-ubc,UBC,winter,ACF Winter,-1.402139,3.642110
+2024-acf-winter-at-ubc::uw-a,UW A,2024-acf-winter-at-ubc,UBC,winter,ACF Winter,-2.181172,-2.229346
+2024-acf-winter-at-ubc::sfu,SFU,2024-acf-winter-at-ubc,UBC,winter,ACF Winter,-1.217637,0.763924
+2024-acf-winter-at-central-florida::ucf-a,UCF A,2024-acf-winter-at-central-florida,Central Florida,winter,ACF Winter,-1.827504,-0.837160
+2024-acf-winter-at-central-florida::uf-e,UF E,2024-acf-winter-at-central-florida,Central Florida,winter,ACF Winter,2.332209,1.424826
+2024-acf-winter-at-central-florida::ucf-b,UCF B,2024-acf-winter-at-central-florida,Central Florida,winter,ACF Winter,3.241052,-1.807861
+2024-acf-winter-at-central-florida::uf-d,UF D,2024-acf-winter-at-central-florida,Central Florida,winter,ACF Winter,2.224180,0.818763
+2024-acf-winter-at-central-florida::uf-b,UF B,2024-acf-winter-at-central-florida,Central Florida,winter,ACF Winter,-3.649934,-0.945097
+2024-acf-winter-at-central-florida::florida-state-university-a,Florida State University A,2024-acf-winter-at-central-florida,Central Florida,winter,ACF Winter,2.646814,-0.381197
+2024-acf-winter-at-central-florida::uf-c,UF C,2024-acf-winter-at-central-florida,Central Florida,winter,ACF Winter,2.122353,-1.899618
+2024-acf-winter-at-central-florida::uf-a,UF A,2024-acf-winter-at-central-florida,Central Florida,winter,ACF Winter,-3.904817,-0.469547
+2024-acf-winter-at-central-florida::uf-f,UF F,2024-acf-winter-at-central-florida,Central Florida,winter,ACF Winter,7.702630,-0.326712
+2024-acf-winter-at-central-florida::florida-tech-b,Florida Tech B,2024-acf-winter-at-central-florida,Central Florida,winter,ACF Winter,6.423636,-0.686303
+2024-acf-winter-at-central-florida::florida-tech-a,Florida Tech A,2024-acf-winter-at-central-florida,Central Florida,winter,ACF Winter,3.294044,-2.326358
+2024-acf-winter-at-oxford::birmingham,Birmingham,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-0.747287,0.231333
+2024-acf-winter-at-oxford::southampton-b,Southampton B,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,0.447524,-0.368553
+2024-acf-winter-at-oxford::bristol-a,Bristol A,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-0.392908,-1.423563
+2024-acf-winter-at-oxford::manchester,Manchester,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-1.269195,-0.877051
+2024-acf-winter-at-oxford::cambridge-a,Cambridge A,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-4.483971,0.510458
+2024-acf-winter-at-oxford::oxford-a,Oxford A,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-5.077606,1.305091
+2024-acf-winter-at-oxford::cambridge-b,Cambridge B,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-3.677059,-1.482475
+2024-acf-winter-at-oxford::cambridge-c,Cambridge C,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-2.663580,-1.844163
+2024-acf-winter-at-oxford::durham-a,Durham A,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-0.159371,0.731773
+2024-acf-winter-at-oxford::warwick-a,Warwick A,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-0.737260,-0.822562
+2024-acf-winter-at-oxford::imperial-b,Imperial B,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,1.817782,-1.176826
+2024-acf-winter-at-oxford::cambridge-d,Cambridge D,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-0.247798,-0.603833
+2024-acf-winter-at-oxford::lse-a,LSE A,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-3.504967,1.171219
+2024-acf-winter-at-oxford::imperial-a,Imperial A,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-3.808937,-0.848774
+2024-acf-winter-at-oxford::oxford-b,Oxford B,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-1.621829,-0.344007
+2024-acf-winter-at-oxford::southampton-a,Southampton A,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,0.302976,2.997039
+2024-acf-winter-at-oxford::vanderbilt,Vanderbilt,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,-0.164576,1.748020
+2024-acf-winter-at-oxford::bristol-b,Bristol B,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,1.221911,-1.738276
+2024-acf-winter-at-oxford::warwick-b,Warwick B,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,2.920758,1.676549
+2024-acf-winter-at-oxford::edinburgh,Edinburgh,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,0.797978,0.172360
+2024-acf-winter-at-oxford::lse-b,LSE B,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,1.221325,1.221162
+2024-acf-winter-at-oxford::durham-b,Durham B,2024-acf-winter-at-oxford,Oxford,winter,ACF Winter,1.867795,-2.152850
+2024-acf-fall-at-claremont-colleges::ucla-c,UCLA C,2024-acf-fall-at-claremont-colleges,Claremont Colleges,fall,ACF Fall,-5.685963,1.068701
+2024-acf-fall-at-claremont-colleges::claremont-a,Claremont A,2024-acf-fall-at-claremont-colleges,Claremont Colleges,fall,ACF Fall,-4.257121,-0.673869
+2024-acf-fall-at-claremont-colleges::claremont-c,Claremont C,2024-acf-fall-at-claremont-colleges,Claremont Colleges,fall,ACF Fall,-1.097875,1.381327
+2024-acf-fall-at-claremont-colleges::claremont-b,Claremont B,2024-acf-fall-at-claremont-colleges,Claremont Colleges,fall,ACF Fall,0.948117,-0.368457
+2024-acf-fall-at-claremont-colleges::ucla-b,UCLA B,2024-acf-fall-at-claremont-colleges,Claremont Colleges,fall,ACF Fall,-1.665828,-0.177098
+2024-acf-fall-at-claremont-colleges::ucla-a,UCLA A,2024-acf-fall-at-claremont-colleges,Claremont Colleges,fall,ACF Fall,-3.657119,0.200868
+2024-acf-fall-at-claremont-colleges::ucsd,UCSD,2024-acf-fall-at-claremont-colleges,Claremont Colleges,fall,ACF Fall,-4.265480,0.073366
+2024-acf-fall-at-claremont-colleges::ucla-e,UCLA E,2024-acf-fall-at-claremont-colleges,Claremont Colleges,fall,ACF Fall,-3.678116,-0.923016
+2024-acf-fall-at-claremont-colleges::ucla-d,UCLA D,2024-acf-fall-at-claremont-colleges,Claremont Colleges,fall,ACF Fall,-1.229282,-1.854877
+2024-acf-fall-at-claremont-colleges::usc,USC,2024-acf-fall-at-claremont-colleges,Claremont Colleges,fall,ACF Fall,-3.292728,-0.806954
+2024-acf-fall-at-cornell::cornell-a,Cornell A,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,0.515833,-0.953946
+2024-acf-fall-at-cornell::u-of-rochester-a,U of Rochester A,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,-0.804364,-2.362627
+2024-acf-fall-at-cornell::cornell-b,Cornell B,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,-1.485724,1.115828
+2024-acf-fall-at-cornell::cornell-f,Cornell F,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,0.676180,1.512652
+2024-acf-fall-at-cornell::cornell-c,Cornell C,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,-4.069333,-1.395978
+2024-acf-fall-at-cornell::syracuse,Syracuse,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,-2.208078,1.157073
+2024-acf-fall-at-cornell::cornell-d,Cornell D,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,-3.018011,1.286078
+2024-acf-fall-at-cornell::binghamton-a,Binghamton A,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,-2.525281,2.479813
+2024-acf-fall-at-cornell::cornell-g,Cornell G,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,-0.113924,-1.969304
+2024-acf-fall-at-cornell::rit-c,RIT C,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,3.983967,3.898085
+2024-acf-fall-at-cornell::esf,ESF,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,-0.831968,-2.194038
+2024-acf-fall-at-cornell::penn-state,Penn State,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,1.136182,-1.035606
+2024-acf-fall-at-cornell::rit-a,RIT A,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,-0.989678,1.328246
+2024-acf-fall-at-cornell::binghamton-c,Binghamton C,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,2.960040,3.796291
+2024-acf-fall-at-cornell::rit-b,RIT B,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,-1.317681,1.856669
+2024-acf-fall-at-cornell::cornell-e,Cornell E,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,-1.290450,-1.073817
+2024-acf-fall-at-cornell::u-of-rochester-b,U of Rochester B,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,1.972420,-0.437966
+2024-acf-fall-at-cornell::binghamton-b,Binghamton B,2024-acf-fall-at-cornell,Cornell,fall,ACF Fall,0.230627,0.017315
+2024-acf-fall-at-illinois::chicago-b,Chicago B,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-0.009347,0.522829
+2024-acf-fall-at-illinois::indiana,Indiana,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-1.241703,-0.048479
+2024-acf-fall-at-illinois::illinois-a,Illinois A,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-4.815940,2.056394
+2024-acf-fall-at-illinois::illinois-b,Illinois B,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-2.754783,0.513731
+2024-acf-fall-at-illinois::illinois-c,Illinois C,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-2.309013,-1.691744
+2024-acf-fall-at-illinois::siue,SIUE,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-0.074332,-2.187067
+2024-acf-fall-at-illinois::iowa-a,Iowa A,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-2.358741,-2.509380
+2024-acf-fall-at-illinois::notre-dame-b,Notre Dame B,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-1.551463,1.732142
+2024-acf-fall-at-illinois::iowa-b,Iowa B,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-0.403130,-1.873129
+2024-acf-fall-at-illinois::notre-dame-a,Notre Dame A,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-6.070110,1.336914
+2024-acf-fall-at-illinois::northwestern-a,Northwestern A,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-2.998209,2.557189
+2024-acf-fall-at-illinois::notre-dame-c,Notre Dame C,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-0.558623,-2.594643
+2024-acf-fall-at-illinois::purdue-a,Purdue A,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-5.579864,0.473285
+2024-acf-fall-at-illinois::northwestern-b,Northwestern B,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-2.867278,0.577877
+2024-acf-fall-at-illinois::purdue-b,Purdue B,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-5.018610,1.040127
+2024-acf-fall-at-illinois::washu-b,WashU B,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-1.579805,-0.130172
+2024-acf-fall-at-illinois::purdue-c,Purdue C,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-1.031181,1.488160
+2024-acf-fall-at-illinois::chicago-a,Chicago A,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-5.661634,1.660673
+2024-acf-fall-at-illinois::illinois-d,Illinois D,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-2.047737,-0.295569
+2024-acf-fall-at-illinois::washu-a,WashU A,2024-acf-fall-at-illinois,Illinois,fall,ACF Fall,-2.703786,1.011103
+2024-acf-fall-at-rutgers::bard-a,Bard A,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,1.614249,-3.081242
+2024-acf-fall-at-rutgers::princeton-a,Princeton A,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,0.055263,1.071474
+2024-acf-fall-at-rutgers::columbia-j,Columbia J,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-1.946616,1.502215
+2024-acf-fall-at-rutgers::penn-a,Penn A,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-2.946598,1.909764
+2024-acf-fall-at-rutgers::fordham-a,Fordham A,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-2.596038,0.233612
+2024-acf-fall-at-rutgers::columbia-b,Columbia B,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-2.161398,0.731903
+2024-acf-fall-at-rutgers::nyu-a,NYU A,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-1.674481,2.776502
+2024-acf-fall-at-rutgers::columbia-a,Columbia A,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-6.110597,-1.051943
+2024-acf-fall-at-rutgers::nyu-b,NYU B,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-0.195879,-1.150162
+2024-acf-fall-at-rutgers::rutgers-b,Rutgers B,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-0.704544,0.034495
+2024-acf-fall-at-rutgers::rowan-a,Rowan A,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,1.327575,-3.057599
+2024-acf-fall-at-rutgers::maryland-b,Maryland B,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-3.418717,-0.688726
+2024-acf-fall-at-rutgers::rutgers-a,Rutgers A,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-3.402574,-0.008634
+2024-acf-fall-at-rutgers::maryland-a,Maryland A,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-5.750413,-1.189343
+2024-acf-fall-at-rutgers::lehigh-b,Lehigh B,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,1.517884,3.324453
+2024-acf-fall-at-rutgers::lehigh-a,Lehigh A,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-1.365320,0.260873
+2024-acf-fall-at-rutgers::penn-b,Penn B,2024-acf-fall-at-rutgers,Rutgers,fall,ACF Fall,-3.051071,-0.713399
+california::uc-berkeley-b,UC Berkeley B,california,California,regionals,ACF Regionals,-2.893797,-0.669650
+california::claremont-b,Claremont B,california,California,regionals,ACF Regionals,4.570892,3.204303
+california::ucla,UCLA,california,California,regionals,ACF Regionals,-0.023968,-1.669579
+california::uc-berkeley-a,UC Berkeley A,california,California,regionals,ACF Regionals,-4.843643,-2.097783
+california::ucsd,UCSD,california,California,regionals,ACF Regionals,4.814588,-1.156798
+california::claremont-a,Claremont A,california,California,regionals,ACF Regionals,0.465473,0.734322
+overflow::northwestern-a,Northwestern A,overflow,Overflow,regionals,ACF Regionals,-3.462048,-0.194281
+overflow::iowa,Iowa,overflow,Overflow,regionals,ACF Regionals,2.300088,0.216693
+overflow::northwestern-b,Northwestern B,overflow,Overflow,regionals,ACF Regionals,0.491123,1.178024
+overflow::notre-dame-a,Notre Dame A,overflow,Overflow,regionals,ACF Regionals,1.223718,1.515832
+overflow::notre-dame-b,Notre Dame B,overflow,Overflow,regionals,ACF Regionals,3.327426,2.410963
+overflow::georgetown-b,Georgetown B,overflow,Overflow,regionals,ACF Regionals,6.230705,1.028133
+overflow::purdue,Purdue,overflow,Overflow,regionals,ACF Regionals,-0.904816,0.245356
+overflow::stanford-b,Stanford B,overflow,Overflow,regionals,ACF Regionals,-3.804634,0.882699
+overflow::georgetown-a,Georgetown A,overflow,Overflow,regionals,ACF Regionals,-0.102115,0.867064
+overflow::notre-dame-c,Notre Dame C,overflow,Overflow,regionals,ACF Regionals,4.973874,1.660909
+pacific-northwest::uw-a,UW A,pacific-northwest,Pacific Northwest,regionals,ACF Regionals,0.562688,1.267935
+pacific-northwest::ubc,UBC,pacific-northwest,Pacific Northwest,regionals,ACF Regionals,-0.534930,0.088803
+pacific-northwest::uw-b,UW B,pacific-northwest,Pacific Northwest,regionals,ACF Regionals,2.808876,2.685086
+pacific-northwest::alberta,Alberta,pacific-northwest,Pacific Northwest,regionals,ACF Regionals,2.422558,2.569213
+2025-acf-nationals::british-columbia,British Columbia,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.877487,0.326497
+2025-acf-nationals::florida,Florida,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.678455,-0.695297
+2025-acf-nationals::chicago-b,Chicago B,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,1.527329,0.205843
+2025-acf-nationals::iowa-state,Iowa State,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.526567,-1.626221
+2025-acf-nationals::columbia-b,Columbia B,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,2.868090,0.296749
+2025-acf-nationals::vanderbilt,Vanderbilt,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,2.978257,-0.107993
+2025-acf-nationals::cornell-b,Cornell B,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,3.578072,0.549505
+2025-acf-nationals::virginia,Virginia,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,1.896123,0.794886
+2025-acf-nationals::georgia-state,Georgia State,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.312351,-0.442130
+2025-acf-nationals::ottawa,Ottawa,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,1.195532,0.886187
+2025-acf-nationals::indiana,Indiana,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-1.973057,-0.018208
+2025-acf-nationals::columbia-a,Columbia A,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-1.043000,0.380794
+2025-acf-nationals::minnesota,Minnesota,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.500273,0.660826
+2025-acf-nationals::johns-hopkins,Johns Hopkins,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.161168,-0.066096
+2025-acf-nationals::nyu,NYU,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-0.967689,-0.148112
+2025-acf-nationals::arizona-state,Arizona State,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.744271,0.102605
+2025-acf-nationals::north-carolina-a,North Carolina A,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-0.243666,2.369760
+2025-acf-nationals::uc-berkeley-a,UC Berkeley A,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-1.842119,-0.275891
+2025-acf-nationals::ohio-state,Ohio State,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,1.779121,0.275951
+2025-acf-nationals::michigan,Michigan,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,1.381545,2.565759
+2025-acf-nationals::rit,RIT,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,3.976789,-0.489926
+2025-acf-nationals::north-carolina-b,North Carolina B,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,3.577494,-1.131843
+2025-acf-nationals::rutgers,Rutgers,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-0.761643,-1.846361
+2025-acf-nationals::wustl-a,WUSTL A,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-0.942680,-0.603642
+2025-acf-nationals::stanford,Stanford,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-2.248375,0.091353
+2025-acf-nationals::chicago-a,Chicago A,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-1.673475,-0.487263
+2025-acf-nationals::texas,Texas,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-0.010061,-0.867567
+2025-acf-nationals::harvard,Harvard,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,1.637411,1.836990
+2025-acf-nationals::toronto-a,Toronto A,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-1.069738,0.472146
+2025-acf-nationals::illinois-a,Illinois A,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-2.032918,0.584296
+2025-acf-nationals::toronto-b,Toronto B,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.988459,-1.888841
+2025-acf-nationals::mit,MIT,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.917359,-0.025497
+2025-acf-nationals::toronto-c,Toronto C,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.773249,-0.880198
+2025-acf-nationals::georgia-tech,Georgia Tech,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.043645,0.410908
+2025-acf-nationals::uc-berkeley-b,UC Berkeley B,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.475708,0.966198
+2025-acf-nationals::wustl-b,WUSTL B,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.674360,-2.206598
+2025-acf-nationals::ucf,UCF,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,1.022058,-1.701090
+2025-acf-nationals::maryland,Maryland,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,1.743037,-2.285022
+2025-acf-nationals::virginia-tech,Virginia Tech,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.512907,-1.629447
+2025-acf-nationals::cornell-a,Cornell A,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-1.057695,1.029812
+2025-acf-nationals::waterloo-a,Waterloo A,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-0.936442,0.742165
+2025-acf-nationals::northwestern,Northwestern,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-0.796983,0.359586
+2025-acf-nationals::waterloo-b,Waterloo B,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,-0.479560,-0.632227
+2025-acf-nationals::lse,LSE,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,1.832190,1.365292
+2025-acf-nationals::winona-state,Winona State,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,2.098055,-1.052927
+2025-acf-nationals::illinois-b,Illinois B,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,2.497003,-0.004152
+2025-acf-nationals::yale,Yale,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,1.940797,0.644720
+2025-acf-nationals::penn-state,Penn State,2025-acf-nationals,2025 ACF Nationals,nationals,ACF Nationals,0.108137,1.644346
+2024-acf-fall-at-ohio-state::cwru-a,CWRU A,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-2.151222,1.709338
+2024-acf-fall-at-ohio-state::cwru-b,CWRU B,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-0.835108,0.169222
+2024-acf-fall-at-ohio-state::miami-a,Miami A,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-3.222425,-2.189491
+2024-acf-fall-at-ohio-state::michigan-c,Michigan C,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-2.155307,-0.355824
+2024-acf-fall-at-ohio-state::miami-c,Miami C,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,2.014470,-1.387028
+2024-acf-fall-at-ohio-state::cwru-c,CWRU C,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,0.298849,1.108661
+2024-acf-fall-at-ohio-state::michigan-a,Michigan A,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-6.911107,0.107084
+2024-acf-fall-at-ohio-state::ohio-state-b,Ohio State B,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-2.224994,0.375875
+2024-acf-fall-at-ohio-state::michigan-b,Michigan B,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-3.146489,-1.459336
+2024-acf-fall-at-ohio-state::jefferson-county-scholars,Jefferson County Scholars,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-2.900470,2.593145
+2024-acf-fall-at-ohio-state::michigan-state-a,Michigan State A,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-4.804956,0.541899
+2024-acf-fall-at-ohio-state::michigan-d,Michigan D,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-3.404062,1.480102
+2024-acf-fall-at-ohio-state::michigan-state-b,Michigan State B,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-0.019337,1.061397
+2024-acf-fall-at-ohio-state::ohio-state-c,Ohio State C,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,1.662874,2.186601
+2024-acf-fall-at-ohio-state::ohio-state-a,Ohio State A,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-3.277603,1.454290
+2024-acf-fall-at-ohio-state::miami-b,Miami B,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-1.409665,0.214161
+2024-acf-fall-at-ohio-state::west-virginia-b,West Virginia B,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,2.563219,3.475892
+2024-acf-fall-at-ohio-state::west-virginia-a,West Virginia A,2024-acf-fall-at-ohio-state,Ohio State,fall,ACF Fall,-0.894760,0.579825
+2024-acf-fall-at-washington::alberta,Alberta,2024-acf-fall-at-washington,Washington,fall,ACF Fall,-3.019846,2.852474
+2024-acf-fall-at-washington::uw-chastity,UW Chastity,2024-acf-fall-at-washington,Washington,fall,ACF Fall,-0.733027,3.372999
+2024-acf-fall-at-washington::arizona-state-a,Arizona State A,2024-acf-fall-at-washington,Washington,fall,ACF Fall,-1.468558,-2.061814
+2024-acf-fall-at-washington::arizona-state-b,Arizona State B,2024-acf-fall-at-washington,Washington,fall,ACF Fall,-3.053778,0.411188
+2024-acf-fall-at-washington::ubc-a,UBC A,2024-acf-fall-at-washington,Washington,fall,ACF Fall,-4.508935,0.858934
+2024-acf-fall-at-washington::ubc-b,UBC B,2024-acf-fall-at-washington,Washington,fall,ACF Fall,-4.793315,-1.884759
+2024-acf-fall-at-washington::uw-greed,UW Greed,2024-acf-fall-at-washington,Washington,fall,ACF Fall,-0.986231,4.355087
+2024-acf-fall-at-washington::uw-gluttony,UW Gluttony,2024-acf-fall-at-washington,Washington,fall,ACF Fall,-1.541729,-1.150039
+2024-acf-fall-at-washington::uw-lust,UW Lust,2024-acf-fall-at-washington,Washington,fall,ACF Fall,-0.748782,0.389798
+2024-acf-fall-at-washington::uw-envy,UW Envy,2024-acf-fall-at-washington,Washington,fall,ACF Fall,-2.250523,2.530542
+2024-acf-fall-at-washington::uw-pride,UW Pride,2024-acf-fall-at-washington,Washington,fall,ACF Fall,-1.486531,0.374840
+2024-acf-fall-at-washington::uw-wrath,UW Wrath,2024-acf-fall-at-washington,Washington,fall,ACF Fall,-2.767715,-1.476015
+2024-acf-fall-at-washington::uw-sloth,UW Sloth,2024-acf-fall-at-washington,Washington,fall,ACF Fall,1.246786,5.506523
+2024-acf-fall-at-washington::boise-state,Boise State,2024-acf-fall-at-washington,Washington,fall,ACF Fall,1.900374,1.589005
+2024-acf-fall-at-georgia::alabama-a,Alabama A,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-0.104839,-1.330920
+2024-acf-fall-at-georgia::georgia-tech-c,Georgia Tech C,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,0.395481,4.213427
+2024-acf-fall-at-georgia::clemson-b,Clemson B,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,0.231467,-0.090378
+2024-acf-fall-at-georgia::furman,Furman,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,0.087638,0.781091
+2024-acf-fall-at-georgia::emory-a,Emory A,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-3.296425,0.520851
+2024-acf-fall-at-georgia::mississippi-state-a,Mississippi State A,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-2.814720,1.637242
+2024-acf-fall-at-georgia::georgia-a,Georgia A,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-1.350765,0.490157
+2024-acf-fall-at-georgia::auburn-b,Auburn B,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,0.284884,-2.153172
+2024-acf-fall-at-georgia::georgia-tech-a,Georgia Tech A,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-4.282565,-0.490069
+2024-acf-fall-at-georgia::tennessee-a,Tennessee A,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-4.259682,0.015905
+2024-acf-fall-at-georgia::georgia-tech-b,Georgia Tech B,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-1.618869,-2.082766
+2024-acf-fall-at-georgia::vanderbilt-a,Vanderbilt A,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-1.509112,1.508632
+2024-acf-fall-at-georgia::georgia-tech-d,Georgia Tech D,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-5.236181,2.179937
+2024-acf-fall-at-georgia::auburn-a,Auburn A,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-5.154844,-0.126658
+2024-acf-fall-at-georgia::south-carolina-a,South Carolina A,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-3.013147,-1.078767
+2024-acf-fall-at-georgia::georgia-tech-e,Georgia Tech E,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-2.616947,0.297944
+2024-acf-fall-at-georgia::south-carolina-b,South Carolina B,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-1.366889,-1.469124
+2024-acf-fall-at-georgia::emory-oxford,Emory Oxford,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-1.484751,-0.090572
+2024-acf-fall-at-georgia::southern,Southern,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,2.539240,1.261242
+2024-acf-fall-at-georgia::clemson-a,Clemson A,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,-0.013244,1.438473
+2024-acf-fall-at-georgia::tennessee-b,Tennessee B,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,2.662666,0.120077
+2024-acf-fall-at-georgia::auburn-c,Auburn C,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,2.052440,-0.172457
+2024-acf-fall-at-georgia::vanderbilt-b,Vanderbilt B,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,1.897598,-1.559640
+2024-acf-fall-at-georgia::belmont,Belmont,2024-acf-fall-at-georgia,Georgia,fall,ACF Fall,1.386979,-1.207565
+2024-acf-fall-at-north-carolina::appalachian-state-b,Appalachian State B,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,0.379205,-3.743300
+2024-acf-fall-at-north-carolina::virginia,Virginia,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,0.128082,-2.089883
+2024-acf-fall-at-north-carolina::duke-b,Duke B,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,1.600531,3.202575
+2024-acf-fall-at-north-carolina::liberty-b,Liberty B,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,0.128815,-0.170395
+2024-acf-fall-at-north-carolina::james-madison-a,James Madison A,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,0.942869,-0.611375
+2024-acf-fall-at-north-carolina::unc-d,UNC D,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,-0.205735,-2.623972
+2024-acf-fall-at-north-carolina::nc-state,NC State,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,-2.195418,0.948955
+2024-acf-fall-at-north-carolina::unc-a,UNC A,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,-2.045443,-0.674983
+2024-acf-fall-at-north-carolina::unc-b,UNC B,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,-0.720173,0.390770
+2024-acf-fall-at-north-carolina::liberty-a,Liberty A,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,-3.868659,-0.715091
+2024-acf-fall-at-north-carolina::vcu,VCU,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,-3.135272,-0.018972
+2024-acf-fall-at-north-carolina::liberty-c,Liberty C,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,1.088359,-3.225921
+2024-acf-fall-at-north-carolina::virginia-tech-a,Virginia Tech A,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,-5.998643,-0.721128
+2024-acf-fall-at-north-carolina::duke-a,Duke A,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,1.583865,0.424645
+2024-acf-fall-at-north-carolina::virginia-tech-b,Virginia Tech B,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,-0.811246,-0.754514
+2024-acf-fall-at-north-carolina::unc-c,UNC C,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,-1.583347,-1.511295
+2024-acf-fall-at-north-carolina::william-and-mary,William & Mary,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,-2.483298,1.281658
+2024-acf-fall-at-north-carolina::tusculum,Tusculum,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,-0.478188,1.372427
+2024-acf-fall-at-north-carolina::appalachian-state-a,Appalachian State A,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,-1.516499,-2.113113
+2024-acf-fall-at-north-carolina::james-madison-b,James Madison B,2024-acf-fall-at-north-carolina,North Carolina,fall,ACF Fall,1.002744,-1.786293
+2025-acf-regionals-north::carleton,Carleton,2025-acf-regionals-north,North,regionals,ACF Regionals,4.494138,-0.885743
+2025-acf-regionals-north::winona-state,Winona State,2025-acf-regionals-north,North,regionals,ACF Regionals,-0.743862,-1.530874
+2025-acf-regionals-north::minnesota-b,Minnesota B,2025-acf-regionals-north,North,regionals,ACF Regionals,1.154710,0.218141
+2025-acf-regionals-north::wisconsin-a,Wisconsin A,2025-acf-regionals-north,North,regionals,ACF Regionals,4.510752,2.130836
+2025-acf-regionals-north::wisconsin-b,Wisconsin B,2025-acf-regionals-north,North,regionals,ACF Regionals,6.150343,1.129874
+2025-acf-regionals-north::iowa-state,Iowa State,2025-acf-regionals-north,North,regionals,ACF Regionals,-3.065839,-2.533661
+2025-acf-regionals-florida::florida-b,Florida B,2025-acf-regionals-florida,Florida,regionals,ACF Regionals,0.224098,-0.141454
+2025-acf-regionals-florida::florida-state-a,Florida State A,2025-acf-regionals-florida,Florida,regionals,ACF Regionals,5.214963,-2.586033
+2025-acf-regionals-florida::ucf-b,UCF B,2025-acf-regionals-florida,Florida,regionals,ACF Regionals,3.172069,-0.977151
+2025-acf-regionals-florida::florida-a,Florida A,2025-acf-regionals-florida,Florida,regionals,ACF Regionals,-2.400442,-1.342704
+2025-acf-regionals-florida::valencia-a,Valencia A,2025-acf-regionals-florida,Florida,regionals,ACF Regionals,5.064148,-1.227081
+2025-acf-regionals-florida::ucf-c,UCF C,2025-acf-regionals-florida,Florida,regionals,ACF Regionals,3.844227,-0.118149
+2025-acf-regionals-great-lakes::carnegie-mellon-a,Carnegie Mellon A,2025-acf-regionals-great-lakes,Great Lakes,regionals,ACF Regionals,-0.197206,-1.510028
+2025-acf-regionals-great-lakes::michigan-c,Michigan C,2025-acf-regionals-great-lakes,Great Lakes,regionals,ACF Regionals,1.609040,-0.178343
+2025-acf-regionals-great-lakes::michigan-a,Michigan A,2025-acf-regionals-great-lakes,Great Lakes,regionals,ACF Regionals,-1.476543,0.321779
+2025-acf-regionals-great-lakes::kenyon,Kenyon,2025-acf-regionals-great-lakes,Great Lakes,regionals,ACF Regionals,3.794809,-0.048326
+2025-acf-regionals-great-lakes::michigan-b,Michigan B,2025-acf-regionals-great-lakes,Great Lakes,regionals,ACF Regionals,-0.258337,-2.008554
+2025-acf-regionals-great-lakes::case-western-b,Case Western B,2025-acf-regionals-great-lakes,Great Lakes,regionals,ACF Regionals,3.949852,1.165562
+2025-acf-regionals-great-lakes::michigan-d,Michigan D,2025-acf-regionals-great-lakes,Great Lakes,regionals,ACF Regionals,4.563960,-0.532861
+2025-acf-regionals-great-lakes::ohio-state-a,Ohio State A,2025-acf-regionals-great-lakes,Great Lakes,regionals,ACF Regionals,-0.753171,-0.008421
+2025-acf-regionals-great-lakes::michigan-state,Michigan State,2025-acf-regionals-great-lakes,Great Lakes,regionals,ACF Regionals,2.296328,1.918870
+2025-acf-regionals-great-lakes::case-western-a,Case Western A,2025-acf-regionals-great-lakes,Great Lakes,regionals,ACF Regionals,1.086021,-0.019802
+2025-acf-regionals-great-lakes::ohio-state-b,Ohio State B,2025-acf-regionals-great-lakes,Great Lakes,regionals,ACF Regionals,0.738119,0.592576
+2025-acf-regionals-great-lakes::carnegie-mellon-b,Carnegie Mellon B,2025-acf-regionals-great-lakes,Great Lakes,regionals,ACF Regionals,5.256495,5.029354
+2025-acf-regionals-lower-mid-atlantic::liberty-b,Liberty B,2025-acf-regionals-lower-mid-atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,6.522732,-1.174977
+2025-acf-regionals-lower-mid-atlantic::liberty-a,Liberty A,2025-acf-regionals-lower-mid-atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,3.015264,-1.102645
+2025-acf-regionals-lower-mid-atlantic::liberty-c,Liberty C,2025-acf-regionals-lower-mid-atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,6.614195,-2.997994
+2025-acf-regionals-lower-mid-atlantic::william-and-mary,William & Mary,2025-acf-regionals-lower-mid-atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,0.151229,-1.533250
+2025-acf-regionals-lower-mid-atlantic::unc-c,UNC C,2025-acf-regionals-lower-mid-atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,3.013595,-2.003620
+2025-acf-regionals-lower-mid-atlantic::unc-b,UNC B,2025-acf-regionals-lower-mid-atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,-1.407814,-1.317145
+2025-acf-regionals-lower-mid-atlantic::unc-d,UNC D,2025-acf-regionals-lower-mid-atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,3.661048,-1.958193
+2025-acf-regionals-lower-mid-atlantic::duke,Duke,2025-acf-regionals-lower-mid-atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,1.768380,0.681337
+2025-acf-regionals-lower-mid-atlantic::virginia-tech-a,Virginia Tech A,2025-acf-regionals-lower-mid-atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,-2.267815,-1.057338
+2025-acf-regionals-lower-mid-atlantic::virginia-a,Virginia A,2025-acf-regionals-lower-mid-atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,-1.186180,-2.462719
+2025-acf-regionals-lower-mid-atlantic::wake-forest,Wake Forest,2025-acf-regionals-lower-mid-atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,6.520553,0.084637
+2025-acf-regionals-lower-mid-atlantic::south-carolina,South Carolina,2025-acf-regionals-lower-mid-atlantic,Lower Mid-Atlantic,regionals,ACF Regionals,4.020274,0.047778
+2025-acf-regionals-midwest::chicago-b,Chicago B,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,0.259607,1.962684
+2025-acf-regionals-midwest::washu-a,WashU A,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,-1.939146,0.878683
+2025-acf-regionals-midwest::illinois-b,Illinois B,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,0.155789,1.030953
+2025-acf-regionals-midwest::chicago-a,Chicago A,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,-4.719266,-0.939837
+2025-acf-regionals-midwest::illinois-c,Illinois C,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,2.915319,0.558737
+2025-acf-regionals-midwest::illinois-a,Illinois A,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,-5.032458,0.501968
+2025-acf-regionals-midwest::indiana-a,Indiana A,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,-4.255373,0.281560
+2025-acf-regionals-midwest::missoui-sandt,Missoui S&T,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,3.963897,-0.087341
+2025-acf-regionals-midwest::missouri,Missouri,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,-0.916672,0.734950
+2025-acf-regionals-midwest::indiana-b,Indiana B,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,1.619769,-2.790600
+2025-acf-regionals-midwest::washu-b,WashU B,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,-1.768637,-1.823419
+2025-acf-regionals-midwest::chicago-c,Chicago C,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,0.471040,-0.002794
+2025-acf-regionals-midwest::chicago-d,Chicago D,2025-acf-regionals-midwest,Midwest,regionals,ACF Regionals,1.671225,0.091519
+2025-acf-regionals-northeast::bu,BU,2025-acf-regionals-northeast,Northeast,regionals,ACF Regionals,3.739535,-1.077385
+2025-acf-regionals-northeast::umass-boston,UMass Boston,2025-acf-regionals-northeast,Northeast,regionals,ACF Regionals,5.310834,-0.106039
+2025-acf-regionals-northeast::brown-a,Brown A,2025-acf-regionals-northeast,Northeast,regionals,ACF Regionals,-0.723364,-1.275417
+2025-acf-regionals-northeast::brandeis-b,Brandeis B,2025-acf-regionals-northeast,Northeast,regionals,ACF Regionals,1.727833,-0.436658
+2025-acf-regionals-northeast::mit-a,MIT A,2025-acf-regionals-northeast,Northeast,regionals,ACF Regionals,-2.600792,0.067588
+2025-acf-regionals-northeast::harvard-a,Harvard A,2025-acf-regionals-northeast,Northeast,regionals,ACF Regionals,-3.412648,-1.053437
+2025-acf-regionals-northeast::tufts-a,Tufts A,2025-acf-regionals-northeast,Northeast,regionals,ACF Regionals,1.687953,-0.459994
+2025-acf-regionals-northeast::harvard-b,Harvard B,2025-acf-regionals-northeast,Northeast,regionals,ACF Regionals,0.593422,0.125968
+2025-acf-regionals-northeast::brandeis-a,Brandeis A,2025-acf-regionals-northeast,Northeast,regionals,ACF Regionals,2.684937,-1.482134
+2025-acf-regionals-northeast::dartmouth-a,Dartmouth A,2025-acf-regionals-northeast,Northeast,regionals,ACF Regionals,3.288306,0.792476
+2025-acf-regionals-south-central::asu,ASU,2025-acf-regionals-south-central,South Central,regionals,ACF Regionals,-1.159741,0.329228
+2025-acf-regionals-south-central::texas-a,Texas A,2025-acf-regionals-south-central,South Central,regionals,ACF Regionals,-2.553795,-0.390576
+2025-acf-regionals-south-central::texas-b,Texas B,2025-acf-regionals-south-central,South Central,regionals,ACF Regionals,2.112334,1.598615
+2025-acf-regionals-south-central::tamu,TAMU,2025-acf-regionals-south-central,South Central,regionals,ACF Regionals,2.477028,0.495307
+2025-acf-regionals-southeast::georgia-tech-a,Georgia Tech A,2025-acf-regionals-southeast,Southeast,regionals,ACF Regionals,1.996469,-0.151083
+2025-acf-regionals-southeast::georgia-tech-b,Georgia Tech B,2025-acf-regionals-southeast,Southeast,regionals,ACF Regionals,2.429271,0.684849
+2025-acf-regionals-southeast::georgia-tech-d,Georgia Tech D,2025-acf-regionals-southeast,Southeast,regionals,ACF Regionals,2.278200,1.429538
+2025-acf-regionals-southeast::georgia-tech-c,Georgia Tech C,2025-acf-regionals-southeast,Southeast,regionals,ACF Regionals,-1.708139,-0.078336
+2025-acf-regionals-southeast::tennessee-a,Tennessee A,2025-acf-regionals-southeast,Southeast,regionals,ACF Regionals,3.820717,0.867491
+2025-acf-regionals-southeast::vanderbilt-a,Vanderbilt A,2025-acf-regionals-southeast,Southeast,regionals,ACF Regionals,4.070699,1.580990
+2025-acf-regionals-southeast::bruin-a,Bruin A,2025-acf-regionals-southeast,Southeast,regionals,ACF Regionals,-1.673678,-1.693356
+2025-acf-regionals-southeast::louisville-a,Louisville A,2025-acf-regionals-southeast,Southeast,regionals,ACF Regionals,2.822646,-1.546060
+2025-acf-regionals-southeast::alabama-a,Alabama A,2025-acf-regionals-southeast,Southeast,regionals,ACF Regionals,3.324080,-1.702992
+2025-acf-regionals-uk::cambridge-b,Cambridge B,2025-acf-regionals-uk,UK,regionals,ACF Regionals,-0.943106,-1.194256
+2025-acf-regionals-uk::cambridge-c,Cambridge C,2025-acf-regionals-uk,UK,regionals,ACF Regionals,-0.000541,-2.316704
+2025-acf-regionals-uk::cambridge-d,Cambridge D,2025-acf-regionals-uk,UK,regionals,ACF Regionals,2.304450,-1.703450
+2025-acf-regionals-uk::southampton-b,Southampton B,2025-acf-regionals-uk,UK,regionals,ACF Regionals,3.555427,1.922180
+2025-acf-regionals-uk::cambridge-e,Cambridge E,2025-acf-regionals-uk,UK,regionals,ACF Regionals,3.189121,-1.723643
+2025-acf-regionals-uk::oxford-c,Oxford C,2025-acf-regionals-uk,UK,regionals,ACF Regionals,3.359405,-2.246862
+2025-acf-regionals-uk::lse,LSE,2025-acf-regionals-uk,UK,regionals,ACF Regionals,-0.750700,1.226990
+2025-acf-regionals-uk::imperial-a,Imperial A,2025-acf-regionals-uk,UK,regionals,ACF Regionals,-1.531535,-1.103914
+2025-acf-regionals-uk::nyu-c,NYU C,2025-acf-regionals-uk,UK,regionals,ACF Regionals,2.599577,-2.089499
+2025-acf-regionals-uk::southampton-a,Southampton A,2025-acf-regionals-uk,UK,regionals,ACF Regionals,3.058657,2.139800
+2025-acf-regionals-uk::oxford-a,Oxford A,2025-acf-regionals-uk,UK,regionals,ACF Regionals,-4.819781,0.653875
+2025-acf-regionals-uk::cambridge-a,Cambridge A,2025-acf-regionals-uk,UK,regionals,ACF Regionals,-3.172867,-0.665318
+2025-acf-regionals-uk::oxford-b,Oxford B,2025-acf-regionals-uk,UK,regionals,ACF Regionals,2.178275,2.479628
+2025-acf-regionals-uk::imperial-b,Imperial B,2025-acf-regionals-uk,UK,regionals,ACF Regionals,2.180734,-1.812133
+2025-acf-regionals-uk::sheffield,Sheffield,2025-acf-regionals-uk,UK,regionals,ACF Regionals,0.262896,-0.661957
+2025-acf-regionals-uk::manchester,Manchester,2025-acf-regionals-uk,UK,regionals,ACF Regionals,0.714346,-1.394025
+2025-acf-regionals-uk::warwick-a,Warwick A,2025-acf-regionals-uk,UK,regionals,ACF Regionals,1.016631,-0.765580
+2025-acf-regionals-uk::bristol,Bristol,2025-acf-regionals-uk,UK,regionals,ACF Regionals,1.231668,-1.808035
+2025-acf-regionals-uk::warwick-b,Warwick B,2025-acf-regionals-uk,UK,regionals,ACF Regionals,4.405151,-0.122824
+2025-acf-regionals-uk::durham,Durham,2025-acf-regionals-uk,UK,regionals,ACF Regionals,4.719403,-0.609197
+2025-acf-regionals-upper-mid-atlantic::columbia-b,Columbia B,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,-1.513951,-0.635068
+2025-acf-regionals-upper-mid-atlantic::cornell-b,Cornell B,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,-2.948798,-0.086137
+2025-acf-regionals-upper-mid-atlantic::haverford-a,Haverford A,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,3.278887,-0.749013
+2025-acf-regionals-upper-mid-atlantic::george-washington-b,George Washington B,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,7.371059,2.616159
+2025-acf-regionals-upper-mid-atlantic::john-jay-college,John Jay College,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,0.410466,0.249008
+2025-acf-regionals-upper-mid-atlantic::vassar-a,Vassar A,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,3.477228,-1.812423
+2025-acf-regionals-upper-mid-atlantic::maryland-a,Maryland A,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,-0.535156,-2.289326
+2025-acf-regionals-upper-mid-atlantic::yale-a,Yale A,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,-1.402061,-0.648419
+2025-acf-regionals-upper-mid-atlantic::maryland-b,Maryland B,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,2.298055,-1.521800
+2025-acf-regionals-upper-mid-atlantic::rutgers-a,Rutgers A,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,-2.038695,-0.377879
+2025-acf-regionals-upper-mid-atlantic::nyu-a,NYU A,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,-3.391367,-1.475117
+2025-acf-regionals-upper-mid-atlantic::johns-hopkins-a,Johns Hopkins A,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,-1.909009,0.424224
+2025-acf-regionals-upper-mid-atlantic::nyu-b,NYU B,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,4.411639,-0.295958
+2025-acf-regionals-upper-mid-atlantic::haverford-b,Haverford B,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,7.460324,3.535878
+2025-acf-regionals-upper-mid-atlantic::penn-a,Penn A,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,0.155857,-0.805337
+2025-acf-regionals-upper-mid-atlantic::columbia-c,Columbia C,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,0.735648,-1.166414
+2025-acf-regionals-upper-mid-atlantic::penn-b,Penn B,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,5.468597,3.337905
+2025-acf-regionals-upper-mid-atlantic::george-washington-a,George Washington A,2025-acf-regionals-upper-mid-atlantic,Upper Mid-Atlantic,regionals,ACF Regionals,5.618695,-2.726957
+2025-acf-regionals-upstate-ny::binghamton-a,Binghamton A,2025-acf-regionals-upstate-ny,Upstate NY,regionals,ACF Regionals,4.926978,1.894620
+2025-acf-regionals-upstate-ny::rit-a,RIT A,2025-acf-regionals-upstate-ny,Upstate NY,regionals,ACF Regionals,1.265247,-1.027940
+2025-acf-regionals-upstate-ny::cornell-c,Cornell C,2025-acf-regionals-upstate-ny,Upstate NY,regionals,ACF Regionals,3.187005,-0.433791
+2025-acf-regionals-upstate-ny::esf-a,ESF A,2025-acf-regionals-upstate-ny,Upstate NY,regionals,ACF Regionals,5.569555,-4.142199
+2025-acf-regionals-upstate-ny::rit-b,RIT B,2025-acf-regionals-upstate-ny,Upstate NY,regionals,ACF Regionals,5.595456,1.646209
+2025-acf-regionals-upstate-ny::cornell-d,Cornell D,2025-acf-regionals-upstate-ny,Upstate NY,regionals,ACF Regionals,3.721323,-0.799684

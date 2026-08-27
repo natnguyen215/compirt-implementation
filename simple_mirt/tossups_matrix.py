@@ -115,39 +115,6 @@ def _player_game_membership(
     )
 
 
-def get_game_players(
-    games_df: pd.DataFrame,
-    players_df: pd.DataFrame,
-) -> dict[int, set[int]]:
-    """Return {game_id: set of player_ids} — everyone on both rosters per game."""
-    membership = _player_game_membership(games_df, players_df)
-    return membership.groupby("game_id")["player_id"].apply(set).to_dict()
-
-
-def get_player_games(
-    games_df: pd.DataFrame,
-    players_df: pd.DataFrame,
-) -> dict[int, set[int]]:
-    """Return {player_id: set of game_ids} — inverse of get_game_players."""
-    membership = _player_game_membership(games_df, players_df)
-    return membership.groupby("player_id")["game_id"].apply(set).to_dict()
-
-
-def get_game_tossups(buzzes_df: pd.DataFrame) -> dict[int, set[int]]:
-    """Return {game_id: set of tossup_ids} — which tossups were read in each game.
-
-    Uses the buzz table as ground truth: a tossup is 'read' if any buzz exists
-    for that (game_id, tossup_id) pair, regardless of outcome.
-    """
-    return (
-        buzzes_df[["game_id", "tossup_id"]]
-        .drop_duplicates()
-        .groupby("game_id")["tossup_id"]
-        .apply(set)
-        .to_dict()
-    )
-
-
 # Response matrix
 
 def build_response_matrix(
@@ -158,8 +125,8 @@ def build_response_matrix(
 ) -> pd.DataFrame:
     """Build a player × tossup response matrix (index=player_slug, cols=tossup_id).
 
-    Uses get_game_players internally to determine which (player, tossup) pairs
-    are eligible (0/1) vs masked (NaN).
+    A cell is eligible (0/1) when the player was on a roster for a game in which
+    the tossup was read, and masked (NaN) otherwise.
     """
     # Long-form player ↔ game membership via team rosters
     player_game = _player_game_membership(games_df, players_df)

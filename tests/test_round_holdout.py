@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import os
 import unittest
-from unittest.mock import patch
 
 import pandas as pd
 
@@ -14,7 +12,6 @@ from holdout.round_splits import (
     round_holdout_split_name,
     select_round_holdout_tables,
 )
-from run_scripts.common import run_compirt_round_holdout as runner
 
 
 def linked_tables() -> dict[str, pd.DataFrame]:
@@ -126,29 +123,6 @@ class RoundHoldoutTests(unittest.TestCase):
             self.assertTrue(set(test[outcome_table]["game_id"]) <= test_games)
         self.assertNotIn("t2-unknown", train_games)
         self.assertIn("t2-unknown", test_games)
-
-    def test_wrapper_configures_existing_holdout_runner(self):
-        with patch.dict(
-            os.environ,
-            {
-                "BASE_SPLIT": "year_2024",
-                "ROUND_HOLDOUT_FRACTION": "0.2",
-                "MODEL": "multidim",
-            },
-            clear=True,
-        ):
-            train_split, test_split = runner.configure_round_holdout()
-            self.assertEqual(
-                train_split, "round-holdout:year_2024:train:0.2"
-            )
-            self.assertEqual(test_split, "round-holdout:year_2024:test:0.2")
-            self.assertIn("final-round-fraction/multidim", os.environ["ROOT"])
-
-    def test_wrapper_rejects_conflicting_explicit_splits(self):
-        with patch.dict(os.environ, {"TRAIN_SPLIT": "year_2024"}, clear=True):
-            with self.assertRaisesRegex(SystemExit, "derives TRAIN_SPLIT"):
-                runner.configure_round_holdout()
-
 
 if __name__ == "__main__":
     unittest.main()

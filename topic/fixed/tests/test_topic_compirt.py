@@ -19,7 +19,6 @@ from topic.fixed.topic_compirt.compositional import (
 from utils.training import fit_svi
 from topic.fixed.topic_compirt.evaluation import (
     _topic_difficulty_components,
-    topic_difficulty_components_plot,
     topic_first_buzz_distribution,
 )
 from topic.fixed.topic_compirt.pyramidal import (
@@ -37,9 +36,6 @@ from topic.fixed.topic_compirt.topics import (
 from topic.utils.categories import UNKNOWN, top_level_category
 from topic.utils.corpus import clean_text, tokenize
 from topic.utils.outputs import (
-    DEFAULT_LDA_OUTPUT_DIR,
-    DEFAULT_PLDA_OUTPUT_DIR,
-    DEFAULT_TOPIC_VECTORS,
     load_dimension_labels,
 )
 
@@ -193,14 +189,6 @@ class TopicVectorTests(unittest.TestCase):
 
 
 class TopicUtilityTests(unittest.TestCase):
-    def test_topic_output_defaults_use_stable_directories(self):
-        self.assertEqual(DEFAULT_PLDA_OUTPUT_DIR.name, "plda")
-        self.assertEqual(DEFAULT_LDA_OUTPUT_DIR.name, "lda")
-        self.assertEqual(
-            DEFAULT_TOPIC_VECTORS,
-            DEFAULT_PLDA_OUTPUT_DIR / "document_latent_vectors.csv",
-        )
-
     def test_tokenizer_strips_html_and_boilerplate(self):
         text = (
             "<p>Napoleon&nbsp;called this question. The author and her people "
@@ -333,59 +321,6 @@ class TopicWeightedMathTests(unittest.TestCase):
             per_topic, [[1.0, 1.0, 1.0], [3.0, 3.0, 3.0]]
         )
         np.testing.assert_allclose(weighted, [2.5, 2.5, 2.5])
-
-    def test_topic_difficulty_components_plot_writes_companion_png(self):
-        directory = tempfile.TemporaryDirectory()
-        self.addCleanup(directory.cleanup)
-        results_dir = Path(directory.name) / "pyramidal"
-        output_dir = Path(directory.name) / "evaluation"
-        results_dir.mkdir()
-
-        pd.DataFrame(
-            [
-                {
-                    "tossup_id": "q1",
-                    "beta_1": 2.0,
-                    "beta_2": 6.0,
-                    "gamma_1": 0.0,
-                    "gamma_2": 0.0,
-                    "mu_1": 0.5,
-                    "mu_2": 0.5,
-                    "topic_weight_1": 0.25,
-                    "topic_weight_2": 0.75,
-                }
-            ]
-        ).to_csv(results_dir / "tossups.csv", index=False)
-        pd.DataFrame(
-            [
-                {
-                    "event_id": "e1",
-                    "tossup_id": "q1",
-                    "z": "BUZZ",
-                    "relative_position": 0.25,
-                },
-                {
-                    "event_id": "e2",
-                    "tossup_id": "q1",
-                    "z": "BUZZ",
-                    "relative_position": 0.75,
-                },
-                {
-                    "event_id": "e3",
-                    "tossup_id": "q1",
-                    "z": "WAIT",
-                    "relative_position": 0.9,
-                },
-            ]
-        ).to_csv(results_dir / "tossup_predictions.csv", index=False)
-
-        topic_difficulty_components_plot(
-            results_dir, output_dir, {1: "Topic A", 2: "Topic B"}
-        )
-
-        graph = output_dir / "graphs" / "tossup" / "tossup_difficulty_curves_by_topic.png"
-        self.assertTrue(graph.exists())
-        self.assertGreater(graph.stat().st_size, 0)
 
     def test_pyramidal_svi_posterior_uses_vector_difficulty_without_alpha(self):
         data = {

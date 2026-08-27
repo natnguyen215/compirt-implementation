@@ -40,6 +40,13 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from holdout.game_splits import game_holdout_split_name
+from holdout.aggregate_reports import (
+    add_in_sample_correctness_metrics,
+    add_in_sample_main_table_fold_means,
+    add_main_table_fold_means,
+    pooled_correctness_metrics,
+    write_correctness_markdown,
+)
 from utils.run_logging import resolve_result_root
 
 PYTHON = Path(os.environ.get("PYTHON", str(REPO_ROOT / ".venv" / "bin" / "python")))
@@ -147,6 +154,36 @@ def aggregate_folds(root: str, n_folds: int) -> None:
     (aggregate_dir / "summary.md").write_text(
         "\n".join(summary_lines).rstrip() + "\n", encoding="utf-8"
     )
+    run_dirs = [
+        Path(root) / f"fold_{fold}"
+        for fold in range(n_folds)
+        if (
+            Path(root)
+            / f"fold_{fold}"
+            / "train"
+            / "pyramidal"
+            / "tossup_predictions.csv"
+        ).exists()
+        and (
+            Path(root)
+            / f"fold_{fold}"
+            / "holdout"
+            / "pyramidal"
+            / "tossup_predictions.csv"
+        ).exists()
+    ]
+    if run_dirs:
+        correctness: dict[str, object] = pooled_correctness_metrics(
+            run_dirs, split="holdout"
+        )
+        add_in_sample_correctness_metrics(correctness, run_dirs)
+        add_in_sample_main_table_fold_means(correctness, run_dirs)
+        add_main_table_fold_means(correctness, run_dirs)
+        write_correctness_markdown(
+            correctness,
+            aggregate_dir / "correctness_metrics.md",
+            title=f"{Path(root).name} correctness summary",
+        )
     print(f"Aggregated metrics in {aggregate_dir}")
 
 

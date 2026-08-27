@@ -1,0 +1,124 @@
+{
+  "approximation": "Pyro AutoNormal variational posterior",
+  "mean_field": true,
+  "quantile_probabilities": [
+    0.025,
+    0.5,
+    0.975
+  ],
+  "draws": 0,
+  "draw_seed": 42,
+  "estimated_draw_bytes": 0,
+  "draw_alignment": "The same leading draw index across every site file is one joint variational-posterior draw.",
+  "interpretation": "Intervals are approximate SVI credible intervals conditional on this model and fitted dataset; they are not bootstrap intervals.",
+  "sites": {
+    "theta": {
+      "shape": [
+        1455,
+        3
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "theta",
+      "draw_file": null
+    },
+    "c": {
+      "shape": [
+        1455
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "c",
+      "draw_file": null
+    },
+    "curve_location_correct": {
+      "shape": [],
+      "dtype": "float32",
+      "quantile_prefix": "curve_location_correct",
+      "draw_file": null
+    },
+    "curve_location_hazard": {
+      "shape": [],
+      "dtype": "float32",
+      "quantile_prefix": "curve_location_hazard",
+      "draw_file": null
+    },
+    "skill_weights": {
+      "shape": [
+        1260,
+        3
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "skill_weights",
+      "draw_file": null
+    },
+    "discrimination": {
+      "shape": [
+        1260
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "discrimination",
+      "draw_file": null
+    },
+    "start_difficulty_correct": {
+      "shape": [
+        1260
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "start_difficulty_correct",
+      "draw_file": null
+    },
+    "total_drop_correct": {
+      "shape": [
+        1260
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "total_drop_correct",
+      "draw_file": null
+    },
+    "drop_proportions_correct": {
+      "shape": [
+        1260,
+        3
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "drop_proportions_correct",
+      "draw_file": null
+    },
+    "start_difficulty_hazard": {
+      "shape": [
+        1260
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "start_difficulty_hazard",
+      "draw_file": null
+    },
+    "total_drop_hazard": {
+      "shape": [
+        1260
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "total_drop_hazard",
+      "draw_file": null
+    },
+    "drop_proportions_hazard": {
+      "shape": [
+        1260,
+        3
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "drop_proportions_hazard",
+      "draw_file": null
+    },
+    "end_correct": {
+      "shape": [],
+      "dtype": "float32",
+      "quantile_prefix": "end_correct",
+      "draw_file": null
+    },
+    "end_hazard": {
+      "shape": [],
+      "dtype": "float32",
+      "quantile_prefix": "end_hazard",
+      "draw_file": null
+    }
+  }
+}

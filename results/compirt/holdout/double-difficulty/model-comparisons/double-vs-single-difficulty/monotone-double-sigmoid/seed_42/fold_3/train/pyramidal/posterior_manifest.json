@@ -1,0 +1,105 @@
+{
+  "approximation": "Pyro AutoNormal variational posterior",
+  "mean_field": true,
+  "quantile_probabilities": [
+    0.025,
+    0.5,
+    0.975
+  ],
+  "draws": 100,
+  "draw_seed": 42,
+  "estimated_draw_bytes": 23652000,
+  "draw_alignment": "The same leading draw index across every site file is one joint variational-posterior draw.",
+  "interpretation": "Intervals are approximate SVI credible intervals conditional on this model and fitted dataset; they are not bootstrap intervals.",
+  "sites": {
+    "theta": {
+      "shape": [
+        1455,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "theta",
+      "draw_file": "posterior_draws/theta.npy"
+    },
+    "c": {
+      "shape": [
+        1455
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "c",
+      "draw_file": "posterior_draws/c.npy"
+    },
+    "r_correct": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "r_correct",
+      "draw_file": "posterior_draws/r_correct.npy"
+    },
+    "r_hazard": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "r_hazard",
+      "draw_file": "posterior_draws/r_hazard.npy"
+    },
+    "beta_correct": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "beta_correct",
+      "draw_file": "posterior_draws/beta_correct.npy"
+    },
+    "gamma_correct": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "gamma_correct",
+      "draw_file": "posterior_draws/gamma_correct.npy"
+    },
+    "mu_correct": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "mu_correct",
+      "draw_file": "posterior_draws/mu_correct.npy"
+    },
+    "beta_hazard": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "beta_hazard",
+      "draw_file": "posterior_draws/beta_hazard.npy"
+    },
+    "gamma_hazard": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "gamma_hazard",
+      "draw_file": "posterior_draws/gamma_hazard.npy"
+    },
+    "mu_hazard": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "mu_hazard",
+      "draw_file": "posterior_draws/mu_hazard.npy"
+    }
+  }
+}

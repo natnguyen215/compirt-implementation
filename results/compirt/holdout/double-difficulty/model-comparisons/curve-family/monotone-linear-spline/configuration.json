@@ -1,0 +1,21 @@
+{
+  "root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/model-comparisons/curve-family/monotone-linear-spline",
+  "base_split": "year_2024",
+  "folds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "split_seed": 42,
+  "optimization_seed": 42,
+  "dimensions": 5,
+  "steps": 3000,
+  "lr": 0.01,
+  "device": "cuda",
+  "posterior_draws": 0,
+  "data_dir": null,
+  "calibrate_correctness": false,
+  "include_bounceback": false
+}

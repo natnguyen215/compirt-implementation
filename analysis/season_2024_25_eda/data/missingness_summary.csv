@@ -1,0 +1,17 @@
+table,field,rows,missing,missing_rate
+tossups,category,1360,0,0.000000
+tossups,subcategory,1360,398,0.292647
+tossups,answer,1360,0,0.000000
+tossups,tokens,1360,0,0.000000
+tossups,sentence_boundaries,1360,0,0.000000
+bonuses,category,1359,0,0.000000
+bonuses,subcategory,1359,398,0.292862
+bonuses,leadin,1359,0,0.000000
+bonuses,parts,1359,0,0.000000
+bonus_responses,earning_player_id,49042,10892,0.222095
+teams,team_name,492,0,0.000000
+teams,player_ids,492,0,0.000000
+tournaments,level,33,0,0.000000
+tournaments,location,33,0,0.000000
+tournaments,start_date,33,0,0.000000
+tournaments,end_date,33,0,0.000000

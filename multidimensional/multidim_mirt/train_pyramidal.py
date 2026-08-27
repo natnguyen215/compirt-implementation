@@ -130,6 +130,7 @@ def run_experiment(args):
             "data": data,
             "n_dimensions": args.dimensions,
             "calibrate_correctness": args.calibrate_correctness,
+            "calibrate_scale": not args.calibration_no_scale,
             "link": args.difficulty_link,
         },
         n_steps=args.steps,
@@ -149,7 +150,11 @@ def run_experiment(args):
 
     # Attach fitted predictions back onto the readable observation rows.
     correct, hazard, survival = posterior_row_predictions(
-        data, posterior, args.calibrate_correctness, args.difficulty_link
+        data,
+        posterior,
+        args.calibrate_correctness,
+        args.difficulty_link,
+        calibrate_scale=not args.calibration_no_scale,
     )
     buzz_expected = expected_first_buzz_positions(
         data, posterior, args.difficulty_link
@@ -166,6 +171,7 @@ def run_experiment(args):
             "data": data,
             "n_dimensions": args.dimensions,
             "calibrate_correctness": args.calibrate_correctness,
+            "calibrate_scale": not args.calibration_no_scale,
             "link": args.difficulty_link,
         },
         draws=args.ppc_draws,
@@ -186,6 +192,7 @@ def run_experiment(args):
         "tossups": len(data["tossup_ids"]),
         "events": len(data["event_ids"]),
         "calibrate_correctness": args.calibrate_correctness,
+        "calibration_no_scale": args.calibration_no_scale,
         "include_bounceback": args.include_bounceback,
         "observation_counts": observations["z"].value_counts().to_dict(),
     }
@@ -214,6 +221,12 @@ def parse_args():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     parser.add_argument("--calibrate-correctness", action="store_true")
+    parser.add_argument(
+        "--calibration-no-scale",
+        action="store_true",
+        help="with --calibrate-correctness, recalibrate with an additive bias "
+        "only, keeping the multiplicative scale out of the correctness logit",
+    )
     parser.add_argument(
         "--include-bounceback",
         action="store_true",

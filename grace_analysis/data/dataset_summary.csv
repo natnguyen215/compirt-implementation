@@ -1,0 +1,24 @@
+component,metric,value
+live_competition,packets_in_public_archive,12
+live_competition,questions_in_public_archive,240
+live_competition,recorded_buzz_events,1749
+live_competition,teams_with_recorded_buzz,20
+live_competition,human_team_ids,17
+live_competition,model_team_ids,3
+live_competition,raw_category_labels,24
+live_competition,normalized_category_groups,6
+live_competition,globally_unique_tossup_ids,239
+live_competition,individual_player_count,not derivable: player mapping is empty
+paper_context,competitions,3
+paper_context,matches,93
+paper_context,human_vs_model_matches,55
+paper_context,human_vs_human_matches,38
+paper_context,qa_pairs_including_tiebreakers,243
+qanta_reference_corpus,questions,19612
+qanta_reference_corpus,unique_qanta_ids,19612
+qanta_reference_corpus,categories,11
+qanta_reference_corpus,tournaments,191
+qanta_reference_corpus,earliest_year,1997
+qanta_reference_corpus,latest_year,2015
+qanta_reference_corpus,duplicate_question_text_rows,91
+qanta_reference_corpus,missing_wikipedia_pages,651

@@ -23,15 +23,8 @@ from compirt_data import (
     tossup_tensors,
 )
 from lineup import LineupIndex
-from compirt_eval.scenario_b_bonuses.distributions import bonus_parameter_distribution_plots
 from compirt_eval.scenario_b_bonuses.evaluation import evaluate_bonuses
 from compirt_eval.scenario_b_bonuses.metrics import bonus_metrics
-from compirt_eval.scenario_a_tossups import (
-    buzz_density_fit_plot,
-    difficulty_plot,
-    multidim_difficulty_components_plot,
-    pyramidal_parameter_distribution_plots,
-)
 from compirt_eval.scenario_a_tossups.parameters import (
     _multidim_difficulty_components,
     _parameter_columns,
@@ -597,69 +590,60 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(tuple(posterior["gamma"].shape), (1, 2))
         self.assertEqual(tuple(posterior["mu"].shape), (1, 2))
 
-    def test_multidim_calibration_replays_only_correctness(self):
+    def test_calibration_replays_only_correctness(self):
+        """`correctness_scale`/`bias` must rescale correctness and nothing else.
+
+        Both families share the contract: replaying with calibration on leaves
+        the buzz hazard and survival untouched, because the calibration is a
+        read-out transform, not part of the fitted timing model.
+        """
         data = {
             "player": torch.tensor([0]),
             "tossup": torch.tensor([0]),
             "t_star": torch.tensor([1]),
             "T_j": torch.tensor([2]),
         }
-        posterior = {
-            "theta": torch.tensor([[0.0, 0.0]]),
-            "c": torch.tensor([0.0]),
-            "r": torch.tensor([[1.0, 1.0]]),
-            "beta": torch.tensor([[0.0, 0.0]]),
-            "gamma": torch.tensor([[1.0, 1.0]]),
-            "mu": torch.tensor([[0.5, 0.5]]),
+        calibration = {
             "correctness_scale": torch.tensor(2.0),
             "correctness_bias": torch.tensor(1.0),
         }
-
-        raw_correctness, raw_hazard, raw_survival = multidim_posterior_row_predictions(
-            data, posterior
-        )
-        cal_correctness, cal_hazard, cal_survival = multidim_posterior_row_predictions(
-            data, posterior, calibrate_correctness=True
-        )
-
-        self.assertAlmostEqual(float(raw_correctness), 0.5)
-        self.assertAlmostEqual(
-            float(cal_correctness), float(torch.sigmoid(torch.tensor(1.0)))
-        )
-        self.assertTrue(torch.allclose(raw_hazard, cal_hazard))
-        self.assertTrue(torch.allclose(raw_survival, cal_survival))
-
-    def test_pyramidal_calibration_replays_only_correctness(self):
-        data = {
-            "player": torch.tensor([0]),
-            "tossup": torch.tensor([0]),
-            "t_star": torch.tensor([1]),
-            "T_j": torch.tensor([2]),
-        }
-        posterior = {
-            "theta": torch.tensor([[0.0]]),
-            "c": torch.tensor([0.0]),
-            "alpha": torch.tensor([[0.0]]),
-            "beta": torch.tensor([0.0]),
-            "gamma": torch.tensor([1.0]),
-            "mu": torch.tensor([0.5]),
-            "correctness_scale": torch.tensor(2.0),
-            "correctness_bias": torch.tensor(1.0),
+        families = {
+            "multidim": (
+                multidim_posterior_row_predictions,
+                {
+                    "theta": torch.tensor([[0.0, 0.0]]),
+                    "c": torch.tensor([0.0]),
+                    "r": torch.tensor([[1.0, 1.0]]),
+                    "beta": torch.tensor([[0.0, 0.0]]),
+                    "gamma": torch.tensor([[1.0, 1.0]]),
+                    "mu": torch.tensor([[0.5, 0.5]]),
+                },
+            ),
+            "pyramidal": (
+                posterior_row_predictions,
+                {
+                    "theta": torch.tensor([[0.0]]),
+                    "c": torch.tensor([0.0]),
+                    "alpha": torch.tensor([[0.0]]),
+                    "beta": torch.tensor([0.0]),
+                    "gamma": torch.tensor([1.0]),
+                    "mu": torch.tensor([0.5]),
+                },
+            ),
         }
 
-        raw_correctness, raw_hazard, raw_survival = posterior_row_predictions(
-            data, posterior
-        )
-        cal_correctness, cal_hazard, cal_survival = posterior_row_predictions(
-            data, posterior, calibrate_correctness=True
-        )
+        for family, (predict, parameters) in families.items():
+            with self.subTest(family=family):
+                posterior = {**parameters, **calibration}
+                raw = predict(data, posterior)
+                calibrated = predict(data, posterior, calibrate_correctness=True)
 
-        self.assertAlmostEqual(float(raw_correctness), 0.5)
-        self.assertAlmostEqual(
-            float(cal_correctness), float(torch.sigmoid(torch.tensor(1.0)))
-        )
-        self.assertTrue(torch.allclose(raw_hazard, cal_hazard))
-        self.assertTrue(torch.allclose(raw_survival, cal_survival))
+                self.assertAlmostEqual(float(raw[0]), 0.5)
+                self.assertAlmostEqual(
+                    float(calibrated[0]), float(torch.sigmoid(torch.tensor(1.0)))
+                )
+                self.assertTrue(torch.allclose(raw[1], calibrated[1]))
+                self.assertTrue(torch.allclose(raw[2], calibrated[2]))
 
     def test_expected_buzz_position_conditions_on_a_buzz(self):
         data = {
@@ -899,89 +883,15 @@ class ModelTests(unittest.TestCase):
         self.assertAlmostEqual(float(mass[0]), expected_hazard)
         self.assertAlmostEqual(dead, 1 - expected_hazard)
 
-    def test_multidim_difficulty_components_plot_writes_graph(self):
+    def test_biased_tanh_difficulty_uses_saved_bias_and_scale(self):
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            results_dir = root / "pyramidal"
-            output_dir = root / "evaluation"
+            results_dir = Path(directory) / "pyramidal"
             results_dir.mkdir()
-            pd.DataFrame(
-                {
-                    "tossup_id": ["q1", "q2"],
-                    "r_1": [0.25, 0.4],
-                    "r_2": [0.75, 0.6],
-                    "beta_1": [2.0, 2.5],
-                    "beta_2": [4.0, 3.5],
-                    "gamma_1": [3.0, 3.0],
-                    "gamma_2": [5.0, 5.0],
-                    "mu_1": [0.35, 0.4],
-                    "mu_2": [0.7, 0.65],
-                }
-            ).to_csv(results_dir / "tossups.csv", index=False)
-            pd.DataFrame(
-                [
-                    {
-                        "event_id": "e1",
-                        "tossup_id": "q1",
-                        "z": "BUZZ",
-                        "relative_position": 0.25,
-                    },
-                    {
-                        "event_id": "e2",
-                        "tossup_id": "q1",
-                        "z": "BUZZ",
-                        "relative_position": 0.75,
-                    },
-                    {
-                        "event_id": "e3",
-                        "tossup_id": "q2",
-                        "z": "BUZZ",
-                        "relative_position": 0.4,
-                    },
-                    {
-                        "event_id": "e4",
-                        "tossup_id": "q2",
-                        "z": "BUZZ",
-                        "relative_position": 0.6,
-                    },
-                ]
-            ).to_csv(results_dir / "tossup_predictions.csv", index=False)
-
-            multidim_difficulty_components_plot(
-                results_dir, output_dir, count=2, panels_per_figure=1
+            (results_dir / "summary.json").write_text(
+                '{"model": "multidim-tanhbias-competing-risks", '
+                '"difficulty_scale": 3.0}',
+                encoding="utf-8",
             )
-
-            graphs = output_dir / "graphs" / "tossup"
-            self.assertFalse(
-                (graphs / "tossup_difficulty_curves_by_dimension.png").exists()
-            )
-            self.assertTrue(
-                (graphs / "tossup_difficulty_curves_by_dimension_01.png").exists()
-            )
-            self.assertTrue(
-                (graphs / "tossup_difficulty_curves_by_dimension_02.png").exists()
-            )
-
-            multidim_difficulty_components_plot(
-                results_dir, output_dir, count=1, panels_per_figure=1
-            )
-
-            graph = graphs / "tossup_difficulty_curves_by_dimension.png"
-            self.assertTrue(graph.exists())
-            self.assertGreater(graph.stat().st_size, 0)
-            self.assertFalse(
-                (graphs / "tossup_difficulty_curves_by_dimension_01.png").exists()
-            )
-            self.assertFalse(
-                (graphs / "tossup_difficulty_curves_by_dimension_02.png").exists()
-            )
-
-    def test_biased_tanh_difficulty_plots_use_saved_bias_and_scale(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            results_dir = root / "pyramidal"
-            output_dir = root / "evaluation"
-            results_dir.mkdir()
             row = pd.Series(
                 {
                     "r_1": 0.25,
@@ -994,180 +904,43 @@ class ModelTests(unittest.TestCase):
                     "mu_2": 0.25,
                 }
             )
-            parameters = pd.DataFrame(
-                [
-                    {"tossup_id": "q1", **row.to_dict()},
-                    {"tossup_id": "q2", **row.to_dict()},
-                ]
-            )
-            parameters.to_csv(results_dir / "tossups.csv", index=False)
-            pd.DataFrame(
-                {
-                    "player_id": ["p1", "p2"],
-                    "c": [0.0, 0.25],
-                    "theta_1": [1.0, 0.5],
-                    "theta_2": [0.0, 1.0],
-                }
-            ).to_csv(results_dir / "players.csv", index=False)
-            pd.DataFrame(
-                [
-                    {
-                        "event_id": "e1",
-                        "tossup_id": "q1",
-                        "z": "BUZZ",
-                        "relative_position": 0.3,
-                    },
-                    {
-                        "event_id": "e2",
-                        "tossup_id": "q2",
-                        "z": "BUZZ",
-                        "relative_position": 0.7,
-                    },
-                ]
-            ).to_csv(results_dir / "tossup_predictions.csv", index=False)
-            (results_dir / "summary.json").write_text(
-                '{"model": "multidim-tanhbias-competing-risks", '
-                '"difficulty_scale": 3.0}',
-                encoding="utf-8",
-            )
 
             link = load_difficulty_link(results_dir)
             scale = load_difficulty_scale(results_dir)
-            positions = np.array([0.25, 0.5])
-            per_dimension, aggregate = _multidim_difficulty_components(
-                row, _parameter_columns(row), positions, link, scale
-            )
-            expected = 3.0 * np.tanh(
-                np.array([[2.0], [4.0]])
-                * (np.array([[0.5], [0.25]]) - positions)
-                + np.array([[0.0], [0.5]])
-            )
 
-            np.testing.assert_allclose(per_dimension, expected)
-            np.testing.assert_allclose(aggregate, np.array([0.25, 0.75]) @ expected)
+        positions = np.array([0.25, 0.5])
+        per_dimension, aggregate = _multidim_difficulty_components(
+            row, _parameter_columns(row), positions, link, scale
+        )
+        expected = 3.0 * np.tanh(
+            np.array([[2.0], [4.0]]) * (np.array([[0.5], [0.25]]) - positions)
+            + np.array([[0.0], [0.5]])
+        )
 
-            difficulty_plot(results_dir, output_dir)
-            multidim_difficulty_components_plot(results_dir, output_dir)
-            pyramidal_parameter_distribution_plots(results_dir, output_dir)
+        np.testing.assert_allclose(per_dimension, expected)
+        np.testing.assert_allclose(aggregate, np.array([0.25, 0.75]) @ expected)
 
-            for filename in (
-                "tossup_difficulty_curves.png",
-                "tossup_difficulty_curves_by_dimension.png",
-            ):
-                graph = output_dir / "graphs" / "tossup" / filename
-                self.assertTrue(graph.exists(), filename)
-                self.assertGreater(graph.stat().st_size, 0, filename)
+        players = pd.DataFrame(
+            {"theta_1": [0.0], "theta_2": [0.0], "c": [0.0]},
+            index=pd.Index(["p1"], name="player_id"),
+        )
+        tossups = pd.DataFrame(
+            [row], index=pd.Index(["q1"], name="tossup_id")
+        )
+        event = pd.DataFrame(
+            {"player_id": ["p1"], "tossup_id": ["q1"], "T_j": [2]}
+        )
+        scaled = event_first_buzz_components(
+            event, players, tossups, link=link, difficulty_scale=scale
+        )
+        unscaled = event_first_buzz_components(
+            event, players, tossups, link=link
+        )
+        self.assertFalse(
+            np.allclose(scaled["first_buzz_mass"], unscaled["first_buzz_mass"])
+        )
 
-            summary = pd.read_csv(
-                output_dir
-                / "csvs"
-                / "pyramidal_parameter_distribution_summary.csv"
-            )
-            reported = set(summary["parameter"])
-            self.assertTrue({"bias_1", "bias_2"}.issubset(reported))
-            bias_graph = (
-                output_dir / "graphs" / "parameters" / "pyramidal_tossup_parameter_distributions.png"
-            )
-            self.assertTrue(bias_graph.exists())
-            self.assertGreater(bias_graph.stat().st_size, 0)
-
-    def test_embedding_relevance_columns_enable_tossup_diagnostics(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            results_dir = root / "pyramidal"
-            output_dir = root / "evaluation"
-            results_dir.mkdir()
-            pd.DataFrame(
-                {
-                    "player_id": ["p1", "p2"],
-                    "c": [0.0, 0.25],
-                    "theta_1": [1.0, 0.5],
-                    "theta_2": [0.0, 1.0],
-                    "theta_norm": [1.0, math.sqrt(1.25)],
-                }
-            ).to_csv(results_dir / "players.csv", index=False)
-            pd.DataFrame(
-                {
-                    "tossup_id": ["q1", "q2"],
-                    "r_1": [0.25, 0.75],
-                    "r_2": [0.75, 0.25],
-                    "beta_1": [2.0, 3.0],
-                    "beta_2": [4.0, 1.5],
-                    "gamma_1": [3.0, 2.0],
-                    "gamma_2": [5.0, 4.0],
-                    "mu_1": [0.35, 0.45],
-                    "mu_2": [0.7, 0.65],
-                }
-            ).to_csv(results_dir / "tossups.csv", index=False)
-            pd.DataFrame(
-                [
-                    {
-                        "event_id": "e1",
-                        "player_id": "p1",
-                        "tossup_id": "q1",
-                        "z": "BUZZ",
-                        "relative_position": 0.25,
-                        "T_j": 10,
-                    },
-                    {
-                        "event_id": "e2",
-                        "player_id": "p2",
-                        "tossup_id": "q1",
-                        "z": "BUZZ",
-                        "relative_position": 0.75,
-                        "T_j": 10,
-                    },
-                    {
-                        "event_id": "e3",
-                        "player_id": "p1",
-                        "tossup_id": "q2",
-                        "z": "BUZZ",
-                        "relative_position": 0.5,
-                        "T_j": 10,
-                    },
-                ]
-            ).to_csv(results_dir / "tossup_predictions.csv", index=False)
-
-            difficulty_plot(results_dir, output_dir)
-            multidim_difficulty_components_plot(results_dir, output_dir)
-            buzz_density_fit_plot(results_dir, output_dir)
-            pyramidal_parameter_distribution_plots(results_dir, output_dir)
-
-            for filename in [
-                "tossup_difficulty_curves.png",
-                "tossup_difficulty_curves_by_dimension.png",
-                "tossup_buzz_density_fit.png",
-                "pyramidal_difficulty_curve_distribution.png",
-            ]:
-                graph = output_dir / "graphs" / "tossup" / filename
-                self.assertTrue(graph.exists(), filename)
-                self.assertGreater(graph.stat().st_size, 0, filename)
-
-    def test_embedding_relevance_columns_enable_bonus_parameter_diagnostics(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            results_dir = root / "compositional"
-            output_dir = root / "evaluation"
-            results_dir.mkdir()
-            pd.DataFrame(
-                {
-                    "bonus_part_id": ["b1::part-1", "b1::part-2"],
-                    "beta_1": [0.5, -0.25],
-                    "beta_2": [1.5, 0.75],
-                    "r_1": [0.25, 0.75],
-                    "r_2": [0.75, 0.25],
-                }
-            ).to_csv(results_dir / "bonus_parts.csv", index=False)
-
-            bonus_parameter_distribution_plots(results_dir, output_dir)
-
-            graph = output_dir / "graphs" / "parameters" / "bonus_part_parameter_distributions.png"
-            summary = output_dir / "csvs" / "bonus_parameter_distribution_summary.csv"
-            self.assertTrue(graph.exists())
-            self.assertGreater(graph.stat().st_size, 0)
-            self.assertIn("r_norm", pd.read_csv(summary)["parameter"].tolist())
-
-    def test_bonus_response_score_graph_has_population_accurate_name(self):
+    def test_bonus_score_probability_ledger_and_log_loss(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             results_dir = root / "compositional"
@@ -1193,11 +966,6 @@ class ModelTests(unittest.TestCase):
 
             metrics = evaluate_bonuses(results_dir, output_dir)
 
-            graph_dir = output_dir / "graphs" / "bonus"
-            self.assertTrue(
-                (graph_dir / "bonus_response_score_predictions.png").exists()
-            )
-            self.assertFalse((graph_dir / "bonus_ppb_predictions.png").exists())
             ledger = pd.read_csv(
                 output_dir / "csvs" / "bonus_score_probability_predictions.csv"
             )

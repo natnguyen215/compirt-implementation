@@ -6,22 +6,15 @@ import numpy as np
 import pandas as pd
 
 from compirt_eval.common.figures import (
+    density_panel_spec,
     distribution_dashboard,
     distribution_summary,
     labeled_series,
     numeric_columns,
+    vector_weight_columns,
     vector_weight_name,
 )
 from compirt_eval.common.report_paths import csv_path, graph_path
-
-
-def _vector_weight_columns(frame):
-    """Return bonus-part vector weights, accepting alpha_* or embedding r_*."""
-    alpha_columns = numeric_columns(frame, "alpha_")
-    relevance_columns = numeric_columns(frame, "r_")
-    if alpha_columns and relevance_columns:
-        raise ValueError("Saved vector weights must use either alpha_* or r_*, not both")
-    return alpha_columns or relevance_columns
 
 
 def _bonus_part_panels_and_summary(
@@ -33,51 +26,35 @@ def _bonus_part_panels_and_summary(
     norm_column = f"{weight_name}_norm"
     if "beta" in parts:
         panels.append(
-            {
-                "series": {"beta": parts["beta"]},
-                "title": "Bonus-part difficulty",
-                "xlabel": "beta",
-                "zero_line": True,
-                "bounds": None,
-            }
+            density_panel_spec(
+                parts["beta"], "Bonus-part difficulty", "beta", zero_line=True
+            )
         )
     if beta_columns:
         panels.append(
-            {
-                "series": labeled_series(parts, beta_columns, dimension_labels),
-                "title": "Bonus-part difficulty coordinates",
-                "xlabel": "beta",
-                "zero_line": True,
-                "bounds": None,
-            }
+            density_panel_spec(
+                labeled_series(parts, beta_columns, dimension_labels),
+                "Bonus-part difficulty coordinates",
+                "beta",
+                zero_line=True,
+            )
         )
     if weight_columns:
-        weight_title = (
-            "Bonus relevance coordinates"
-            if weight_name == "r"
-            else "Bonus discrimination coordinates"
-        )
-        norm_title = (
-            "Bonus relevance magnitude"
-            if weight_name == "r"
-            else "Bonus discrimination magnitude"
-        )
+        role = "relevance" if weight_name == "r" else "discrimination"
         panels.extend(
             [
-                {
-                    "series": labeled_series(parts, weight_columns, dimension_labels),
-                    "title": weight_title,
-                    "xlabel": weight_name,
-                    "zero_line": True,
-                    "bounds": None,
-                },
-                {
-                    "series": {norm_column: parts[norm_column]},
-                    "title": norm_title,
-                    "xlabel": f"{weight_name} norm",
-                    "zero_line": False,
-                    "bounds": (0, None),
-                },
+                density_panel_spec(
+                    labeled_series(parts, weight_columns, dimension_labels),
+                    f"Bonus {role} coordinates",
+                    weight_name,
+                    zero_line=True,
+                ),
+                density_panel_spec(
+                    parts[norm_column],
+                    f"Bonus {role} magnitude",
+                    f"{weight_name} norm",
+                    bounds=(0, None),
+                ),
             ]
         )
     rows = []
@@ -106,20 +83,18 @@ def _synergy_panels_and_summary(results_dir):
             )
             panels.extend(
                 [
-                    {
-                        "series": {column: profiles[column] for column in psi_columns},
-                        "title": "Synergy profile coordinates",
-                        "xlabel": "psi",
-                        "zero_line": True,
-                        "bounds": None,
-                    },
-                    {
-                        "series": {"psi_norm": profiles["psi_norm"]},
-                        "title": "Synergy profile magnitude",
-                        "xlabel": "psi norm",
-                        "zero_line": False,
-                        "bounds": (0, None),
-                    },
+                    density_panel_spec(
+                        profiles[psi_columns],
+                        "Synergy profile coordinates",
+                        "psi",
+                        zero_line=True,
+                    ),
+                    density_panel_spec(
+                        profiles["psi_norm"],
+                        "Synergy profile magnitude",
+                        "psi norm",
+                        bounds=(0, None),
+                    ),
                 ]
             )
             for column in [*psi_columns, "psi_norm"]:
@@ -145,13 +120,7 @@ def _synergy_panels_and_summary(results_dir):
             frame = pd.read_csv(path)
             if column in frame:
                 panels.append(
-                    {
-                        "series": {column: frame[column]},
-                        "title": title,
-                        "xlabel": xlabel,
-                        "zero_line": True,
-                        "bounds": None,
-                    }
+                    density_panel_spec(frame[column], title, xlabel, zero_line=True)
                 )
                 summary = distribution_summary("synergy", column, frame[column])
                 if summary:
@@ -168,7 +137,7 @@ def bonus_parameter_distribution_plots(
         return
     parts = pd.read_csv(part_path)
     beta_columns = numeric_columns(parts, "beta_")
-    weight_columns = _vector_weight_columns(parts)
+    weight_columns = vector_weight_columns(parts)
     weight_name = vector_weight_name(weight_columns)
     norm_column = f"{weight_name}_norm"
     if weight_columns:

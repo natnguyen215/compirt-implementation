@@ -37,11 +37,11 @@ TABLES = (
 def load_hf_tables(data_dir: str | Path = DEFAULT_DATA_DIR, split: str = "all"):
     """Load every linked HuggingFace table as a pandas DataFrame.
 
-    'split' is '"all"', a year split such as '"year_2024"', a derived
-    final-round split such as '"round-holdout:year_2024:test:0.2"', or a derived
-    stratified whole-game split such as
-    '"game-holdout:year_2024:test:5:0:42"'. The returned dict is keyed by table
-    name ('tables["games"]', etc.).
+    'split' is '"all"', a year split such as '"year_2024"', an academic-season
+    split such as '"season_2024_25"', a derived final-round split such as
+    '"round-holdout:year_2024:test:0.2"', or a derived stratified whole-game
+    split such as '"game-holdout:year_2024:test:5:0:42"'. The returned dict is
+    keyed by table name ('tables["games"]', etc.).
     """
     from holdout.round_splits import (
         parse_round_holdout_split,
@@ -50,6 +50,11 @@ def load_hf_tables(data_dir: str | Path = DEFAULT_DATA_DIR, split: str = "all"):
     from holdout.game_splits import (
         parse_game_holdout_split,
         select_game_holdout_tables,
+    )
+    from holdout.season_splits import (
+        SEASON_BASE_SPLIT,
+        parse_season_split,
+        select_season_tables,
     )
 
     data_dir = Path(data_dir)
@@ -61,11 +66,20 @@ def load_hf_tables(data_dir: str | Path = DEFAULT_DATA_DIR, split: str = "all"):
         disk_split = game_spec.base_split
     else:
         disk_split = split
+    # Seasons span calendar years, so they are carved out of "all" in memory
+    # rather than read from a disk split of their own.
+    season = parse_season_split(disk_split)
+    if season is not None:
+        disk_split = SEASON_BASE_SPLIT
     # Each table is its own DatasetDict directory; pandas is easier to join.
     tables = {
         name: load_from_disk(str(data_dir / name))[disk_split].to_pandas()
         for name in TABLES
     }
+    if season is not None:
+        # Applied before any derived selection so folds are drawn within the
+        # season, not within the whole corpus.
+        tables = select_season_tables(tables, season)
     if round_spec is not None:
         return select_round_holdout_tables(
             tables, round_spec.part, round_spec.fraction

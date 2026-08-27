@@ -15,7 +15,8 @@ index, call those replay functions, and hand the results to the existing
 ``save_*`` writers.  The output directories are byte-schema-identical to a
 trainer's, so ``evaluate_compirt`` consumes them unchanged.
 
-The active model family is ``multidim`` (per-dimension tossup difficulty).
+The tossup scorer auto-detects the supported multidimensional, spline, and
+Bernstein schemas. Bonus replay remains the standard compositional family.
 
 Usage::
 
@@ -34,8 +35,11 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
+import numpy as np
 import pandas as pd
 import torch
 
@@ -53,14 +57,57 @@ from compirt_data import (
     tossup_tensors,
 )
 from compositional_model import posterior_predictions
-from multidimensional.multidim_mirt.pyramidal_model import (
-    expected_first_buzz_positions,
-    posterior_row_predictions,
-)
+from multidimensional.multidim_mirt import pyramidal_model as multidim_model
 from train_compositional import load_player_skills
 from multidimensional.multidim_mirt.train_pyramidal import save_multidim_parameters
+from polynomial_compirt import pyramidal_model as polynomial_model
+from polynomial_compirt.train_pyramidal import save_polynomial_parameters
+from hazard_double_difficulty.bernstein import pyramidal_model as full_bernstein_model
+from hazard_double_difficulty.compact_bernstein import (
+    pyramidal_model as compact_bernstein_model,
+)
+from hazard_double_difficulty.perceived_difficulty_bernstein import (
+    pyramidal_model as perceived_difficulty_bernstein_model,
+)
+from hazard_double_difficulty.perceived_logit_bernstein import (
+    pyramidal_model as perceived_logit_bernstein_model,
+)
+from hazard_double_difficulty.multidim import pyramidal_model as double_sigmoid_model
+from hazard_double_difficulty.bernstein.train_pyramidal import (
+    save_double_difficulty_parameters as save_full_bernstein_parameters,
+)
+from hazard_double_difficulty.compact_bernstein.train_pyramidal import (
+    save_compact_parameters,
+)
+from hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal import (
+    save_perceived_parameters,
+)
+from hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal import (
+    save_perceived_logit_parameters,
+)
+from hazard_double_difficulty.multidim.train_pyramidal import (
+    save_double_difficulty_parameters as save_double_sigmoid_parameters,
+)
+from dd_linear_spline.clues import attach_spline_knot_positions
+from dd_linear_spline import pyramidal_model as linear_spline_model
+from dd_linear_spline.train_pyramidal import (
+    save_spline_parameters as save_linear_spline_parameters,
+)
 from utils.saving import save_bonus_predictions, save_tossup_predictions
 from utils.training import require_device
+
+
+FULL_BERNSTEIN = "full-double-bernstein"
+COMPACT_BERNSTEIN = "compact-double-bernstein"
+POLYNOMIAL_BERNSTEIN = "single-curve-bernstein"
+PERCEIVED_DIFFICULTY_BERNSTEIN = "perceived-difficulty-bernstein"
+PERCEIVED_DIFFICULTY_SLICED_BERNSTEIN = (
+    "perceived-difficulty-sliced-bernstein"
+)
+PERCEIVED_LOGIT_BERNSTEIN = "perceived-logit-bernstein"
+DOUBLE_SIGMOID = "monotone-double-sigmoid"
+MULTIDIM = "multidim"
+LINEAR_SPLINE = "dd-linear-spline"
 
 
 # --- aligned parameter loaders ------------------------------------------------
@@ -99,15 +146,403 @@ def _aligned_vector(frame: pd.DataFrame, id_column: str, ids, column: str, devic
     return torch.tensor(values, dtype=torch.float32, device=device)
 
 
+def detect_tossup_parameter_schema(
+    tossups: pd.DataFrame, players: pd.DataFrame | None = None
+) -> str:
+    """Detect frozen-replay schemas, preserving the multidim default."""
+    columns = set(tossups.columns)
+    if "hazard_spline_y_0_d1" in columns:
+        return LINEAR_SPLINE
+    if "start_difficulty" in columns and "hazard_start_difficulty" in columns:
+        return COMPACT_BERNSTEIN
+    if "hazard_start_difficulty_d1" in columns:
+        return FULL_BERNSTEIN
+    if (
+        players is not None
+        and {"alpha", "beta"}.issubset(players.columns)
+        and "start_difficulty_d1" in columns
+    ):
+        return PERCEIVED_LOGIT_BERNSTEIN
+    if (
+        players is not None
+        and {"alpha_first_1", "beta_first_1"}.issubset(players.columns)
+        and "start_difficulty_d1" in columns
+    ):
+        return PERCEIVED_DIFFICULTY_SLICED_BERNSTEIN
+    if (
+        players is not None
+        and {"alpha_1", "beta_1"}.issubset(players.columns)
+        and "start_difficulty_d1" in columns
+    ):
+        return PERCEIVED_DIFFICULTY_BERNSTEIN
+    if "start_difficulty_d1" in columns:
+        return POLYNOMIAL_BERNSTEIN
+    if "hazard_beta_1" in columns:
+        return DOUBLE_SIGMOID
+    return MULTIDIM
+
+
+def _tossup_matrix(tossups, data, prefix, dimensions, device):
+    """Return one numbered ``prefix_1..K`` block aligned to the test tossups."""
+    return _aligned_matrix(
+        tossups,
+        "tossup_id",
+        data["tossup_ids"],
+        _numbered_columns(tossups, prefix, dimensions),
+        device,
+    )
+
+
+def _both_curves(load_curve):
+    """Run a curve loader over both branches and key it the way models expect.
+
+    Correctness columns are saved unprefixed and hazard columns under
+    ``hazard_``; the posterior keys they map to carry the matching suffix.
+    """
+    posterior = {}
+    for prefix, suffix in (("", "correct"), ("hazard_", "hazard")):
+        start, total, shares = load_curve(prefix)
+        posterior[f"start_difficulty_{suffix}"] = start
+        posterior[f"total_drop_{suffix}"] = total
+        posterior[f"drop_proportions_{suffix}"] = shares
+    return posterior
+
+
+def _double_relevance(tossups, data, dimensions, device):
+    """Load the two relevance vectors the vector double-difficulty families save."""
+    return {
+        f"r_{suffix}": _tossup_matrix(tossups, data, prefix, dimensions, device)
+        for prefix, suffix in (("r", "correct"), ("hazard_r", "hazard"))
+    }
+
+
+def _aligned_bernstein_curve(frame, ids, prefix, dimensions, degree, device):
+    indexed = frame.set_index(frame["tossup_id"].astype(str)).loc[list(ids)]
+    dimension_range = range(1, dimensions + 1)
+    start = [f"{prefix}start_difficulty_d{k}" for k in dimension_range]
+    total = [f"{prefix}total_drop_d{k}" for k in dimension_range]
+    shares = [
+        f"{prefix}drop_share_{m}_d{k}"
+        for k in dimension_range
+        for m in range(1, degree + 1)
+    ]
+    return (
+        torch.tensor(indexed[start].to_numpy(dtype="float32"), device=device),
+        torch.tensor(indexed[total].to_numpy(dtype="float32"), device=device),
+        torch.tensor(
+            indexed[shares]
+            .to_numpy(dtype="float32")
+            .reshape(len(indexed), dimensions, degree),
+            device=device,
+        ),
+    )
+
+
+def _load_full_bernstein_parameters(tossups, data, dimensions, device):
+    degree = sum(
+        column.startswith("drop_share_") and column.endswith("_d1")
+        for column in tossups.columns
+    )
+    return {
+        **_double_relevance(tossups, data, dimensions, device),
+        **_both_curves(
+            lambda prefix: _aligned_bernstein_curve(
+                tossups, data["tossup_ids"], prefix, dimensions, degree, device
+            )
+        ),
+    }
+
+
+def _aligned_scalar_bernstein_curve(frame, ids, prefix, degree, device):
+    indexed = frame.set_index(frame["tossup_id"].astype(str)).loc[list(ids)]
+    shares = [f"{prefix}drop_share_{m}" for m in range(1, degree + 1)]
+    return (
+        torch.tensor(
+            indexed[f"{prefix}start_difficulty"].to_numpy(dtype="float32"),
+            device=device,
+        ),
+        torch.tensor(
+            indexed[f"{prefix}total_drop"].to_numpy(dtype="float32"),
+            device=device,
+        ),
+        torch.tensor(indexed[shares].to_numpy(dtype="float32"), device=device),
+    )
+
+
+def _load_compact_bernstein_parameters(tossups, data, dimensions, device):
+    degree = sum(
+        column.startswith("drop_share_")
+        and column.removeprefix("drop_share_").isdigit()
+        for column in tossups.columns
+    )
+    effective_r = _tossup_matrix(tossups, data, "r", dimensions, device)
+    discrimination = effective_r.sum(-1)
+    if torch.any(discrimination <= 0):
+        raise ValueError("Compact Bernstein effective relevance must have positive sum")
+    return {
+        "skill_weights": effective_r / discrimination.unsqueeze(-1),
+        "discrimination": discrimination,
+        **_both_curves(
+            lambda prefix: _aligned_scalar_bernstein_curve(
+                tossups, data["tossup_ids"], prefix, degree, device
+            )
+        ),
+    }
+
+
+def _load_polynomial_parameters(tossups, data, dimensions, device):
+    degree = sum(
+        column.startswith("drop_share_") and column.endswith("_d1")
+        for column in tossups.columns
+    )
+    start, total_drop, shares = _aligned_bernstein_curve(
+        tossups, data["tossup_ids"], "", dimensions, degree, device
+    )
+    return {
+        "r": _tossup_matrix(tossups, data, "r", dimensions, device),
+        "start_difficulty": start,
+        "total_drop": total_drop,
+        "drop_proportions": shares,
+    }
+
+
+def _load_double_sigmoid_parameters(tossups, data, dimensions, device):
+    return {
+        **_double_relevance(tossups, data, dimensions, device),
+        **{
+            f"{name}_{suffix}": _tossup_matrix(
+                tossups, data, f"{prefix}{name}", dimensions, device
+            )
+            for prefix, suffix in (("", "correct"), ("hazard_", "hazard"))
+            for name in ("beta", "gamma", "mu")
+        },
+    }
+
+
+def _load_multidim_parameters(tossups, data, dimensions, device):
+    return {
+        name: _tossup_matrix(tossups, data, name, dimensions, device)
+        for name in ("r", "beta", "gamma", "mu")
+    }
+
+
+def _load_linear_spline_parameters(tossups, data, dimensions, device):
+    """Align saved variable-length knots and landmarks to frozen test tensors."""
+    indexed = tossups.assign(
+        tossup_id=tossups["tossup_id"].astype(str)
+    ).set_index("tossup_id").loc[list(data["tossup_ids"])]
+    if "clue_count" not in indexed:
+        raise ValueError("Linear-spline parameters are missing clue_count")
+    counts = indexed["clue_count"].to_numpy(dtype=int) + 1
+    max_knots = int(counts.max())
+    x_columns = [f"spline_knot_x_{knot}" for knot in range(max_knots)]
+    missing_x = [column for column in x_columns if column not in indexed]
+    if missing_x:
+        raise ValueError(f"Linear-spline knot columns {missing_x} missing")
+    positions_by_tossup = {
+        tossup_id: indexed.loc[tossup_id, x_columns[: counts[row]]]
+        .to_numpy(dtype=float)
+        .tolist()
+        for row, tossup_id in enumerate(data["tossup_ids"])
+    }
+    attach_spline_knot_positions(data, positions_by_tossup, device)
+
+    posterior = _double_relevance(tossups, data, dimensions, device)
+    for prefix, suffix in (("", "correct"), ("hazard_", "hazard")):
+        values = []
+        for row, tossup_id in enumerate(data["tossup_ids"]):
+            for knot in range(counts[row]):
+                columns = [
+                    f"{prefix}spline_y_{knot}_d{dimension}"
+                    for dimension in range(1, dimensions + 1)
+                ]
+                missing = [column for column in columns if column not in indexed]
+                if missing:
+                    raise ValueError(f"Linear-spline columns {missing} missing")
+                values.append(
+                    indexed.loc[tossup_id, columns].to_numpy(dtype="float32")
+                )
+        posterior[f"spline_y_{suffix}"] = torch.tensor(
+            np.asarray(values), dtype=torch.float32, device=device
+        )
+    return posterior
+
+
+@dataclass(frozen=True)
+class TossupSchema:
+    """How one saved Stage-1 family is loaded, replayed, and written back.
+
+    The flags say which optional arguments the family's replay functions take.
+    Bernstein curves carry their shape in the saved parameters, so only the
+    sigmoid families need ``--difficulty-link``.
+    """
+
+    load: Callable
+    model: object
+    save: Callable
+    calibration_aware: bool = False
+    link_aware: bool = False
+    perceived_players: bool = False
+    sliced_perceived_players: bool = False
+    scalar_perception: bool = False
+
+
+TOSSUP_SCHEMAS = {
+    PERCEIVED_LOGIT_BERNSTEIN: TossupSchema(
+        _load_polynomial_parameters,
+        perceived_logit_bernstein_model,
+        save_perceived_logit_parameters,
+        scalar_perception=True,
+    ),
+    PERCEIVED_DIFFICULTY_BERNSTEIN: TossupSchema(
+        _load_polynomial_parameters,
+        perceived_difficulty_bernstein_model,
+        save_perceived_parameters,
+        perceived_players=True,
+    ),
+    PERCEIVED_DIFFICULTY_SLICED_BERNSTEIN: TossupSchema(
+        _load_polynomial_parameters,
+        perceived_difficulty_bernstein_model,
+        save_perceived_parameters,
+        sliced_perceived_players=True,
+    ),
+    COMPACT_BERNSTEIN: TossupSchema(
+        _load_compact_bernstein_parameters,
+        compact_bernstein_model,
+        save_compact_parameters,
+    ),
+    LINEAR_SPLINE: TossupSchema(
+        _load_linear_spline_parameters,
+        linear_spline_model,
+        save_linear_spline_parameters,
+        calibration_aware=True,
+    ),
+    FULL_BERNSTEIN: TossupSchema(
+        _load_full_bernstein_parameters,
+        full_bernstein_model,
+        save_full_bernstein_parameters,
+        calibration_aware=True,
+    ),
+    POLYNOMIAL_BERNSTEIN: TossupSchema(
+        _load_polynomial_parameters,
+        polynomial_model,
+        save_polynomial_parameters,
+        calibration_aware=True,
+    ),
+    DOUBLE_SIGMOID: TossupSchema(
+        _load_double_sigmoid_parameters,
+        double_sigmoid_model,
+        save_double_sigmoid_parameters,
+        calibration_aware=True,
+        link_aware=True,
+    ),
+    MULTIDIM: TossupSchema(
+        _load_multidim_parameters,
+        multidim_model,
+        save_multidim_parameters,
+        calibration_aware=True,
+        link_aware=True,
+    ),
+}
+
+
+def _load_tossup_posterior(players, tossups, data, dimensions, device, schema):
+    """Assemble the shared player parameters plus one family's item parameters."""
+    posterior = {
+        "theta": _aligned_matrix(
+            players,
+            "player_id",
+            data["player_ids"],
+            _numbered_columns(players, "theta", dimensions),
+            device,
+        ),
+    }
+    family = TOSSUP_SCHEMAS[schema]
+    if family.scalar_perception:
+        posterior.update(
+            {
+                name: _aligned_vector(
+                    players, "player_id", data["player_ids"], name, device
+                )
+                for name in ("alpha", "beta")
+            }
+        )
+    elif family.sliced_perceived_players:
+        dimension_range = range(1, dimensions + 1)
+        for name in ("alpha", "beta"):
+            posterior[name] = torch.stack(
+                [
+                    _aligned_matrix(
+                        players,
+                        "player_id",
+                        data["player_ids"],
+                        [
+                            f"{name}_{slice_name}_{dimension}"
+                            for dimension in dimension_range
+                        ],
+                        device,
+                    )
+                    for slice_name in ("first", "middle", "last")
+                ],
+                dim=1,
+            )
+    elif family.perceived_players:
+        posterior.update(
+            {
+                name: _aligned_matrix(
+                    players,
+                    "player_id",
+                    data["player_ids"],
+                    _numbered_columns(players, name, dimensions),
+                    device,
+                )
+                for name in ("alpha", "beta")
+            }
+        )
+    else:
+        posterior["c"] = _aligned_vector(
+            players, "player_id", data["player_ids"], "c", device
+        )
+        if schema == FULL_BERNSTEIN and "a" in players.columns:
+            posterior["a"] = _aligned_vector(
+                players, "player_id", data["player_ids"], "a", device
+            )
+    posterior.update(family.load(tossups, data, dimensions, device))
+    return posterior
+
+
+def _load_terminal_intercepts(summary_path: Path, device):
+    """Return a fit's saved final-cell intercepts, if it has them.
+
+    The double-difficulty families give position 'T_j' its own correctness and
+    hazard intercept. Both are global scalars, so they live in the training
+    'summary.json' rather than in 'tossups.csv'. A fit made without them simply
+    has no keys and the replay stays on the old path.
+    """
+    if not summary_path.exists():
+        return {}
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    if "end_correct" not in summary or "end_hazard" not in summary:
+        return {}
+    return {
+        name: torch.tensor(float(summary[name]), device=device)
+        for name in ("end_correct", "end_hazard")
+    }
+
+
 def _load_calibration(summary_path: Path, device):
     """Return Platt scale/bias tensors from a stage summary, or ``None``."""
     if not summary_path.exists():
         return None
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
-    if "correctness_scale" not in summary:
+    if "correctness_bias" not in summary:
         return None
     return (
-        torch.tensor(float(summary["correctness_scale"]), device=device),
+        (
+            torch.tensor(float(summary["correctness_scale"]), device=device)
+            if "correctness_scale" in summary
+            else None
+        ),
         torch.tensor(float(summary["correctness_bias"]), device=device),
     )
 
@@ -212,38 +647,46 @@ def frozen_predict_tossups(args) -> dict:
         f"Tossups: {len(data['tossup_ids']):,}"
     )
 
-    theta_cols = _numbered_columns(players, "theta", args.dimensions)
-    posterior = {
-        "theta": _aligned_matrix(
-            players, "player_id", data["player_ids"], theta_cols, args.device
-        ),
-        "c": _aligned_vector(
-            players, "player_id", data["player_ids"], "c", args.device
-        ),
-    }
-    for prefix in ("r", "beta", "gamma", "mu"):
-        posterior[prefix] = _aligned_matrix(
-            tossups,
-            "tossup_id",
-            data["tossup_ids"],
-            _numbered_columns(tossups, prefix, args.dimensions),
-            args.device,
-        )
+    schema = detect_tossup_parameter_schema(tossups, players)
+    family = TOSSUP_SCHEMAS[schema]
+    if args.calibrate_correctness and not family.calibration_aware:
+        raise ValueError(f"{schema} does not support correctness calibration")
+    posterior = _load_tossup_posterior(
+        players, tossups, data, args.dimensions, args.device, schema
+    )
+    # Terminal-cell intercepts are global, so they live in the training summary.
+    # A family or fit without them contributes no keys and replays unchanged.
+    posterior.update(
+        _load_terminal_intercepts(train_pyr / "summary.json", args.device)
+    )
+    calibrate_scale = True
     if args.calibrate_correctness:
         calibration = _load_calibration(train_pyr / "summary.json", args.device)
         if calibration is None:
             raise ValueError(
                 "--calibrate-correctness set but training summary.json has no "
-                "correctness_scale/bias"
+                "correctness_bias"
             )
-        posterior["correctness_scale"], posterior["correctness_bias"] = calibration
+        scale, posterior["correctness_bias"] = calibration
+        calibrate_scale = scale is not None
+        if calibrate_scale:
+            posterior["correctness_scale"] = scale
 
-    correct, hazard, survival = posterior_row_predictions(
-        data, posterior, args.calibrate_correctness, args.difficulty_link
+    # Passed by keyword: the families order these differently.
+    row_kwargs = {}
+    if family.calibration_aware:
+        row_kwargs.update(
+            calibrate_correctness=args.calibrate_correctness,
+            calibrate_scale=calibrate_scale,
+        )
+    timing_kwargs = {"link": args.difficulty_link} if family.link_aware else {}
+    correct, hazard, survival = family.model.posterior_row_predictions(
+        data, posterior, **row_kwargs, **timing_kwargs
     )
-    buzz_expected = expected_first_buzz_positions(data, posterior, args.difficulty_link)
-
-    save_multidim_parameters(args.output_dir, data, posterior)
+    buzz_expected = family.model.expected_first_buzz_positions(
+        data, posterior, **timing_kwargs
+    )
+    family.save(args.output_dir, data, posterior)
     save_tossup_predictions(
         args.output_dir,
         observations,
@@ -253,6 +696,7 @@ def frozen_predict_tossups(args) -> dict:
         buzz_expected=buzz_expected,
     )
     summary = _stage_summary(train_pyr / "summary.json", args, data, drop_info)
+    summary["parameter_schema"] = schema
     (args.output_dir / "summary.json").write_text(
         json.dumps(summary, indent=2), encoding="utf-8"
     )

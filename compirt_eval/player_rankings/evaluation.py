@@ -13,13 +13,15 @@ use a competing-risks expected-points summary
 """
 
 from __future__ import annotations
+
 import csv
 import json
 import math
 import sqlite3
-import statistics
 from collections import defaultdict
 from pathlib import Path
+
+from scipy.stats import spearmanr
 
 
 # This module lives at compirt_eval/player_rankings/evaluation.py, so the repository
@@ -182,7 +184,7 @@ def actual_tournament_stats(
 
 
 def rank_correlation(rows: list[dict[str, object]], rank_key: str) -> float | None:
-    """Pearson correlation on rank columns, equivalent to Spearman here."""
+    """Return Spearman rank correlation for players present in both rankings."""
     matched = [
         (float(row["actual_rank"]), float(row[rank_key]))
         for row in rows
@@ -191,19 +193,9 @@ def rank_correlation(rows: list[dict[str, object]], rank_key: str) -> float | No
     if len(matched) < 2:
         return None
     actual_ranks, model_ranks = zip(*matched)
-    actual_mean = statistics.mean(actual_ranks)
-    model_mean = statistics.mean(model_ranks)
-    covariance = sum(
-        (actual - actual_mean) * (model - model_mean)
-        for actual, model in matched
-    )
-    actual_scale = math.sqrt(
-        sum((actual - actual_mean) ** 2 for actual in actual_ranks)
-    )
-    model_scale = math.sqrt(sum((model - model_mean) ** 2 for model in model_ranks))
-    if actual_scale == 0 or model_scale == 0:
-        return None
-    return covariance / (actual_scale * model_scale)
+    correlation = spearmanr(actual_ranks, model_ranks).statistic
+    # A constant column leaves the correlation undefined.
+    return None if math.isnan(correlation) else float(correlation)
 
 
 def overlap_count(

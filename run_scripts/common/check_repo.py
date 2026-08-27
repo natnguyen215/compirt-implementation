@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Run the repository's publication-readiness checks without training models.
 
-The default check covers every unit-test discovery root, Markdown links,
-Pyflakes, tracked shell syntax, and whitespace errors in the working-tree diff.
-Dataset validation is opt-in because it requires the ignored local dataset.
+The default check covers every test suite, Pyflakes, tracked shell syntax, and
+whitespace errors in the working-tree diff. Dataset validation is opt-in
+because it requires the ignored local dataset.
 """
 
 from __future__ import annotations
@@ -18,8 +18,12 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
+# The root suite runs under pytest, not `unittest discover`: `tests/` holds both
+# TestCase classes and bare `test_*` functions, and unittest discovery silently
+# skips the latter. The family suites below are TestCase-only and stay on
+# unittest so each keeps its own discovery root and PYTHONPATH.
 TEST_SUITES = [
-    ("root tests", ["-m", "unittest", "discover", "-s", "tests", "-v"], None),
+    ("root tests", ["-m", "pytest", "-q", "tests"], None),
     (
         "TF-IDF tests",
         ["-m", "unittest", "discover", "-s", "tfidf/tests", "-t", ".", "-v"],
@@ -62,6 +66,20 @@ TEST_SUITES = [
             "discover",
             "-s",
             "polynomial_compirt/tests",
+            "-t",
+            ".",
+            "-v",
+        ],
+        None,
+    ),
+    (
+        "double-difficulty tests",
+        [
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "hazard_double_difficulty/tests",
             "-t",
             ".",
             "-v",

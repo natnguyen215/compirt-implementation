@@ -1,0 +1,26 @@
+{
+  "model": "multidimensional-difficulty-competing-risks",
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))",
+  "tournament": "",
+  "dimensions": 5,
+  "difficulty_link": "sigmoid",
+  "seed": 42,
+  "steps": 3000,
+  "final_loss": 299007.90838623047,
+  "players": 1167,
+  "tossups": 1220,
+  "events": 9240,
+  "calibrate_correctness": false,
+  "include_bounceback": false,
+  "observation_counts": {
+    "CENSORED": 239379,
+    "BUZZ": 38821,
+    "NO-BUZZ": 3924
+  },
+  "frozen_predict": true,
+  "split": "game-holdout:year_2024:test:5:1:42",
+  "dropped_events": 0,
+  "missing_tossups": [],
+  "missing_players": [],
+  "parameter_schema": "multidim"
+}

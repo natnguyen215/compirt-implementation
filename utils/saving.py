@@ -208,13 +208,30 @@ def write_summary(output_dir, summary, posterior):
     """Append learned calibration parameters (if any) and write 'summary.json'.
 
     Each training script builds its own 'summary' dict of run configuration and
-    dataset sizes, then calls this to record the optional Platt-scaling
-    parameters ('correctness_scale'/'correctness_bias', present only when a run
-    used '--calibrate-correctness') and write the file.
+    dataset sizes, then calls this to record any learned correctness scale/bias
+    and write the file. Bias-only calibration deliberately has no scale site.
+
+    Every learned *global* scalar is recorded here rather than in a per-entity
+    CSV, for two reasons: the frozen scorer has to replay some of them (the
+    terminal-cell intercepts), and the rest are the run's headline interpretable
+    quantities (population curve locations, the hazard skill loading). Sites a
+    run does not have are simply skipped, so this list is a superset across the
+    families.
     """
-    if "correctness_scale" in posterior:
-        summary["correctness_scale"] = float(posterior["correctness_scale"].detach().cpu())
-        summary["correctness_bias"] = float(posterior["correctness_bias"].detach().cpu())
+    for parameter in (
+        "correctness_scale",
+        "correctness_bias",
+        "end_correct",
+        "end_hazard",
+        "curve_location_correct",
+        "curve_location_hazard",
+        "curve_start_scale",
+        "hazard_skill_scale",
+        "conservatism_skill_slope",
+        "a_scale",
+    ):
+        if parameter in posterior:
+            summary[parameter] = float(posterior[parameter].detach().cpu())
     (output_dir / "summary.json").write_text(
         json.dumps(summary, indent=2), encoding="utf-8"
     )

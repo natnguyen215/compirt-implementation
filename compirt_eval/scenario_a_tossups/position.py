@@ -43,7 +43,7 @@ def evaluate_buzz_positions(events, output_dir):
     )
     ax.plot([0, 1], [0, 1], "--", color="0.5")
     ax.set(
-        title="Observed versus predicted buzz position",
+        title="Observed versus hazard-predicted buzz position",
         xlabel="Observed",
         ylabel="Predicted",
         xlim=(0, 1),
@@ -87,7 +87,7 @@ def _binned_buzz_position_plot(events, output_dir, bins=10):
     )
     ax.plot(summary.index, summary["predicted_mean"], "o-", label="Mean prediction")
     ax.set(
-        title=f"Binned buzz-position calibration ({len(events):,} events)",
+        title=f"Hazard-based buzz-position calibration ({len(events):,} events)",
         xlabel="Observed position (bin center)",
         ylabel="Predicted position",
         xlim=(0, 1),

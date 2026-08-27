@@ -1,0 +1,76 @@
+{
+  "approximation": "Pyro AutoNormal variational posterior",
+  "mean_field": true,
+  "quantile_probabilities": [
+    0.025,
+    0.5,
+    0.975
+  ],
+  "draws": 100,
+  "draw_seed": 42,
+  "estimated_draw_bytes": 23652400,
+  "draw_alignment": "The same leading draw index across every site file is one joint variational-posterior draw.",
+  "interpretation": "Intervals are approximate SVI credible intervals conditional on this model and fitted dataset; they are not bootstrap intervals.",
+  "sites": {
+    "theta": {
+      "shape": [
+        1455,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "theta",
+      "draw_file": "posterior_draws/theta.npy"
+    },
+    "c": {
+      "shape": [
+        1455
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "c",
+      "draw_file": "posterior_draws/c.npy"
+    },
+    "r": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "r",
+      "draw_file": "posterior_draws/r.npy"
+    },
+    "start_difficulty": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "start_difficulty",
+      "draw_file": "posterior_draws/start_difficulty.npy"
+    },
+    "total_drop": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "total_drop",
+      "draw_file": "posterior_draws/total_drop.npy"
+    },
+    "drop_proportions": {
+      "shape": [
+        1260,
+        5,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "drop_proportions",
+      "draw_file": "posterior_draws/drop_proportions.npy"
+    },
+    "correctness_bias": {
+      "shape": [],
+      "dtype": "float32",
+      "quantile_prefix": "correctness_bias",
+      "draw_file": "posterior_draws/correctness_bias.npy"
+    }
+  }
+}

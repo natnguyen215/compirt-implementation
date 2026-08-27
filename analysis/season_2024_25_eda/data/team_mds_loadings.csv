@@ -1,0 +1,13 @@
+feature,mds1,mds2
+accuracy_all_attempts,-0.802307,-0.486887
+scored_accuracy,-0.362723,-0.922817
+neg_rate,0.144607,0.967206
+zero_rate,0.850849,-0.089741
+mean_position_pct,0.919540,-0.279583
+early_share,-0.829773,0.265467
+very_late_share,0.925068,-0.262934
+ppb,-0.964152,0.086841
+perfect_bonus_rate,-0.841502,0.097197
+zero_bonus_rate,0.796107,-0.056981
+points_per_game,-0.949989,-0.057786
+mean_margin,-0.812895,-0.107905

@@ -1,0 +1,5 @@
+minimum_scored_attempts_per_category_half,timing_player_category_cells,timing_players,timing_specialty_correlation,correctness_player_category_cells,correctness_players,correctness_specialty_correlation
+5,554,261,0.330973,554,261,-0.010792
+8,328,207,0.365949,328,207,-0.035014
+10,239,168,0.386780,239,168,0.009128
+15,122,99,0.484032,122,99,-0.009708

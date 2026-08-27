@@ -542,76 +542,50 @@ def build_holdout_stages(
     """Construct the established holdout command sequence without running it."""
     if config.frozen_predict == "1":
         return build_frozen_holdout_stages(config, paths)
-    model = config.model
-    scripts = MODELS[model]
-    train_split = config.train_split
-    test_split = config.test_split
-    new_player_prior = config.new_player_prior
-    tournament = config.tournament
-    pyramidal_steps = config.pyramidal_steps
-    bonus_steps = config.bonus_steps
-    lr = config.lr
-    seed = config.seed
-    device = config.device
-    run_synergy = config.run_synergy
-    synergy_dimensions = config.synergy_dimensions
-    save_synergy_details = config.save_synergy_details
-    run_c1_c4 = config.run_c1_c4
-    c1_c4_item_steps = config.c1_c4_item_steps
-    c1_c4_min_cross_team_games = config.c1_c4_min_cross_team_games
-    c1_c4_seed = config.c1_c4_seed
-    tfidf_plot_count = config.tfidf_plot_count
-    train_pyr = paths.train_pyramidal
-    train_bonus = paths.train_bonus
-    train_synergy = paths.train_synergy
-    holdout_pyr = paths.holdout_pyramidal
-    holdout_bonus = paths.holdout_bonus
-    holdout_synergy = paths.holdout_synergy
-    holdout_eval = paths.holdout_evaluation
-    holdout_synergy_eval = paths.holdout_synergy_evaluation
-    scenario_c_root = paths.scenario_c_root
-    scenario_c_eval = paths.scenario_c_evaluation
+    scripts = MODELS[config.model]
 
-    pyr_extra, comp_extra = model_stage_args(config, train_pyr)
+    pyr_extra, comp_extra = model_stage_args(config, paths.train_pyramidal)
     stages: list[HoldoutStage] = []
     # 1. Stage-1 training on the historical split.
     stages.append(HoldoutStage("train-pyramidal", [
         PYTHON, "-m", scripts["pyramidal"],
-        "--split", train_split, *tournament_args(tournament),
-        "--steps", pyramidal_steps, "--lr", lr, "--seed", seed, "--device", device,
-        "--output-dir", train_pyr, *pyr_extra,
+        "--split", config.train_split, *tournament_args(config.tournament),
+        "--steps", config.pyramidal_steps, "--lr", config.lr,
+        "--seed", config.seed, "--device", config.device,
+        "--output-dir", paths.train_pyramidal, *pyr_extra,
     ]))
 
     # 2. Stage-1 held-out transductive pass on the test split with informative
     #    player priors built from the training posterior.
     heldout_pyr_extra = list(pyr_extra)
-    if model in ("learned", "learned_tfidf"):
-        heldout_pyr_extra += ["--train-topic-model", train_pyr]
+    if config.model in ("learned", "learned_tfidf"):
+        heldout_pyr_extra += ["--train-topic-model", paths.train_pyramidal]
     stages.append(HoldoutStage("holdout-pyramidal", [
         PYTHON, "-m", scripts["pyramidal"],
-        "--split", test_split, *tournament_args(tournament),
-        "--steps", pyramidal_steps, "--lr", lr, "--seed", seed, "--device", device,
-        "--train-posterior", f"{train_pyr}/player_posterior.csv",
-        "--new-player-prior", new_player_prior,
-        "--output-dir", holdout_pyr, *heldout_pyr_extra,
+        "--split", config.test_split, *tournament_args(config.tournament),
+        "--steps", config.pyramidal_steps, "--lr", config.lr,
+        "--seed", config.seed, "--device", config.device,
+        "--train-posterior", f"{paths.train_pyramidal}/player_posterior.csv",
+        "--new-player-prior", config.new_player_prior,
+        "--output-dir", paths.holdout_pyramidal, *heldout_pyr_extra,
     ]))
 
     # Scenario C transfers Stage-2 team parameters learned on the historical
     # split. Its opt-in fits write to dedicated output paths.
-    if run_c1_c4 == "1":
+    if config.run_c1_c4 == "1":
         historical_extra = list(comp_extra)
         stages.append(HoldoutStage(
             "train-compositional",
             bonus_stage_command(
                 scripts,
-                split=train_split,
-                tournament=tournament,
-                player_skills=f"{train_pyr}/players.csv",
-                output_dir=train_bonus,
-                steps=bonus_steps,
-                lr=lr,
-                seed=c1_c4_seed,
-                device=device,
+                split=config.train_split,
+                tournament=config.tournament,
+                player_skills=f"{paths.train_pyramidal}/players.csv",
+                output_dir=paths.train_bonus,
+                steps=config.bonus_steps,
+                lr=config.lr,
+                seed=config.c1_c4_seed,
+                device=config.device,
                 extra_args=historical_extra,
             ),
         ))
@@ -619,18 +593,18 @@ def build_holdout_stages(
             "train-synergy",
             bonus_stage_command(
                 scripts,
-                split=train_split,
-                tournament=tournament,
-                player_skills=f"{train_pyr}/players.csv",
-                output_dir=train_synergy,
-                steps=bonus_steps,
-                lr=lr,
-                seed=c1_c4_seed,
-                device=device,
+                split=config.train_split,
+                tournament=config.tournament,
+                player_skills=f"{paths.train_pyramidal}/players.csv",
+                output_dir=paths.train_synergy,
+                steps=config.bonus_steps,
+                lr=config.lr,
+                seed=config.c1_c4_seed,
+                device=config.device,
                 extra_args=[
                     "--use-synergy",
                     "--synergy-dimensions",
-                    synergy_dimensions,
+                    config.synergy_dimensions,
                     "--save-synergy-details",
                     *historical_extra,
                 ],
@@ -642,39 +616,39 @@ def build_holdout_stages(
         "holdout-compositional",
         bonus_stage_command(
             scripts,
-            split=test_split,
-            tournament=tournament,
-            player_skills=f"{holdout_pyr}/players.csv",
-            output_dir=holdout_bonus,
-            steps=bonus_steps,
-            lr=lr,
-            seed=seed,
-            device=device,
+            split=config.test_split,
+            tournament=config.tournament,
+            player_skills=f"{paths.holdout_pyramidal}/players.csv",
+            output_dir=paths.holdout_bonus,
+            steps=config.bonus_steps,
+            lr=config.lr,
+            seed=config.seed,
+            device=config.device,
             extra_args=comp_extra,
         ),
     ))
 
-    if run_synergy == "1":
+    if config.run_synergy == "1":
         synergy_extra = [
             "--use-synergy",
             "--synergy-dimensions",
-            synergy_dimensions,
+            config.synergy_dimensions,
         ]
-        if save_synergy_details == "1":
+        if config.save_synergy_details == "1":
             synergy_extra.append("--save-synergy-details")
         synergy_extra.extend(comp_extra)
         stages.append(HoldoutStage(
             "holdout-synergy",
             bonus_stage_command(
                 scripts,
-                split=test_split,
-                tournament=tournament,
-                player_skills=f"{holdout_pyr}/players.csv",
-                output_dir=holdout_synergy,
-                steps=bonus_steps,
-                lr=lr,
-                seed=seed,
-                device=device,
+                split=config.test_split,
+                tournament=config.tournament,
+                player_skills=f"{paths.holdout_pyramidal}/players.csv",
+                output_dir=paths.holdout_synergy,
+                steps=config.bonus_steps,
+                lr=config.lr,
+                seed=config.seed,
+                device=config.device,
                 extra_args=synergy_extra,
             ),
         ))
@@ -682,66 +656,66 @@ def build_holdout_stages(
     # 4. Scenario A/B evaluation on the held-out predictions.
     stages.append(HoldoutStage("holdout-evaluation", [
         PYTHON, "-m", scripts["evaluate"],
-        "--pyramidal-results", holdout_pyr,
-        "--compositional-results", holdout_bonus,
-        "--output-dir", holdout_eval,
+        "--pyramidal-results", paths.holdout_pyramidal,
+        "--compositional-results", paths.holdout_bonus,
+        "--output-dir", paths.holdout_evaluation,
     ]))
 
-    if model in ("tfidf", "tfidf_multidim"):
+    if config.model in ("tfidf", "tfidf_multidim"):
         stages.append(HoldoutStage("tfidf-difficulty-plots", [
             PYTHON, "-m", "tfidf.plot_tfidf_difficulty_curves",
-            "--results-dir", holdout_pyr,
-            "--output-dir", f"{holdout_eval}/graphs",
-            "--count", tfidf_plot_count,
+            "--results-dir", paths.holdout_pyramidal,
+            "--output-dir", f"{paths.holdout_evaluation}/graphs",
+            "--count", config.tfidf_plot_count,
         ]))
 
-    if run_c1_c4 == "1":
+    if config.run_c1_c4 == "1":
         stages.append(HoldoutStage("scenario-c", [
             PYTHON,
             "-m",
             "run_scripts.common.run_scenario_c",
             "--train-split",
-            train_split,
+            config.train_split,
             "--test-split",
-            test_split,
-            *tournament_args(tournament),
+            config.test_split,
+            *tournament_args(config.tournament),
             "--train-player-skills",
-            f"{train_pyr}/players.csv",
+            f"{paths.train_pyramidal}/players.csv",
             "--test-player-skills",
-            f"{holdout_pyr}/players.csv",
+            f"{paths.holdout_pyramidal}/players.csv",
             "--train-compositional",
-            train_bonus,
+            paths.train_bonus,
             "--train-synergy",
-            train_synergy,
+            paths.train_synergy,
             "--output-root",
-            scenario_c_root,
+            paths.scenario_c_root,
             "--evaluation-dir",
-            scenario_c_eval,
+            paths.scenario_c_evaluation,
             "--steps",
-            c1_c4_item_steps,
+            config.c1_c4_item_steps,
             "--lr",
-            lr,
+            config.lr,
             "--seed",
-            c1_c4_seed,
+            config.c1_c4_seed,
             "--min-cross-team-games",
-            c1_c4_min_cross_team_games,
+            config.c1_c4_min_cross_team_games,
             "--device",
-            device,
-        ], f"Scenario C metrics in {scenario_c_eval}."))
+            config.device,
+        ], f"Scenario C metrics in {paths.scenario_c_evaluation}."))
 
-    if run_synergy == "1":
+    if config.run_synergy == "1":
         stages.append(HoldoutStage("holdout-synergy-evaluation", [
             PYTHON, "-m", scripts["evaluate"],
-            "--pyramidal-results", holdout_pyr,
-            "--compositional-results", holdout_synergy,
-            "--output-dir", holdout_synergy_eval,
+            "--pyramidal-results", paths.holdout_pyramidal,
+            "--compositional-results", paths.holdout_synergy,
+            "--output-dir", paths.holdout_synergy_evaluation,
         ]))
         stages.append(HoldoutStage("compare-bonus-models", [
             PYTHON, "run_scripts/common/run_synergy_comparison.py",
             "--compositional-metrics",
-            f"{holdout_eval}/csvs/bonus_metrics.csv",
+            f"{paths.holdout_evaluation}/csvs/bonus_metrics.csv",
             "--synergy-metrics",
-            f"{holdout_synergy_eval}/csvs/bonus_metrics.csv",
+            f"{paths.holdout_synergy_evaluation}/csvs/bonus_metrics.csv",
             "--output-dir",
             paths.comparison,
         ]))

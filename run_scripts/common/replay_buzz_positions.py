@@ -34,6 +34,7 @@ from compirt_eval.scenario_a_tossups.parameters import (
     _supports_first_buzz_reconstruction,
     load_difficulty_adjustment_curves,
     load_difficulty_link,
+    load_difficulty_scale,
 )
 from compirt_eval.scenario_a_tossups.timing import conditional_expected_buzz_position
 
@@ -58,6 +59,7 @@ def replay_run(results_dir: Path, output_path: Path) -> pd.DataFrame:
         )
     adjustments = load_difficulty_adjustment_curves(results_dir)
     link = load_difficulty_link(results_dir)
+    difficulty_scale = load_difficulty_scale(results_dir)
 
     rows = []
     skipped = 0
@@ -76,7 +78,12 @@ def replay_run(results_dir: Path, output_path: Path) -> pd.DataFrame:
                     buzz["relative_position"].iloc[0]
                 ),
                 "predicted_relative_position": conditional_expected_buzz_position(
-                    event, players, tossups, adjustments, link
+                    event,
+                    players,
+                    tossups,
+                    adjustments,
+                    link,
+                    difficulty_scale=difficulty_scale,
                 ),
             }
         )

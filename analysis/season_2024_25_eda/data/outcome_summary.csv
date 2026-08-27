@@ -1,0 +1,13 @@
+tier,outcome,buzz_events,median_position_pct,share_within_tier
+fall,Correct (+10),14125,67.647059,0.798835
+fall,Neg (-5),2909,56.410256,0.164518
+fall,Zero (0),648,100.000000,0.036647
+nationals,Correct (+10),7597,80.000000,0.747074
+nationals,Neg (-5),1774,71.227949,0.174452
+nationals,Zero (0),798,99.354839,0.078474
+regionals,Correct (+10),13239,80.392157,0.733463
+regionals,Neg (-5),2953,68.750000,0.163601
+regionals,Zero (0),1858,100.000000,0.102936
+winter,Correct (+10),14115,73.015873,0.778286
+winter,Neg (-5),3056,60.869565,0.168505
+winter,Zero (0),965,100.000000,0.053209

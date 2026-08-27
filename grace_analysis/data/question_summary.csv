@@ -1,0 +1,241 @@
+question_key,packet,packet_question_number,tossup_index,category_raw,category_group,question_words,buzz_events,human_buzzes,model_buzzes,correct_buzzes,incorrect_buzzes,accuracy,earliest_position_pct,latest_position_pct,no_human_buzz,no_model_buzz
+p1:qexh-1,1,1,exh-1,Other Fine Arts,Arts,101,1,0,1,1,0,1.0000,68.3168,68.3168,True,False
+p1:qexh-2,1,2,exh-2,Chemistry,Science,110,1,1,0,1,0,1.0000,10.9091,10.9091,False,True
+p1:qexh-3,1,3,exh-3,Myth/Other Academic,RMPSS,110,1,0,1,1,0,1.0000,50.0000,50.0000,True,False
+p1:qexh-4,1,4,exh-4,Painting/Sculpture,Arts,119,1,1,0,1,0,1.0000,48.7395,48.7395,False,True
+p1:qexh-5,1,5,exh-5,Philosophy,RMPSS,94,1,1,0,0,1,0.0000,18.0851,18.0851,False,True
+p1:qexh-6,1,6,exh-6,British Lit,Literature,110,1,1,0,1,0,1.0000,73.6364,73.6364,False,True
+p1:qexh-7,1,7,exh-7,Euro Hist,History,111,1,1,0,1,0,1.0000,27.9279,27.9279,False,True
+p1:qexh-8,1,8,exh-8,Other Sci,Science,101,1,1,0,1,0,1.0000,26.7327,26.7327,False,True
+p1:qexh-9,1,9,exh-9,World Hist,History,105,1,1,0,1,0,1.0000,51.4286,51.4286,False,True
+p1:qexh-10,1,10,exh-10,Euro Lit,Literature,112,1,1,0,1,0,1.0000,15.1786,15.1786,False,True
+p1:qexh-11,1,11,exh-11,Social Science,RMPSS,104,1,0,1,1,0,1.0000,46.1538,46.1538,True,False
+p1:qexh-12,1,12,exh-12,American Hist,History,96,1,1,0,0,1,0.0000,34.3750,34.3750,False,True
+p1:qexh-13,1,13,exh-13,Classical Music,Arts,101,1,1,0,1,0,1.0000,99.0099,99.0099,False,True
+p1:qexh-14,1,14,exh-14,American Lit,Literature,105,1,0,1,1,0,1.0000,32.3810,32.3810,True,False
+p1:qexh-15,1,15,exh-15,Geo/CE,Geo/CE,97,1,0,1,1,0,1.0000,21.6495,21.6495,True,False
+p1:qexh-16,1,16,exh-16,Other Hist,History,94,1,1,0,1,0,1.0000,20.2128,20.2128,False,True
+p1:qexh-17,1,17,exh-17,Biology,Science,86,1,1,0,1,0,1.0000,39.5349,39.5349,False,True
+p1:qexh-18,1,18,exh-18,Religion,RMPSS,104,1,1,0,1,0,1.0000,34.6154,34.6154,False,True
+p1:qexh-19,1,19,exh-19,World/Other Lit,Literature,111,1,0,1,1,0,1.0000,28.8288,28.8288,True,False
+p1:qexh-20,1,20,exh-20,Physics,Science,111,1,1,0,1,0,1.0000,31.5315,31.5315,False,True
+p2:qexh-21,2,1,exh-21,Chemistry,Science,88,1,1,0,1,0,1.0000,14.7727,14.7727,False,True
+p2:qexh-22,2,2,exh-22,Classical Music,Arts,105,1,1,0,1,0,1.0000,83.8095,83.8095,False,True
+p2:qexh-23,2,3,exh-23,Biology,Science,99,1,1,0,0,1,0.0000,42.4242,42.4242,False,True
+p2:qexh-24,2,4,exh-24,Euro Hist,History,108,2,1,1,1,1,0.5000,39.8148,99.0741,False,False
+p2:qexh-25,2,5,exh-25,Painting/Sculpture,Arts,109,1,0,1,1,0,1.0000,22.9358,22.9358,True,False
+p2:qexh-26,2,6,exh-26,World/Other Lit,Literature,102,1,0,1,1,0,1.0000,35.2941,35.2941,True,False
+p2:qexh-27,2,7,exh-27,American Hist,History,103,1,0,1,1,0,1.0000,32.0388,32.0388,True,False
+p2:qexh-28,2,8,exh-28,American Lit,Literature,107,1,1,0,1,0,1.0000,28.9720,28.9720,False,True
+p2:qexh-29,2,9,exh-29,Religion,RMPSS,112,1,1,0,1,0,1.0000,38.3929,38.3929,False,True
+p2:qexh-30,2,10,exh-30,Philosophy,RMPSS,81,2,1,1,1,1,0.5000,50.6173,98.7654,False,False
+p2:qexh-31,2,11,exh-31,Myth/Other Academic,RMPSS,102,1,1,0,1,0,1.0000,64.7059,64.7059,False,True
+p2:qexh-32,2,12,exh-32,Social Science,RMPSS,96,1,0,1,1,0,1.0000,48.9583,48.9583,True,False
+p2:qexh-33,2,13,exh-33,Physics,Science,108,1,0,1,1,0,1.0000,27.7778,27.7778,True,False
+p2:qexh-34,2,14,exh-34,British Lit,Literature,110,2,1,1,1,1,0.5000,39.0909,99.0909,False,False
+p2:qexh-35,2,15,exh-35,Other Sci,Science,86,1,0,1,1,0,1.0000,52.3256,52.3256,True,False
+p2:qexh-36,2,16,exh-36,Other Fine Arts,Arts,106,1,1,0,1,0,1.0000,42.4528,42.4528,False,True
+p2:qexh-37,2,17,exh-37,World Hist,History,104,1,1,0,1,0,1.0000,41.3462,41.3462,False,True
+p2:qexh-38,2,18,exh-38,Euro Lit,Literature,100,2,1,1,1,1,0.5000,11.0000,99.0000,False,False
+p2:qexh-39,2,19,exh-39,Geo/CE,Geo/CE,106,1,1,0,1,0,1.0000,30.1887,30.1887,False,True
+p2:qexh-40,2,20,exh-40,Other Hist,History,98,1,0,1,1,0,1.0000,31.6327,31.6327,True,False
+p3:q195,3,1,195,Physics,Science,104,11,11,0,8,3,0.7273,51.9231,99.0385,False,True
+p3:q128,3,2,128,Other Arts,Arts,107,10,9,1,9,1,0.9000,30.8411,99.0654,False,False
+p3:q94,3,3,94,Other Hist,History,103,12,10,2,9,3,0.7500,41.7476,99.0291,False,False
+p3:q39,3,4,39,World/Other,Literature,117,10,9,1,9,1,0.9000,26.4957,86.3248,False,False
+p3:q161,3,5,161,Social Science,RMPSS,93,9,8,1,8,1,0.8889,33.3333,97.8495,False,False
+p3:q76,3,6,76,World Hist,History,109,13,12,1,7,6,0.5385,0.0000,99.0826,False,False
+p3:q134,3,7,134,Religion,RMPSS,111,10,9,1,9,1,0.9000,30.6306,99.0991,False,False
+p3:q2,3,8,2,American Lit,Literature,96,9,7,2,9,0,1.0000,25.0000,98.9583,False,False
+p3:q171,3,9,171,Biology,Science,91,11,8,3,8,3,0.7273,23.0769,98.9011,False,False
+p3:q99,3,10,99,Classical Music,Arts,93,9,6,3,8,1,0.8889,30.1075,95.6989,False,False
+p3:q70,3,11,70,Euro Hist,History,103,10,8,2,6,4,0.6000,25.2427,99.0291,False,False
+p3:q208,3,12,208,Other Sci,Science,109,13,11,2,6,7,0.4615,23.8532,99.0826,False,False
+p3:q60,3,13,60,American Hist,History,109,12,11,1,6,6,0.5000,23.8532,99.0826,False,False
+p3:q217,3,14,217,Geo/CE,Geo/CE,90,12,9,3,6,6,0.5000,25.5556,98.8889,False,False
+p3:q28,3,15,28,Euro Lit,Literature,106,9,8,1,8,1,0.8889,33.0189,99.0566,False,False
+p3:q112,3,16,112,Painting/Sculpture,Arts,116,10,7,3,6,4,0.6000,32.7586,99.1379,False,False
+p3:q151,3,17,151,Philosophy,RMPSS,97,9,8,1,9,0,1.0000,23.7113,98.9691,False,False
+p3:q225,3,18,225,Myth/Other Academic,RMPSS,100,8,7,1,5,3,0.6250,46.0000,99.0000,False,False
+p3:q17,3,19,17,British Lit,Literature,107,11,8,3,5,6,0.4545,68.2243,99.0654,False,False
+p3:q182,3,20,182,Chemistry,Science,96,9,7,2,7,2,0.7778,30.2083,98.9583,False,False
+p4:q190,4,1,190,Chemistry,Science,100,11,9,2,8,3,0.7273,31.0000,99.0000,False,False
+p4:q111,4,2,111,Painting/Sculpture,Arts,100,11,10,1,9,2,0.8182,19.0000,99.0000,False,False
+p4:q152,4,3,152,Philosophy,RMPSS,89,10,8,2,8,2,0.8000,26.9663,98.8764,False,False
+p4:q72,4,4,72,Euro Hist,History,96,5,3,2,4,1,0.8000,25.0000,98.9583,False,False
+p4:q100,4,5,100,Classical Music,Arts,81,6,4,2,5,1,0.8333,45.6790,98.7654,False,False
+p4:q93,4,6,93,Other Hist,History,99,10,8,2,8,2,0.8000,27.2727,98.9899,False,False
+p4:q27,4,7,27,Euro Lit,Literature,104,8,6,2,6,2,0.7500,19.2308,99.0385,False,False
+p4:q135,4,8,135,Religion,RMPSS,104,7,6,1,7,0,1.0000,29.8077,99.0385,False,False
+p4:q196,4,9,196,Physics,Science,87,5,3,2,4,1,0.8000,32.1839,98.8506,False,False
+p4:q16,4,10,16,British Lit,Literature,114,8,6,2,7,1,0.8750,26.3158,99.1228,False,False
+p4:q205,4,11,205,Other Sci,Science,94,5,3,2,5,0,1.0000,38.2979,98.9362,False,False
+p4:q52,4,12,52,American Hist,History,98,5,3,2,5,0,1.0000,36.7347,93.8776,False,False
+p4:q38,4,13,38,World/Other,Literature,118,10,9,1,7,3,0.7000,47.4576,99.1525,False,False
+p4:q82,4,14,82,World Hist,History,114,8,7,1,7,1,0.8750,32.4561,99.1228,False,False
+p4:q162,4,15,162,Social Science,RMPSS,97,8,6,2,7,1,0.8750,27.8351,98.9691,False,False
+p4:q218,4,16,218,Geo/CE,Geo/CE,102,7,5,2,5,2,0.7143,24.5098,99.0196,False,False
+p4:q0,4,17,0,American Lit,Literature,117,7,5,2,5,2,0.7143,78.6325,99.1453,False,False
+p4:q144,4,18,144,Myth/Other Academic,RMPSS,102,7,5,2,6,1,0.8571,27.4510,91.1765,False,False
+p4:q172,4,19,172,Biology,Science,97,5,3,2,5,0,1.0000,27.8351,88.6598,False,False
+p4:q123,4,20,123,Other Arts,Arts,101,5,3,2,5,0,1.0000,48.5149,99.0099,False,False
+p5:q101,5,1,101,Classical Music,Arts,112,10,9,1,7,3,0.7000,19.6429,99.1071,False,False
+p5:q209,5,2,209,Other Sci,Science,111,12,10,2,7,5,0.5833,17.1171,99.0991,False,False
+p5:q25,5,3,25,Euro Lit,Literature,95,7,5,2,5,2,0.7143,34.7368,98.9474,False,False
+p5:q50,5,4,50,American Hist,History,90,7,5,2,5,2,0.7143,31.1111,98.8889,False,False
+p5:q219,5,5,219,Geo/CE/other,Geo/CE,111,8,7,1,7,1,0.8750,62.1622,99.0991,False,False
+p5:q141,5,6,141,Religion,RMPSS,96,10,8,2,7,3,0.7000,61.4583,98.9583,False,False
+p5:q75,5,7,75,World Hist,History,105,8,6,2,7,1,0.8750,34.2857,99.0476,False,False
+p5:q197,5,8,197,Physics,Science,90,10,9,1,8,2,0.8000,35.5556,98.8889,False,False
+p5:q163,5,9,163,Social Science,RMPSS,95,11,8,3,8,3,0.7273,41.0526,98.9474,False,False
+p5:q42,5,10,42,World/Other,Literature,100,8,7,1,8,0,1.0000,17.0000,66.0000,False,False
+p5:q192,5,11,192,Chemistry,Science,101,10,7,3,7,3,0.7000,13.8614,99.0099,False,False
+p5:q65,5,12,65,Euro Hist,History,113,9,8,1,8,1,0.8889,31.8584,99.1150,False,False
+p5:q169,5,13,169,Biology,Science,96,9,7,2,7,2,0.7778,7.2917,98.9583,False,False
+p5:q145,5,14,145,Myth/Other Academic,RMPSS,101,9,7,2,8,1,0.8889,17.8218,99.0099,False,False
+p5:q130,5,15,130,Other Arts,Arts,112,7,5,2,6,1,0.8571,26.7857,83.0357,False,False
+p5:q154,5,16,154,Philosophy,RMPSS,107,9,6,3,6,3,0.6667,25.2336,99.0654,False,False
+p5:q89,5,17,89,Other Hist,History,105,10,8,2,8,2,0.8000,60.9524,99.0476,False,False
+p5:q18,5,18,18,British Lit,Literature,119,9,7,2,7,2,0.7778,34.4538,99.1597,False,False
+p5:q113,5,19,113,Painting/Sculpture,Arts,110,9,7,2,6,3,0.6667,16.3636,96.3636,False,False
+p5:q4,5,20,4,American Lit,Literature,117,7,5,2,6,1,0.8571,24.7863,94.8718,False,False
+p6:q114,6,1,114,Painting/Sculpture,Arts,115,12,9,3,10,2,0.8333,23.4783,99.1304,False,False
+p6:q227,6,2,227,Geo/CE,Geo/CE,101,10,7,3,7,3,0.7000,34.6535,99.0099,False,False
+p6:q226,6,3,226,Myth/Other Academic,RMPSS,113,8,6,2,7,1,0.8750,19.4690,99.1150,False,False
+p6:q175,6,4,175,Biology,Science,110,7,5,2,3,4,0.4286,27.2727,99.0909,False,False
+p6:q90,6,5,90,Other Hist,History,101,9,8,1,9,0,1.0000,34.6535,90.0990,False,False
+p6:q14,6,6,14,British Lit,Literature,108,11,9,2,8,3,0.7273,25.0000,99.0741,False,False
+p6:q61,6,7,61,Euro Hist,History,95,10,7,3,7,3,0.7000,30.5263,98.9474,False,False
+p6:q183,6,8,183,Chemistry,Science,97,10,7,3,10,0,1.0000,14.4330,98.9691,False,False
+p6:q156,6,9,156,Philosophy,RMPSS,96,8,6,2,7,1,0.8750,33.3333,98.9583,False,False
+p6:q6,6,10,6,American Lit,Literature,119,12,11,1,8,4,0.6667,33.6134,99.1597,False,False
+p6:q73,6,11,73,World Hist,History,93,10,7,3,8,2,0.8000,38.7097,98.9247,False,False
+p6:q203,6,12,203,Physics,Science,90,10,7,3,9,1,0.9000,24.4444,98.8889,False,False
+p6:q107,6,13,107,Classical Music,Arts,106,10,7,3,8,2,0.8000,25.4717,99.0566,False,False
+p6:q210,6,14,210,Other Sci,Science,106,11,9,2,9,2,0.8182,9.4340,99.0566,False,False
+p6:q137,6,15,137,Religion,RMPSS,103,12,9,3,6,6,0.5000,33.0097,99.0291,False,False
+p6:q125,6,16,125,Other Arts,Arts,108,14,12,2,10,4,0.7143,15.7407,99.0741,False,False
+p6:q35,6,17,35,Euro Lit,Literature,115,11,8,3,9,2,0.8182,42.6087,99.1304,False,False
+p6:q53,6,18,53,American Hist,History,108,12,10,2,10,2,0.8333,29.6296,99.0741,False,False
+p6:q164,6,19,164,Social Science,RMPSS,99,9,8,1,8,1,0.8889,14.1414,98.9899,False,False
+p6:q46,6,20,46,World/Other,Literature,106,8,7,1,7,1,0.8750,28.3019,99.0566,False,False
+p7:q187,7,1,187,Chemistry,Science,94,11,8,3,6,5,0.5455,26.5957,98.9362,False,False
+p7:q29,7,2,29,Euro Lit,Literature,101,10,8,2,9,1,0.9000,17.8218,99.0099,False,False
+p7:q138,7,3,138,Religion,RMPSS,104,12,9,3,5,7,0.4167,26.9231,99.0385,False,False
+p7:q56,7,4,56,American Hist,History,100,9,6,3,7,2,0.7778,21.0000,99.0000,False,False
+p7:q15,7,5,15,British Lit,Literature,108,8,6,2,7,1,0.8750,24.0741,99.0741,False,False
+p7:q155,7,6,155,Philosophy,RMPSS,101,9,6,3,7,2,0.7778,30.6931,99.0099,False,False
+p7:q220,7,7,220,Geo/CE,Geo/CE,95,9,6,3,5,4,0.5556,31.5789,98.9474,False,False
+p7:q174,7,8,174,Biology,Science,101,10,7,3,7,3,0.7000,21.7822,99.0099,False,False
+p7:q79,7,9,79,World Hist,History,99,8,5,3,6,2,0.7500,24.2424,98.9899,False,False
+p7:q103,7,10,103,Classical Music,Arts,90,10,7,3,5,5,0.5000,21.1111,98.8889,False,False
+p7:q91,7,11,91,Other Hist,History,111,9,7,2,8,1,0.8889,30.6306,95.4955,False,False
+p7:q126,7,12,126,Other Arts,Arts,115,10,10,0,9,1,0.9000,30.4348,99.1304,False,True
+p7:q212,7,13,212,Other Sci,Science,103,10,7,3,5,5,0.5000,28.1553,99.0291,False,False
+p7:q115,7,14,115,Painting/Sculpture,Arts,107,8,6,2,8,0,1.0000,15.8879,90.6542,False,False
+p7:q40,7,15,40,World/Other,Literature,102,11,8,3,8,3,0.7273,20.5882,99.0196,False,False
+p7:q146,7,16,146,Myth/Other Academic,RMPSS,106,10,8,2,8,2,0.8000,15.0943,99.0566,False,False
+p7:q165,7,17,165,Social Science,RMPSS,100,13,11,2,6,7,0.4615,58.0000,99.0000,False,False
+p7:q8,7,18,8,American Lit,Literature,109,11,9,2,9,2,0.8182,34.8624,98.1651,False,False
+p7:q67,7,19,67,Euro Hist,History,104,10,7,3,8,2,0.8000,23.0769,99.0385,False,False
+p7:q199,7,20,199,Physics,Science,94,10,8,2,8,2,0.8000,21.2766,98.9362,False,False
+p8:q147,8,1,147,Myth,RMPSS,115,12,10,2,8,4,0.6667,26.9565,99.1304,False,False
+p8:q213,8,2,213,Other Sci,Science,109,11,10,1,8,3,0.7273,16.5138,99.0826,False,False
+p8:q153,8,3,153,Philosophy,RMPSS,104,9,8,1,8,1,0.8889,33.6538,99.0385,False,False
+p8:q47,8,4,47,World/Other,Literature,118,8,7,1,8,0,1.0000,33.0508,94.9153,False,False
+p8:q80,8,5,80,World Hist,History,95,9,7,2,7,2,0.7778,31.5789,98.9474,False,False
+p8:q176,8,6,176,Biology,Science,81,9,7,2,7,2,0.7778,20.9877,98.7654,False,False
+p8:q3,8,7,3,American Lit,Literature,119,8,8,0,8,0,1.0000,24.3697,80.6723,False,True
+p8:q127,8,8,127,Other Arts,Arts,106,11,9,2,7,4,0.6364,18.8679,99.0566,False,False
+p8:q92,8,9,92,Other Hist,History,98,9,8,1,7,2,0.7778,14.2857,77.5510,False,False
+p8:q116,8,10,116,Painting/Sculpture,Arts,98,8,7,1,7,1,0.8750,22.4490,55.1020,False,False
+p8:q188,8,11,188,Chemistry,Science,102,7,5,2,6,1,0.8571,20.5882,99.0196,False,False
+p8:q55,8,12,55,American Hist,History,91,9,9,0,8,1,0.8889,28.5714,98.9011,False,True
+p8:q22,8,13,22,British Lit,Literature,96,10,9,1,8,2,0.8000,60.4167,98.9583,False,False
+p8:q216,8,14,216,Geo/CE/other,Geo/CE,87,10,9,1,7,3,0.7000,54.0230,98.8506,False,False
+p8:q168,8,15,168,Social Science,RMPSS,102,11,9,2,5,6,0.4545,32.3529,99.0196,False,False
+p8:q106,8,16,106,Classical Music,Arts,99,9,7,2,8,1,0.8889,25.2525,98.9899,False,False
+p8:q200,8,17,200,Physics,Science,109,9,7,2,8,1,0.8889,44.9541,99.0826,False,False
+p8:q62,8,18,62,Euro Hist,History,111,9,8,1,7,2,0.7778,41.4414,99.0991,False,False
+p8:q142,8,19,142,Religion,RMPSS,100,9,9,0,7,2,0.7778,28.0000,99.0000,False,True
+p8:q30,8,20,30,Euro Lit,Literature,108,9,7,2,8,1,0.8889,23.1481,57.4074,False,False
+p9:q117,9,1,117,Painting/Sculpture,Arts,115,11,8,3,9,2,0.8182,13.0435,99.1304,False,False
+p9:q189,9,2,189,Chemistry,Science,101,7,4,3,6,1,0.8571,36.6337,96.0396,False,False
+p9:q158,9,3,158,Philosophy,RMPSS,90,11,9,2,8,3,0.7273,34.4444,98.8889,False,False
+p9:q140,9,4,140,Religion,RMPSS,107,11,8,3,6,5,0.5455,22.4299,99.0654,False,False
+p9:q19,9,5,19,British Lit,Literature,114,12,9,3,8,4,0.6667,17.5439,99.1228,False,False
+p9:q201,9,6,201,Physics,Science,93,10,7,3,7,3,0.7000,30.1075,98.9247,False,False
+p9:q63,9,7,63,Euro Hist,History,103,9,6,3,7,2,0.7778,29.1262,99.0291,False,False
+p9:q31,9,8,31,Euro Lit,Literature,109,8,5,3,7,1,0.8750,41.2844,99.0826,False,False
+p9:q221,9,9,221,Geo/CE,Geo/CE,100,13,10,3,8,5,0.6154,37.0000,99.0000,False,False
+p9:q88,9,10,88,Other Hist,History,92,6,3,3,6,0,1.0000,27.1739,80.4348,False,False
+p9:q180,9,11,180,Biology,Science,102,12,9,3,9,3,0.7500,19.6078,99.0196,False,False
+p9:q131,9,12,131,Other Arts,Arts,109,10,9,1,9,1,0.9000,18.3486,99.0826,False,False
+p9:q7,9,13,7,American Lit,Literature,117,7,4,3,7,0,1.0000,29.9145,99.1453,False,False
+p9:q229,9,14,229,Myth/Other Academic,RMPSS,97,10,7,3,8,2,0.8000,25.7732,98.9691,False,False
+p9:q211,9,15,211,Other Sci,Science,108,9,6,3,7,2,0.7778,17.5926,99.0741,False,False
+p9:q59,9,16,59,American Hist,History,96,9,7,2,9,0,1.0000,9.3750,86.4583,False,False
+p9:q43,9,17,43,World/Other,Literature,113,11,8,3,8,3,0.7273,13.2743,99.1150,False,False
+p9:q81,9,18,81,World Hist,History,105,13,10,3,6,7,0.4615,28.5714,99.0476,False,False
+p9:q108,9,19,108,Classical Music,Arts,105,9,6,3,7,2,0.7778,23.8095,99.0476,False,False
+p9:q167,9,20,167,Social Science,RMPSS,98,12,10,2,9,3,0.7500,14.2857,98.9796,False,False
+p10:q166,10,1,166,Social Science,RMPSS,91,9,7,2,7,2,0.7778,60.4396,98.9011,False,False
+p10:q204,10,2,204,Physics,Science,104,8,7,1,7,1,0.8750,62.5000,99.0385,False,False
+p10:q10,10,3,10,American Lit,Literature,118,10,9,1,7,3,0.7000,23.7288,99.1525,False,False
+p10:q118,10,4,118,Painting/Sculpture,Arts,115,7,7,0,6,1,0.8571,42.6087,99.1304,False,True
+p10:q74,10,5,74,World Hist,History,97,10,8,2,7,3,0.7000,34.0206,98.9691,False,False
+p10:q148,10,6,148,Religion,RMPSS,95,10,8,2,6,4,0.6000,6.3158,98.9474,False,False
+p10:q129,10,7,129,Other Arts,Arts,105,6,4,2,5,1,0.8333,47.6190,99.0476,False,False
+p10:q44,10,8,44,World/Other,Literature,103,9,7,2,6,3,0.6667,33.9806,99.0291,False,False
+p10:q87,10,9,87,Other Hist,History,102,7,6,1,7,0,1.0000,31.3725,99.0196,False,False
+p10:q191,10,10,191,Chemistry,Science,100,10,9,1,7,3,0.7000,31.0000,99.0000,False,False
+p10:q157,10,11,157,Philosophy,RMPSS,87,7,6,1,7,0,1.0000,74.7126,98.8506,False,False
+p10:q223,10,12,223,Geo/CE,Geo/CE,99,9,7,2,7,2,0.7778,40.4040,98.9899,False,False
+p10:q32,10,13,32,Euro Lit,Literature,107,11,9,2,6,5,0.5455,49.5327,99.0654,False,False
+p10:q170,10,14,170,Biology,Science,99,8,6,2,7,1,0.8750,21.2121,98.9899,False,False
+p10:q228,10,15,228,Myth/Other Academic,RMPSS,93,7,6,1,6,1,0.8571,35.4839,98.9247,False,False
+p10:q128,10,16,128,Classical Music,Arts,91,9,8,1,5,4,0.5556,39.5604,98.9011,False,False
+p10:q69,10,17,69,Euro Hist,History,96,8,7,1,7,1,0.8750,53.1250,98.9583,False,False
+p10:q20,10,18,20,British Lit,Literature,123,7,5,2,7,0,1.0000,49.5935,99.1870,False,False
+p10:q214,10,19,214,Other Sci,Science,95,8,8,0,7,1,0.8750,53.6842,98.9474,False,True
+p10:q58,10,20,58,American Hist,History,104,9,8,1,4,5,0.4444,36.5385,99.0385,False,False
+p11:q230,11,1,230,World/Other Lit,Literature,102,7,5,2,5,2,0.7143,21.5686,99.0196,False,False
+p11:q231,11,2,231,Classical Music,Arts,98,5,4,1,4,1,0.8000,21.4286,98.9796,False,False
+p11:q232,11,3,232,Other Hist,History,109,7,5,2,5,2,0.7143,33.9450,99.0826,False,False
+p11:q233,11,4,233,British Lit,Literature,99,6,5,1,5,1,0.8333,37.3737,98.9899,False,False
+p11:q234,11,5,234,Biology,Science,111,6,4,2,4,2,0.6667,22.5225,99.0991,False,False
+p11:q235,11,6,235,Myth/Other Academic,RMPSS,98,6,4,2,4,2,0.6667,13.2653,98.9796,False,False
+p11:q236,11,7,236,Painting/Sculpture,Arts,101,4,3,1,4,0,1.0000,75.2475,99.0099,False,False
+p11:q237,11,8,237,Euro Hist,History,102,5,4,1,5,0,1.0000,56.8627,99.0196,False,False
+p11:q238,11,9,238,Other Sci,Science,101,4,3,1,4,0,1.0000,26.7327,99.0099,False,False
+p11:q239,11,10,239,Philosophy,RMPSS,87,5,4,1,3,2,0.6000,27.5862,98.8506,False,False
+p11:q240,11,11,240,World Hist,History,103,6,4,2,4,2,0.6667,27.1845,99.0291,False,False
+p11:q241,11,12,241,Euro Lit,Literature,104,5,3,2,4,1,0.8000,23.0769,99.0385,False,False
+p11:q242,11,13,242,Geo/CE,Geo/CE,97,5,5,0,5,0,1.0000,41.2371,64.9485,False,True
+p11:q243,11,14,243,Physics,Science,111,4,3,1,4,0,1.0000,43.2432,99.0991,False,False
+p11:q244,11,15,244,American Hist,History,107,6,6,0,5,1,0.8333,13.0841,85.0467,False,True
+p11:q245,11,16,245,Social Science,RMPSS,105,6,4,2,4,2,0.6667,31.4286,99.0476,False,False
+p11:q246,11,17,246,American Lit,Literature,101,5,5,0,5,0,1.0000,47.5248,76.2376,False,True
+p11:q247,11,18,247,Chemistry,Science,94,5,4,1,5,0,1.0000,30.8511,78.7234,False,False
+p11:q248,11,19,248,Religion,RMPSS,107,9,7,2,3,6,0.3333,29.9065,99.0654,False,False
+p11:q249,11,20,249,Other Arts,Arts,101,4,3,1,4,0,1.0000,35.6436,75.2475,False,False
+p12:q250,12,1,250,World/Other,Literature,101,5,5,0,5,0,1.0000,42.5743,94.0594,False,True
+p12:q251,12,2,251,Biology,Science,99,5,4,1,4,1,0.8000,32.3232,98.9899,False,False
+p12:q252,12,3,252,Painting/Sculpture,Arts,112,5,4,1,5,0,1.0000,27.6786,95.5357,False,False
+p12:q253,12,4,253,American Hist,History,89,4,2,2,4,0,1.0000,37.0787,74.1573,False,False
+p12:q254,12,5,254,Chemistry,Science,91,6,5,1,5,1,0.8333,27.4725,98.9011,False,False
+p12:q255,12,6,255,Other Arts,Arts,101,4,3,1,4,0,1.0000,36.6337,84.1584,False,False
+p12:q256,12,7,256,World Hist,History,93,6,4,2,4,2,0.6667,39.7849,98.9247,False,False
+p12:q257,12,8,257,Myth,RMPSS,115,6,4,2,5,1,0.8333,38.2609,99.1304,False,False
+p12:q258,12,9,258,Philosophy,RMPSS,99,7,5,2,4,3,0.5714,27.2727,98.9899,False,False
+p12:q259,12,10,259,British Lit,Literature,123,5,5,0,5,0,1.0000,56.0976,86.9919,False,True
+p12:q260,12,11,260,Social Science,RMPSS,86,5,5,0,5,0,1.0000,26.7442,98.8372,False,True
+p12:q261,12,12,261,Religion,RMPSS,92,4,2,2,3,1,0.7500,30.4348,98.9130,False,False
+p12:q262,12,13,262,Euro Lit,Literature,113,4,3,1,4,0,1.0000,48.6726,89.3805,False,False
+p12:q263,12,14,263,Geo/CE,Geo/CE,93,6,5,1,5,1,0.8333,40.8602,98.9247,False,False
+p12:q264,12,15,264,Physics,Science,89,4,2,2,4,0,1.0000,46.0674,74.1573,False,False
+p12:q265,12,16,265,Euro Hist,History,91,6,4,2,5,1,0.8333,35.1648,98.9011,False,False
+p12:q266,12,17,266,American Lit,Literature,114,6,4,2,3,3,0.5000,30.7018,99.1228,False,False
+p12:q267,12,18,267,Classical Music,Arts,97,5,3,2,4,1,0.8000,28.8660,97.9381,False,False
+p12:q268,12,19,268,Other Hist,History,102,6,5,1,5,1,0.8333,29.4118,99.0196,False,False
+p12:q269,12,20,269,Other Sci,Science,93,5,4,1,5,0,1.0000,34.4086,74.1935,False,False

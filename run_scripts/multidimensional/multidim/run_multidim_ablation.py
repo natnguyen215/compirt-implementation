@@ -391,11 +391,7 @@ def main() -> None:
             for stage in build_stages(args, dimension)
         ]
         validate_ablation_resume(
-            args.root,
-            stages,
-            args.rerun,
-            allow_stage_subset=True,
-            allow_root_rebase=True,
+            args.root, stages, args.rerun, allow_partial_resume=True
         )
         # Record the run configuration before training. Collect-only passes keep
         # the configuration written by the training sweep.

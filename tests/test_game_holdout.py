@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import os
 import unittest
-from unittest.mock import patch
 
 import pandas as pd
 
@@ -16,7 +14,6 @@ from holdout.game_splits import (
     parse_game_holdout_split,
     select_game_holdout_tables,
 )
-from run_scripts.common import run_compirt_game_holdout as runner
 
 
 def linked_tables() -> dict[str, pd.DataFrame]:
@@ -183,26 +180,6 @@ class GameHoldoutSplitTests(unittest.TestCase):
         self.assertEqual(train_games | test_games, set(tables["games"]["game_id"]))
         for outcome_table in ("tossup_buzzes", "bonus_responses"):
             self.assertTrue(set(test[outcome_table]["game_id"]) <= test_games)
-
-
-class GameHoldoutRunnerTests(unittest.TestCase):
-    def test_runner_rejects_non_multidim_model(self):
-        with patch.dict(os.environ, {"MODEL": "baseline"}, clear=True):
-            with self.assertRaisesRegex(SystemExit, "multidim"):
-                runner.resolve_settings()
-
-    def test_runner_rejects_explicit_splits(self):
-        with patch.dict(
-            os.environ, {"MODEL": "multidim", "TRAIN_SPLIT": "year_2024"}, clear=True
-        ):
-            with self.assertRaisesRegex(SystemExit, "derives"):
-                runner.resolve_settings()
-
-    def test_runner_resolves_defaults(self):
-        with patch.dict(os.environ, {"MODEL": "multidim"}, clear=True):
-            base_split, n_folds, seed, root = runner.resolve_settings()
-        self.assertEqual((base_split, n_folds, seed), ("year_2024", 5, 42))
-        self.assertIn("holdout", root)
 
 
 if __name__ == "__main__":

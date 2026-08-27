@@ -1,0 +1,9 @@
+team_type,timing_band,buzz_events,correct_buzzes,incorrect_buzzes,accuracy
+Human,0-25%,50,32,18,0.6400
+Human,25-50%,221,157,64,0.7104
+Human,50-75%,340,265,75,0.7794
+Human,75-100%,760,625,135,0.8224
+Model,0-25%,39,18,21,0.4615
+Model,25-50%,163,104,59,0.6380
+Model,50-75%,60,45,15,0.7500
+Model,75-100%,116,101,15,0.8707

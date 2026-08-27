@@ -1,0 +1,11 @@
+feature,mds1,mds2
+accuracy_all_attempts,-0.922333,0.260306
+neg_rate,0.023619,-0.842318
+zero_rate,0.941285,0.088441
+median_position_pct,0.965955,0.128878
+ppb,-0.969921,-0.121367
+perfect_bonus_rate,-0.897269,-0.044344
+zero_bonus_rate,0.882816,0.254237
+mean_team_score,-0.985498,-0.089359
+median_abs_margin,-0.117178,0.650733
+mean_tossups_read,0.661475,-0.516295

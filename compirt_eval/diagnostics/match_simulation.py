@@ -27,6 +27,7 @@ from compirt_eval.scenario_a_tossups.parameters import (
     _supports_first_buzz_reconstruction,
     load_difficulty_adjustment_curves,
     load_difficulty_link,
+    load_difficulty_scale,
 )
 from compirt_eval.scenario_a_tossups.timing import event_first_buzz_components
 from compirt_eval.scenario_b_bonuses.metrics import bonus_ranked_probability_scores
@@ -52,6 +53,7 @@ class _GameSimulationInputs:
     global_bonus: np.ndarray
     adjustments: dict
     link: str
+    difficulty_scale: float
     correctness_scale: float
     correctness_bias: float
 
@@ -136,6 +138,7 @@ def _load_simulation_inputs(pyramidal_results, compositional_results):
         global_bonus=global_bonus,
         adjustments=load_difficulty_adjustment_curves(pyramidal_results),
         link=load_difficulty_link(pyramidal_results),
+        difficulty_scale=load_difficulty_scale(pyramidal_results),
         correctness_scale=scale,
         correctness_bias=bias,
     )
@@ -155,6 +158,7 @@ def _event_simulation_inputs(event, inputs, game_teams):
         inputs.tossups,
         inputs.adjustments,
         inputs.link,
+        difficulty_scale=inputs.difficulty_scale,
     )
     first_buzz_mass = components["player_first_buzz_mass"]
     # The terminal no-buzz outcome is the last category in this categorical draw.

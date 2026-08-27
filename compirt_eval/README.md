@@ -157,6 +157,11 @@ runs trained before that conditioning fix can be regenerated with
 Players: `player_id`, threshold `c`, skill `theta_1..K` (plus `theta_norm`).
 Tossups: scalar runs have `alpha_1..K`, `beta`, `gamma`, `mu`; per-dimension
 runs have relevance `r_1..K` and per-dimension `beta_k`, `gamma_k`, `mu_k`.
+Double-difficulty runs keep correctness under those canonical names and save
+the separate timing family as `hazard_beta_*`, `hazard_gamma_*`,
+`hazard_mu_*` (or hazard-prefixed Bernstein parameters). Buzz timing,
+survival, first-buzzer, replay, and simulation paths automatically select the
+hazard family; correctness scoring continues to select the canonical family.
 `scenario_a_tossups/parameters.py` detects which schema is present, which is why the
 multidim/embedding/tfidf families reuse this evaluator unmodified. TF-IDF
 runs additionally save difficulty-adjustment curves that the timing replay
@@ -221,7 +226,9 @@ is the concatenation); `tossup_joint_event_scores.csv`,
 `tossup_time_metrics.csv`, `tossup_buzz_density_metrics.csv`,
 `first_buzzer_predictions.csv`, `bonus_score_probability_predictions.csv`,
 `game_predictions.csv`, `posterior_predictive_{summary,draws}.csv`, and
-`{pyramidal,bonus}_parameter_distribution_summary.csv`.
+`{pyramidal,bonus}_parameter_distribution_summary.csv`. Difficulty reports
+also include `pyramidal_difficulty_curve_distribution.csv`; DD runs add
+`pyramidal_hazard_difficulty_curve_distribution.csv`.
 
 ### `graphs/<group>/` — figures, sorted by theme
 
@@ -230,10 +237,10 @@ into `GRAPH_GROUPS` subdirectories:
 
 | Group | Figures |
 | --- | --- |
-| `tossup/` | reliability (aggregate + by buzz position), position scatter + binned calibration, buzz-density fit, survival metrics, first-buzzer identity, difficulty curves (+ per-dimension pages, population percentiles) |
+| `tossup/` | reliability (aggregate + by buzz position), hazard-based position scatter + binned calibration, buzz-density fit, survival metrics, first-buzzer identity, correctness difficulty curves (+ hazard counterparts for DD, per-dimension pages, population percentiles) |
 | `bonus/` | part reliability, team PPB scatter, score-by-observed-score |
 | `match/` | winner reliability, simulated-vs-actual scores |
-| `parameters/` | player, tossup, bonus-part, synergy distributions |
+| `parameters/` | player, tossup correctness, DD hazard, bonus-part, synergy distributions |
 | `diagnostics/` | posterior predictive checks, ECE by stratum |
 
 Standalone runners (ablation sweeps, drop robustness, Scenario C) call
@@ -247,7 +254,7 @@ layouts. An unknown group name raises.
 | `common/metrics.py` | Scenario-agnostic probability math, no I/O: classification metrics, ECE/Brier/sharpness, calibration tables, generic RPS, and stratified metrics |
 | `common/ranking_metrics.py` | Generic ranking agreement math used by the standalone stability studies |
 | `common/player_scoring.py` | Rotation-invariant actual and expected PPG functionals replayed from saved Stage-1 fits |
-| `common/figures.py` | Plotting primitives: `reliability_plot`, `stratified_ece_plot`, density panels/dashboards, `numeric_columns`, `short_id` |
+| `common/figures.py` | Plotting primitives: `reliability_plot`, `stratified_ece_plot`, density panels/dashboards, `short_id`; plus the shared saved-column readers every family uses — `numeric_columns` (a table or one saved row), `vector_weight_columns` (`alpha_*` or `r_*`), `vector_weight_name` |
 | `common/report_paths.py` | Path helpers: `csv_path`, `graph_path` (+ `GRAPH_GROUPS`), `metrics_path`, `evaluation_output_dirs` |
 | `common/reports.py` | Everything Markdown: metric groups, `experiment_report_markdown`, `write_eval_docs_summary`, regime notes, result-layout discovery (`load_metrics_row`, `bonus_stage_name`, …) |
 | `scenario_a_tossups/` | Scenario A, split by concern: `evaluation` (orchestration), `metrics` (joint event + buzz-position scoring), `parameters` (schema detection + difficulty reconstruction), `position` (position errors/figures), `reliability`, `difficulty`, `distributions`, and `timing` (first-buzz replay, survival metrics, first-buzzer identity) |

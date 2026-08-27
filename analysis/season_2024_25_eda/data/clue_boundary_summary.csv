@@ -1,0 +1,5 @@
+outcome,buzzes,at_exact_boundary,observed_boundary_share,uniform_expected_boundary_share,boundary_enrichment
+Correct (+10),49076,8744,0.178173,0.046769,3.809622
+Neg (-5),10692,1833,0.171437,0.047311,3.623636
+All scored,59768,10577,0.176968,0.046866,3.776035
+Phase-0 first buzz,51037,8703,0.170523,0.046748,3.647737

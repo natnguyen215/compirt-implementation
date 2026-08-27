@@ -1,0 +1,26 @@
+{
+  "model": "monotone-bernstein-multidim-competing-risks",
+  "formula": "logit_ij(x) = sum_k r_jk * (theta_ik - d_jk(x))",
+  "difficulty_family": "monotone_bernstein_polynomial",
+  "polynomial_degree": 5,
+  "polynomial_basis": "strictly-decreasing-bernstein",
+  "drop_concentration": 2.0,
+  "total_drop_prior": "LogNormal(0, 0.5)",
+  "split": "game-holdout:year_2024:train:5:0:42",
+  "tournament": "",
+  "dimensions": 5,
+  "steps": 3000,
+  "lr": 0.01,
+  "seed": 42,
+  "final_loss": 327702.75437927246,
+  "players": 1455,
+  "tossups": 1260,
+  "events": 39192,
+  "calibrate_correctness": false,
+  "include_bounceback": false,
+  "observation_counts": {
+    "CENSORED": 238670,
+    "BUZZ": 38619,
+    "NO-BUZZ": 4035
+  }
+}

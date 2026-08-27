@@ -1,0 +1,33 @@
+{
+  "source_signature": {
+    "players.csv": [
+      110328,
+      1786933532413803677
+    ],
+    "tossups.csv": [
+      330960,
+      1786933532437304347
+    ],
+    "tossup_predictions.csv": [
+      88605069,
+      1786933550919889843
+    ],
+    "buzz_event_predictions.csv": [
+      4256356,
+      1786933551116164854
+    ]
+  },
+  "metrics": {
+    "accuracy": 0.7659403788427699,
+    "neg_f1": 0.016099205917545958,
+    "accuracy_lift_over_all_correct": 0.00012938619190561162,
+    "joint_tossup_event_log_loss": 7.5894855659496665,
+    "log_loss": 0.5655165246999684,
+    "auc": 0.6228606552694532,
+    "ece": 0.09213753940637612,
+    "buzz_position_mae": 0.3409621123536097,
+    "first_buzzer_top1_accuracy": 0.40169237139012526,
+    "no_buzz_calibration_error": 0.2227574049763962,
+    "full_pmf_final_decile_mass": 0.02900687843809022
+  }
+}

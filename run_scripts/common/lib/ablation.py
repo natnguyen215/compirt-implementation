@@ -165,82 +165,86 @@ def stage_config(stages: list[Stage]) -> list[dict[str, object]]:
     ]
 
 
+def _has_existing_outputs(root: Path, stages: list[Stage]) -> bool:
+    """Return whether a previous sweep already left results under ``root``."""
+    return any(root.glob("dim_*")) or any(
+        stage.expected_output.exists() for stage in stages
+    )
+
+
+def _stage_key(stage: dict[str, object], result_roots: list[str]) -> tuple[str, ...]:
+    """Identify a stage by name and command, with the result root masked out.
+
+    A sweep resumed after its output directory moved keeps the same stages, so
+    the root prefix is replaced by a placeholder before stages are compared.
+    """
+
+    def mask(value: str) -> str:
+        for candidate in result_roots:
+            if candidate in value:
+                return value.replace(candidate, "<ABLATION_ROOT>")
+        return value
+
+    command = [str(value) for value in stage["command"]]
+    return (str(stage["name"]), *(mask(str(stage["expected_output"])), *map(mask, command)))
+
+
 def validate_ablation_resume(
     root: Path,
     stages: list[Stage],
     rerun: bool,
     *,
-    allow_stage_subset: bool = False,
-    allow_root_rebase: bool = False,
+    allow_partial_resume: bool = False,
 ) -> None:
     """Reject completed outputs produced by a different or unknown command set.
 
-    Dimension sweeps may be resumed with a larger or smaller dimension list. If
-    requested, accept compatible overlapping stages; every overlap must still
-    have the exact same command and marker. This lets a stopped sweep add
-    missing points without weakening protection against changed model settings.
+    Dimension sweeps may be resumed with a larger or smaller dimension list, and
+    from a moved output directory. With ``allow_partial_resume`` the run is
+    accepted as long as it shares at least one stage with the saved sweep;
+    shared stages must still match command-for-command, so this lets a stopped
+    sweep add missing points without weakening protection against changed model
+    settings.
     """
     if rerun:
         return
     config_path = root / "ablation_config.json"
     if not config_path.exists():
-        has_outputs = any(root.glob("dim_*")) or any(
-            stage.expected_output.exists() for stage in stages
-        )
-        if has_outputs:
+        if _has_existing_outputs(root, stages):
             raise RuntimeError(
                 f"Existing ablation outputs under {root} have no saved command "
                 "metadata; use --rerun or a new --root"
             )
         return
+
     saved = json.loads(config_path.read_text(encoding="utf-8"))
     saved_stages = saved.get("stages")
-    if saved_stages is None:
-        has_outputs = any(root.glob("dim_*")) or any(
-            stage.expected_output.exists() for stage in stages
-        )
-        if not has_outputs:
-            return
+    if saved_stages is None and not _has_existing_outputs(root, stages):
+        return
+
     current_stages = stage_config(stages)
-    if saved_stages != current_stages:
-        if allow_stage_subset or allow_root_rebase:
-            saved_root = saved.get("arguments", {}).get("root")
-            root_candidates = {str(root), path_for_command(root)}
-            if allow_root_rebase and saved_root:
-                saved_root_path = Path(saved_root)
-                root_candidates.update(
-                    {str(saved_root_path), path_for_command(saved_root_path)}
-                )
+    if saved_stages == current_stages:
+        return
 
-            def normalized(stage: dict[str, object]) -> tuple[object, ...]:
-                values = [stage["expected_output"], *stage["command"]]
-                if allow_root_rebase:
-                    values = [
-                        next(
-                            (
-                                value.replace(candidate, "<ABLATION_ROOT>")
-                                for candidate in sorted(
-                                    root_candidates, key=len, reverse=True
-                                )
-                                if candidate
-                                and candidate not in {"."}
-                                and candidate in value
-                            ),
-                            value,
-                        )
-                        for value in values
-                    ]
-                return (stage["name"], *values)
-
-            saved_by_marker = {normalized(stage): stage for stage in saved_stages}
-            current_by_marker = {normalized(stage): stage for stage in current_stages}
-            overlap = saved_by_marker.keys() & current_by_marker.keys()
-            if overlap:
-                return
-        raise RuntimeError(
-            f"Existing ablation outputs under {root} were produced by different "
-            "commands; use --rerun or a new --root"
+    if allow_partial_resume and saved_stages is not None:
+        # Mask both this run's root and the root the snapshot was written under,
+        # longest first so a path that contains the other still masks cleanly.
+        saved_root = saved.get("arguments", {}).get("root")
+        candidates = {str(root), path_for_command(root)}
+        if saved_root:
+            candidates.update({str(Path(saved_root)), path_for_command(Path(saved_root))})
+        result_roots = sorted(
+            (value for value in candidates if value and value != "."),
+            key=len,
+            reverse=True,
         )
+        saved_keys = {_stage_key(stage, result_roots) for stage in saved_stages}
+        if saved_keys & {_stage_key(stage, result_roots) for stage in current_stages}:
+            return
+
+    raise RuntimeError(
+        f"Existing ablation outputs under {root} were produced by different "
+        "commands; use --rerun or a new --root"
+    )
 
 
 def save_ablation_config(

@@ -10,7 +10,10 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 from sklearn.metrics import (
+    average_precision_score,
     log_loss,
+    precision_score,
+    recall_score,
     roc_auc_score,
 )
 
@@ -142,6 +145,32 @@ def classification_metrics(y, probability):
         "accuracy_lift_over_all_correct": accuracy - all_correct_accuracy,
     }
     metrics.update(sharpness_metrics(raw_probability))
+    return metrics
+
+
+def negative_class_metrics(y, probability):
+    """Score the negative outcome as the positive class at threshold 0.5."""
+    y = 1 - np.asarray(y, dtype=int)
+    probability = 1 - np.asarray(probability, dtype=float)
+    metrics = {
+        "neg_auroc": float("nan"),
+        "neg_average_precision": float("nan"),
+        "neg_precision": float("nan"),
+        "neg_recall": float("nan"),
+    }
+    if not len(y):
+        return metrics
+
+    prediction = probability >= 0.5
+    metrics.update(
+        neg_precision=float(precision_score(y, prediction, zero_division=0)),
+        neg_recall=float(recall_score(y, prediction, zero_division=0)),
+    )
+    if len(np.unique(y)) == 2:
+        metrics.update(
+            neg_auroc=float(roc_auc_score(y, probability)),
+            neg_average_precision=float(average_precision_score(y, probability)),
+        )
     return metrics
 
 

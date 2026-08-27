@@ -1,0 +1,25 @@
+{
+  "model": "test-additions-multidim-sigmoid-competing-risks",
+  "formula": "logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t)) - c_i [+ g(t) if timing]  ; correctness [+ position bias if correctness]",
+  "tournament": "",
+  "dimensions": 5,
+  "improve_timing": true,
+  "improve_correctness": false,
+  "calibrate_correctness": false,
+  "urgency_knots": 5,
+  "calibration_knots": 5,
+  "seed": 42,
+  "steps": 3000,
+  "final_loss": 70162.88074970245,
+  "players": 1186,
+  "tossups": 1240,
+  "events": 9420,
+  "include_bounceback": false,
+  "observation_counts": {
+    "CENSORED": 56885,
+    "BUZZ": 9295,
+    "NO-BUZZ": 900
+  },
+  "mean_buzz_loglik": -4.209634752668572,
+  "mean_buzz_crps": 0.08871588197087388
+}

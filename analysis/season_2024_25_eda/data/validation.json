@@ -1,0 +1,38 @@
+{
+  "scope": {
+    "season": "2024-25",
+    "sites_33": true,
+    "all_four_tiers_present": true,
+    "events_4": true,
+    "buzzes_64037": true
+  },
+  "referential_checks": {
+    "all_buzz_games_resolved": true,
+    "all_buzz_tossups_resolved": true,
+    "all_bonus_games_resolved": true,
+    "two_teams_per_game": true,
+    "two_scores_per_game": true,
+    "every_site_in_season": true
+  },
+  "diagnostic_checks": {
+    "clue_phase_has_four_views": true,
+    "phase0_first_buzz_count_matches_source": true,
+    "three_adjacent_tier_stability_rows": true,
+    "specialty_sensitivity_thresholds_present": true,
+    "question_correlations_have_pooled_plus_tiers": true
+  },
+  "known_quality_items": {
+    "missing_tossup_categories": 0,
+    "missing_bonus_categories": 0,
+    "buzz_position_overruns_before_clipping": 53,
+    "missing_earning_player_bonus_responses": 10892
+  },
+  "mds": {
+    "team_stress_1": 0.132003,
+    "team_variance_explained": 0.835826,
+    "team_points": 480.0,
+    "site_stress_1": 0.150458,
+    "site_variance_explained": 0.819905,
+    "site_points": 33.0
+  }
+}

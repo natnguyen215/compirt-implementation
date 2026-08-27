@@ -13,6 +13,7 @@ import pyro.distributions as dist
 import torch
 
 from utils.posterior import save_variational_posterior
+from utils.saving import write_summary
 from utils.training import fit_svi
 
 
@@ -35,6 +36,21 @@ class _FakeGuide:
 
 
 class PosteriorArtifactTests(unittest.TestCase):
+    def test_summary_keeps_bias_only_calibration(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output_dir = Path(directory)
+            write_summary(
+                output_dir,
+                {"model": "test"},
+                {"correctness_bias": torch.tensor(0.75)},
+            )
+
+            summary = json.loads(
+                (output_dir / "summary.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(summary["correctness_bias"], 0.75)
+            self.assertNotIn("correctness_scale", summary)
+
     def test_saves_shape_preserving_quantiles_and_aligned_draws(self):
         with tempfile.TemporaryDirectory() as directory:
             output_dir = Path(directory)

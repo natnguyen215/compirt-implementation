@@ -1,0 +1,87 @@
+{
+  "approximation": "Pyro AutoNormal variational posterior",
+  "mean_field": true,
+  "quantile_probabilities": [
+    0.025,
+    0.5,
+    0.975
+  ],
+  "draws": 0,
+  "draw_seed": 42,
+  "estimated_draw_bytes": 0,
+  "draw_alignment": "The same leading draw index across every site file is one joint variational-posterior draw.",
+  "interpretation": "Intervals are approximate SVI credible intervals conditional on this model and fitted dataset; they are not bootstrap intervals.",
+  "sites": {
+    "theta": {
+      "shape": [
+        1455,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "theta",
+      "draw_file": null
+    },
+    "c": {
+      "shape": [
+        1455
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "c",
+      "draw_file": null
+    },
+    "r_correct": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "r_correct",
+      "draw_file": null
+    },
+    "r_hazard": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "r_hazard",
+      "draw_file": null
+    },
+    "spline_start_correct": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "spline_start_correct",
+      "draw_file": null
+    },
+    "spline_drop_correct": {
+      "shape": [
+        8059,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "spline_drop_correct",
+      "draw_file": null
+    },
+    "spline_start_hazard": {
+      "shape": [
+        1260,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "spline_start_hazard",
+      "draw_file": null
+    },
+    "spline_drop_hazard": {
+      "shape": [
+        8059,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "spline_drop_hazard",
+      "draw_file": null
+    }
+  }
+}

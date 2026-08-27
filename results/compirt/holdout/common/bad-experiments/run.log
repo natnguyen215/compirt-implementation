@@ -1,0 +1,10 @@
+neg_test | configs=['bernstein-drop0.5', 'bernstein-drop0.1'] folds=[0, 1, 2, 3, 4] device=cuda steps=3000 dim=5 root=results/neg_test
+
+===== bernstein-drop0.5 | fold 0 | TRAIN =====
+Rows: 281,324  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238670
+BUZZ         38619
+NO-BUZZ       4035
+step    0  ELBO loss: 51,121,501.8
+step  100  ELBO loss: 487,410.1

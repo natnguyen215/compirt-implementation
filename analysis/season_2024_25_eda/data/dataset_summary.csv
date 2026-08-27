@@ -1,0 +1,27 @@
+metric,value
+season,2024-25
+tiers,fall;winter;regionals;nationals
+date_range,2024-10-19 to 2025-04-19
+tournament_sites,33
+question_set_events,4
+teams,492
+roster_memberships,1987
+normalized_player_ids_with_buzz,1339
+games,2661
+tossup_questions,1360
+bonus_questions,1359
+buzz_events,64037
+correct_buzzes,49076
+negs,10692
+zero_value_attempts,4269
+bonus_responses,49042
+bonus_part_observations,147126
+category_missing_tossups,0
+category_missing_bonuses,0
+bonus_responses_without_earning_player,10892
+buzz_position_overruns,53
+players_in_one_tier_only,898
+players_in_all_four_tiers,7
+nationals_seen_earlier_buzz_share,0.721015
+team_mds_stress_1,0.132003
+site_mds_stress_1,0.150458

@@ -204,17 +204,37 @@ def sample_parameters(data, n_dimensions):
     return theta, c, r, beta, gamma, mu
 
 
-def sample_correctness_calibration(data):
-    """Sample the global correctness recalibration scale and bias."""
+def sample_correctness_calibration(data, with_scale=True):
+    """Sample the global correctness recalibration scale and bias.
+
+    `with_scale=False` drops the multiplicative term and returns `None` in its
+    place, leaving a bias-only shift that moves the correctness level without
+    compressing its spread (see `neg_test/README.md`).
+    """
     zero = data["y"].new_tensor(0.0)
-    scale = pyro.sample(
-        "correctness_scale", dist.LogNormal(zero, data["y"].new_tensor(0.5))
+    scale = (
+        pyro.sample("correctness_scale", dist.LogNormal(zero, data["y"].new_tensor(0.5)))
+        if with_scale
+        else None
     )
     bias = pyro.sample("correctness_bias", dist.Normal(zero, data["y"].new_tensor(3.0)))
     return scale, bias
 
 
-def competing_risks_model(data, n_dimensions=1, calibrate_correctness=False, link="sigmoid"):
+def apply_correctness_calibration(correctness, scale, bias):
+    """Recalibrate a correctness logit; a `scale` of None is the bias-only form."""
+    if scale is None:
+        return correctness + bias
+    return scale * correctness + bias
+
+
+def competing_risks_model(
+    data,
+    n_dimensions=1,
+    calibrate_correctness=False,
+    link="sigmoid",
+    calibrate_scale=True,
+):
     """Define the multidimensional-difficulty competing-risks likelihood.
 
     Every rostered player contributes survival before the stopping position. The
@@ -267,8 +287,8 @@ def competing_risks_model(data, n_dimensions=1, calibrate_correctness=False, lin
     )
     if calibrate_correctness:
         # Apply calibration to correctness; hazard/timing keeps its base logit.
-        scale, bias = sample_correctness_calibration(data)
-        correctness = scale * correctness + bias
+        scale, bias = sample_correctness_calibration(data, with_scale=calibrate_scale)
+        correctness = apply_correctness_calibration(correctness, scale, bias)
 
     log_likelihood = (
         # Sum log survival over every player-event row.
@@ -280,7 +300,9 @@ def competing_risks_model(data, n_dimensions=1, calibrate_correctness=False, lin
     pyro.factor("multidim_competing_risks_likelihood", log_likelihood)
 
 
-def posterior_row_predictions(data, posterior, calibrate_correctness=False, link="sigmoid"):
+def posterior_row_predictions(
+    data, posterior, calibrate_correctness=False, link="sigmoid", calibrate_scale=True
+):
     """Return fitted correctness, hazard, and survival for each row.
 
     Indexing each fitted parameter by the row's player and tossup recreates the
@@ -299,9 +321,10 @@ def posterior_row_predictions(data, posterior, calibrate_correctness=False, link
         theta, r, beta, gamma, mu, data["t_star"], data["T_j"], link
     )
     if calibrate_correctness:
-        correctness_logits = (
-            posterior["correctness_scale"] * correctness_logits
-            + posterior["correctness_bias"]
+        correctness_logits = apply_correctness_calibration(
+            correctness_logits,
+            posterior["correctness_scale"] if calibrate_scale else None,
+            posterior["correctness_bias"],
         )
     correctness = torch.sigmoid(correctness_logits)
     hazard = torch.sigmoid(

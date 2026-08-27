@@ -11,6 +11,7 @@ import math
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 from compirt_eval.common.metrics import calibration_table, expected_calibration_error
 
@@ -96,21 +97,37 @@ def stratified_ece_plot(diagnostics, path):
 
 
 def numeric_columns(frame, prefix):
-    """Return numbered columns such as theta_1, theta_2 in numeric order."""
+    """Return numbered labels such as theta_1, theta_2 in numeric order.
+
+    Accepts a DataFrame (whose columns are searched) or a single saved row as
+    a Series (whose index is searched), so the same helper reads a whole table
+    or one tossup.
+    """
+    labels = frame.index if isinstance(frame, pd.Series) else frame.columns
     return sorted(
         (
-            column
-            for column in frame
-            if column.startswith(prefix)
-            and column.removeprefix(prefix).isdigit()
+            label
+            for label in labels
+            if isinstance(label, str)
+            and label.startswith(prefix)
+            and label.removeprefix(prefix).isdigit()
         ),
-        key=lambda column: int(column.removeprefix(prefix)),
+        key=lambda label: int(label.removeprefix(prefix)),
     )
+
+
+def vector_weight_columns(frame):
+    """Return saved vector weights, accepting either alpha_* or embedding r_*."""
+    alpha_columns = numeric_columns(frame, "alpha_")
+    relevance_columns = numeric_columns(frame, "r_")
+    if alpha_columns and relevance_columns:
+        raise ValueError("Saved vector weights must use either alpha_* or r_*, not both")
+    return alpha_columns or relevance_columns
 
 
 def vector_weight_name(columns):
     """Return the coordinate prefix used by a saved vector-weight family."""
-    if columns and columns[0].startswith("r_"):
+    if columns and columns[0].removeprefix("hazard_").startswith("r_"):
         return "r"
     return "alpha"
 
@@ -228,6 +245,26 @@ def density_panel(ax, series, title, xlabel, zero_line=False, bounds=None):
     ax.grid(alpha=0.2)
     if multiple:
         ax.legend(fontsize=7)
+
+
+def density_panel_spec(series, title, xlabel, *, zero_line=False, bounds=None):
+    """Build one `distribution_dashboard` panel, keyed for `density_panel`.
+
+    `series` may already be the label-to-values mapping `density_panel` wants,
+    or a DataFrame slice / single column, which is the common case and reads
+    better than spelling the comprehension out at every call site.
+    """
+    if isinstance(series, pd.DataFrame):
+        series = {column: series[column] for column in series.columns}
+    elif isinstance(series, pd.Series):
+        series = {series.name: series}
+    return {
+        "series": series,
+        "title": title,
+        "xlabel": xlabel,
+        "zero_line": zero_line,
+        "bounds": bounds,
+    }
 
 
 def distribution_dashboard(panels, title, path):

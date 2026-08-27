@@ -1,0 +1,81 @@
+{
+  "approximation": "Pyro AutoNormal variational posterior",
+  "mean_field": true,
+  "quantile_probabilities": [
+    0.025,
+    0.5,
+    0.975
+  ],
+  "draws": 100,
+  "draw_seed": 42,
+  "estimated_draw_bytes": 12767200,
+  "draw_alignment": "The same leading draw index across every site file is one joint variational-posterior draw.",
+  "interpretation": "Intervals are approximate SVI credible intervals conditional on this model and fitted dataset; they are not bootstrap intervals.",
+  "sites": {
+    "theta": {
+      "shape": [
+        1186,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "theta",
+      "draw_file": "posterior_draws/theta.npy"
+    },
+    "c": {
+      "shape": [
+        1186
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "c",
+      "draw_file": "posterior_draws/c.npy"
+    },
+    "r": {
+      "shape": [
+        1240,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "r",
+      "draw_file": "posterior_draws/r.npy"
+    },
+    "beta": {
+      "shape": [
+        1240,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "beta",
+      "draw_file": "posterior_draws/beta.npy"
+    },
+    "gamma": {
+      "shape": [
+        1240,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "gamma",
+      "draw_file": "posterior_draws/gamma.npy"
+    },
+    "mu": {
+      "shape": [
+        1240,
+        5
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "mu",
+      "draw_file": "posterior_draws/mu.npy"
+    },
+    "correctness_scale": {
+      "shape": [],
+      "dtype": "float32",
+      "quantile_prefix": "correctness_scale",
+      "draw_file": "posterior_draws/correctness_scale.npy"
+    },
+    "correctness_bias": {
+      "shape": [],
+      "dtype": "float32",
+      "quantile_prefix": "correctness_bias",
+      "draw_file": "posterior_draws/correctness_bias.npy"
+    }
+  }
+}

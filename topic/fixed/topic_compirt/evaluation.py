@@ -26,6 +26,7 @@ from compirt_eval.common.reports import (
     write_eval_docs_summary,
 )
 from compirt_eval.common.figures import (
+    density_panel_spec,
     distribution_dashboard,
     distribution_summary,
     labeled_series,
@@ -446,12 +447,8 @@ def topic_pyramidal_parameter_distribution_plots(
 ):
     """Plot saved topic-pyramidal parameter distributions.
 
-    Builds one dict per panel with the keys 'compirt_eval.common.figures.density_panel'
-    expects: 'series' (label -> values), 'title', 'xlabel', 'zero_line'
-    (draw a reference line at 0, for signed parameters), and 'bounds' (clamp
-    the density grid, or 'None' for an unbounded parameter). Panels are only
-    added when their source column(s) exist, so a run without e.g. a topic
-    weight still produces a dashboard for the columns it does have.
+    Panels are only added when their source column(s) exist, so a run without
+    e.g. a topic weight still produces a dashboard for the columns it does have.
     """
     player_path = results_dir / "players.csv"
     tossup_path = results_dir / "tossups.csv"
@@ -473,33 +470,27 @@ def topic_pyramidal_parameter_distribution_plots(
     player_panels = []
     if "c" in players:
         player_panels.append(
-            {
-                "series": {"c": players["c"]},
-                "title": "Confidence threshold",
-                "xlabel": "c",
-                "zero_line": True,
-                "bounds": None,
-            }
+            density_panel_spec(
+                players["c"], "Confidence threshold", "c", zero_line=True
+            )
         )
     if theta_columns:
         player_panels.append(
-            {
-                "series": labeled_series(players, theta_columns, dimension_labels),
-                "title": "Skill coordinates",
-                "xlabel": "theta",
-                "zero_line": True,
-                "bounds": None,
-            }
+            density_panel_spec(
+                labeled_series(players, theta_columns, dimension_labels),
+                "Skill coordinates",
+                "theta",
+                zero_line=True,
+            )
         )
     if "theta_norm" in players:
         player_panels.append(
-            {
-                "series": {"theta_norm": players["theta_norm"]},
-                "title": "Skill magnitude",
-                "xlabel": "theta norm",
-                "zero_line": False,
-                "bounds": (0, None),
-            }
+            density_panel_spec(
+                players["theta_norm"],
+                "Skill magnitude",
+                "theta norm",
+                bounds=(0, None),
+            )
         )
     if player_panels:
         distribution_dashboard(
@@ -515,45 +506,39 @@ def topic_pyramidal_parameter_distribution_plots(
     tossup_panels = []
     if beta_columns:
         tossup_panels.append(
-            {
-                "series": labeled_series(tossups, beta_columns, dimension_labels),
-                "title": "Per-topic difficulty amplitudes",
-                "xlabel": "beta",
-                "zero_line": True,
-                "bounds": None,
-            }
+            density_panel_spec(
+                labeled_series(tossups, beta_columns, dimension_labels),
+                "Per-topic difficulty amplitudes",
+                "beta",
+                zero_line=True,
+            )
         )
     if gamma_columns:
         tossup_panels.append(
-            {
-                "series": _positive_log_series(
-                    tossups, gamma_columns, dimension_labels
-                ),
-                "title": "Per-topic difficulty sharpness",
-                "xlabel": "log10(gamma)",
-                "zero_line": True,
-                "bounds": None,
-            }
+            density_panel_spec(
+                _positive_log_series(tossups, gamma_columns, dimension_labels),
+                "Per-topic difficulty sharpness",
+                "log10(gamma)",
+                zero_line=True,
+            )
         )
     if mu_columns:
         tossup_panels.append(
-            {
-                "series": labeled_series(tossups, mu_columns, dimension_labels),
-                "title": "Per-topic difficulty transition locations",
-                "xlabel": "relative position mu",
-                "zero_line": False,
-                "bounds": (0, 1),
-            }
+            density_panel_spec(
+                labeled_series(tossups, mu_columns, dimension_labels),
+                "Per-topic difficulty transition locations",
+                "relative position mu",
+                bounds=(0, 1),
+            )
         )
     if topic_columns:
         tossup_panels.append(
-            {
-                "series": labeled_series(tossups, topic_columns, dimension_labels),
-                "title": "Fixed topic weights",
-                "xlabel": "topic weight",
-                "zero_line": False,
-                "bounds": (0, 1),
-            }
+            density_panel_spec(
+                labeled_series(tossups, topic_columns, dimension_labels),
+                "Fixed topic weights",
+                "topic weight",
+                bounds=(0, 1),
+            )
         )
     if tossup_panels:
         distribution_dashboard(

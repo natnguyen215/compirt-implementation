@@ -1,0 +1,13 @@
+tier,difficulty,observations,conversion,tier_label
+fall,easy,14112,0.944657,ACF Fall
+fall,hard,14112,0.244473,ACF Fall
+fall,medium,14112,0.607355,ACF Fall
+nationals,easy,7594,0.942455,ACF Nationals
+nationals,hard,7594,0.094022,ACF Nationals
+nationals,medium,7594,0.489070,ACF Nationals
+regionals,easy,13232,0.891097,ACF Regionals
+regionals,hard,13232,0.114646,ACF Regionals
+regionals,medium,13232,0.412409,ACF Regionals
+winter,easy,14104,0.915130,ACF Winter
+winter,hard,14104,0.147547,ACF Winter
+winter,medium,14104,0.472915,ACF Winter

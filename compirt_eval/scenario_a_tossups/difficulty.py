@@ -1,11 +1,11 @@
-"""Plot learned difficulty curves against empirical first-buzz locations.
+"""Plot learned correctness and hazard difficulty curves.
 
 Picks a handful of tossups spanning the observed range of buzz timing and
-overlays each one's fitted difficulty curve (Eq. 3) on a histogram of where
-players actually buzzed, as a visual sanity check that harder-difficulty
-curves line up with later empirical buzzes. 'difficulty_plot' renders the
-single effective curve; 'multidim_difficulty_components_plot' additionally
-breaks a multidimensional fit down into its per-skill-dimension components.
+overlays each fitted curve on a histogram of where players actually buzzed.
+For double-difficulty runs the hazard curve is the buzz-timing diagnostic and
+the correctness curve is shown separately for comparison. ``difficulty_plot``
+renders effective curves; ``multidim_difficulty_components_plot`` also breaks
+each family down into its per-skill-dimension components.
 """
 
 from __future__ import annotations
@@ -20,17 +20,33 @@ from compirt_eval.common.figures import short_id, vector_weight_name
 from compirt_eval.common.report_paths import graph_path
 from compirt_eval.scenario_a_tossups.parameters import (
     _difficulty_parameter_columns,
+    _has_saved_difficulty,
     _parameter_columns,
     _saved_difficulty_components,
     _saved_difficulty_curve,
     _validate_tossup_multidim_dimensions,
     _validate_monotone_dimensions,
     _validate_polynomial_dimensions,
+    _validate_spline_dimensions,
     difficulty_adjustment_at,
     load_difficulty_adjustment_curves,
     load_difficulty_link,
     load_difficulty_scale,
 )
+
+DIFFICULTY_FAMILIES = (
+    ("", "Correctness difficulty", "tossup_difficulty_curves"),
+    ("hazard_", "Hazard difficulty", "tossup_hazard_difficulty_curves"),
+)
+
+
+def _saved_families(parameters):
+    """Yield the canonical curve and an optional saved hazard curve."""
+    for parameter_prefix, label, filename_stem in DIFFICULTY_FAMILIES:
+        if not parameter_prefix or _has_saved_difficulty(
+            parameters, parameter_prefix
+        ):
+            yield parameter_prefix, label, filename_stem
 
 
 def tossup_observation_summary(predictions):
@@ -72,8 +88,50 @@ def selected_tossups(predictions, count=6):
     return evenly_spaced_ids(frequent, "mean_buzz_position", count)
 
 
+def _buzz_histogram_axes(ax, predictions, tossup_id):
+    """Draw one tossup's observed buzz histogram and return a difficulty axis.
+
+    Difficulty and buzz counts share an x axis but not a y scale, so the
+    returned twin carries the curves.
+    """
+    buzz_positions = predictions.loc[
+        (predictions["tossup_id"] == tossup_id) & (predictions["z"] == "BUZZ"),
+        "relative_position",
+    ]
+    ax.hist(
+        buzz_positions,
+        bins=np.linspace(0, 1, 11),
+        color="tab:orange",
+        alpha=0.25,
+        label=f"Observed buzzes (n={len(buzz_positions)})",
+    )
+    return ax.twinx()
+
+
+def _finish_curve_panel(ax, curve_ax, tossup_id, fontsize, family_label="Difficulty"):
+    """Label one buzz/difficulty panel and merge both axes into one legend."""
+    ax.set(
+        title=short_id(tossup_id),
+        xlabel="Relative position",
+        ylabel="Buzz count",
+        xlim=(0, 1),
+    )
+    curve_ax.set_ylabel(f"Estimated {family_label.lower()}")
+    ax.grid(alpha=0.2)
+    handles, labels = ax.get_legend_handles_labels()
+    curve_handles, curve_labels = curve_ax.get_legend_handles_labels()
+    handles += curve_handles
+    ax.legend(
+        handles,
+        labels + curve_labels,
+        fontsize=fontsize,
+        loc="upper right",
+        ncol=2 if len(handles) > 8 else 1,
+    )
+
+
 def difficulty_plot(results_dir, output_dir):
-    """Plot learned difficulty curves over empirical first-buzz locations.
+    """Plot correctness and, when saved, hazard difficulty curves.
 
     When the run saved TF-IDF adjustment curves, they are signed additive
     difficulty deltas, so the plotted curve is 'd'_j(t) = d_j(t) + delta_j(t)'.
@@ -84,13 +142,43 @@ def difficulty_plot(results_dir, output_dir):
     adjustments = load_difficulty_adjustment_curves(results_dir)
     link = load_difficulty_link(results_dir)
     difficulty_scale = load_difficulty_scale(results_dir)
+    for parameter_prefix, family_label, filename_stem in _saved_families(parameters):
+        _difficulty_family_plot(
+            parameters,
+            predictions,
+            output_dir,
+            adjustments,
+            link,
+            difficulty_scale,
+            parameter_prefix,
+            family_label,
+            f"{filename_stem}.png",
+        )
+
+
+def _difficulty_family_plot(
+    parameters,
+    predictions,
+    output_dir,
+    adjustments,
+    link,
+    difficulty_scale,
+    parameter_prefix,
+    family_label,
+    filename,
+):
+    """Render one saved difficulty family over empirical buzz locations."""
     positions = np.linspace(0.0, 1.0, 200)
     selected = [
         tossup_id
         for tossup_id in selected_tossups(predictions)
         if tossup_id in parameters.index
         and _saved_difficulty_curve(
-            parameters.loc[tossup_id], positions, link, difficulty_scale
+            parameters.loc[tossup_id],
+            positions,
+            link,
+            difficulty_scale,
+            parameter_prefix,
         ) is not None
     ]
 
@@ -102,20 +190,9 @@ def difficulty_plot(results_dir, output_dir):
     for ax, tossup_id in zip(axes.flat, selected):
         row = parameters.loc[tossup_id]
         difficulty = _saved_difficulty_curve(
-            row, positions, link, difficulty_scale
+            row, positions, link, difficulty_scale, parameter_prefix
         )
-        buzz_positions = predictions.loc[
-            (predictions["tossup_id"] == tossup_id) & (predictions["z"] == "BUZZ"),
-            "relative_position",
-        ]
-        ax.hist(
-            buzz_positions,
-            bins=np.linspace(0, 1, 11),
-            color="tab:orange",
-            alpha=0.25,
-            label=f"Observed buzzes (n={len(buzz_positions)})",
-        )
-        curve_ax = ax.twinx()
+        curve_ax = _buzz_histogram_axes(ax, predictions, tossup_id)
         adjustment = difficulty_adjustment_at(adjustments, tossup_id, positions)
         if adjustment is not None:
             curve_ax.plot(
@@ -125,14 +202,14 @@ def difficulty_plot(results_dir, output_dir):
                 linewidth=1.3,
                 linestyle="--",
                 alpha=0.65,
-                label="Base difficulty d(t)",
+                label=f"Base {family_label.lower()} d(t)",
             )
             curve_ax.plot(
                 positions,
                 difficulty + adjustment,
                 color="black",
                 linewidth=2,
-                label="Effective difficulty d'(t)",
+                label=f"Effective {family_label.lower()} d'(t)",
             )
         else:
             curve_ax.plot(
@@ -140,29 +217,22 @@ def difficulty_plot(results_dir, output_dir):
                 difficulty,
                 color="tab:blue",
                 linewidth=2,
-                label="Difficulty",
+                label=family_label,
             )
-        ax.set(
-            title=short_id(tossup_id),
-            xlabel="Relative position",
-            ylabel="Buzz count",
-            xlim=(0, 1),
-        )
-        curve_ax.set_ylabel("Estimated difficulty")
-        ax.grid(alpha=0.2)
-        handles, labels = ax.get_legend_handles_labels()
-        curve_handles, curve_labels = curve_ax.get_legend_handles_labels()
-        ax.legend(
-            handles + curve_handles,
-            labels + curve_labels,
+        _finish_curve_panel(
+            ax,
+            curve_ax,
+            tossup_id,
             fontsize=7,
-            loc="upper right",
+            family_label=family_label,
         )
     for ax in axes.flat[len(selected):]:
         ax.set_visible(False)
-    fig.suptitle("Estimated tossup difficulty and empirical buzz locations")
+    fig.suptitle(
+        f"Estimated tossup {family_label.lower()} and empirical buzz locations"
+    )
     fig.tight_layout()
-    fig.savefig(graph_path(output_dir, "tossup_difficulty_curves.png", "tossup"), dpi=160)
+    fig.savefig(graph_path(output_dir, filename, "tossup"), dpi=160)
     plt.close(fig)
 
 
@@ -179,7 +249,7 @@ def multidim_difficulty_components_plot(
     count=6,
     panels_per_figure=6,
 ):
-    """Plot every per-dimension curve plus weighted difficulty.
+    """Plot every per-dimension correctness and hazard curve.
 
     The evaluator's default remains one six-tossup diagnostic. Larger opt-in
     galleries are split across numbered files so high-dimensional runs stay
@@ -189,11 +259,6 @@ def multidim_difficulty_components_plot(
         raise ValueError("count must be at least 1")
     if panels_per_figure < 1:
         raise ValueError("panels_per_figure must be at least 1")
-    graphs_dir = graph_path(
-        output_dir, "tossup_difficulty_curves_by_dimension.png", "tossup"
-    ).parent
-    for previous in graphs_dir.glob("tossup_difficulty_curves_by_dimension*.png"):
-        previous.unlink()
     required = [
         results_dir / "tossups.csv",
         results_dir / "tossup_predictions.csv",
@@ -204,13 +269,49 @@ def multidim_difficulty_components_plot(
     predictions = pd.read_csv(required[1])
     link = load_difficulty_link(results_dir)
     difficulty_scale = load_difficulty_scale(results_dir)
-    columns = _parameter_columns(parameters)
+    for parameter_prefix, family_label, filename_stem in _saved_families(parameters):
+        _multidim_difficulty_family_plot(
+            parameters,
+            predictions,
+            output_dir,
+            count,
+            panels_per_figure,
+            link,
+            difficulty_scale,
+            parameter_prefix,
+            family_label,
+            f"{filename_stem}_by_dimension",
+        )
+
+
+def _multidim_difficulty_family_plot(
+    parameters,
+    predictions,
+    output_dir,
+    count,
+    panels_per_figure,
+    link,
+    difficulty_scale,
+    parameter_prefix,
+    family_label,
+    filename_stem,
+):
+    """Render per-dimension components for one saved difficulty family."""
+    graphs_dir = graph_path(
+        output_dir, f"{filename_stem}.png", "tossup"
+    ).parent
+    for previous in graphs_dir.glob(f"{filename_stem}*.png"):
+        previous.unlink()
+    columns = _parameter_columns(parameters, parameter_prefix)
     parameter_columns = _difficulty_parameter_columns(columns, link)
     has_polynomial = bool(columns["polynomial"])
     has_monotone = bool(columns["monotone"])
+    has_spline = bool(columns["spline"])
     if not columns["alpha"]:
         return
-    if has_monotone:
+    if has_spline:
+        _validate_spline_dimensions(columns["alpha"], columns["spline"])
+    elif has_monotone:
         _validate_monotone_dimensions(
             columns["alpha"], columns["monotone"]
         )
@@ -252,26 +353,18 @@ def multidim_difficulty_components_plot(
         for ax, tossup_id in zip(axes.flat, batch):
             row = parameters.loc[tossup_id]
             components = _saved_difficulty_components(
-                row, positions, link, difficulty_scale
+                row,
+                positions,
+                link,
+                difficulty_scale,
+                parameter_prefix,
             )
             if components is None:
                 ax.set_visible(False)
                 continue
             per_dimension, difficulty = components
             alpha = row[columns["alpha"]].to_numpy(dtype=float)
-            buzz_positions = predictions.loc[
-                (predictions["tossup_id"] == tossup_id)
-                & (predictions["z"] == "BUZZ"),
-                "relative_position",
-            ]
-            ax.hist(
-                buzz_positions,
-                bins=np.linspace(0, 1, 11),
-                color="tab:orange",
-                alpha=0.25,
-                label=f"Observed buzzes (n={len(buzz_positions)})",
-            )
-            curve_ax = ax.twinx()
+            curve_ax = _buzz_histogram_axes(ax, predictions, tossup_id)
             for index, (alpha_column, alpha_value) in enumerate(
                 zip(columns["alpha"], alpha)
             ):
@@ -288,35 +381,25 @@ def multidim_difficulty_components_plot(
                 difficulty,
                 color="black",
                 linewidth=3,
-                label=f"{weight_name}-weighted difficulty",
+                label=f"{weight_name}-weighted {family_label.lower()}",
                 zorder=10,
             )
-            ax.set(
-                title=short_id(tossup_id),
-                xlabel="Relative position",
-                ylabel="Buzz count",
-                xlim=(0, 1),
-            )
-            curve_ax.set_ylabel("Estimated difficulty")
-            ax.grid(alpha=0.2)
-            handles, labels = ax.get_legend_handles_labels()
-            curve_handles, curve_labels = curve_ax.get_legend_handles_labels()
-            legend_handles = handles + curve_handles
-            ax.legend(
-                legend_handles,
-                labels + curve_labels,
+            _finish_curve_panel(
+                ax,
+                curve_ax,
+                tossup_id,
                 fontsize=6,
-                loc="upper right",
-                ncol=2 if len(legend_handles) > 8 else 1,
+                family_label=family_label,
             )
         for ax in axes.flat[len(batch):]:
             ax.set_visible(False)
         fig.suptitle(
-            f"Per-dimension difficulty curves and {weight_name}-weighted difficulty"
+            f"Per-dimension {family_label.lower()} curves and "
+            f"{weight_name}-weighted {family_label.lower()}"
         )
         fig.tight_layout()
-        filename = "tossup_difficulty_curves_by_dimension.png"
+        filename = f"{filename_stem}.png"
         if len(batches) > 1:
-            filename = f"tossup_difficulty_curves_by_dimension_{batch_index:02d}.png"
+            filename = f"{filename_stem}_{batch_index:02d}.png"
         fig.savefig(graph_path(output_dir, filename, "tossup"), dpi=160)
         plt.close(fig)

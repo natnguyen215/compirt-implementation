@@ -30,8 +30,8 @@ def evaluate_bonuses(results_dir, output_dir, dimension_labels=None):
     """Evaluate binary bonus parts and total expected points per bonus."""
     parts = pd.read_csv(results_dir / "bonus_part_predictions.csv")
     teams = pd.read_csv(results_dir / "team_predictions.csv")
-    metrics = bonus_metrics(parts, teams)
     response_scores = bonus_ranked_probability_scores(parts)
+    metrics = bonus_metrics(parts, teams, response_scores)
     response_scores.to_csv(
         csv_path(output_dir, "bonus_score_probability_predictions.csv"), index=False
     )

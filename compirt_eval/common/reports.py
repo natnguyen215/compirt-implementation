@@ -203,7 +203,11 @@ def _read_json(path: Path) -> dict[str, object]:
 
 def stage_base_for_evaluation(evaluation_dir: Path) -> Path:
     """Return the directory containing pyramidal/compositional/synergy stages."""
-    return Path(evaluation_dir).parent
+    evaluation_dir = Path(evaluation_dir)
+    sibling_holdout = evaluation_dir.parent / "holdout"
+    if sibling_holdout.is_dir():
+        return sibling_holdout
+    return evaluation_dir.parent
 
 
 def result_root_for_evaluation(evaluation_dir: Path) -> Path:
@@ -241,7 +245,16 @@ def evaluation_regime_notes(evaluation_dir: Path) -> list[str]:
     """
     evaluation_dir = Path(evaluation_dir)
     parts = {part.lower() for part in evaluation_dir.parts}
-    if "in_sample" in parts:
+    pyramidal_summary = _read_json(
+        stage_base_for_evaluation(evaluation_dir) / "pyramidal" / "summary.json"
+    )
+    if pyramidal_summary.get("frozen_predict"):
+        notes = [
+            "**Evaluation regime: frozen matrix-infill holdout.** Player and "
+            "question parameters were fit on the training folds and replayed "
+            "on held-out games without fitting any held-out outcomes."
+        ]
+    elif "in_sample" in parts:
         notes = [
             "**Evaluation regime: in-sample fit.** Player and question "
             "parameters were estimated on the same observations these metrics "
@@ -262,9 +275,6 @@ def evaluation_regime_notes(evaluation_dir: Path) -> list[str]:
             "on the same split it is scored on, read these metrics as "
             "in-sample fit."
         ]
-    pyramidal_summary = _read_json(
-        stage_base_for_evaluation(evaluation_dir) / "pyramidal" / "summary.json"
-    )
     if pyramidal_summary.get("calibrate_correctness"):
         notes.append(
             "**Correctness calibration was fit on the scored outcomes.** This "
@@ -549,6 +559,13 @@ def _stratum_table_lines(evaluation_dir: Path) -> list[str]:
     diagnostics = _read_csv(
         metrics_path(Path(evaluation_dir), "prediction_diagnostics_by_stratum.csv")
     )
+    if diagnostics.empty:
+        diagnostics = _read_csv(
+            metrics_path(
+                Path(evaluation_dir),
+                "tossup_prediction_diagnostics_by_stratum.csv",
+            )
+        )
     lines = ["## Calibration By Stratum", ""]
     if diagnostics.empty:
         lines.extend(["No stratified prediction diagnostics CSV was found.", ""])
@@ -572,7 +589,7 @@ def _stratum_table_lines(evaluation_dir: Path) -> list[str]:
 def experiment_report_markdown(
     evaluation_dir: Path,
     tossup: dict[str, object],
-    bonus: dict[str, object],
+    bonus: dict[str, object] | None,
     game: dict[str, object] | None = None,
     title: str = "CompIRT Experiment Report",
 ) -> str:
@@ -591,9 +608,10 @@ def experiment_report_markdown(
     lines.extend(["## Stage 1: Tossup Metrics", ""])
     lines.extend(_grouped_metric_lines(tossup, TOSSUP_METRIC_GROUPS))
     lines.extend(_position_bias_lines(evaluation_dir))
-    lines.extend(["## Stage 2: Bonus Metrics", ""])
-    lines.extend(_grouped_metric_lines(bonus, BONUS_METRIC_GROUPS))
-    lines.extend(_synergy_section_lines(evaluation_dir))
+    if bonus is not None:
+        lines.extend(["## Stage 2: Bonus Metrics", ""])
+        lines.extend(_grouped_metric_lines(bonus, BONUS_METRIC_GROUPS))
+        lines.extend(_synergy_section_lines(evaluation_dir))
     if game is not None:
         lines.extend(["## Match Winner Simulation", ""])
         if game:
@@ -605,11 +623,18 @@ def experiment_report_markdown(
 
 
 def _summary_sections(
-    evaluation_dir: Path, comparison_csv: Path | None
+    evaluation_dir: Path,
+    comparison_csv: Path | None,
+    include_bonus: bool = True,
 ) -> list[tuple[str, pd.DataFrame, str]]:
     """Collect report tables separately from their Markdown rendering."""
     csv_dir = evaluation_dir / "csvs"
-    return [
+    diagnostics = _read_csv(csv_dir / "prediction_diagnostics_by_stratum.csv")
+    if diagnostics.empty:
+        diagnostics = _read_csv(
+            csv_dir / "tossup_prediction_diagnostics_by_stratum.csv"
+        )
+    sections = [
         (
             "Run Variables And Stage Scalars",
             _stage_summary_rows(evaluation_dir),
@@ -644,7 +669,7 @@ def _summary_sections(
         ),
         (
             "Calibration And Sharpness By Stratum",
-            _read_csv(csv_dir / "prediction_diagnostics_by_stratum.csv"),
+            diagnostics,
             "No stratified prediction diagnostics CSV was found.",
         ),
         (
@@ -670,11 +695,22 @@ def _summary_sections(
             "No bonus parameter distribution summary CSV was found.",
         ),
     ]
+    if include_bonus:
+        return sections
+    bonus_titles = {
+        "Bonus Stage Scalars",
+        "Stage 2 Bonus Metrics",
+        "Match Winner Simulation",
+        "No-Synergy Versus Synergy Deltas",
+        "Bonus And Synergy Parameters",
+    }
+    return [section for section in sections if section[0] not in bonus_titles]
 
 
 def write_eval_docs_summary(
     evaluation_dir: Path,
     comparison_csv: Path | None = None,
+    include_bonus: bool = True,
 ) -> Path:
     """Create 'docs/summary.md' for one evaluation or synergy-evaluation folder."""
     evaluation_dir = Path(evaluation_dir)
@@ -693,6 +729,10 @@ def write_eval_docs_summary(
         f"Result root: `{result_root_for_evaluation(evaluation_dir)}`",
         "",
         (
+            "This file consolidates the metric CSVs and fitted-parameter "
+            "distribution summaries for quick review."
+            if not include_bonus
+            else
             "This file consolidates the metric CSVs, bonus-model comparison "
             "deltas, and fitted-parameter distribution summaries for quick review."
         ),
@@ -701,7 +741,7 @@ def write_eval_docs_summary(
     for note in evaluation_regime_notes(evaluation_dir):
         lines.extend([note, ""])
     for title, frame, empty_text in _summary_sections(
-        evaluation_dir, comparison_csv
+        evaluation_dir, comparison_csv, include_bonus
     ):
         _append_table(lines, title, frame, empty_text)
 

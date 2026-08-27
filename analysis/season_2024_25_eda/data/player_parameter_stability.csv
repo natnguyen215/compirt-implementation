@@ -1,0 +1,4 @@
+source_tier,target_tier,minimum_scored_attempts_per_tier,players,timing_residual_correlation,correctness_residual_correlation
+fall,winter,20,69,0.540183,0.498879
+winter,regionals,20,141,0.716245,0.422793
+regionals,nationals,20,101,0.735671,0.545351

@@ -22,13 +22,20 @@ import pandas as pd
 from datasets import load_from_disk
 
 
-from compirt_eval.diagnostics.match_simulation import _bonus_probability_pools
+from compirt_eval.common.figures import numeric_columns, vector_weight_columns
 from compirt_eval.common.metrics import inverse_logit
+from compirt_eval.diagnostics.match_simulation import _bonus_probability_pools
 from compirt_eval.scenario_a_tossups.parameters import (
+    _buzz_parameter_prefix,
+    _parameter_columns,
+    _saved_difficulty_components,
+    _saved_difficulty_curve,
     difficulty_adjustment_at,
     load_difficulty_adjustment_curves,
     load_difficulty_link,
     load_difficulty_scale,
+    perception_slice_indices,
+    sliced_perception_columns,
 )
 
 
@@ -52,19 +59,10 @@ class TournamentInputs:
     difficulty_scale: float
     correctness_scale: float
     correctness_bias: float
-
-
-def _numbered_columns(frame, prefix):
-    """Return numbered columns such as theta_1, theta_2 in numeric order."""
-    return sorted(
-        (
-            column
-            for column in frame.columns
-            if column.startswith(prefix)
-            and column.removeprefix(prefix).isdigit()
-        ),
-        key=lambda column: int(column.removeprefix(prefix)),
-    )
+    perception_alpha: np.ndarray | None = None
+    perception_beta: np.ndarray | None = None
+    perceived_logit_alpha: np.ndarray | None = None
+    perceived_logit_beta: np.ndarray | None = None
 
 
 def _load_question_lengths(data_dir, split, fitted_tossup_ids):
@@ -82,10 +80,8 @@ def _load_question_lengths(data_dir, split, fitted_tossup_ids):
 
 def _normalize_tossup_weights(tossups):
     """Expose topic weights as relevance columns used by the common replay."""
-    has_standard_weights = bool(
-        _numbered_columns(tossups, "alpha_") or _numbered_columns(tossups, "r_")
-    )
-    topic_columns = _numbered_columns(tossups, "topic_weight_")
+    has_standard_weights = bool(vector_weight_columns(tossups))
+    topic_columns = numeric_columns(tossups, "topic_weight_")
     if has_standard_weights or not topic_columns:
         return tossups
     return tossups.rename(
@@ -116,9 +112,33 @@ def load_tournament_inputs(
         "tossup_id"
     )
     tossups = _normalize_tossup_weights(tossups)
-    theta_columns = _numbered_columns(players, "theta_")
-    if not theta_columns or "c" not in players:
-        raise ValueError("players.csv must contain c and numbered theta columns")
+    theta_columns = numeric_columns(players, "theta_")
+    alpha_columns = numeric_columns(players, "alpha_")
+    beta_columns = numeric_columns(players, "beta_")
+    sliced_alpha_columns = sliced_perception_columns(players, "alpha")
+    sliced_beta_columns = sliced_perception_columns(players, "beta")
+    perceived_difficulty = bool(alpha_columns or beta_columns)
+    sliced_perceived_difficulty = bool(
+        sliced_alpha_columns or sliced_beta_columns
+    )
+    perceived_logit = {"alpha", "beta"}.issubset(players.columns)
+    if not theta_columns or (
+        "c" not in players
+        and not perceived_logit
+        and not (len(alpha_columns) == len(beta_columns) == len(theta_columns))
+        and not (
+            sliced_alpha_columns
+            and sliced_beta_columns
+            and all(
+                len(columns) == len(theta_columns)
+                for columns in sliced_alpha_columns + sliced_beta_columns
+            )
+        )
+    ):
+        raise ValueError(
+            "players.csv must contain theta plus c, scalar alpha/beta, or matching "
+            "numbered alpha/beta"
+        )
 
     question_lengths = _load_question_lengths(data_dir, split, tossups.index)
     tossups = tossups.loc[tossups.index.intersection(question_lengths.index)].copy()
@@ -143,7 +163,11 @@ def load_tournament_inputs(
     return TournamentInputs(
         player_ids=players["player_id"].astype(str).to_numpy(),
         theta=players[theta_columns].to_numpy(dtype=float),
-        thresholds=players["c"].to_numpy(dtype=float),
+        thresholds=(
+            players["c"].to_numpy(dtype=float)
+            if "c" in players
+            else np.zeros(len(players), dtype=float)
+        ),
         tossups=tossups,
         question_lengths=question_lengths,
         bonus_probability=bonus_probability,
@@ -152,68 +176,99 @@ def load_tournament_inputs(
         difficulty_scale=load_difficulty_scale(pyramidal_results),
         correctness_scale=scale,
         correctness_bias=bias,
+        perception_alpha=(
+            np.stack(
+                [
+                    players[columns].to_numpy(dtype=float)
+                    for columns in sliced_alpha_columns
+                ],
+                axis=1,
+            )
+            if sliced_perceived_difficulty
+            else (
+                players[alpha_columns].to_numpy(dtype=float)
+                if perceived_difficulty
+                else None
+            )
+        ),
+        perception_beta=(
+            np.stack(
+                [
+                    players[columns].to_numpy(dtype=float)
+                    for columns in sliced_beta_columns
+                ],
+                axis=1,
+            )
+            if sliced_perceived_difficulty
+            else (
+                players[beta_columns].to_numpy(dtype=float)
+                if perceived_difficulty
+                else None
+            )
+        ),
+        perceived_logit_alpha=(
+            players["alpha"].to_numpy(dtype=float) if perceived_logit else None
+        ),
+        perceived_logit_beta=(
+            players["beta"].to_numpy(dtype=float) if perceived_logit else None
+        ),
     )
 
 
 def _question_curve(tossup_id, tossup, total_tokens, inputs):
-    """Return one tossup's relevance vector and token-level difficulty."""
-    weight_columns = _numbered_columns(inputs.tossups, "alpha_")
-    if not weight_columns:
-        weight_columns = _numbered_columns(inputs.tossups, "r_")
-    theta_dimensions = inputs.theta.shape[1]
-    if len(weight_columns) != theta_dimensions:
+    """Return branch-specific relevance and token-level difficulty.
+
+    The difficulty replay itself is the shared Scenario A reader, so scalar,
+    multidimensional, polynomial, and monotone fits are all handled by the same
+    code the standard evaluator uses.
+    """
+    hazard_prefix = _buzz_parameter_prefix(inputs.tossups)
+    correctness_columns = _parameter_columns(inputs.tossups)["alpha"]
+    hazard_columns = _parameter_columns(inputs.tossups, hazard_prefix)["alpha"]
+    if (
+        len(correctness_columns) != inputs.theta.shape[1]
+        or len(hazard_columns) != inputs.theta.shape[1]
+    ):
         raise ValueError(
             "Saved theta and tossup discrimination/relevance dimensions must match"
         )
-    weights = tossup[weight_columns].to_numpy(dtype=float)
     relative = np.arange(1, total_tokens + 1, dtype=float) / total_tokens
-
-    if {"beta", "gamma", "mu"}.issubset(tossup.index):
-        beta = float(tossup["beta"])
-        gamma = float(tossup["gamma"])
-        mu = float(tossup["mu"])
-        if inputs.difficulty_link == "tanh":
-            difficulty = beta * np.tanh(gamma * (mu - relative))
-        else:
-            difficulty = beta * inverse_logit(gamma * (mu - relative))
-    else:
-        gamma_columns = _numbered_columns(inputs.tossups, "gamma_")
-        mu_columns = _numbered_columns(inputs.tossups, "mu_")
-        parameter_prefix = "bias_" if inputs.difficulty_link == "biased_tanh" else "beta_"
-        parameter_columns = _numbered_columns(inputs.tossups, parameter_prefix)
-        dimensions = {
-            len(weights),
-            len(parameter_columns),
-            len(gamma_columns),
-            len(mu_columns),
-        }
-        if len(dimensions) != 1 or not weights.size:
-            raise ValueError(
-                "Saved relevance, difficulty, gamma, and mu dimensions must match"
-            )
-        parameter = tossup[parameter_columns].to_numpy(dtype=float)[:, None]
-        gamma = tossup[gamma_columns].to_numpy(dtype=float)[:, None]
-        mu = tossup[mu_columns].to_numpy(dtype=float)[:, None]
-        if inputs.difficulty_link == "biased_tanh":
-            per_dimension = inputs.difficulty_scale * np.tanh(
-                gamma * (mu - relative[None, :]) + parameter
-            )
-        elif inputs.difficulty_link == "tanh":
-            per_dimension = parameter * np.tanh(
-                gamma * (mu - relative[None, :])
-            )
-        else:
-            per_dimension = parameter * inverse_logit(
-                gamma * (mu - relative[None, :])
-            )
-        difficulty = weights @ per_dimension
-
-    adjustment = difficulty_adjustment_at(
-        inputs.adjustments, tossup_id, relative
+    hazard_difficulty = _saved_difficulty_curve(
+        tossup,
+        relative,
+        inputs.difficulty_link,
+        inputs.difficulty_scale,
+        hazard_prefix,
     )
+    correctness_difficulty = _saved_difficulty_curve(
+        tossup,
+        relative,
+        inputs.difficulty_link,
+        inputs.difficulty_scale,
+    )
+    if hazard_difficulty is None or correctness_difficulty is None:
+        raise ValueError(
+            f"Saved parameters cannot reconstruct difficulty for tossup {tossup_id!r}"
+        )
+    adjustment = difficulty_adjustment_at(inputs.adjustments, tossup_id, relative)
     if adjustment is not None:
-        difficulty = difficulty + adjustment
-    return weights, np.asarray(difficulty, dtype=float)
+        hazard_difficulty = hazard_difficulty + adjustment
+        correctness_difficulty = correctness_difficulty + adjustment
+    per_dimension = None
+    if inputs.perception_alpha is not None:
+        components = _saved_difficulty_components(tossup, relative)
+        if components is None:
+            raise ValueError(
+                f"Saved parameters cannot reconstruct dimensions for {tossup_id!r}"
+            )
+        per_dimension = components[0]
+    result = (
+        tossup[hazard_columns].to_numpy(dtype=float),
+        tossup[correctness_columns].to_numpy(dtype=float),
+        np.asarray(hazard_difficulty, dtype=float),
+        np.asarray(correctness_difficulty, dtype=float),
+    )
+    return (*result, per_dimension) if per_dimension is not None else result
 
 
 def _simulate_tossup(roster, question, inputs, question_cache, rng):
@@ -224,10 +279,56 @@ def _simulate_tossup(roster, question, inputs, question_cache, rng):
         question_cache[tossup_id] = _question_curve(
             tossup_id, inputs.tossups.loc[tossup_id], total_tokens, inputs
         )
-    weights, difficulty = question_cache[tossup_id]
-    skill = inputs.theta[roster] @ weights
-    logits = skill[:, None] - difficulty[None, :]
-    hazard = inverse_logit(logits - inputs.thresholds[roster, None])
+    cached = question_cache[tossup_id]
+    (
+        hazard_weights,
+        correctness_weights,
+        hazard_difficulty,
+        correctness_difficulty,
+    ) = cached[:4]
+    hazard_difficulty_by_dimension = cached[4] if len(cached) == 5 else None
+    theta = inputs.theta[roster]
+    hazard_skill = theta @ hazard_weights
+    correctness_skill = theta @ correctness_weights
+    if inputs.perceived_logit_alpha is not None:
+        hazard_logits = (
+            inputs.perceived_logit_alpha[roster, None]
+            * (hazard_skill[:, None] - hazard_difficulty[None, :])
+            + inputs.perceived_logit_beta[roster, None]
+        )
+        hazard = inverse_logit(hazard_logits)
+    elif inputs.perception_alpha is not None:
+        if inputs.perception_alpha.ndim == 3:
+            relative = np.arange(1, hazard_difficulty.shape[0] + 1, dtype=float)
+            relative /= hazard_difficulty.shape[0]
+            slice_index = perception_slice_indices(relative)
+            selected_alpha = inputs.perception_alpha[roster][:, slice_index, :]
+            selected_beta = inputs.perception_beta[roster][:, slice_index, :]
+            hazard_logits = np.sum(
+                hazard_weights[None, None, :]
+                * (
+                    theta[:, None, :]
+                    - selected_alpha
+                    * hazard_difficulty_by_dimension.T[None, :, :]
+                    + selected_beta
+                ),
+                axis=2,
+            )
+        else:
+            hazard_logits = np.sum(
+                hazard_weights[None, :, None]
+                * (
+                    theta[:, :, None]
+                    - inputs.perception_alpha[roster, :, None]
+                    * hazard_difficulty_by_dimension[None, :, :]
+                    + inputs.perception_beta[roster, :, None]
+                ),
+                axis=1,
+            )
+        hazard = inverse_logit(hazard_logits)
+    else:
+        hazard_logits = hazard_skill[:, None] - hazard_difficulty[None, :]
+        hazard = inverse_logit(hazard_logits - inputs.thresholds[roster, None])
     someone_hazard = 1.0 - np.prod(1.0 - hazard, axis=0)
     survival = np.concatenate(
         ([1.0], np.cumprod(1.0 - someone_hazard[:-1]))
@@ -250,7 +351,8 @@ def _simulate_tossup(roster, question, inputs, question_cache, rng):
     player_slot, token = divmod(outcome, player_mass.shape[1])
     correct_probability = float(
         inverse_logit(
-            inputs.correctness_scale * logits[player_slot, token]
+            inputs.correctness_scale
+            * (correctness_skill[player_slot] - correctness_difficulty[token])
             + inputs.correctness_bias
         )
     )

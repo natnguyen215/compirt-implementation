@@ -1,0 +1,29 @@
+{
+  "experiment": "compact-selected",
+  "seed": 42,
+  "fold": 3,
+  "configuration": {
+    "root": "results/compirt/holdout/double-difficulty/model-comparisons/compact-parameterization/compact",
+    "base_split": "year_2024",
+    "folds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "split_seed": 42,
+    "optimization_seeds": [
+      42
+    ],
+    "dimensions": 3,
+    "degree": 3,
+    "drop_concentration": 2.0,
+    "steps": 3000,
+    "lr": 0.005,
+    "device": "cuda",
+    "posterior_draws": 0,
+    "data_dir": null,
+    "tournament": null
+  }
+}

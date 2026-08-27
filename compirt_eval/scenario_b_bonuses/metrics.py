@@ -78,13 +78,15 @@ def _macro_group_mean(values, groups):
     return float(values.groupby(groups).mean().mean())
 
 
-def bonus_metrics(parts, teams):
+def bonus_metrics(parts, teams, response_scores=None):
     """Return part-, exact-bonus-, and team-level PPB metrics.
 
     Part correctness is reported as both a micro average and macro averages by
     team and bonus question. Exact accuracy requires all three part
     classifications to match. PPB pools responses by team before calculating
     mean absolute error, giving every observed team equal weight.
+    'response_scores' lets a caller that already built the per-response score
+    table pass it in rather than paying for the response walk twice.
     """
     metrics = classification_metrics(parts["correct"], parts["predicted_correct"])
     metrics["part_accuracy"] = metrics.pop("accuracy")
@@ -115,7 +117,8 @@ def bonus_metrics(parts, teams):
     else:
         metrics["exact_acc"] = float("nan")
 
-    response_scores = bonus_ranked_probability_scores(parts)
+    if response_scores is None:
+        response_scores = bonus_ranked_probability_scores(parts)
     metrics["ranked_probability_score"] = (
         float(response_scores["rps"].mean()) if not response_scores.empty else float("nan")
     )

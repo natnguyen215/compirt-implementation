@@ -1,0 +1,13 @@
+accuracy_bin,players,mean_accuracy,mean_player_first_position,definition,accuracy_q1_cut,accuracy_q2_cut,accuracy_q3_cut,player_pearson_r,player_pearson_p,player_spearman_rho,player_spearman_p,within_question_slope
+Q1 low,353,0.622418,0.706231,all recorded attempts; timing on all first buzzes,0.706667,0.781250,0.838710,-0.297231,0.000000,-0.255957,0.000000,-0.213374
+Q2,351,0.747387,0.674201,all recorded attempts; timing on all first buzzes,0.706667,0.781250,0.838710,-0.297231,0.000000,-0.255957,0.000000,-0.213374
+Q3,352,0.809480,0.657653,all recorded attempts; timing on all first buzzes,0.706667,0.781250,0.838710,-0.297231,0.000000,-0.255957,0.000000,-0.213374
+Q4 high,349,0.882682,0.646539,all recorded attempts; timing on all first buzzes,0.706667,0.781250,0.838710,-0.297231,0.000000,-0.255957,0.000000,-0.213374
+Q1 low,353,0.622418,0.685134,all recorded attempts; timing excludes value-0 first buzzes,0.706667,0.781250,0.838710,-0.214391,0.000000,-0.193436,0.000000,-0.153935
+Q2,351,0.747387,0.664311,all recorded attempts; timing excludes value-0 first buzzes,0.706667,0.781250,0.838710,-0.214391,0.000000,-0.193436,0.000000,-0.153935
+Q3,352,0.809480,0.650808,all recorded attempts; timing excludes value-0 first buzzes,0.706667,0.781250,0.838710,-0.214391,0.000000,-0.193436,0.000000,-0.153935
+Q4 high,349,0.882682,0.642574,all recorded attempts; timing excludes value-0 first buzzes,0.706667,0.781250,0.838710,-0.214391,0.000000,-0.193436,0.000000,-0.153935
+Q1 low,335,0.714467,0.647716,scored attempts only (-5/+10); timing excludes value-0 first buzzes,0.777778,0.833333,0.880952,0.107152,0.000095,0.123877,0.000006,0.080538
+Q2,330,0.809447,0.650083,scored attempts only (-5/+10); timing excludes value-0 first buzzes,0.777778,0.833333,0.880952,0.107152,0.000095,0.123877,0.000006,0.080538
+Q3,329,0.857209,0.663057,scored attempts only (-5/+10); timing excludes value-0 first buzzes,0.777778,0.833333,0.880952,0.107152,0.000095,0.123877,0.000006,0.080538
+Q4 high,328,0.919212,0.669637,scored attempts only (-5/+10); timing excludes value-0 first buzzes,0.777778,0.833333,0.880952,0.107152,0.000095,0.123877,0.000006,0.080538

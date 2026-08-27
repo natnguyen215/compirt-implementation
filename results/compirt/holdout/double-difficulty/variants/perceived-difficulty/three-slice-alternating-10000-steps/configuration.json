@@ -1,0 +1,22 @@
+{
+  "root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/variants/perceived-difficulty/three-slice-alternating-10000-steps",
+  "base_split": "year_2024",
+  "folds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "split_seed": 42,
+  "optimization_seed": 42,
+  "degree": 3,
+  "dimensions": 3,
+  "relevance_concentration": 2.0,
+  "drop_concentration": 2.0,
+  "steps": 10000,
+  "lr": 0.005,
+  "device": "cuda",
+  "posterior_draws": 0,
+  "data_dir": null
+}
