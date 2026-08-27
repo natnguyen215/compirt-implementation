@@ -1,78 +1,53 @@
-# Double-difficulty holdout results
+# Double-difficulty holdout experiments
 
 These runs fit separate position curves for correctness and buzz hazard. They
 use frozen five-fold matrix infill on whole games: train on four folds, freeze
 the fitted parameters, replay the held-out fold, and evaluate. Held-out data do
 not update player or question parameters.
 
-Unless a folder says otherwise, runs share `base_split=year_2024`, split seed
-42, optimization seed 42, 3,000 SVI steps, lr 0.005, and 5/5 complete folds.
+Unless noted otherwise, runs use `base_split=year_2024`, split seed 42,
+optimization seed 42, 3,000 SVI steps, learning rate 0.005, and five complete
+folds.
 
-## Index
+## Directory guide
 
-| Contents | Location |
+| Directory | Contents |
 | --- | --- |
-| Reference configuration | [`ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/`](ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/) |
-| Double- versus single-difficulty comparison | [`model-comparisons/double-vs-single-difficulty/aggregate/comparison.md`](model-comparisons/double-vs-single-difficulty/aggregate/comparison.md) |
-| Curve-family comparison | [`model-comparisons/curve-family/`](model-comparisons/curve-family/) |
-| Degree, dimension, and prior grid | [`ablations/hyperparameter-grid/aggregate/summary.md`](ablations/hyperparameter-grid/aggregate/summary.md) |
-| Per-run metrics | `<run>/aggregate/pooled.csv` and `<run>/aggregate/fold_mean_std.csv` |
-| Interpretation | [`RESEARCH_LOG.md`](../../../../RESEARCH_LOG.md), Sections 3.1–3.11 |
+| [`ablations/relevance-locations-terminal/`](ablations/relevance-locations-terminal/) | Seven relevance, learned-location, and terminal-intercept configurations. The reference is `dd-bernstein-332-simplex-locations-terminal/`. |
+| [`ablations/optimization-steps/`](ablations/optimization-steps/) | Reference configuration at 6,000 and 20,000 steps. |
+| [`ablations/incorrect-loss-weight/`](ablations/incorrect-loss-weight/) | Incorrect-response weights 1.5, 2, and 3. |
+| [`ablations/hyperparameter-grid/`](ablations/hyperparameter-grid/) | Degree 3–6, dimensions 1–5, and drop concentration 0.67–2.0. See the [`grid summary`](ablations/hyperparameter-grid/aggregate/summary.md). |
+| [`model-comparisons/double-vs-single-difficulty/`](model-comparisons/double-vs-single-difficulty/) | Separate versus shared correctness and hazard curves. See the [`comparison`](model-comparisons/double-vs-single-difficulty/aggregate/comparison.md). |
+| [`model-comparisons/curve-family/`](model-comparisons/curve-family/) | Bernstein, sigmoid, linear-spline, and monotone-linear-spline models. |
+| [`model-comparisons/compact-parameterization/`](model-comparisons/compact-parameterization/) | Compact scalar projection versus full Bernstein 3/3/2. |
+| [`variants/`](variants/) | Perceived-difficulty, perceived-logit, and player-neg-propensity models. |
+| [`2023-2025-season/`](2023-2025-season/) | Reference model on 2023–25 data. These metrics are not comparable with the 2024 runs. |
 
-## Layout
+The full interpretation is in [`RESEARCH_LOG.md`](../../../../RESEARCH_LOG.md),
+Sections 3.1–3.11.
 
-```
-ablations/                  configuration changes to one fixed model form
-  relevance-locations-terminal/  relevance parameterization x learned locations
-                                 x terminal intercepts -- read together, so
-                                 grouped. Seven runs, each named for its own
-                                 settings; the reference configuration is
-                                 dd-bernstein-332-simplex-locations-terminal/.
-  optimization-steps/            steps-6000/ and steps-20000/ (reference is 3,000)
-  incorrect-loss-weight/         weight-1.5 | weight-2 | weight-3 (reference is 1x)
-  hyperparameter-grid/           100-point sweep: degree 3-6 x dim 1-5 x
-                                 drop-concentration 0.67-2.0. Ignored by git;
-                                 its 3/3/2 cell is tracked in the group above.
-model-comparisons/          model families evaluated side by side
-  double-vs-single-difficulty/   double vs single curve (4 arms + comparison.md)
-  curve-family/                  sigmoid | linear-spline |
-                                 monotone-linear-spline (its Bernstein arm is
-                                 ablations/.../dd-bernstein-332-unconstrained-terminal/)
-  compact-parameterization/      scalar-projection compact model vs full 3/3/2
-variants/                   structural model changes
-  perceived-difficulty/          6 arms
-  perceived-logit/               2 arms
-  player-neg-propensity/         hierarchical per-player neg propensity
-2023-2025-season/           same model, different data
-  season-2023-25/                2023-25 data; not comparable with 2024 runs
-```
+### Run outputs
 
-### Reading a single run
-
-```
-<run>/
-  configuration.json    every setting used
-  aggregate/
-    pooled.csv          metrics pooled across folds
-    fold_mean_std.csv   per-metric mean and sd across folds
-    per_fold.csv        one row per fold
-    correctness_metrics.md
-  fold_{0..4}/
-    train/pyramidal/    the fitted model for that fold
-    holdout/pyramidal/  frozen replay on the held-out fold (predictions, no refit)
-    evaluation/         experiment_report.md, csvs/, graphs/
-```
+| Path within a run | Contents |
+| --- | --- |
+| `configuration.json` | Run settings |
+| `aggregate/pooled.csv` | Metrics pooled across folds |
+| `aggregate/fold_mean_std.csv` | Mean and standard deviation across folds |
+| `aggregate/per_fold.csv` | One row per fold |
+| `fold_{0..4}/train/pyramidal/` | Fitted fold model |
+| `fold_{0..4}/holdout/pyramidal/` | Frozen held-out replay |
+| `fold_{0..4}/evaluation/` | Reports, tables, and figures |
 
 Some runners add a `seed_42/` or `degree_3/curves_3/dirichlet_2/` directory
 above the folds. Resume markers depend on this layout.
 
-## Results at a glance
+## Held-out metrics
 
 Values are pooled over the five held-out folds. Lower is better for log loss,
 ECE, and MAE; higher is better for accuracy. The always-correct accuracy
 baseline is 0.7670.
 
-| run | joint event LL | correctness LL | ECE | accuracy | position MAE |
+| Experiment | Joint event LL | Correctness LL | ECE | Accuracy | Position MAE |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | [`dd-bernstein-332-simplex-locations-terminal`](ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/) (Bernstein 3/3/2, simplex, locations, terminal) | 6.6124 | 0.4878 | 0.0098 | 0.7795 | 0.1519 |
 | [`steps-6000`](ablations/optimization-steps/steps-6000/) | 6.5032 | 0.4885 | 0.0079 | 0.7789 | 0.1440 |
@@ -96,14 +71,11 @@ baseline is 0.7670.
 | [`perceived-logit/positive-alpha`](variants/perceived-logit/positive-alpha/) | 6.7591 | 0.7876 | 0.3458 | 0.3758 | 0.1376 |
 | [`season-2023-25`](2023-2025-season/season-2023-25/) (different population) | 5.5353 | 0.4934 | 0.0143 | 0.7741 | 0.1588 |
 
-The two `dd-bernstein-332-unconstrained*` runs are absent from this table: no
-pooled aggregate was computed for them, only fold-level metrics. Their
-unweighted fold means are the `DD-Bernstein 3/3/2` rows of the
-[`RESEARCH_LOG.md`](../../../../RESEARCH_LOG.md) main table, which uses that
-basis throughout and so is the place to compare all nine on equal footing.
+The two `dd-bernstein-332-unconstrained*` runs have fold-level metrics but no
+pooled aggregate. Their unweighted fold means are reported in the main table in
+[`RESEARCH_LOG.md`](../../../../RESEARCH_LOG.md).
 
-Other model-comparison runs use grid- or seed-nested layouts. Their aggregate
-reports, along with the compact and linear-spline comparisons, are in
+Additional aggregate reports are in
 [`results/compirt/holdout/aggregate_correctness_metrics.md`](../aggregate_correctness_metrics.md)
 and [`docs/dd-linear-spline-vs-bernstein-3-3-2.md`](../../../../docs/dd-linear-spline-vs-bernstein-3-3-2.md).
 
