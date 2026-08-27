@@ -49,6 +49,7 @@ results/compirt/**/polynomial/
 # Source paper PDFs and other binaries — kept out of version control.
 *.pdf
 
-# Double-difficulty hyperparameter/ablation sweep outputs: ~2.8 GB of
-# per-fold loss curves and quantile summaries, regenerable from the runners.
-results/compirt/holdout/double-difficulty/ablations/
+# Double-difficulty hyperparameter grid: ~2.7 GB of per-fold loss curves
+# and quantile summaries, regenerable from the runners. The other ablation
+# sweeps under ablations/ stay tracked.
+results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/
