@@ -238,21 +238,41 @@ The main five-fold means are:
 
 | Model | Accuracy | Neg F1 | Lift over all-correct | Joint event LL | Correctness LL | AUC | ECE | Position MAE | First-buzzer top-1 | No-buzz error | Predicted final-decile mass |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Single-difficulty Bernstein 5/5/2, legacy | 65.71% | 38.91% | −10.99 pp | 6.7289 | 0.7286 | 0.6314 | 0.1918 | 0.1375 | **40.07%** | +4.78 pp | 13.92% |
-| DD-Bernstein 3/3/2, no terminal | 76.28% | 40.07% | −0.42 pp | 6.4959 | 0.5094 | 0.7114 | 0.0725 | 0.1389 | 38.08% | +4.53 pp | 12.92% |
-| DD-Bernstein 3/3/2, terminal | 76.55% | 41.11% | −0.15 pp | 6.4375 | 0.5059 | 0.7166 | 0.0706 | 0.1364 | 37.99% | −0.49 pp | 18.94% |
-| Simplex relevance, no terminal | 77.16% | 36.84% | +0.46 pp | 6.7444 | 0.5025 | 0.7115 | 0.0673 | 0.1783 | 34.04% | +6.44 pp | 9.48% |
-| Simplex relevance, terminal | 77.31% | 37.34% | +0.61 pp | 6.7216 | 0.5021 | 0.7140 | 0.0707 | 0.1667 | 33.67% | −0.19 pp | **17.52%** |
-| Simplex relevance, locations + terminal | **77.95%** | 23.21% | **+1.25 pp** | 6.6123 | 0.4878 | 0.7155 | 0.0125 | 0.1519 | 35.16% | **+0.09 pp** | 18.82% |
-| Simplex relevance 3/3/0.67, locations + terminal | 77.94% | 23.88% | +1.24 pp | 6.6090 | **0.4873** | 0.7160 | **0.0110** | 0.1494 | 35.11% | +0.13 pp | 19.62% |
-| Simplex relevance, locations + terminal + player `a_i` | **77.95%** | 23.92% | **+1.25 pp** | 6.5828 | 0.4878 | 0.7158 | 0.0128 | 0.1511 | 36.09% | **+0.07 pp** | 18.66% |
-| Perceived difficulty, unconstrained `alpha` | 76.83% | 21.77% | +0.13 pp | 7.6178 | 0.5166 | 0.6605 | 0.0350 | 0.3277 | 35.10% | +20.81 pp | 3.23% |
-| Perceived difficulty, `alpha > 0` | 64.87% | 35.59% | −11.83 pp | 6.6373 | 0.6359 | 0.6017 | 0.2022 | 0.1363 | 39.18% | +3.43 pp | 13.85% |
-| Perceived difficulty, three-slice `alpha,beta` | 58.57% | 37.99% | −18.13 pp | 6.8075 | 0.7050 | 0.6009 | 0.2584 | 0.1383 | 37.50% | +3.76 pp | 13.67% |
-| Perceived logit, unconstrained `alpha` | 76.65% | 1.67% | −0.05 pp | 7.7776 | 0.6080 | 0.5486 | 0.1058 | 0.3418 | 35.15% | +22.28 pp | 2.86% |
-| Perceived logit, `alpha > 0` | 37.59% | 39.21% | −39.11 pp | 6.7589 | 0.7875 | 0.6065 | 0.3458 | 0.1376 | 39.18% | +3.65 pp | 12.75% |
-| DD linear spline | 73.45% | **46.28%** | −3.25 pp | 6.4596 | 0.5651 | **0.7228** | 0.1185 | **0.1359** | 39.74% | +3.37 pp | 17.76% |
-| Monotone DD linear spline | 63.40% | 43.01% | −13.30 pp | 8.1446 | 0.8367 | 0.6571 | 0.2265 | 0.1510 | 32.47% | +18.22 pp | 16.39% |
+| [Single-difficulty Bernstein 5/5/2, legacy](results/compirt/holdout/double-difficulty/model-comparisons/double-vs-single-difficulty/single-curve-bernstein-baseline/seed_42/) | 65.71% | 38.91% | −10.99 pp | 6.7289 | 0.7286 | 0.6314 | 0.1918 | 0.1375 | **40.07%** | +4.78 pp | 13.92% |
+| [DD-Bernstein 3/3/2, no terminal](results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/degree_3/curves_3/dirichlet_2/) | 76.28% | 40.07% | −0.42 pp | 6.4959 | 0.5094 | 0.7114 | 0.0725 | 0.1389 | 38.08% | +4.53 pp | 12.92% |
+| [DD-Bernstein 3/3/2, terminal](results/compirt/holdout/double-difficulty/model-comparisons/curve-family/bernstein-332/seed_42/) | 76.55% | 41.11% | −0.15 pp | 6.4375 | 0.5059 | 0.7166 | 0.0706 | 0.1364 | 37.99% | −0.49 pp | 18.94% |
+| [Simplex relevance, no terminal](results/compirt/holdout/double-difficulty/ablations/simplex-locations-terminal/terminal-off/) | 77.16% | 36.84% | +0.46 pp | 6.7444 | 0.5025 | 0.7115 | 0.0673 | 0.1783 | 34.04% | +6.44 pp | 9.48% |
+| [Simplex relevance, terminal](results/compirt/holdout/double-difficulty/ablations/simplex-locations-terminal/terminal-on/) | 77.31% | 37.34% | +0.61 pp | 6.7216 | 0.5021 | 0.7140 | 0.0707 | 0.1667 | 33.67% | −0.19 pp | **17.52%** |
+| [Simplex relevance, locations + terminal](results/compirt/holdout/double-difficulty/ablations/simplex-locations-terminal/reference/) | **77.95%** | 23.21% | **+1.25 pp** | 6.6123 | 0.4878 | 0.7155 | 0.0125 | 0.1519 | 35.16% | **+0.09 pp** | 18.82% |
+| [Simplex relevance 3/3/0.67, locations + terminal](results/compirt/holdout/double-difficulty/ablations/simplex-locations-terminal/drop-concentration-0.67/) | 77.94% | 23.88% | +1.24 pp | 6.6090 | **0.4873** | 0.7160 | **0.0110** | 0.1494 | 35.11% | +0.13 pp | 19.62% |
+| [Simplex relevance, locations + terminal + player `a_i`](results/compirt/holdout/double-difficulty/variants/player-neg-propensity/) | **77.95%** | 23.92% | **+1.25 pp** | 6.5828 | 0.4878 | 0.7158 | 0.0128 | 0.1511 | 36.09% | **+0.07 pp** | 18.66% |
+| [Perceived difficulty, unconstrained `alpha`](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/unconstrained/) | 76.83% | 21.77% | +0.13 pp | 7.6178 | 0.5166 | 0.6605 | 0.0350 | 0.3277 | 35.10% | +20.81 pp | 3.23% |
+| [Perceived difficulty, `alpha > 0`](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/positive-alpha/) | 64.87% | 35.59% | −11.83 pp | 6.6373 | 0.6359 | 0.6017 | 0.2022 | 0.1363 | 39.18% | +3.43 pp | 13.85% |
+| [Perceived difficulty, three-slice `alpha,beta`](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/three-slice/) | 58.57% | 37.99% | −18.13 pp | 6.8075 | 0.7050 | 0.6009 | 0.2584 | 0.1383 | 37.50% | +3.76 pp | 13.67% |
+| [Perceived logit, unconstrained `alpha`](results/compirt/holdout/double-difficulty/variants/perceived-logit/unconstrained/) | 76.65% | 1.67% | −0.05 pp | 7.7776 | 0.6080 | 0.5486 | 0.1058 | 0.3418 | 35.15% | +22.28 pp | 2.86% |
+| [Perceived logit, `alpha > 0`](results/compirt/holdout/double-difficulty/variants/perceived-logit/positive-alpha/) | 37.59% | 39.21% | −39.11 pp | 6.7589 | 0.7875 | 0.6065 | 0.3458 | 0.1376 | 39.18% | +3.65 pp | 12.75% |
+| [DD linear spline](results/compirt/holdout/double-difficulty/model-comparisons/curve-family/linear-spline/seed_42/) | 73.45% | **46.28%** | −3.25 pp | 6.4596 | 0.5651 | **0.7228** | 0.1185 | **0.1359** | 39.74% | +3.37 pp | 17.76% |
+| [Monotone DD linear spline](results/compirt/holdout/double-difficulty/model-comparisons/curve-family/monotone-linear-spline/) | 63.40% | 43.01% | −13.30 pp | 8.1446 | 0.8367 | 0.6571 | 0.2265 | 0.1510 | 32.47% | +18.22 pp | 16.39% |
+
+Each model name links to the run directory it was measured from. Three rows do
+not live under `ablations/simplex-locations-terminal/`, because they are not
+variations on that group's factors:
+
+| Row | Directory | Why it is elsewhere |
+| --- | --- | --- |
+| `DD-Bernstein 3/3/2, no terminal` | [`ablations/hyperparameter-grid/degree_3/curves_3/dirichlet_2/`](results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/degree_3/curves_3/dirichlet_2/) | A cell of the 100-point grid, kept in place. The grid predates the simplex prior, so this point uses the older unconstrained relevance (`effective_item_parameters = 30`, not 28). |
+| `DD-Bernstein 3/3/2, terminal` | [`model-comparisons/curve-family/bernstein-332/seed_42/`](results/compirt/holdout/double-difficulty/model-comparisons/curve-family/bernstein-332/seed_42/) | The Bernstein arm of the curve-family comparison; also unconstrained relevance. |
+| `Single-difficulty Bernstein 5/5/2, legacy` | [`model-comparisons/double-vs-single-difficulty/single-curve-bernstein-baseline/seed_42/`](results/compirt/holdout/double-difficulty/model-comparisons/double-vs-single-difficulty/single-curve-bernstein-baseline/seed_42/) | An arm of the double-versus-single comparison. |
+
+The `DD-Bernstein 3/3/2, terminal` fit is stored twice: the same five folds also
+sit at
+[`model-comparisons/compact-parameterization/full-bernstein-332/degree_3/curves_3/dirichlet_2/`](results/compirt/holdout/double-difficulty/model-comparisons/compact-parameterization/full-bernstein-332/degree_3/curves_3/dirichlet_2/)
+as the "full" arm of the compact comparison. Both copies report
+`final_loss = 286419.26131153107` on fold 0.
+
+The naming split is the parameterization, not the curve family: rows named
+`DD-Bernstein` use the unconstrained per-dimension relevance, rows named
+`Simplex relevance` use `Dirichlet(ones(k))`. Both are degree-3 Bernstein.
 
 The learned-location simplex models improve on the always-correct baseline by
 1.24–1.25 percentage points. The earlier simplex models improve it by 0.46–0.61
