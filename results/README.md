@@ -51,11 +51,14 @@ and sweep runners nest further (`<arm>/seed_N/fold_K/`, or the ablation grid's
 
 `holdout/double-difficulty/` is the one family grouped a level deeper, by the
 *question* each run answers rather than as a flat list of runs:
-`reference-model/`, `model-comparisons/`, `ablations/`, `variants/`,
-`data-splits/`. It has enough runs that a flat listing stopped being
-navigable. See
+`ablations/`, `model-comparisons/`, `variants/`, `2023-2025-season/`. It has
+enough runs that a flat listing stopped being navigable. The reference
+configuration is not a top-level folder: it lives in
+`ablations/simplex-locations-terminal/reference/`, alongside the runs that vary
+the relevance prior, the learned curve locations, and the terminal intercepts,
+because those three settings are interrelated and are read together. See
 [`holdout/double-difficulty/README.md`](compirt/holdout/double-difficulty/README.md)
-for the index; each of the four category directories carries its own README.
+for the index.
 
 ## Naming
 
@@ -68,7 +71,8 @@ may name an older location for the same run.
 
 `holdout/double-difficulty/` is the exception: its run leaves *were* renamed
 from encoded settings (`dd-bernstein-332-simplex-locations-terminal`,
-`matrix-infill`) to what each run answers (`reference-model`,
+`matrix-infill`) to what each run answers
+(`ablations/simplex-locations-terminal/reference`,
 `model-comparisons/double-vs-single-difficulty`). Every recorded path inside
 those runs — `configuration.json`, `command.json`, the `.complete.json` resume
 markers, and the `Result root:` lines — was rewritten to match, so the runners'

@@ -1,7 +1,7 @@
 # CompIRT Evaluation Summary
 
-Evaluation folder: `/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/data-splits/season-2023-25/fold_0/evaluation`
-Result root: `/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/data-splits/season-2023-25/fold_0`
+Evaluation folder: `/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/2023-2025-season/season-2023-25/fold_0/evaluation`
+Result root: `/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/2023-2025-season/season-2023-25/fold_0`
 
 This file consolidates the metric CSVs and fitted-parameter distribution summaries for quick review.
 

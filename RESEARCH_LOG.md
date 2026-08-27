@@ -474,9 +474,9 @@ joint LL and position MAE trail the compact and Gamma alternatives. The mean
 final-100-step slope is −4.25, so the 3,000-step fits have not plateaued.
 
 Artifacts are under
-[`dd-bernstein-332-simplex-locations-terminal`](results/compirt/holdout/double-difficulty/reference-model/),
+[`dd-bernstein-332-simplex-locations-terminal`](results/compirt/holdout/double-difficulty/ablations/simplex-locations-terminal/reference/),
 with fold means in
-[`aggregate/fold_mean_std.csv`](results/compirt/holdout/double-difficulty/reference-model/aggregate/fold_mean_std.csv).
+[`aggregate/fold_mean_std.csv`](results/compirt/holdout/double-difficulty/ablations/simplex-locations-terminal/reference/aggregate/fold_mean_std.csv).
 
 #### Accuracy-tuned neg thresholds
 
@@ -552,9 +552,9 @@ concentration selection; the existing
 materially affects joint event LL.
 
 Artifacts are under
-[`dd-bernstein-330p67-simplex-locations-terminal`](results/compirt/holdout/double-difficulty/ablations/relevance-prior/dirichlet-concentration-0.67/),
+[`dd-bernstein-330p67-simplex-locations-terminal`](results/compirt/holdout/double-difficulty/ablations/simplex-locations-terminal/drop-concentration-0.67/),
 with pooled metrics in
-[`aggregate/pooled.csv`](results/compirt/holdout/double-difficulty/ablations/relevance-prior/dirichlet-concentration-0.67/aggregate/pooled.csv).
+[`aggregate/pooled.csv`](results/compirt/holdout/double-difficulty/ablations/simplex-locations-terminal/drop-concentration-0.67/aggregate/pooled.csv).
 
 ### 3.7 Bernstein hyperparameter grid
 
@@ -855,7 +855,7 @@ average precision, and the models are similar after threshold correction. For
 calibrated probabilities or maximum accuracy, retain the ordinary likelihood
 and tune the deployment threshold.
 
-Artifacts: [1× baseline](results/compirt/holdout/double-difficulty/reference-model/configuration.json),
+Artifacts: [1× baseline](results/compirt/holdout/double-difficulty/ablations/simplex-locations-terminal/reference/configuration.json),
 [1.5× incorrect loss](results/compirt/holdout/double-difficulty/ablations/incorrect-loss-weight/weight-1.5/configuration.json),
 [2× incorrect loss](results/compirt/holdout/double-difficulty/ablations/incorrect-loss-weight/weight-2/configuration.json),
 and [3× incorrect loss](results/compirt/holdout/double-difficulty/ablations/incorrect-loss-weight/weight-3/configuration.json).

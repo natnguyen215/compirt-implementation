@@ -15,7 +15,7 @@ Example -- the 2024-25 season, no terminal intercepts::
 
     .venv/bin/python -m run_scripts.bernstein.run_dd_bernstein_332 \\
         --base-split season_2024_25 --no-terminal-intercepts \\
-        --root results/compirt/holdout/double-difficulty/data-splits/season-2024-25-noterminal
+        --root results/compirt/holdout/double-difficulty/2023-2025-season/season-2024-25-noterminal
 """
 
 from __future__ import annotations
@@ -48,7 +48,7 @@ PYTHON = str(REPO_ROOT / ".venv" / "bin" / "python")
 FOLD_COUNT = 5
 TRAIN_MODULE = "hazard_double_difficulty.bernstein.train_pyramidal"
 EVALUATE_MODULE = "run_scripts.paper_model_selection.evaluate_fold"
-DEFAULT_ROOT = Path("results/compirt/holdout/double-difficulty/reference-model")
+DEFAULT_ROOT = Path("results/compirt/holdout/double-difficulty/ablations/simplex-locations-terminal/reference")
 
 
 @dataclass(frozen=True)
