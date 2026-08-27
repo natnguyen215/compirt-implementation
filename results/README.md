@@ -54,9 +54,12 @@ and sweep runners nest further (`<arm>/seed_N/fold_K/`, or the ablation grid's
 `ablations/`, `model-comparisons/`, `variants/`, `2023-2025-season/`. It has
 enough runs that a flat listing stopped being navigable. The reference
 configuration is not a top-level folder: it lives in
-`ablations/simplex-locations-terminal/reference/`, alongside the runs that vary
-the relevance prior, the learned curve locations, and the terminal intercepts,
-because those three settings are interrelated and are read together. See
+`ablations/relevance-locations-terminal/`, alongside the runs that vary the
+relevance parameterization, the learned curve locations, and the terminal
+intercepts, because those three settings are interrelated and are read
+together. Inside that one group the leaves keep their encoded names
+(`dd-bernstein-332-simplex-locations-terminal`), so the name states the
+configuration. See
 [`holdout/double-difficulty/README.md`](compirt/holdout/double-difficulty/README.md)
 for the index.
 
@@ -70,10 +73,12 @@ directory *structure* above them has been normalized, so those recorded paths
 may name an older location for the same run.
 
 `holdout/double-difficulty/` is the exception: its run leaves *were* renamed
-from encoded settings (`dd-bernstein-332-simplex-locations-terminal`,
-`matrix-infill`) to what each run answers
-(`ablations/simplex-locations-terminal/reference`,
-`model-comparisons/double-vs-single-difficulty`). Every recorded path inside
+from encoded settings (`matrix-infill`) to what each run answers
+(`model-comparisons/double-vs-single-difficulty`). Its
+`ablations/relevance-locations-terminal/` leaves are the exception within that
+exception: they keep encoded names
+(`dd-bernstein-332-simplex-locations-terminal`), because there the settings
+*are* the question the group asks. Every recorded path inside
 those runs — `configuration.json`, `command.json`, the `.complete.json` resume
 markers, and the `Result root:` lines — was rewritten to match, so the runners'
 resume logic still works and the reports stay self-consistent. The settings

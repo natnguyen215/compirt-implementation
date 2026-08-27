@@ -50,12 +50,7 @@ results/compirt/**/polynomial/
 *.pdf
 
 # Double-difficulty hyperparameter grid: ~2.7 GB of per-fold loss curves and
-# quantile summaries across 100 points, regenerable from the runner. Only the
-# 3/3/2 point stays tracked -- docs/dd-linear-spline-vs-bernstein-3-3-2.md
-# cites it. Un-ignoring a subdirectory needs each parent re-included first.
-results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/*
-!results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/degree_3
-results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/degree_3/*
-!results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/degree_3/curves_3
-results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/degree_3/curves_3/*
-!results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/degree_3/curves_3/dirichlet_2
+# quantile summaries across 100 points, regenerable from the runner. Its 3/3/2
+# point is tracked, but it lives in ablations/relevance-locations-terminal/ as
+# dd-bernstein-332-unconstrained/, so the whole sweep directory is ignored.
+results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/
