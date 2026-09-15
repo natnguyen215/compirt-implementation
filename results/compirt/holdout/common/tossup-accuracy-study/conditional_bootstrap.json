@@ -1,0 +1,68 @@
+{
+  "regularized": {
+    "game_id": {
+      "accuracy_difference_95_interval": [
+        0.004282043187131654,
+        0.010219926986838447
+      ],
+      "f1_difference_95_interval": [
+        0.16469339024756546,
+        0.1840794057359315
+      ]
+    },
+    "tossup_id": {
+      "accuracy_difference_95_interval": [
+        0.003715208908069817,
+        0.010854766162314556
+      ],
+      "f1_difference_95_interval": [
+        0.15896331939767686,
+        0.19028402646319234
+      ]
+    }
+  },
+  "frozen_skills": {
+    "game_id": {
+      "accuracy_difference_95_interval": [
+        0.0051586084066364505,
+        0.010937073426825256
+      ],
+      "f1_difference_95_interval": [
+        0.17217272015212942,
+        0.1911966372224573
+      ]
+    },
+    "tossup_id": {
+      "accuracy_difference_95_interval": [
+        0.004569574360357406,
+        0.01171885433930471
+      ],
+      "f1_difference_95_interval": [
+        0.16610266407591737,
+        0.19816714861962104
+      ]
+    }
+  },
+  "boosting_ensemble": {
+    "game_id": {
+      "accuracy_difference_95_interval": [
+        0.01049494456199252,
+        0.015503872047996022
+      ],
+      "f1_difference_95_interval": [
+        0.13011729593968877,
+        0.14865749038117812
+      ]
+    },
+    "tossup_id": {
+      "accuracy_difference_95_interval": [
+        0.009840436364440815,
+        0.01658602916124162
+      ],
+      "f1_difference_95_interval": [
+        0.12490166134526152,
+        0.1547757238598717
+      ]
+    }
+  }
+}

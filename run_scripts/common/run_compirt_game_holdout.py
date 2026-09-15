@@ -46,6 +46,12 @@ from holdout.aggregate_reports import (
     add_main_table_fold_means,
     pooled_correctness_metrics,
     write_correctness_markdown,
+    write_pooled_player_leaderboards,
+)
+from compirt_eval.scenario_a_tossups.outcomes import (
+    OUTCOME_METRICS,
+    OUTCOME_SCHEMA_VERSION,
+    evaluate_tossup_outcomes,
 )
 from utils.run_logging import resolve_result_root
 
@@ -111,6 +117,26 @@ def aggregate_folds(root: str, n_folds: int) -> None:
     aggregate_dir = Path(root) / "aggregate"
     aggregate_dir.mkdir(parents=True, exist_ok=True)
     summary_lines = ["# Game-infill 5-fold aggregate", "", f"Folds: {n_folds}", ""]
+
+    # Refresh legacy expected-score artifacts before generic fold aggregation.
+    for fold in range(n_folds):
+        fold_dir = Path(root) / f"fold_{fold}" / "holdout"
+        evaluation_dir = fold_dir / "evaluation"
+        tossup_path = evaluation_dir / "csvs" / "tossup_metrics.csv"
+        if not tossup_path.exists():
+            continue
+        frame = pd.read_csv(tossup_path)
+        if frame.empty or frame.iloc[0].get("tossup_outcome_schema_version") == OUTCOME_SCHEMA_VERSION:
+            continue
+        replay, *_ = evaluate_tossup_outcomes(fold_dir / "pyramidal", evaluation_dir)
+        if not replay:
+            raise ValueError(f"Cannot aggregate stale game metrics without replay inputs: {fold_dir}")
+        old = frame.iloc[0].to_dict()
+        for name in list(old):
+            if name in OUTCOME_METRICS or name.startswith(("tossup_game_", "tossup_model_official_", "tournament_player_ppg_", "tossup_scorer_", "first_buzzer_team_")):
+                old.pop(name)
+        old.update(replay)
+        pd.DataFrame([old]).to_csv(tossup_path, index=False)
 
     for subdir, filename in AGGREGATED_METRICS:
         rows = []
@@ -184,6 +210,7 @@ def aggregate_folds(root: str, n_folds: int) -> None:
             aggregate_dir / "correctness_metrics.md",
             title=f"{Path(root).name} correctness summary",
         )
+        write_pooled_player_leaderboards(run_dirs, aggregate_dir)
     print(f"Aggregated metrics in {aggregate_dir}")
 
 

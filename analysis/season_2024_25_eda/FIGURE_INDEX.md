@@ -57,4 +57,4 @@ See [MDS.md](MDS.md) for features, algorithm, and axis interpretation.
 22. [Site MDS](figures/22_site_mds.png) — 10-feature map of all 33 mirror sites, stress-1 0.150.
 23. [MDS loadings](figures/23_mds_loadings.png) — correlation of each standardized feature with each axis, for both maps. Read this before interpreting 21 or 22.
 
-There is deliberately **no event-grain MDS** here. The season has only four question-set events, and a two-dimensional embedding of four points is near-exact by construction, so it would carry no information. The nine-event map in [`../full_dataset_eda/`](../full_dataset_eda/figures/26_event_mds.png) covers that question.
+There is deliberately **no event-grain MDS** here. The season has only four question-set events, and a two-dimensional embedding of four points is near-exact by construction, so it would carry no information.

@@ -11,7 +11,13 @@ validate the linked tables from the repository root:
 
 Generated outputs are written to `data/hf/quizbowl-irt/` and
 `data/response_matrix.csv`. Inferred lineups are cached under `data/lineups/`.
-All three locations are ignored because they are reproducible local artifacts.
+All three locations are ignored by git.
+
+The builder emits `all`, `year_2024`, and `year_2025` splits from the 2024–25
+export. The current local `data/hf/quizbowl-irt/` is a one-off union that also
+adds tossup-only records from nine 2023 tournaments to the `all` split;
+`build_report.json` there records both sources and the resulting counts.
+Rebuilding from `data/database.db` alone does not reproduce that extension.
 
 See [`../docs/dataset-schema.md`](../docs/dataset-schema.md) for table schemas
 and [`../docs/lineup-inference.md`](../docs/lineup-inference.md) for lineup rules.

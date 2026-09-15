@@ -1,0 +1,72 @@
+[
+  {
+    "fold": 0,
+    "selected_new": "predictive_mixture",
+    "selected_with_previous": "boosting_ensemble",
+    "validation_ap": {
+      "whole_prefix": 0.4944852496296184,
+      "vb_base": 0.4891585156420253,
+      "predictive_mixture": 0.49726737894247336,
+      "regularized": 0.4892729617154119,
+      "frozen_skills": 0.494168886061351,
+      "boosting": 0.4973585596089275,
+      "boosting_ensemble": 0.5063117290749224
+    }
+  },
+  {
+    "fold": 1,
+    "selected_new": "predictive_mixture",
+    "selected_with_previous": "boosting_ensemble",
+    "validation_ap": {
+      "whole_prefix": 0.4675003922437904,
+      "vb_base": 0.4647239656346445,
+      "predictive_mixture": 0.47071218847894436,
+      "regularized": 0.4648371395974927,
+      "frozen_skills": 0.4653707187879601,
+      "boosting": 0.47339223414257775,
+      "boosting_ensemble": 0.4794059769564727
+    }
+  },
+  {
+    "fold": 2,
+    "selected_new": "predictive_mixture",
+    "selected_with_previous": "boosting_ensemble",
+    "validation_ap": {
+      "whole_prefix": 0.4926270297432177,
+      "vb_base": 0.4912666783651617,
+      "predictive_mixture": 0.4968586537016393,
+      "regularized": 0.4911001126468369,
+      "frozen_skills": 0.4951603037221854,
+      "boosting": 0.5017873771993973,
+      "boosting_ensemble": 0.5094739242874032
+    }
+  },
+  {
+    "fold": 3,
+    "selected_new": "predictive_mixture",
+    "selected_with_previous": "boosting_ensemble",
+    "validation_ap": {
+      "whole_prefix": 0.47731842425138493,
+      "vb_base": 0.47276512992209785,
+      "predictive_mixture": 0.4807297786810113,
+      "regularized": 0.4731279110075852,
+      "frozen_skills": 0.47498163792054265,
+      "boosting": 0.4873402299353273,
+      "boosting_ensemble": 0.4904897179416345
+    }
+  },
+  {
+    "fold": 4,
+    "selected_new": "predictive_mixture",
+    "selected_with_previous": "boosting_ensemble",
+    "validation_ap": {
+      "whole_prefix": 0.47577098812922436,
+      "vb_base": 0.47972167056330817,
+      "predictive_mixture": 0.4814004701436584,
+      "regularized": 0.47489584062308315,
+      "frozen_skills": 0.47743317340147207,
+      "boosting": 0.4871117214206444,
+      "boosting_ensemble": 0.4909318268846331
+    }
+  }
+]

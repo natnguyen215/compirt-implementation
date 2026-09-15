@@ -1,0 +1,3280 @@
+{
+  "tasks": [
+    {
+      "name": "dd-prepare",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-c",
+        "import json, sys; from run_scripts.bernstein.run_dd_bernstein_332 import Configuration, snapshot_configuration; snapshot_configuration(Configuration(**json.loads(sys.argv[1])))",
+        "{\"root\": \"/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350\", \"base_split\": \"year_2024\", \"folds\": [0, 1, 2, 3, 4], \"split_seed\": 42, \"optimization_seed\": 42, \"degree\": 3, \"dimensions\": 3, \"drop_concentration\": 2.0, \"relevance_prior\": \"simplex\", \"learned_curve_locations\": true, \"terminal_intercepts\": true, \"steps\": 3000, \"lr\": 0.005, \"device\": \"cuda\", \"posterior_draws\": 0, \"incorrect_weight\": 1.0, \"player_neg_propensity\": false, \"data_dir\": null}"
+      ],
+      "needs": [],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/configuration.json"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "dd-0-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "hazard_double_difficulty.bernstein.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:0:42",
+        "--degree",
+        "3",
+        "--dimensions",
+        "3",
+        "--drop-concentration",
+        "2.0",
+        "--relevance-prior",
+        "simplex",
+        "--learn-curve-locations",
+        "--incorrect-weight",
+        "1.0",
+        "--steps",
+        "3000",
+        "--lr",
+        "0.005",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/train/pyramidal"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "dd-0-frozen-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:0:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/train/pyramidal",
+        "--dimensions",
+        "3",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/holdout/pyramidal"
+      ],
+      "needs": [
+        "dd-0-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-0-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "run_scripts.paper_model_selection.evaluate_fold",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/holdout/pyramidal",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/evaluation"
+      ],
+      "needs": [
+        "dd-0-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/evaluation/csvs/tossup_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-0-train-pyramidal",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "multidimensional.multidim_mirt.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:0:42",
+        "--steps",
+        "3000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/pyramidal",
+        "--dimensions",
+        "5",
+        "--difficulty-link",
+        "sigmoid"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "multidim-0-train-compositional",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "train_compositional",
+        "--split",
+        "game-holdout:year_2024:train:5:0:42",
+        "--player-skills",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/pyramidal/players.csv",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/compositional"
+      ],
+      "needs": [
+        "multidim-0-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/compositional/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "multidim-0-train-synergy",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "train_compositional",
+        "--split",
+        "game-holdout:year_2024:train:5:0:42",
+        "--player-skills",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/pyramidal/players.csv",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/synergy",
+        "--use-synergy",
+        "--synergy-dimensions",
+        "3",
+        "--save-synergy-details"
+      ],
+      "needs": [
+        "multidim-0-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/synergy/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "multidim-0-frozen-pyramidal",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:0:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/pyramidal",
+        "--dimensions",
+        "5",
+        "--difficulty-link",
+        "sigmoid",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/pyramidal"
+      ],
+      "needs": [
+        "multidim-0-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-0-frozen-compositional",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "bonus",
+        "--split",
+        "game-holdout:year_2024:test:5:0:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/pyramidal",
+        "--train-compositional",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/compositional",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/compositional"
+      ],
+      "needs": [
+        "multidim-0-train-compositional"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/compositional/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-0-frozen-synergy",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "bonus",
+        "--split",
+        "game-holdout:year_2024:test:5:0:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/pyramidal",
+        "--train-compositional",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/synergy",
+        "--use-synergy",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/synergy"
+      ],
+      "needs": [
+        "multidim-0-train-synergy"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/synergy/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-0-holdout-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "evaluate_compirt",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/pyramidal",
+        "--compositional-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/compositional",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/evaluation"
+      ],
+      "needs": [
+        "multidim-0-frozen-pyramidal",
+        "multidim-0-frozen-compositional"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/evaluation/csvs/tossup_metrics.csv",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/evaluation/csvs/bonus_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-0-holdout-synergy-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "evaluate_compirt",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/pyramidal",
+        "--compositional-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/synergy",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/synergy-evaluation"
+      ],
+      "needs": [
+        "multidim-0-frozen-pyramidal",
+        "multidim-0-frozen-synergy"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/synergy-evaluation/csvs/tossup_metrics.csv",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/synergy-evaluation/csvs/bonus_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-0-compare-bonus-models",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "run_scripts/common/run_synergy_comparison.py",
+        "--compositional-metrics",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/evaluation/csvs/bonus_metrics.csv",
+        "--synergy-metrics",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/synergy-evaluation/csvs/bonus_metrics.csv",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/comparison"
+      ],
+      "needs": [
+        "multidim-0-holdout-evaluation",
+        "multidim-0-holdout-synergy-evaluation"
+      ],
+      "gpu": false,
+      "outputs": [],
+      "priority": 10
+    },
+    {
+      "name": "dd-1-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "hazard_double_difficulty.bernstein.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:1:42",
+        "--degree",
+        "3",
+        "--dimensions",
+        "3",
+        "--drop-concentration",
+        "2.0",
+        "--relevance-prior",
+        "simplex",
+        "--learn-curve-locations",
+        "--incorrect-weight",
+        "1.0",
+        "--steps",
+        "3000",
+        "--lr",
+        "0.005",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/train/pyramidal"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "dd-1-frozen-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:1:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/train/pyramidal",
+        "--dimensions",
+        "3",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/holdout/pyramidal"
+      ],
+      "needs": [
+        "dd-1-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-1-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "run_scripts.paper_model_selection.evaluate_fold",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/holdout/pyramidal",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/evaluation"
+      ],
+      "needs": [
+        "dd-1-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/evaluation/csvs/tossup_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-1-train-pyramidal",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "multidimensional.multidim_mirt.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:1:42",
+        "--steps",
+        "3000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/pyramidal",
+        "--dimensions",
+        "5",
+        "--difficulty-link",
+        "sigmoid"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "multidim-1-train-compositional",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "train_compositional",
+        "--split",
+        "game-holdout:year_2024:train:5:1:42",
+        "--player-skills",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/pyramidal/players.csv",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/compositional"
+      ],
+      "needs": [
+        "multidim-1-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/compositional/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "multidim-1-train-synergy",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "train_compositional",
+        "--split",
+        "game-holdout:year_2024:train:5:1:42",
+        "--player-skills",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/pyramidal/players.csv",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/synergy",
+        "--use-synergy",
+        "--synergy-dimensions",
+        "3",
+        "--save-synergy-details"
+      ],
+      "needs": [
+        "multidim-1-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/synergy/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "multidim-1-frozen-pyramidal",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:1:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/pyramidal",
+        "--dimensions",
+        "5",
+        "--difficulty-link",
+        "sigmoid",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/pyramidal"
+      ],
+      "needs": [
+        "multidim-1-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-1-frozen-compositional",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "bonus",
+        "--split",
+        "game-holdout:year_2024:test:5:1:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/pyramidal",
+        "--train-compositional",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/compositional",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/compositional"
+      ],
+      "needs": [
+        "multidim-1-train-compositional"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/compositional/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-1-frozen-synergy",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "bonus",
+        "--split",
+        "game-holdout:year_2024:test:5:1:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/pyramidal",
+        "--train-compositional",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/synergy",
+        "--use-synergy",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/synergy"
+      ],
+      "needs": [
+        "multidim-1-train-synergy"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/synergy/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-1-holdout-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "evaluate_compirt",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/pyramidal",
+        "--compositional-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/compositional",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/evaluation"
+      ],
+      "needs": [
+        "multidim-1-frozen-pyramidal",
+        "multidim-1-frozen-compositional"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/evaluation/csvs/tossup_metrics.csv",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/evaluation/csvs/bonus_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-1-holdout-synergy-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "evaluate_compirt",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/pyramidal",
+        "--compositional-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/synergy",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/synergy-evaluation"
+      ],
+      "needs": [
+        "multidim-1-frozen-pyramidal",
+        "multidim-1-frozen-synergy"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/synergy-evaluation/csvs/tossup_metrics.csv",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/synergy-evaluation/csvs/bonus_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-1-compare-bonus-models",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "run_scripts/common/run_synergy_comparison.py",
+        "--compositional-metrics",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/evaluation/csvs/bonus_metrics.csv",
+        "--synergy-metrics",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/synergy-evaluation/csvs/bonus_metrics.csv",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/comparison"
+      ],
+      "needs": [
+        "multidim-1-holdout-evaluation",
+        "multidim-1-holdout-synergy-evaluation"
+      ],
+      "gpu": false,
+      "outputs": [],
+      "priority": 10
+    },
+    {
+      "name": "dd-2-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "hazard_double_difficulty.bernstein.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:2:42",
+        "--degree",
+        "3",
+        "--dimensions",
+        "3",
+        "--drop-concentration",
+        "2.0",
+        "--relevance-prior",
+        "simplex",
+        "--learn-curve-locations",
+        "--incorrect-weight",
+        "1.0",
+        "--steps",
+        "3000",
+        "--lr",
+        "0.005",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/train/pyramidal"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "dd-2-frozen-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:2:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/train/pyramidal",
+        "--dimensions",
+        "3",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/holdout/pyramidal"
+      ],
+      "needs": [
+        "dd-2-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-2-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "run_scripts.paper_model_selection.evaluate_fold",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/holdout/pyramidal",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/evaluation"
+      ],
+      "needs": [
+        "dd-2-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/evaluation/csvs/tossup_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-2-train-pyramidal",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "multidimensional.multidim_mirt.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:2:42",
+        "--steps",
+        "3000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/pyramidal",
+        "--dimensions",
+        "5",
+        "--difficulty-link",
+        "sigmoid"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "multidim-2-train-compositional",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "train_compositional",
+        "--split",
+        "game-holdout:year_2024:train:5:2:42",
+        "--player-skills",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/pyramidal/players.csv",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/compositional"
+      ],
+      "needs": [
+        "multidim-2-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/compositional/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "multidim-2-train-synergy",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "train_compositional",
+        "--split",
+        "game-holdout:year_2024:train:5:2:42",
+        "--player-skills",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/pyramidal/players.csv",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/synergy",
+        "--use-synergy",
+        "--synergy-dimensions",
+        "3",
+        "--save-synergy-details"
+      ],
+      "needs": [
+        "multidim-2-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/synergy/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "multidim-2-frozen-pyramidal",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:2:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/pyramidal",
+        "--dimensions",
+        "5",
+        "--difficulty-link",
+        "sigmoid",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/pyramidal"
+      ],
+      "needs": [
+        "multidim-2-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-2-frozen-compositional",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "bonus",
+        "--split",
+        "game-holdout:year_2024:test:5:2:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/pyramidal",
+        "--train-compositional",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/compositional",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/compositional"
+      ],
+      "needs": [
+        "multidim-2-train-compositional"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/compositional/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-2-frozen-synergy",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "bonus",
+        "--split",
+        "game-holdout:year_2024:test:5:2:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/pyramidal",
+        "--train-compositional",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/synergy",
+        "--use-synergy",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/synergy"
+      ],
+      "needs": [
+        "multidim-2-train-synergy"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/synergy/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-2-holdout-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "evaluate_compirt",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/pyramidal",
+        "--compositional-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/compositional",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/evaluation"
+      ],
+      "needs": [
+        "multidim-2-frozen-pyramidal",
+        "multidim-2-frozen-compositional"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/evaluation/csvs/tossup_metrics.csv",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/evaluation/csvs/bonus_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-2-holdout-synergy-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "evaluate_compirt",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/pyramidal",
+        "--compositional-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/synergy",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/synergy-evaluation"
+      ],
+      "needs": [
+        "multidim-2-frozen-pyramidal",
+        "multidim-2-frozen-synergy"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/synergy-evaluation/csvs/tossup_metrics.csv",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/synergy-evaluation/csvs/bonus_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-2-compare-bonus-models",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "run_scripts/common/run_synergy_comparison.py",
+        "--compositional-metrics",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/evaluation/csvs/bonus_metrics.csv",
+        "--synergy-metrics",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/synergy-evaluation/csvs/bonus_metrics.csv",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/comparison"
+      ],
+      "needs": [
+        "multidim-2-holdout-evaluation",
+        "multidim-2-holdout-synergy-evaluation"
+      ],
+      "gpu": false,
+      "outputs": [],
+      "priority": 10
+    },
+    {
+      "name": "dd-3-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "hazard_double_difficulty.bernstein.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:3:42",
+        "--degree",
+        "3",
+        "--dimensions",
+        "3",
+        "--drop-concentration",
+        "2.0",
+        "--relevance-prior",
+        "simplex",
+        "--learn-curve-locations",
+        "--incorrect-weight",
+        "1.0",
+        "--steps",
+        "3000",
+        "--lr",
+        "0.005",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/train/pyramidal"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "dd-3-frozen-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:3:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/train/pyramidal",
+        "--dimensions",
+        "3",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/holdout/pyramidal"
+      ],
+      "needs": [
+        "dd-3-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-3-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "run_scripts.paper_model_selection.evaluate_fold",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/holdout/pyramidal",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/evaluation"
+      ],
+      "needs": [
+        "dd-3-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/evaluation/csvs/tossup_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-3-train-pyramidal",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "multidimensional.multidim_mirt.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:3:42",
+        "--steps",
+        "3000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/pyramidal",
+        "--dimensions",
+        "5",
+        "--difficulty-link",
+        "sigmoid"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "multidim-3-train-compositional",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "train_compositional",
+        "--split",
+        "game-holdout:year_2024:train:5:3:42",
+        "--player-skills",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/pyramidal/players.csv",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/compositional"
+      ],
+      "needs": [
+        "multidim-3-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/compositional/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "multidim-3-train-synergy",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "train_compositional",
+        "--split",
+        "game-holdout:year_2024:train:5:3:42",
+        "--player-skills",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/pyramidal/players.csv",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/synergy",
+        "--use-synergy",
+        "--synergy-dimensions",
+        "3",
+        "--save-synergy-details"
+      ],
+      "needs": [
+        "multidim-3-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/synergy/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "multidim-3-frozen-pyramidal",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:3:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/pyramidal",
+        "--dimensions",
+        "5",
+        "--difficulty-link",
+        "sigmoid",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/pyramidal"
+      ],
+      "needs": [
+        "multidim-3-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-3-frozen-compositional",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "bonus",
+        "--split",
+        "game-holdout:year_2024:test:5:3:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/pyramidal",
+        "--train-compositional",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/compositional",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/compositional"
+      ],
+      "needs": [
+        "multidim-3-train-compositional"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/compositional/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-3-frozen-synergy",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "bonus",
+        "--split",
+        "game-holdout:year_2024:test:5:3:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/pyramidal",
+        "--train-compositional",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/synergy",
+        "--use-synergy",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/synergy"
+      ],
+      "needs": [
+        "multidim-3-train-synergy"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/synergy/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-3-holdout-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "evaluate_compirt",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/pyramidal",
+        "--compositional-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/compositional",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/evaluation"
+      ],
+      "needs": [
+        "multidim-3-frozen-pyramidal",
+        "multidim-3-frozen-compositional"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/evaluation/csvs/tossup_metrics.csv",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/evaluation/csvs/bonus_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-3-holdout-synergy-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "evaluate_compirt",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/pyramidal",
+        "--compositional-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/synergy",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/synergy-evaluation"
+      ],
+      "needs": [
+        "multidim-3-frozen-pyramidal",
+        "multidim-3-frozen-synergy"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/synergy-evaluation/csvs/tossup_metrics.csv",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/synergy-evaluation/csvs/bonus_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-3-compare-bonus-models",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "run_scripts/common/run_synergy_comparison.py",
+        "--compositional-metrics",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/evaluation/csvs/bonus_metrics.csv",
+        "--synergy-metrics",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/synergy-evaluation/csvs/bonus_metrics.csv",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/comparison"
+      ],
+      "needs": [
+        "multidim-3-holdout-evaluation",
+        "multidim-3-holdout-synergy-evaluation"
+      ],
+      "gpu": false,
+      "outputs": [],
+      "priority": 10
+    },
+    {
+      "name": "dd-4-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "hazard_double_difficulty.bernstein.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:4:42",
+        "--degree",
+        "3",
+        "--dimensions",
+        "3",
+        "--drop-concentration",
+        "2.0",
+        "--relevance-prior",
+        "simplex",
+        "--learn-curve-locations",
+        "--incorrect-weight",
+        "1.0",
+        "--steps",
+        "3000",
+        "--lr",
+        "0.005",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/train/pyramidal"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "dd-4-frozen-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:4:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/train/pyramidal",
+        "--dimensions",
+        "3",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/holdout/pyramidal"
+      ],
+      "needs": [
+        "dd-4-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-4-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "run_scripts.paper_model_selection.evaluate_fold",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/holdout/pyramidal",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/evaluation"
+      ],
+      "needs": [
+        "dd-4-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/evaluation/csvs/tossup_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-4-train-pyramidal",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "multidimensional.multidim_mirt.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:4:42",
+        "--steps",
+        "3000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/pyramidal",
+        "--dimensions",
+        "5",
+        "--difficulty-link",
+        "sigmoid"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "multidim-4-train-compositional",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "train_compositional",
+        "--split",
+        "game-holdout:year_2024:train:5:4:42",
+        "--player-skills",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/pyramidal/players.csv",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/compositional"
+      ],
+      "needs": [
+        "multidim-4-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/compositional/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "multidim-4-train-synergy",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "train_compositional",
+        "--split",
+        "game-holdout:year_2024:train:5:4:42",
+        "--player-skills",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/pyramidal/players.csv",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/synergy",
+        "--use-synergy",
+        "--synergy-dimensions",
+        "3",
+        "--save-synergy-details"
+      ],
+      "needs": [
+        "multidim-4-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/synergy/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "multidim-4-frozen-pyramidal",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:4:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/pyramidal",
+        "--dimensions",
+        "5",
+        "--difficulty-link",
+        "sigmoid",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/pyramidal"
+      ],
+      "needs": [
+        "multidim-4-train-pyramidal"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-4-frozen-compositional",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "bonus",
+        "--split",
+        "game-holdout:year_2024:test:5:4:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/pyramidal",
+        "--train-compositional",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/compositional",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/compositional"
+      ],
+      "needs": [
+        "multidim-4-train-compositional"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/compositional/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-4-frozen-synergy",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "bonus",
+        "--split",
+        "game-holdout:year_2024:test:5:4:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/pyramidal",
+        "--train-compositional",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/synergy",
+        "--use-synergy",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/synergy"
+      ],
+      "needs": [
+        "multidim-4-train-synergy"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/synergy/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-4-holdout-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "evaluate_compirt",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/pyramidal",
+        "--compositional-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/compositional",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/evaluation"
+      ],
+      "needs": [
+        "multidim-4-frozen-pyramidal",
+        "multidim-4-frozen-compositional"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/evaluation/csvs/tossup_metrics.csv",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/evaluation/csvs/bonus_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-4-holdout-synergy-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "evaluate_compirt",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/pyramidal",
+        "--compositional-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/synergy",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/synergy-evaluation"
+      ],
+      "needs": [
+        "multidim-4-frozen-pyramidal",
+        "multidim-4-frozen-synergy"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/synergy-evaluation/csvs/tossup_metrics.csv",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/synergy-evaluation/csvs/bonus_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "multidim-4-compare-bonus-models",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "run_scripts/common/run_synergy_comparison.py",
+        "--compositional-metrics",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/evaluation/csvs/bonus_metrics.csv",
+        "--synergy-metrics",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/synergy-evaluation/csvs/bonus_metrics.csv",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/comparison"
+      ],
+      "needs": [
+        "multidim-4-holdout-evaluation",
+        "multidim-4-holdout-synergy-evaluation"
+      ],
+      "gpu": false,
+      "outputs": [],
+      "priority": 10
+    },
+    {
+      "name": "bonus-prepare",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--prepare-only"
+      ],
+      "needs": [
+        "dd-0-train",
+        "dd-1-train",
+        "dd-2-train",
+        "dd-3-train",
+        "dd-4-train"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/configuration.json"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-0-compositional-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "0",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "train"
+      ],
+      "needs": [
+        "bonus-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_0/train/compositional/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "bonus-0-compositional-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "0",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "replay"
+      ],
+      "needs": [
+        "bonus-0-compositional-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_0/holdout/compositional/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-0-compositional-evaluate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "0",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "evaluate"
+      ],
+      "needs": [
+        "bonus-0-compositional-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_0/compositional_checks.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-0-synergy-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "0",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "train"
+      ],
+      "needs": [
+        "bonus-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_0/train/synergy/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "bonus-0-synergy-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "0",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "replay"
+      ],
+      "needs": [
+        "bonus-0-synergy-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_0/holdout/synergy/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-0-synergy-evaluate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "0",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "evaluate"
+      ],
+      "needs": [
+        "bonus-0-synergy-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_0/synergy_checks.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-1-compositional-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "1",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "train"
+      ],
+      "needs": [
+        "bonus-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_1/train/compositional/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "bonus-1-compositional-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "1",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "replay"
+      ],
+      "needs": [
+        "bonus-1-compositional-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_1/holdout/compositional/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-1-compositional-evaluate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "1",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "evaluate"
+      ],
+      "needs": [
+        "bonus-1-compositional-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_1/compositional_checks.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-1-synergy-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "1",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "train"
+      ],
+      "needs": [
+        "bonus-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_1/train/synergy/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "bonus-1-synergy-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "1",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "replay"
+      ],
+      "needs": [
+        "bonus-1-synergy-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_1/holdout/synergy/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-1-synergy-evaluate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "1",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "evaluate"
+      ],
+      "needs": [
+        "bonus-1-synergy-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_1/synergy_checks.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-2-compositional-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "2",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "train"
+      ],
+      "needs": [
+        "bonus-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_2/train/compositional/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "bonus-2-compositional-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "2",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "replay"
+      ],
+      "needs": [
+        "bonus-2-compositional-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_2/holdout/compositional/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-2-compositional-evaluate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "2",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "evaluate"
+      ],
+      "needs": [
+        "bonus-2-compositional-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_2/compositional_checks.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-2-synergy-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "2",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "train"
+      ],
+      "needs": [
+        "bonus-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_2/train/synergy/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "bonus-2-synergy-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "2",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "replay"
+      ],
+      "needs": [
+        "bonus-2-synergy-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_2/holdout/synergy/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-2-synergy-evaluate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "2",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "evaluate"
+      ],
+      "needs": [
+        "bonus-2-synergy-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_2/synergy_checks.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-3-compositional-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "3",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "train"
+      ],
+      "needs": [
+        "bonus-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_3/train/compositional/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "bonus-3-compositional-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "3",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "replay"
+      ],
+      "needs": [
+        "bonus-3-compositional-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_3/holdout/compositional/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-3-compositional-evaluate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "3",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "evaluate"
+      ],
+      "needs": [
+        "bonus-3-compositional-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_3/compositional_checks.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-3-synergy-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "3",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "train"
+      ],
+      "needs": [
+        "bonus-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_3/train/synergy/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "bonus-3-synergy-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "3",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "replay"
+      ],
+      "needs": [
+        "bonus-3-synergy-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_3/holdout/synergy/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-3-synergy-evaluate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "3",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "evaluate"
+      ],
+      "needs": [
+        "bonus-3-synergy-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_3/synergy_checks.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-4-compositional-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "4",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "train"
+      ],
+      "needs": [
+        "bonus-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_4/train/compositional/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "bonus-4-compositional-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "4",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "replay"
+      ],
+      "needs": [
+        "bonus-4-compositional-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_4/holdout/compositional/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-4-compositional-evaluate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "4",
+        "--worker-arm",
+        "compositional",
+        "--worker-stage",
+        "evaluate"
+      ],
+      "needs": [
+        "bonus-4-compositional-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_4/compositional_checks.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-4-synergy-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "4",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "train"
+      ],
+      "needs": [
+        "bonus-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_4/train/synergy/summary.json"
+      ],
+      "priority": 50
+    },
+    {
+      "name": "bonus-4-synergy-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "4",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "replay"
+      ],
+      "needs": [
+        "bonus-4-synergy-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_4/holdout/synergy/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-4-synergy-evaluate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--worker-fold",
+        "4",
+        "--worker-arm",
+        "synergy",
+        "--worker-stage",
+        "evaluate"
+      ],
+      "needs": [
+        "bonus-4-synergy-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_4/synergy_checks.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-aggregate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-c",
+        "import json, sys; from run_scripts.bernstein.run_dd_bernstein_332 import Configuration, run_fold, aggregate; c = Configuration(**json.loads(sys.argv[1])); [run_fold(c, f) for f in c.folds]; aggregate(c)",
+        "{\"root\": \"/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350\", \"base_split\": \"year_2024\", \"folds\": [0, 1, 2, 3, 4], \"split_seed\": 42, \"optimization_seed\": 42, \"degree\": 3, \"dimensions\": 3, \"drop_concentration\": 2.0, \"relevance_prior\": \"simplex\", \"learned_curve_locations\": true, \"terminal_intercepts\": true, \"steps\": 3000, \"lr\": 0.005, \"device\": \"cuda\", \"posterior_draws\": 0, \"incorrect_weight\": 1.0, \"player_neg_propensity\": false, \"data_dir\": null}"
+      ],
+      "needs": [
+        "dd-0-evaluation",
+        "dd-1-evaluation",
+        "dd-2-evaluation",
+        "dd-3-evaluation",
+        "dd-4-evaluation"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/aggregate/pooled.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-aggregate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "run_scripts.common.run_compositional_from_folds",
+        "--stage1-root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+        "--root",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+        "--folds",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--arms",
+        "compositional",
+        "synergy",
+        "--alpha-prior",
+        "gamma",
+        "--steps",
+        "2000",
+        "--lr",
+        "0.01",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--collect-only"
+      ],
+      "needs": [
+        "bonus-0-compositional-evaluate",
+        "bonus-0-synergy-evaluate",
+        "bonus-1-compositional-evaluate",
+        "bonus-1-synergy-evaluate",
+        "bonus-2-compositional-evaluate",
+        "bonus-2-synergy-evaluate",
+        "bonus-3-compositional-evaluate",
+        "bonus-3-synergy-evaluate",
+        "bonus-4-compositional-evaluate",
+        "bonus-4-synergy-evaluate"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/aggregate/report.md"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "multidim-aggregate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-c",
+        "import sys; from run_scripts.common.run_compirt_game_holdout import aggregate_folds; aggregate_folds(sys.argv[1], int(sys.argv[2]))",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350",
+        "5"
+      ],
+      "needs": [
+        "multidim-0-compare-bonus-models",
+        "multidim-1-compare-bonus-models",
+        "multidim-2-compare-bonus-models",
+        "multidim-3-compare-bonus-models",
+        "multidim-4-compare-bonus-models"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/aggregate/summary.md"
+      ],
+      "priority": 0
+    }
+  ],
+  "environment": {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "MPLBACKEND": "Agg",
+    "MPLCONFIGDIR": "/tmp/matplotlib-compirt",
+    "COMPIRT_SURVIVAL_CHUNK": "2048"
+  },
+  "contract": {
+    "run_scripts/common/run_parallel_game_holdout.py": "be8ac06cf240043054ce82c1e16bd7c35776178e3b630b386746338a68ee4858",
+    "run_scripts/common/lib/gpu_queue.py": "cecac115cfb143220f8c5e1e830633b8b7d0ee4f87b5bd6742a56a3620cd2eae",
+    "run_scripts/common/run_compositional_from_folds.py": "7ae1b9514e65c7aa9b4134a6acbc10f484a99bf3bfea57470e89613172798dea",
+    "run_scripts/common/run_compirt_holdout.py": "0709466877e45a2e7fcc11adaf07eaf07d6e439c96b99d3a4f4bfdef45acb9d0",
+    "run_scripts/bernstein/run_dd_bernstein_332.py": "b574386bc8d3f4aba196864651a8645845b7be198c6b493638e73fae89f2e149",
+    "compirt_race.py": "33fd7e4ded72a359d07fd53a317a17f2412b5b03f18fb7a25105f35a110a6d45",
+    "hazard_double_difficulty/bernstein/pyramidal_model.py": "9af6c1c44a6c2d057abf2fad84098b475af688b67e8f0e0b6b341c0219ccf5ed",
+    "hazard_double_difficulty/bernstein/train_pyramidal.py": "6e1fba37d710dc863925f03db07346e6b29b8405045c7b3c30ef2a38d5968092",
+    "multidimensional/multidim_mirt/pyramidal_model.py": "781505b8aaa447cbeb24b0eb2ceb6350630a50c788992978c36ccde332cc3684",
+    "multidimensional/multidim_mirt/train_pyramidal.py": "ffbac4b5924f689d87df8bdb0d2e308a77b99041445fdff77c33ff52bd726737",
+    "compositional_model.py": "b9070a2672f589ce9fa13f4c497c1a88974d4fc0052c597c3c674e0569bacc3d",
+    "train_compositional.py": "a7999404ff4f6972089509ad30327981aca42b372bfc782a907b73bf0a58c485",
+    "holdout/frozen_predict.py": "d361bf90704d08f3985dc2b5ffb10875db1c41cbca98a9e37d7d9f5452cd7326"
+  }
+}

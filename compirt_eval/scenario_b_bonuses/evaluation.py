@@ -14,6 +14,7 @@ from compirt_eval.common.metrics import stratified_prediction_metrics
 from compirt_eval.common.report_paths import csv_path, graph_path
 from compirt_eval.scenario_b_bonuses.distributions import (
     bonus_parameter_distribution_plots,
+    bonus_prediction_distribution_plots,
 )
 from compirt_eval.scenario_b_bonuses.figures import (
     bonus_score_by_observed_plot,
@@ -23,7 +24,7 @@ from compirt_eval.scenario_b_bonuses.metrics import (
     bonus_metrics,
     bonus_ranked_probability_scores,
 )
-from topic.utils.categories import top_level_category
+from compirt_eval.common.categories import top_level_category
 
 
 def evaluate_bonuses(results_dir, output_dir, dimension_labels=None):
@@ -58,6 +59,7 @@ def evaluate_bonuses(results_dir, output_dir, dimension_labels=None):
         graph_path(output_dir, "bonus_reliability.png", "bonus"),
     )
     bonus_parameter_distribution_plots(results_dir, output_dir, dimension_labels)
+    bonus_prediction_distribution_plots(parts, output_dir)
     team_ppb_plot(teams, output_dir)
     bonus_score_by_observed_plot(teams, output_dir)
     return metrics

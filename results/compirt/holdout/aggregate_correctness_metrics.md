@@ -4,8 +4,8 @@ Both samples use unweighted fold means, matching the Research Log main table. Ea
 
 | model | sample | accuracy | Neg F1 | lift | joint event LL | correctness LL | AUC | ECE | position MAE | first-buzzer top-1 | no-buzz error | final-decile mass |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `double-difficulty/model-comparisons/compact-parameterization/full-bernstein-332/degree_3/curves_3/dirichlet_2` | in-sample | 0.810907 | 0.514289 | 0.043572 | 6.073468 | 0.425029 | 0.818831 | 0.056585 | 0.127629 | 0.433022 | -0.005036 | 0.191641 |
-| `double-difficulty/model-comparisons/compact-parameterization/full-bernstein-332/degree_3/curves_3/dirichlet_2` | held-out | 0.765455 | 0.411095 | -0.001536 | 6.437505 | 0.505854 | 0.716635 | 0.070584 | 0.136436 | 0.379875 | -0.004869 | 0.189412 |
+| `double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal` | in-sample | 0.810907 | 0.514289 | 0.043572 | 6.073468 | 0.425029 | 0.818831 | 0.056585 | 0.127629 | 0.433022 | -0.005036 | 0.191641 |
+| `double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal` | held-out | 0.765455 | 0.411095 | -0.001536 | 6.437505 | 0.505854 | 0.716635 | 0.070584 | 0.136436 | 0.379875 | -0.004869 | 0.189412 |
 | `double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal` | in-sample | 0.797572 | 0.302886 | 0.030236 | 6.405448 | 0.435495 | 0.813563 | 0.054623 | 0.146273 | 0.393159 | 0.000216 | 0.190831 |
 | `double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal` | held-out | 0.779493 | 0.232093 | 0.012502 | 6.612269 | 0.487803 | 0.715466 | 0.012510 | 0.151862 | 0.351634 | 0.000930 | 0.188189 |
 | `double-difficulty/variants/player-neg-propensity` | in-sample | 0.798956 | 0.314159 | 0.031620 | 6.379021 | 0.432863 | 0.815790 | 0.053595 | 0.145785 | 0.400051 | 0.000038 | 0.189111 |

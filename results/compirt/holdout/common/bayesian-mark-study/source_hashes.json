@@ -1,0 +1,9 @@
+{
+  "analysis/bayesian_mark_study/models.py": "335bc8c5e604b82b698d88adc72ee7f0d5e29ab94e466d2e0379e0049e341065",
+  "analysis/bayesian_mark_study/summarize.py": "8dee2a6c3e7f2ec7330337c87787c4dc3cd9cd0ded1da3c23fbe7a887fb61da4",
+  "analysis/bayesian_mark_study/blend.py": "b6e3ecc74622ab2870600d75aaa7d97388230bb71593c221f8215d3f4850b9a7",
+  "analysis/bayesian_mark_study/test_models.py": "b56e2ef12738a11b06207aa33a0cbab5094a8615126bbb698ef9630f40b8ad32",
+  "analysis/bayesian_mark_study/verify.py": "19e0ca3a5e8b649283b8ca6eac98784458d40049320fc6483ab2dbb8f53d351c",
+  "analysis/bayesian_mark_study/run.py": "59a2d8315ab19455237c6dcce4154f7ba657c9ae79a5f64b6c421e047905f2ea",
+  "docs/bayesian-mark-experiments.md": "d439a5ff8d650d5e547ff9d21e57de2565f3e109b315a600bbc77a44e6de5e97"
+}

@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import torch
 from datasets import load_from_disk
@@ -66,8 +67,7 @@ def load_hf_tables(data_dir: str | Path = DEFAULT_DATA_DIR, split: str = "all"):
         disk_split = game_spec.base_split
     else:
         disk_split = split
-    # Seasons span calendar years, so they are carved out of "all" in memory
-    # rather than read from a disk split of their own.
+    # Seasons span calendar years, so select them from "all" in memory.
     season = parse_season_split(disk_split)
     if season is not None:
         disk_split = SEASON_BASE_SPLIT
@@ -77,8 +77,7 @@ def load_hf_tables(data_dir: str | Path = DEFAULT_DATA_DIR, split: str = "all"):
         for name in TABLES
     }
     if season is not None:
-        # Applied before any derived selection so folds are drawn within the
-        # season, not within the whole corpus.
+        # Select the season first so derived folds use that season's games.
         tables = select_season_tables(tables, season)
     if round_spec is not None:
         return select_round_holdout_tables(
@@ -107,8 +106,8 @@ def filter_tournament(tables, tournament: str | None):
         | tournaments["tournament_id"].str.startswith(tournament)
     ]
     tournament_ids = set(selected["tournament_id"])
-    # Tossups and bonuses belong to a shared question-set event, not a single
-    # mirror tournament, so they are selected through this ID.
+    # Mirror tournaments share tossup and bonus metadata through the
+    # question-set event ID.
     question_set_event_ids = set(selected["question_set_event_id"])
     game_ids = set(
         tables["games"].loc[
@@ -486,6 +485,15 @@ def build_tossup_observations(tables, lineups=None, include_bounceback=False):
         else {}
     )
     buzzes = tables["tossup_buzzes"].copy()
+    if "value" not in buzzes:
+        # Minimal/legacy inputs stored only correctness. Current datasets carry
+        # literal score values, which remain authoritative when present.
+        buzzes["value"] = np.where(buzzes["correct"], 10, -5)
+    if "team_id" not in buzzes:
+        buzzes["team_id"] = [
+            _player_team(games[game_id], teams, player_id)
+            for game_id, player_id in zip(buzzes["game_id"], buzzes["player_id"])
+        ]
     # Order by token position with deterministic buzz_id tie-breaking, then rank
     # buzzes within each event so the first buzz (and, for bouncebacks, the
     # second) can be selected by rank.
@@ -529,7 +537,51 @@ def build_tossup_observations(tables, lineups=None, include_bounceback=False):
                 tossup_category,
             )
         )
-    return pd.DataFrame(rows)
+    observations = pd.DataFrame(rows)
+    if observations.empty:
+        return observations
+
+    # Preserve the complete recorded scoring outcome on the phase-0 rows even
+    # when bounceback likelihood rows are disabled.  Evaluation can therefore
+    # recover literal tossup points (including a post-neg conversion and
+    # zero-point late misses) from a saved prediction file without reopening
+    # the source dataset.  Values are repeated across an event's roster rows;
+    # consumers must select/group rather than sum ``actual_team_tossup_points``.
+    event_key = ["game_id", "tossup_id"]
+    first = buzzes[buzzes["_event_rank"] == 0].set_index(event_key)
+    positive = (
+        buzzes[buzzes["value"] > 0]
+        .drop_duplicates(event_key, keep="first")
+        .set_index(event_key)
+    )
+    player_points = buzzes.groupby(event_key + ["player_id"])["value"].sum()
+    team_points = buzzes.groupby(event_key + ["team_id"])["value"].sum()
+
+    first_value = first["value"].to_dict()
+    scorer_player = positive["player_id"].astype(str).to_dict()
+    scorer_team = positive["team_id"].astype(str).to_dict()
+    player_point_map = player_points.to_dict()
+    team_point_map = team_points.to_dict()
+
+    keys = list(zip(observations["game_id"], observations["tossup_id"]))
+    observations["actual_first_buzz_value"] = [
+        int(first_value.get(key, 0)) for key in keys
+    ]
+    observations["actual_scorer_player_id"] = [
+        scorer_player.get(key, "no_score") for key in keys
+    ]
+    observations["actual_scorer_team_id"] = [
+        scorer_team.get(key, "no_score") for key in keys
+    ]
+    observations["actual_player_tossup_points"] = [
+        int(player_point_map.get((*key, player_id), 0))
+        for key, player_id in zip(keys, observations["player_id"])
+    ]
+    observations["actual_team_tossup_points"] = [
+        int(team_point_map.get((*key, team_id), 0))
+        for key, team_id in zip(keys, observations["team_id"])
+    ]
+    return observations
 
 
 def build_bonus_part_observations(tables, lineups=None):

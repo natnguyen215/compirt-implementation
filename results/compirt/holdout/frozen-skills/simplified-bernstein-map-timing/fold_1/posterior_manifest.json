@@ -1,0 +1,64 @@
+{
+  "approximation": "Pyro AutoNormal variational posterior",
+  "mean_field": true,
+  "quantile_probabilities": [
+    0.025,
+    0.5,
+    0.975
+  ],
+  "draws": 0,
+  "draw_seed": 42,
+  "estimated_draw_bytes": 0,
+  "draw_alignment": "The same leading draw index across every site file is one joint variational-posterior draw.",
+  "interpretation": "Intervals are approximate SVI credible intervals conditional on this model and fitted dataset; they are not bootstrap intervals.",
+  "sites": {
+    "ability": {
+      "shape": [
+        1455
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "ability",
+      "draw_file": null
+    },
+    "weight": {
+      "shape": [
+        1260,
+        4
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "weight",
+      "draw_file": null
+    },
+    "start": {
+      "shape": [
+        1260
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "start",
+      "draw_file": null
+    },
+    "drop": {
+      "shape": [
+        1260
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "drop",
+      "draw_file": null
+    },
+    "shares": {
+      "shape": [
+        1260,
+        3
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "shares",
+      "draw_file": null
+    },
+    "terminal": {
+      "shape": [],
+      "dtype": "float32",
+      "quantile_prefix": "terminal",
+      "draw_file": null
+    }
+  }
+}

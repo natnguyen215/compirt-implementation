@@ -1,0 +1,243 @@
+[
+  {
+    "family": "regularized",
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 1.0,
+      "curve": "linear"
+    },
+    "validation_neg_ap": 0.43347170104253263,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 0.3,
+      "item": 1.0,
+      "local": 1.0,
+      "curve": "linear"
+    },
+    "validation_neg_ap": 0.43218902027454376,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 3.0,
+      "item": 1.0,
+      "local": 1.0,
+      "curve": "linear"
+    },
+    "validation_neg_ap": 0.4189021202347122,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 1.0,
+      "item": 0.3,
+      "local": 1.0,
+      "curve": "linear"
+    },
+    "validation_neg_ap": 0.4013561657126168,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 1.0,
+      "item": 3.0,
+      "local": 1.0,
+      "curve": "linear"
+    },
+    "validation_neg_ap": 0.43525575219031465,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 0.3,
+      "curve": "linear"
+    },
+    "validation_neg_ap": 0.4214254021410746,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 3.0,
+      "curve": "linear"
+    },
+    "validation_neg_ap": 0.4450088330675447,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 0.3,
+      "item": 0.3,
+      "local": 0.3,
+      "curve": "linear"
+    },
+    "validation_neg_ap": 0.40193132216113936,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 3.0,
+      "item": 3.0,
+      "local": 3.0,
+      "curve": "linear"
+    },
+    "validation_neg_ap": 0.4364075945877446,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 0.3,
+      "curve": "spline"
+    },
+    "validation_neg_ap": 0.4257028942129902,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 1.0,
+      "curve": "spline"
+    },
+    "validation_neg_ap": 0.4538498642319446,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 3.0,
+      "curve": "spline"
+    },
+    "validation_neg_ap": 0.4648371395974927,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 1.0,
+      "curve": "linear",
+      "clue": 0.3
+    },
+    "validation_neg_ap": 0.44090502165516454,
+    "steps": null
+  },
+  {
+    "family": "regularized",
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 1.0,
+      "curve": "linear",
+      "clue": 1.0
+    },
+    "validation_neg_ap": 0.4512938569465075,
+    "steps": null
+  },
+  {
+    "family": "frozen_skills",
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 3.0,
+      "curve": "spline",
+      "skill": 0.25
+    },
+    "validation_neg_ap": 0.4653707187879601,
+    "steps": null
+  },
+  {
+    "family": "frozen_skills",
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 3.0,
+      "curve": "spline",
+      "skill": 0.5
+    },
+    "validation_neg_ap": 0.45817521048088933,
+    "steps": null
+  },
+  {
+    "family": "frozen_skills",
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 3.0,
+      "curve": "spline",
+      "skill": 1.0
+    },
+    "validation_neg_ap": 0.43876006848227045,
+    "steps": null
+  },
+  {
+    "family": "frozen_head",
+    "config": {
+      "family": "frozen_head"
+    },
+    "validation_neg_ap": 0.4250782356331217,
+    "steps": 800
+  },
+  {
+    "family": "joint_head",
+    "config": {
+      "family": "joint_head"
+    },
+    "validation_neg_ap": 0.40538414938652734,
+    "steps": 800
+  },
+  {
+    "family": "neural",
+    "config": {
+      "family": "neural",
+      "dimension": 4,
+      "width": 32,
+      "regularization": 0.5
+    },
+    "validation_neg_ap": 0.40770146822330877,
+    "steps": 40
+  },
+  {
+    "family": "neural",
+    "config": {
+      "family": "neural",
+      "dimension": 16,
+      "width": 64,
+      "regularization": 0.5
+    },
+    "validation_neg_ap": 0.4065865823999562,
+    "steps": 40
+  },
+  {
+    "family": "neural",
+    "config": {
+      "family": "neural",
+      "dimension": 16,
+      "width": 64,
+      "regularization": 5.0
+    },
+    "validation_neg_ap": 0.417649104417254,
+    "steps": 40
+  }
+]

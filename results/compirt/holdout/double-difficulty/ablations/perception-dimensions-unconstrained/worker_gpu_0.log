@@ -1,0 +1,2093 @@
+
+=== launcher start 2026-09-06T04:20:37.150264+00:00 ===
+Perception dimension ablation: 2 models x 10 dimensions x 5 folds = 100 fits; root=/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained
+Worker shard 1/2: 50 fits
+
+=== model=perceived-logit dimensions=1 fold=0 survival_chunk_rows=81920 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:0:42 --degree 3 --dimensions 1 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_0/train/pyramidal
+Rows: 281,324  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238670
+BUZZ         38619
+NO-BUZZ       4035
+step    0  ELBO loss: 16,803,449.7
+step  100  ELBO loss: 6,161,119.3
+step  200  ELBO loss: 741,812.8
+step  300  ELBO loss: 402,401.5
+step  400  ELBO loss: 370,720.1
+step  500  ELBO loss: 354,541.8
+step  600  ELBO loss: 346,033.3
+step  700  ELBO loss: 341,637.2
+step  800  ELBO loss: 339,436.6
+step  900  ELBO loss: 337,919.7
+step 1000  ELBO loss: 336,733.5
+step 1100  ELBO loss: 335,781.3
+step 1200  ELBO loss: 335,111.5
+step 1300  ELBO loss: 334,327.7
+step 1400  ELBO loss: 333,822.1
+step 1500  ELBO loss: 333,382.2
+step 1600  ELBO loss: 333,020.9
+step 1700  ELBO loss: 332,718.1
+step 1800  ELBO loss: 332,418.9
+step 1900  ELBO loss: 332,127.8
+step 2000  ELBO loss: 332,053.1
+step 2100  ELBO loss: 331,803.2
+step 2200  ELBO loss: 331,583.1
+step 2300  ELBO loss: 331,548.1
+step 2400  ELBO loss: 331,509.0
+step 2500  ELBO loss: 331,293.2
+step 2600  ELBO loss: 331,039.2
+step 2700  ELBO loss: 331,018.5
+step 2800  ELBO loss: 330,919.8
+step 2900  ELBO loss: 330,857.8
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:0:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_0/train/pyramidal --dimensions 1 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_0/holdout/pyramidal
+Rows: 67,080  Players: 1,186  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_0/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_0/evaluation
+
+=== model=perceived-logit dimensions=1 fold=2 survival_chunk_rows=81920 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:2:42 --degree 3 --dimensions 1 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_2/train/pyramidal
+Rows: 281,564  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238862
+BUZZ         38657
+NO-BUZZ       4045
+step    0  ELBO loss: 16,797,673.7
+step  100  ELBO loss: 6,153,300.6
+step  200  ELBO loss: 738,560.7
+step  300  ELBO loss: 402,759.7
+step  400  ELBO loss: 371,056.7
+step  500  ELBO loss: 354,836.3
+step  600  ELBO loss: 346,342.6
+step  700  ELBO loss: 341,943.4
+step  800  ELBO loss: 339,735.6
+step  900  ELBO loss: 338,199.7
+step 1000  ELBO loss: 337,022.6
+step 1100  ELBO loss: 336,076.7
+step 1200  ELBO loss: 335,375.2
+step 1300  ELBO loss: 334,606.6
+step 1400  ELBO loss: 334,096.6
+step 1500  ELBO loss: 333,656.0
+step 1600  ELBO loss: 333,298.5
+step 1700  ELBO loss: 333,004.4
+step 1800  ELBO loss: 332,706.2
+step 1900  ELBO loss: 332,421.6
+step 2000  ELBO loss: 332,337.7
+step 2100  ELBO loss: 332,118.1
+step 2200  ELBO loss: 331,880.3
+step 2300  ELBO loss: 331,840.9
+step 2400  ELBO loss: 331,804.3
+step 2500  ELBO loss: 331,578.3
+step 2600  ELBO loss: 331,325.0
+step 2700  ELBO loss: 331,321.4
+step 2800  ELBO loss: 331,235.6
+step 2900  ELBO loss: 331,153.5
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:2:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_2/train/pyramidal --dimensions 1 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_2/holdout/pyramidal
+Rows: 66,840  Players: 1,197  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_2/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_2/evaluation
+
+=== model=perceived-logit dimensions=1 fold=4 survival_chunk_rows=81920 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:4:42 --degree 3 --dimensions 1 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_4/train/pyramidal
+Rows: 280,464  Players: 1,455  Tossups: 1,260
+z
+CENSORED    237696
+BUZZ         38644
+NO-BUZZ       4124
+step    0  ELBO loss: 16,754,710.7
+step  100  ELBO loss: 6,135,309.4
+step  200  ELBO loss: 738,077.3
+step  300  ELBO loss: 402,733.3
+step  400  ELBO loss: 371,050.0
+step  500  ELBO loss: 354,835.7
+step  600  ELBO loss: 346,291.4
+step  700  ELBO loss: 341,869.5
+step  800  ELBO loss: 339,650.5
+step  900  ELBO loss: 338,110.1
+step 1000  ELBO loss: 336,934.5
+step 1100  ELBO loss: 335,979.4
+step 1200  ELBO loss: 335,287.8
+step 1300  ELBO loss: 334,517.1
+step 1400  ELBO loss: 333,994.6
+step 1500  ELBO loss: 333,557.5
+step 1600  ELBO loss: 333,200.2
+step 1700  ELBO loss: 332,905.5
+step 1800  ELBO loss: 332,597.6
+step 1900  ELBO loss: 332,307.7
+step 2000  ELBO loss: 332,234.6
+step 2100  ELBO loss: 332,007.5
+step 2200  ELBO loss: 331,774.1
+step 2300  ELBO loss: 331,740.9
+step 2400  ELBO loss: 331,693.8
+step 2500  ELBO loss: 331,467.7
+step 2600  ELBO loss: 331,209.8
+step 2700  ELBO loss: 331,190.9
+step 2800  ELBO loss: 331,106.6
+step 2900  ELBO loss: 331,043.7
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:4:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_4/train/pyramidal --dimensions 1 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_4/holdout/pyramidal
+Rows: 67,940  Players: 1,196  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_4/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_4/evaluation
+
+=== model=perceived-logit dimensions=2 fold=1 survival_chunk_rows=40960 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:1:42 --degree 3 --dimensions 2 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_1/train/pyramidal
+Rows: 282,124  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239379
+BUZZ         38821
+NO-BUZZ       3924
+step    0  ELBO loss: 16,821,544.8
+step  100  ELBO loss: 6,119,481.4
+step  200  ELBO loss: 747,014.1
+step  300  ELBO loss: 420,296.9
+step  400  ELBO loss: 386,150.0
+step  500  ELBO loss: 369,197.9
+step  600  ELBO loss: 360,367.9
+step  700  ELBO loss: 355,535.0
+step  800  ELBO loss: 352,167.7
+step  900  ELBO loss: 349,547.1
+step 1000  ELBO loss: 347,431.6
+step 1100  ELBO loss: 345,606.7
+step 1200  ELBO loss: 343,883.9
+step 1300  ELBO loss: 342,346.7
+step 1400  ELBO loss: 341,027.4
+step 1500  ELBO loss: 339,964.0
+step 1600  ELBO loss: 338,855.8
+step 1700  ELBO loss: 338,312.7
+step 1800  ELBO loss: 337,570.5
+step 1900  ELBO loss: 337,129.6
+step 2000  ELBO loss: 336,704.1
+step 2100  ELBO loss: 336,297.3
+step 2200  ELBO loss: 336,081.8
+step 2300  ELBO loss: 335,822.2
+step 2400  ELBO loss: 335,507.4
+step 2500  ELBO loss: 335,341.9
+step 2600  ELBO loss: 335,241.5
+step 2700  ELBO loss: 334,815.7
+step 2800  ELBO loss: 334,542.0
+step 2900  ELBO loss: 334,665.5
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:1:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_1/train/pyramidal --dimensions 2 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_1/holdout/pyramidal
+Rows: 66,280  Players: 1,167  Tossups: 1,220
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_1/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_1/evaluation
+
+=== model=perceived-logit dimensions=2 fold=3 survival_chunk_rows=40960 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:3:42 --degree 3 --dimensions 2 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_3/train/pyramidal
+Rows: 282,044  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239288
+BUZZ         38834
+NO-BUZZ       3922
+step    0  ELBO loss: 16,838,772.8
+step  100  ELBO loss: 6,125,457.1
+step  200  ELBO loss: 747,513.4
+step  300  ELBO loss: 420,919.2
+step  400  ELBO loss: 386,756.7
+step  500  ELBO loss: 369,729.2
+step  600  ELBO loss: 360,867.7
+step  700  ELBO loss: 356,006.5
+step  800  ELBO loss: 352,612.6
+step  900  ELBO loss: 350,007.5
+step 1000  ELBO loss: 347,909.4
+step 1100  ELBO loss: 346,091.7
+step 1200  ELBO loss: 344,392.8
+step 1300  ELBO loss: 342,907.8
+step 1400  ELBO loss: 341,576.9
+step 1500  ELBO loss: 340,525.8
+step 1600  ELBO loss: 339,428.5
+step 1700  ELBO loss: 338,849.9
+step 1800  ELBO loss: 338,103.8
+step 1900  ELBO loss: 337,648.4
+step 2000  ELBO loss: 337,201.1
+step 2100  ELBO loss: 336,759.1
+step 2200  ELBO loss: 336,538.9
+step 2300  ELBO loss: 336,187.0
+step 2400  ELBO loss: 335,905.6
+step 2500  ELBO loss: 335,676.6
+step 2600  ELBO loss: 335,527.8
+step 2700  ELBO loss: 335,089.2
+step 2800  ELBO loss: 334,807.3
+step 2900  ELBO loss: 334,926.6
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:3:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_3/train/pyramidal --dimensions 2 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_3/holdout/pyramidal
+Rows: 66,360  Players: 1,133  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_3/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_3/evaluation
+
+=== model=perceived-logit dimensions=3 fold=0 survival_chunk_rows=27306 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:0:42 --degree 3 --dimensions 3 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_0/train/pyramidal
+Rows: 281,324  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238670
+BUZZ         38619
+NO-BUZZ       4035
+step    0  ELBO loss: 16,828,795.0
+step  100  ELBO loss: 6,108,650.7
+step  200  ELBO loss: 758,147.4
+step  300  ELBO loss: 434,376.6
+step  400  ELBO loss: 398,037.3
+step  500  ELBO loss: 379,857.8
+step  600  ELBO loss: 370,162.9
+step  700  ELBO loss: 363,991.9
+step  800  ELBO loss: 359,451.1
+step  900  ELBO loss: 355,732.4
+step 1000  ELBO loss: 352,994.6
+step 1100  ELBO loss: 350,640.2
+step 1200  ELBO loss: 348,440.4
+step 1300  ELBO loss: 346,911.2
+step 1400  ELBO loss: 345,586.3
+step 1500  ELBO loss: 343,967.9
+step 1600  ELBO loss: 342,487.3
+step 1700  ELBO loss: 341,410.2
+step 1800  ELBO loss: 340,404.4
+step 1900  ELBO loss: 339,334.7
+step 2000  ELBO loss: 338,767.4
+step 2100  ELBO loss: 338,026.2
+step 2200  ELBO loss: 337,344.9
+step 2300  ELBO loss: 336,904.6
+step 2400  ELBO loss: 336,555.7
+step 2500  ELBO loss: 336,422.1
+step 2600  ELBO loss: 335,923.8
+step 2700  ELBO loss: 335,459.8
+step 2800  ELBO loss: 335,065.0
+step 2900  ELBO loss: 335,174.0
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:0:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_0/train/pyramidal --dimensions 3 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_0/holdout/pyramidal
+Rows: 67,080  Players: 1,186  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_0/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_0/evaluation
+
+=== model=perceived-logit dimensions=3 fold=2 survival_chunk_rows=27306 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:2:42 --degree 3 --dimensions 3 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_2/train/pyramidal
+Rows: 281,564  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238862
+BUZZ         38657
+NO-BUZZ       4045
+step    0  ELBO loss: 16,820,993.0
+step  100  ELBO loss: 6,102,535.0
+step  200  ELBO loss: 756,615.4
+step  300  ELBO loss: 434,712.6
+step  400  ELBO loss: 398,354.8
+step  500  ELBO loss: 380,177.8
+step  600  ELBO loss: 370,473.0
+step  700  ELBO loss: 364,307.6
+step  800  ELBO loss: 359,758.8
+step  900  ELBO loss: 356,033.4
+step 1000  ELBO loss: 353,300.1
+step 1100  ELBO loss: 350,923.3
+step 1200  ELBO loss: 348,740.1
+step 1300  ELBO loss: 347,131.1
+step 1400  ELBO loss: 345,818.3
+step 1500  ELBO loss: 344,166.4
+step 1600  ELBO loss: 342,715.4
+step 1700  ELBO loss: 341,722.5
+step 1800  ELBO loss: 340,797.3
+step 1900  ELBO loss: 339,757.3
+step 2000  ELBO loss: 339,199.6
+step 2100  ELBO loss: 338,441.9
+step 2200  ELBO loss: 337,751.2
+step 2300  ELBO loss: 337,316.6
+step 2400  ELBO loss: 336,968.5
+step 2500  ELBO loss: 336,788.8
+step 2600  ELBO loss: 336,277.4
+step 2700  ELBO loss: 335,800.5
+step 2800  ELBO loss: 335,343.1
+step 2900  ELBO loss: 335,478.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:2:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_2/train/pyramidal --dimensions 3 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_2/holdout/pyramidal
+Rows: 66,840  Players: 1,197  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_2/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_2/evaluation
+
+=== model=perceived-logit dimensions=3 fold=4 survival_chunk_rows=27306 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:4:42 --degree 3 --dimensions 3 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_4/train/pyramidal
+Rows: 280,464  Players: 1,455  Tossups: 1,260
+z
+CENSORED    237696
+BUZZ         38644
+NO-BUZZ       4124
+step    0  ELBO loss: 16,778,194.0
+step  100  ELBO loss: 6,080,299.4
+step  200  ELBO loss: 753,705.7
+step  300  ELBO loss: 434,704.1
+step  400  ELBO loss: 398,330.5
+step  500  ELBO loss: 380,129.5
+step  600  ELBO loss: 370,383.7
+step  700  ELBO loss: 364,208.8
+step  800  ELBO loss: 359,648.9
+step  900  ELBO loss: 355,914.2
+step 1000  ELBO loss: 353,163.4
+step 1100  ELBO loss: 350,807.0
+step 1200  ELBO loss: 348,617.0
+step 1300  ELBO loss: 347,017.0
+step 1400  ELBO loss: 345,688.7
+step 1500  ELBO loss: 344,065.2
+step 1600  ELBO loss: 342,524.4
+step 1700  ELBO loss: 341,430.0
+step 1800  ELBO loss: 340,393.7
+step 1900  ELBO loss: 339,247.9
+step 2000  ELBO loss: 338,711.9
+step 2100  ELBO loss: 337,912.9
+step 2200  ELBO loss: 337,291.0
+step 2300  ELBO loss: 336,846.9
+step 2400  ELBO loss: 336,528.3
+step 2500  ELBO loss: 336,439.7
+step 2600  ELBO loss: 335,996.5
+step 2700  ELBO loss: 335,559.7
+step 2800  ELBO loss: 335,170.6
+step 2900  ELBO loss: 335,356.1
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:4:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_4/train/pyramidal --dimensions 3 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_4/holdout/pyramidal
+Rows: 67,940  Players: 1,196  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_4/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_4/evaluation
+
+=== model=perceived-logit dimensions=4 fold=1 survival_chunk_rows=20480 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:1:42 --degree 3 --dimensions 4 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_1/train/pyramidal
+Rows: 282,124  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239379
+BUZZ         38821
+NO-BUZZ       3924
+step    0  ELBO loss: 16,843,959.7
+step  100  ELBO loss: 6,106,928.9
+step  200  ELBO loss: 773,877.6
+step  300  ELBO loss: 450,868.7
+step  400  ELBO loss: 411,713.7
+step  500  ELBO loss: 392,218.3
+step  600  ELBO loss: 381,119.0
+step  700  ELBO loss: 373,469.8
+step  800  ELBO loss: 367,851.4
+step  900  ELBO loss: 363,118.2
+step 1000  ELBO loss: 359,589.2
+step 1100  ELBO loss: 356,674.6
+step 1200  ELBO loss: 354,274.6
+step 1300  ELBO loss: 352,193.6
+step 1400  ELBO loss: 350,655.2
+step 1500  ELBO loss: 348,921.0
+step 1600  ELBO loss: 347,205.4
+step 1700  ELBO loss: 345,961.0
+step 1800  ELBO loss: 344,541.9
+step 1900  ELBO loss: 343,014.3
+step 2000  ELBO loss: 342,249.5
+step 2100  ELBO loss: 341,446.3
+step 2200  ELBO loss: 340,433.1
+step 2300  ELBO loss: 339,611.2
+step 2400  ELBO loss: 338,996.6
+step 2500  ELBO loss: 338,678.1
+step 2600  ELBO loss: 338,166.3
+step 2700  ELBO loss: 337,561.1
+step 2800  ELBO loss: 336,944.0
+step 2900  ELBO loss: 336,761.6
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:1:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_1/train/pyramidal --dimensions 4 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_1/holdout/pyramidal
+Rows: 66,280  Players: 1,167  Tossups: 1,220
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_1/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_1/evaluation
+
+=== model=perceived-logit dimensions=4 fold=3 survival_chunk_rows=20480 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:3:42 --degree 3 --dimensions 4 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_3/train/pyramidal
+Rows: 282,044  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239288
+BUZZ         38834
+NO-BUZZ       3922
+step    0  ELBO loss: 16,861,679.7
+step  100  ELBO loss: 6,111,885.1
+step  200  ELBO loss: 774,936.3
+step  300  ELBO loss: 451,492.2
+step  400  ELBO loss: 412,265.5
+step  500  ELBO loss: 392,729.4
+step  600  ELBO loss: 381,609.7
+step  700  ELBO loss: 373,948.5
+step  800  ELBO loss: 368,307.8
+step  900  ELBO loss: 363,586.7
+step 1000  ELBO loss: 360,049.1
+step 1100  ELBO loss: 357,106.1
+step 1200  ELBO loss: 354,704.6
+step 1300  ELBO loss: 352,562.5
+step 1400  ELBO loss: 350,951.5
+step 1500  ELBO loss: 349,079.0
+step 1600  ELBO loss: 347,327.0
+step 1700  ELBO loss: 346,051.2
+step 1800  ELBO loss: 344,591.0
+step 1900  ELBO loss: 343,107.7
+step 2000  ELBO loss: 342,282.9
+step 2100  ELBO loss: 341,456.2
+step 2200  ELBO loss: 340,438.6
+step 2300  ELBO loss: 339,607.9
+step 2400  ELBO loss: 339,054.4
+step 2500  ELBO loss: 338,806.8
+step 2600  ELBO loss: 338,345.4
+step 2700  ELBO loss: 337,794.4
+step 2800  ELBO loss: 337,265.2
+step 2900  ELBO loss: 337,115.5
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:3:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_3/train/pyramidal --dimensions 4 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_3/holdout/pyramidal
+Rows: 66,360  Players: 1,133  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_3/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_3/evaluation
+
+=== model=perceived-logit dimensions=5 fold=0 survival_chunk_rows=16384 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:0:42 --degree 3 --dimensions 5 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_0/train/pyramidal
+Rows: 281,324  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238670
+BUZZ         38619
+NO-BUZZ       4035
+step    0  ELBO loss: 16,856,922.4
+step  100  ELBO loss: 6,101,148.6
+step  200  ELBO loss: 783,587.2
+step  300  ELBO loss: 463,753.5
+step  400  ELBO loss: 422,355.2
+step  500  ELBO loss: 401,179.1
+step  600  ELBO loss: 388,671.1
+step  700  ELBO loss: 379,317.3
+step  800  ELBO loss: 372,609.4
+step  900  ELBO loss: 367,050.8
+step 1000  ELBO loss: 362,723.4
+step 1100  ELBO loss: 359,085.5
+step 1200  ELBO loss: 356,424.0
+step 1300  ELBO loss: 353,951.8
+step 1400  ELBO loss: 351,898.4
+step 1500  ELBO loss: 349,968.9
+step 1600  ELBO loss: 348,404.3
+step 1700  ELBO loss: 346,908.9
+step 1800  ELBO loss: 345,650.4
+step 1900  ELBO loss: 344,326.3
+step 2000  ELBO loss: 343,464.2
+step 2100  ELBO loss: 342,101.3
+step 2200  ELBO loss: 341,347.7
+step 2300  ELBO loss: 340,500.1
+step 2400  ELBO loss: 339,623.1
+step 2500  ELBO loss: 339,062.9
+step 2600  ELBO loss: 338,377.8
+step 2700  ELBO loss: 337,623.5
+step 2800  ELBO loss: 336,930.8
+step 2900  ELBO loss: 336,317.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:0:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_0/train/pyramidal --dimensions 5 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_0/holdout/pyramidal
+Rows: 67,080  Players: 1,186  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_0/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_0/evaluation
+
+=== model=perceived-logit dimensions=5 fold=2 survival_chunk_rows=16384 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:2:42 --degree 3 --dimensions 5 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_2/train/pyramidal
+Rows: 281,564  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238862
+BUZZ         38657
+NO-BUZZ       4045
+step    0  ELBO loss: 16,848,850.4
+step  100  ELBO loss: 6,094,337.7
+step  200  ELBO loss: 781,762.6
+step  300  ELBO loss: 464,077.0
+step  400  ELBO loss: 422,688.1
+step  500  ELBO loss: 401,525.6
+step  600  ELBO loss: 389,000.6
+step  700  ELBO loss: 379,628.2
+step  800  ELBO loss: 372,917.6
+step  900  ELBO loss: 367,353.8
+step 1000  ELBO loss: 363,023.2
+step 1100  ELBO loss: 359,388.3
+step 1200  ELBO loss: 356,728.3
+step 1300  ELBO loss: 354,234.8
+step 1400  ELBO loss: 352,215.9
+step 1500  ELBO loss: 350,280.9
+step 1600  ELBO loss: 348,727.3
+step 1700  ELBO loss: 347,218.1
+step 1800  ELBO loss: 346,027.2
+step 1900  ELBO loss: 344,611.3
+step 2000  ELBO loss: 343,682.9
+step 2100  ELBO loss: 342,331.4
+step 2200  ELBO loss: 341,550.1
+step 2300  ELBO loss: 340,625.0
+step 2400  ELBO loss: 339,783.5
+step 2500  ELBO loss: 339,270.3
+step 2600  ELBO loss: 338,523.8
+step 2700  ELBO loss: 337,781.7
+step 2800  ELBO loss: 337,078.5
+step 2900  ELBO loss: 336,414.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:2:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_2/train/pyramidal --dimensions 5 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_2/holdout/pyramidal
+Rows: 66,840  Players: 1,197  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_2/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_2/evaluation
+
+=== model=perceived-logit dimensions=5 fold=4 survival_chunk_rows=16384 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:4:42 --degree 3 --dimensions 5 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_4/train/pyramidal
+Rows: 280,464  Players: 1,455  Tossups: 1,260
+z
+CENSORED    237696
+BUZZ         38644
+NO-BUZZ       4124
+step    0  ELBO loss: 16,806,315.4
+step  100  ELBO loss: 6,073,271.7
+step  200  ELBO loss: 779,210.5
+step  300  ELBO loss: 464,058.6
+step  400  ELBO loss: 422,630.9
+step  500  ELBO loss: 401,435.7
+step  600  ELBO loss: 388,870.2
+step  700  ELBO loss: 379,491.5
+step  800  ELBO loss: 372,774.7
+step  900  ELBO loss: 367,220.8
+step 1000  ELBO loss: 362,873.0
+step 1100  ELBO loss: 359,259.7
+step 1200  ELBO loss: 356,567.9
+step 1300  ELBO loss: 354,140.1
+step 1400  ELBO loss: 352,089.9
+step 1500  ELBO loss: 350,197.0
+step 1600  ELBO loss: 348,648.6
+step 1700  ELBO loss: 347,114.4
+step 1800  ELBO loss: 345,895.3
+step 1900  ELBO loss: 344,538.9
+step 2000  ELBO loss: 343,587.6
+step 2100  ELBO loss: 342,178.6
+step 2200  ELBO loss: 341,363.8
+step 2300  ELBO loss: 340,455.4
+step 2400  ELBO loss: 339,554.0
+step 2500  ELBO loss: 338,934.5
+step 2600  ELBO loss: 338,189.2
+step 2700  ELBO loss: 337,390.0
+step 2800  ELBO loss: 336,720.6
+step 2900  ELBO loss: 336,123.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:4:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_4/train/pyramidal --dimensions 5 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_4/holdout/pyramidal
+Rows: 67,940  Players: 1,196  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_4/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_4/evaluation
+
+=== launcher start 2026-09-06T09:03:52.452258+00:00 ===
+Perception dimension ablation: 2 models x 10 dimensions x 5 folds = 100 fits; root=/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained
+Worker shard 1/2: 50 fits
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_0
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_2
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_4
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_1
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_3
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_0
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_2
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_4
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_1
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_3
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_0
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_2
+
+=== model=perceived-logit dimensions=5 fold=4 survival_chunk_rows=16384 ===
+resume stage train: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_4/train/pyramidal/summary.json
+resume stage frozen-replay: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_4/holdout/pyramidal/summary.json
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_4/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_4/evaluation
+
+=== model=perceived-logit dimensions=6 fold=1 survival_chunk_rows=13653 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:1:42 --degree 3 --dimensions 6 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_6/fold_1/train/pyramidal
+Perception dimension ablation: 2 models x 10 dimensions x 5 folds = 100 fits; root=/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained
+Worker shard 1/2: 50 fits
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_0
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_2
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_1/fold_4
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_1
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_2/fold_3
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_0
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_2
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_3/fold_4
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_1
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_4/fold_3
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_0
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_2
+resume complete: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_5/fold_4
+
+=== model=perceived-logit dimensions=6 fold=1 survival_chunk_rows=13653 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:1:42 --degree 3 --dimensions 6 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_6/fold_1/train/pyramidal
+Rows: 282,124  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239379
+BUZZ         38821
+NO-BUZZ       3924
+step    0  ELBO loss: 16,867,421.4
+step  100  ELBO loss: 6,106,986.5
+step  200  ELBO loss: 797,059.2
+step  300  ELBO loss: 478,903.3
+step  400  ELBO loss: 435,054.8
+step  500  ELBO loss: 412,032.2
+step  600  ELBO loss: 397,710.0
+step  700  ELBO loss: 387,190.2
+step  800  ELBO loss: 379,338.3
+step  900  ELBO loss: 372,905.0
+step 1000  ELBO loss: 367,968.8
+step 1100  ELBO loss: 363,723.9
+step 1200  ELBO loss: 360,380.3
+step 1300  ELBO loss: 357,842.6
+step 1400  ELBO loss: 355,402.7
+step 1500  ELBO loss: 353,518.5
+step 1600  ELBO loss: 351,669.9
+step 1700  ELBO loss: 350,250.0
+step 1800  ELBO loss: 348,997.3
+step 1900  ELBO loss: 347,524.9
+step 2000  ELBO loss: 346,276.3
+step 2100  ELBO loss: 344,903.1
+step 2200  ELBO loss: 343,810.3
+step 2300  ELBO loss: 342,897.4
+step 2400  ELBO loss: 341,704.7
+step 2500  ELBO loss: 340,769.9
+step 2600  ELBO loss: 340,091.2
+step 2700  ELBO loss: 339,012.2
+step 2800  ELBO loss: 337,975.4
+step 2900  ELBO loss: 338,282.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:1:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_6/fold_1/train/pyramidal --dimensions 6 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_6/fold_1/holdout/pyramidal
+Rows: 66,280  Players: 1,167  Tossups: 1,220
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_6/fold_1/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_6/fold_1/evaluation
+
+=== model=perceived-logit dimensions=6 fold=3 survival_chunk_rows=13653 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:3:42 --degree 3 --dimensions 6 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_6/fold_3/train/pyramidal
+Rows: 282,044  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239288
+BUZZ         38834
+NO-BUZZ       3922
+step    0  ELBO loss: 16,885,109.4
+step  100  ELBO loss: 6,113,999.9
+step  200  ELBO loss: 798,188.8
+step  300  ELBO loss: 479,516.7
+step  400  ELBO loss: 435,599.3
+step  500  ELBO loss: 412,538.7
+step  600  ELBO loss: 398,223.5
+step  700  ELBO loss: 387,674.1
+step  800  ELBO loss: 379,810.2
+step  900  ELBO loss: 373,366.7
+step 1000  ELBO loss: 368,410.1
+step 1100  ELBO loss: 364,179.3
+step 1200  ELBO loss: 360,800.2
+step 1300  ELBO loss: 358,254.9
+step 1400  ELBO loss: 355,772.5
+step 1500  ELBO loss: 353,897.8
+step 1600  ELBO loss: 352,063.1
+step 1700  ELBO loss: 350,650.3
+step 1800  ELBO loss: 349,347.5
+step 1900  ELBO loss: 347,851.8
+step 2000  ELBO loss: 346,560.3
+step 2100  ELBO loss: 345,194.1
+step 2200  ELBO loss: 344,008.0
+step 2300  ELBO loss: 343,103.4
+step 2400  ELBO loss: 341,858.8
+step 2500  ELBO loss: 340,781.5
+step 2600  ELBO loss: 340,088.7
+step 2700  ELBO loss: 338,901.2
+step 2800  ELBO loss: 337,755.1
+step 2900  ELBO loss: 337,887.7
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:3:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_6/fold_3/train/pyramidal --dimensions 6 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_6/fold_3/holdout/pyramidal
+Rows: 66,360  Players: 1,133  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_6/fold_3/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_6/fold_3/evaluation
+
+=== model=perceived-logit dimensions=7 fold=0 survival_chunk_rows=11702 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:0:42 --degree 3 --dimensions 7 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_0/train/pyramidal
+Rows: 281,324  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238670
+BUZZ         38619
+NO-BUZZ       4035
+step    0  ELBO loss: 16,879,062.4
+step  100  ELBO loss: 6,103,220.3
+step  200  ELBO loss: 807,504.6
+step  300  ELBO loss: 491,056.5
+step  400  ELBO loss: 444,649.4
+step  500  ELBO loss: 419,666.3
+step  600  ELBO loss: 403,721.1
+step  700  ELBO loss: 391,627.1
+step  800  ELBO loss: 382,782.5
+step  900  ELBO loss: 375,765.0
+step 1000  ELBO loss: 370,170.1
+step 1100  ELBO loss: 365,349.7
+step 1200  ELBO loss: 361,554.3
+step 1300  ELBO loss: 358,460.9
+step 1400  ELBO loss: 355,692.1
+step 1500  ELBO loss: 353,408.2
+step 1600  ELBO loss: 351,470.8
+step 1700  ELBO loss: 349,854.1
+step 1800  ELBO loss: 348,195.0
+step 1900  ELBO loss: 346,916.2
+step 2000  ELBO loss: 345,438.8
+step 2100  ELBO loss: 343,957.8
+step 2200  ELBO loss: 343,001.1
+step 2300  ELBO loss: 342,102.8
+step 2400  ELBO loss: 340,839.9
+step 2500  ELBO loss: 339,674.0
+step 2600  ELBO loss: 338,718.9
+step 2700  ELBO loss: 337,942.9
+step 2800  ELBO loss: 336,700.6
+step 2900  ELBO loss: 336,266.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:0:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_0/train/pyramidal --dimensions 7 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_0/holdout/pyramidal
+Rows: 67,080  Players: 1,186  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_0/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_0/evaluation
+
+=== model=perceived-logit dimensions=7 fold=2 survival_chunk_rows=11702 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:2:42 --degree 3 --dimensions 7 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_2/train/pyramidal
+Rows: 281,564  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238862
+BUZZ         38657
+NO-BUZZ       4045
+step    0  ELBO loss: 16,871,263.4
+step  100  ELBO loss: 6,095,998.9
+step  200  ELBO loss: 805,791.0
+step  300  ELBO loss: 491,422.9
+step  400  ELBO loss: 445,030.0
+step  500  ELBO loss: 420,036.8
+step  600  ELBO loss: 404,059.5
+step  700  ELBO loss: 391,958.0
+step  800  ELBO loss: 383,089.5
+step  900  ELBO loss: 376,087.5
+step 1000  ELBO loss: 370,494.4
+step 1100  ELBO loss: 365,653.1
+step 1200  ELBO loss: 361,845.1
+step 1300  ELBO loss: 358,754.8
+step 1400  ELBO loss: 355,984.4
+step 1500  ELBO loss: 353,748.6
+step 1600  ELBO loss: 351,781.5
+step 1700  ELBO loss: 350,187.8
+step 1800  ELBO loss: 348,481.6
+step 1900  ELBO loss: 347,220.1
+step 2000  ELBO loss: 345,686.0
+step 2100  ELBO loss: 344,178.7
+step 2200  ELBO loss: 343,152.8
+step 2300  ELBO loss: 342,221.5
+step 2400  ELBO loss: 340,866.0
+step 2500  ELBO loss: 339,555.5
+step 2600  ELBO loss: 338,598.1
+step 2700  ELBO loss: 337,834.6
+step 2800  ELBO loss: 336,583.4
+step 2900  ELBO loss: 336,107.8
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:2:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_2/train/pyramidal --dimensions 7 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_2/holdout/pyramidal
+Rows: 66,840  Players: 1,197  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_2/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_2/evaluation
+
+=== model=perceived-logit dimensions=7 fold=4 survival_chunk_rows=11702 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:4:42 --degree 3 --dimensions 7 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_4/train/pyramidal
+Rows: 280,464  Players: 1,455  Tossups: 1,260
+z
+CENSORED    237696
+BUZZ         38644
+NO-BUZZ       4124
+step    0  ELBO loss: 16,828,168.4
+step  100  ELBO loss: 6,074,100.8
+step  200  ELBO loss: 803,513.2
+step  300  ELBO loss: 491,340.6
+step  400  ELBO loss: 444,933.0
+step  500  ELBO loss: 419,903.1
+step  600  ELBO loss: 403,895.5
+step  700  ELBO loss: 391,775.9
+step  800  ELBO loss: 382,930.7
+step  900  ELBO loss: 375,917.0
+step 1000  ELBO loss: 370,319.4
+step 1100  ELBO loss: 365,502.1
+step 1200  ELBO loss: 361,687.8
+step 1300  ELBO loss: 358,609.8
+step 1400  ELBO loss: 355,844.9
+step 1500  ELBO loss: 353,593.8
+step 1600  ELBO loss: 351,660.0
+step 1700  ELBO loss: 350,066.2
+step 1800  ELBO loss: 348,371.5
+step 1900  ELBO loss: 347,092.8
+step 2000  ELBO loss: 345,565.3
+step 2100  ELBO loss: 344,052.1
+step 2200  ELBO loss: 343,063.1
+step 2300  ELBO loss: 342,155.7
+step 2400  ELBO loss: 340,809.5
+step 2500  ELBO loss: 339,611.7
+step 2600  ELBO loss: 338,679.6
+step 2700  ELBO loss: 337,824.0
+step 2800  ELBO loss: 336,587.9
+step 2900  ELBO loss: 336,172.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:4:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_4/train/pyramidal --dimensions 7 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_4/holdout/pyramidal
+Rows: 67,940  Players: 1,196  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_4/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_7/fold_4/evaluation
+
+=== model=perceived-logit dimensions=8 fold=1 survival_chunk_rows=10240 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:1:42 --degree 3 --dimensions 8 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_8/fold_1/train/pyramidal
+Rows: 282,124  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239379
+BUZZ         38821
+NO-BUZZ       3924
+step    0  ELBO loss: 16,894,021.2
+step  100  ELBO loss: 6,108,348.3
+step  200  ELBO loss: 821,823.6
+step  300  ELBO loss: 505,462.9
+step  400  ELBO loss: 456,620.2
+step  500  ELBO loss: 429,474.1
+step  600  ELBO loss: 411,643.8
+step  700  ELBO loss: 398,313.7
+step  800  ELBO loss: 388,519.6
+step  900  ELBO loss: 380,702.5
+step 1000  ELBO loss: 374,568.8
+step 1100  ELBO loss: 369,195.9
+step 1200  ELBO loss: 364,981.9
+step 1300  ELBO loss: 361,593.7
+step 1400  ELBO loss: 358,550.9
+step 1500  ELBO loss: 355,740.3
+step 1600  ELBO loss: 353,800.7
+step 1700  ELBO loss: 351,776.1
+step 1800  ELBO loss: 350,105.4
+step 1900  ELBO loss: 348,541.9
+step 2000  ELBO loss: 346,690.4
+step 2100  ELBO loss: 345,248.6
+step 2200  ELBO loss: 343,942.8
+step 2300  ELBO loss: 343,114.4
+step 2400  ELBO loss: 341,604.2
+step 2500  ELBO loss: 340,583.8
+step 2600  ELBO loss: 339,278.6
+step 2700  ELBO loss: 338,654.8
+step 2800  ELBO loss: 337,659.0
+step 2900  ELBO loss: 337,173.4
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:1:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_8/fold_1/train/pyramidal --dimensions 8 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_8/fold_1/holdout/pyramidal
+Rows: 66,280  Players: 1,167  Tossups: 1,220
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_8/fold_1/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_8/fold_1/evaluation
+
+=== model=perceived-logit dimensions=8 fold=3 survival_chunk_rows=10240 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:3:42 --degree 3 --dimensions 8 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_8/fold_3/train/pyramidal
+Rows: 282,044  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239288
+BUZZ         38834
+NO-BUZZ       3922
+step    0  ELBO loss: 16,911,985.2
+step  100  ELBO loss: 6,112,296.9
+step  200  ELBO loss: 822,981.9
+step  300  ELBO loss: 506,024.3
+step  400  ELBO loss: 457,148.6
+step  500  ELBO loss: 429,985.6
+step  600  ELBO loss: 412,140.4
+step  700  ELBO loss: 398,785.0
+step  800  ELBO loss: 389,010.2
+step  900  ELBO loss: 381,173.5
+step 1000  ELBO loss: 375,033.2
+step 1100  ELBO loss: 369,650.0
+step 1200  ELBO loss: 365,406.2
+step 1300  ELBO loss: 361,993.2
+step 1400  ELBO loss: 358,922.9
+step 1500  ELBO loss: 356,102.0
+step 1600  ELBO loss: 354,130.8
+step 1700  ELBO loss: 352,116.2
+step 1800  ELBO loss: 350,449.4
+step 1900  ELBO loss: 348,818.9
+step 2000  ELBO loss: 346,916.3
+step 2100  ELBO loss: 345,491.1
+step 2200  ELBO loss: 344,158.2
+step 2300  ELBO loss: 343,224.7
+step 2400  ELBO loss: 341,698.0
+step 2500  ELBO loss: 340,662.8
+step 2600  ELBO loss: 339,340.5
+step 2700  ELBO loss: 338,749.3
+step 2800  ELBO loss: 337,760.7
+step 2900  ELBO loss: 337,317.5
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:3:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_8/fold_3/train/pyramidal --dimensions 8 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_8/fold_3/holdout/pyramidal
+Rows: 66,360  Players: 1,133  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_8/fold_3/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_8/fold_3/evaluation
+
+=== model=perceived-logit dimensions=9 fold=0 survival_chunk_rows=9102 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:0:42 --degree 3 --dimensions 9 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_0/train/pyramidal
+Rows: 281,324  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238670
+BUZZ         38619
+NO-BUZZ       4035
+step    0  ELBO loss: 16,904,038.4
+step  100  ELBO loss: 6,107,237.4
+step  200  ELBO loss: 833,432.1
+step  300  ELBO loss: 516,867.1
+step  400  ELBO loss: 465,397.1
+step  500  ELBO loss: 436,097.1
+step  600  ELBO loss: 416,615.3
+step  700  ELBO loss: 402,061.1
+step  800  ELBO loss: 391,337.8
+step  900  ELBO loss: 382,774.8
+step 1000  ELBO loss: 376,030.9
+step 1100  ELBO loss: 370,178.5
+step 1200  ELBO loss: 365,479.4
+step 1300  ELBO loss: 361,561.7
+step 1400  ELBO loss: 358,499.7
+step 1500  ELBO loss: 355,513.6
+step 1600  ELBO loss: 352,981.8
+step 1700  ELBO loss: 350,778.0
+step 1800  ELBO loss: 348,627.3
+step 1900  ELBO loss: 347,024.0
+step 2000  ELBO loss: 345,130.0
+step 2100  ELBO loss: 343,852.1
+step 2200  ELBO loss: 342,285.7
+step 2300  ELBO loss: 341,101.9
+step 2400  ELBO loss: 339,985.2
+step 2500  ELBO loss: 339,089.7
+step 2600  ELBO loss: 337,704.7
+step 2700  ELBO loss: 336,724.8
+step 2800  ELBO loss: 336,124.5
+step 2900  ELBO loss: 335,707.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:0:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_0/train/pyramidal --dimensions 9 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_0/holdout/pyramidal
+Rows: 67,080  Players: 1,186  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_0/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_0/evaluation
+
+=== model=perceived-logit dimensions=9 fold=2 survival_chunk_rows=9102 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:2:42 --degree 3 --dimensions 9 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_2/train/pyramidal
+Rows: 281,564  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238862
+BUZZ         38657
+NO-BUZZ       4045
+step    0  ELBO loss: 16,896,554.4
+step  100  ELBO loss: 6,097,926.5
+step  200  ELBO loss: 831,664.3
+step  300  ELBO loss: 517,271.4
+step  400  ELBO loss: 465,793.9
+step  500  ELBO loss: 436,479.9
+step  600  ELBO loss: 416,981.6
+step  700  ELBO loss: 402,387.0
+step  800  ELBO loss: 391,654.8
+step  900  ELBO loss: 383,086.6
+step 1000  ELBO loss: 376,338.9
+step 1100  ELBO loss: 370,492.6
+step 1200  ELBO loss: 365,785.3
+step 1300  ELBO loss: 361,869.5
+step 1400  ELBO loss: 358,810.7
+step 1500  ELBO loss: 355,854.9
+step 1600  ELBO loss: 353,289.1
+step 1700  ELBO loss: 351,076.6
+step 1800  ELBO loss: 348,928.8
+step 1900  ELBO loss: 347,335.2
+step 2000  ELBO loss: 345,482.9
+step 2100  ELBO loss: 344,164.4
+step 2200  ELBO loss: 342,495.1
+step 2300  ELBO loss: 341,310.5
+step 2400  ELBO loss: 340,139.4
+step 2500  ELBO loss: 339,241.8
+step 2600  ELBO loss: 337,791.2
+step 2700  ELBO loss: 336,875.3
+step 2800  ELBO loss: 336,209.5
+step 2900  ELBO loss: 335,841.7
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:2:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_2/train/pyramidal --dimensions 9 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_2/holdout/pyramidal
+Rows: 66,840  Players: 1,197  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_2/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_2/evaluation
+
+=== model=perceived-logit dimensions=9 fold=4 survival_chunk_rows=9102 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:4:42 --degree 3 --dimensions 9 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_4/train/pyramidal
+Rows: 280,464  Players: 1,455  Tossups: 1,260
+z
+CENSORED    237696
+BUZZ         38644
+NO-BUZZ       4124
+step    0  ELBO loss: 16,853,662.4
+step  100  ELBO loss: 6,079,156.0
+step  200  ELBO loss: 829,408.1
+step  300  ELBO loss: 517,140.4
+step  400  ELBO loss: 465,644.5
+step  500  ELBO loss: 436,299.2
+step  600  ELBO loss: 416,768.8
+step  700  ELBO loss: 402,174.5
+step  800  ELBO loss: 391,450.3
+step  900  ELBO loss: 382,899.7
+step 1000  ELBO loss: 376,136.0
+step 1100  ELBO loss: 370,317.2
+step 1200  ELBO loss: 365,636.5
+step 1300  ELBO loss: 361,715.2
+step 1400  ELBO loss: 358,652.0
+step 1500  ELBO loss: 355,717.9
+step 1600  ELBO loss: 353,133.0
+step 1700  ELBO loss: 350,909.3
+step 1800  ELBO loss: 348,804.1
+step 1900  ELBO loss: 347,152.5
+step 2000  ELBO loss: 345,324.2
+step 2100  ELBO loss: 344,013.4
+step 2200  ELBO loss: 342,327.0
+step 2300  ELBO loss: 341,153.2
+step 2400  ELBO loss: 339,950.7
+step 2500  ELBO loss: 339,058.7
+step 2600  ELBO loss: 337,665.6
+step 2700  ELBO loss: 336,676.2
+step 2800  ELBO loss: 336,060.0
+step 2900  ELBO loss: 335,566.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:4:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_4/train/pyramidal --dimensions 9 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_4/holdout/pyramidal
+Rows: 67,940  Players: 1,196  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_4/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_9/fold_4/evaluation
+
+=== model=perceived-logit dimensions=10 fold=1 survival_chunk_rows=8192 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:1:42 --degree 3 --dimensions 10 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_10/fold_1/train/pyramidal
+Rows: 282,124  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239379
+BUZZ         38821
+NO-BUZZ       3924
+step    0  ELBO loss: 16,919,752.9
+step  100  ELBO loss: 6,109,180.5
+step  200  ELBO loss: 847,466.1
+step  300  ELBO loss: 530,884.2
+step  400  ELBO loss: 476,616.0
+step  500  ELBO loss: 445,034.5
+step  600  ELBO loss: 423,781.8
+step  700  ELBO loss: 407,949.0
+step  800  ELBO loss: 396,413.9
+step  900  ELBO loss: 387,074.9
+step 1000  ELBO loss: 379,811.3
+step 1100  ELBO loss: 373,674.5
+step 1200  ELBO loss: 368,556.6
+step 1300  ELBO loss: 364,252.2
+step 1400  ELBO loss: 360,587.1
+step 1500  ELBO loss: 357,437.5
+step 1600  ELBO loss: 354,863.6
+step 1700  ELBO loss: 352,402.7
+step 1800  ELBO loss: 350,362.7
+step 1900  ELBO loss: 348,245.4
+step 2000  ELBO loss: 346,617.5
+step 2100  ELBO loss: 344,866.7
+step 2200  ELBO loss: 343,323.5
+step 2300  ELBO loss: 341,952.3
+step 2400  ELBO loss: 340,718.6
+step 2500  ELBO loss: 339,552.3
+step 2600  ELBO loss: 338,722.3
+step 2700  ELBO loss: 337,674.9
+step 2800  ELBO loss: 336,712.0
+step 2900  ELBO loss: 336,284.3
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:1:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_10/fold_1/train/pyramidal --dimensions 10 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_10/fold_1/holdout/pyramidal
+Rows: 66,280  Players: 1,167  Tossups: 1,220
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_10/fold_1/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_10/fold_1/evaluation
+
+=== model=perceived-logit dimensions=10 fold=3 survival_chunk_rows=8192 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:3:42 --degree 3 --dimensions 10 --alpha-prior normal-one --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_10/fold_3/train/pyramidal
+Rows: 282,044  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239288
+BUZZ         38834
+NO-BUZZ       3922
+step    0  ELBO loss: 16,937,212.9
+step  100  ELBO loss: 6,114,054.4
+step  200  ELBO loss: 848,681.8
+step  300  ELBO loss: 531,433.0
+step  400  ELBO loss: 477,121.4
+step  500  ELBO loss: 445,532.7
+step  600  ELBO loss: 424,290.2
+step  700  ELBO loss: 408,432.7
+step  800  ELBO loss: 396,880.3
+step  900  ELBO loss: 387,542.0
+step 1000  ELBO loss: 380,258.8
+step 1100  ELBO loss: 374,124.3
+step 1200  ELBO loss: 368,980.6
+step 1300  ELBO loss: 364,653.5
+step 1400  ELBO loss: 360,979.5
+step 1500  ELBO loss: 357,793.0
+step 1600  ELBO loss: 355,169.5
+step 1700  ELBO loss: 352,696.7
+step 1800  ELBO loss: 350,663.5
+step 1900  ELBO loss: 348,518.4
+step 2000  ELBO loss: 346,841.7
+step 2100  ELBO loss: 345,066.5
+step 2200  ELBO loss: 343,596.1
+step 2300  ELBO loss: 342,171.1
+step 2400  ELBO loss: 340,896.3
+step 2500  ELBO loss: 339,765.4
+step 2600  ELBO loss: 338,945.9
+step 2700  ELBO loss: 337,871.3
+step 2800  ELBO loss: 337,115.5
+step 2900  ELBO loss: 336,581.0
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:3:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_10/fold_3/train/pyramidal --dimensions 10 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_10/fold_3/holdout/pyramidal
+Rows: 66,360  Players: 1,133  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_10/fold_3/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-logit/dim_10/fold_3/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=1 fold=0 survival_chunk_rows=81920 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:0:42 --degree 3 --dimensions 1 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_0/train/pyramidal
+Rows: 281,324  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238670
+BUZZ         38619
+NO-BUZZ       4035
+step    0  ELBO loss: 16,787,854.9
+step  100  ELBO loss: 4,691,170.8
+step  200  ELBO loss: 678,235.8
+step  300  ELBO loss: 340,648.3
+step  400  ELBO loss: 320,192.9
+step  500  ELBO loss: 315,075.7
+step  600  ELBO loss: 312,393.4
+step  700  ELBO loss: 310,460.8
+step  800  ELBO loss: 308,639.9
+step  900  ELBO loss: 307,225.2
+step 1000  ELBO loss: 305,880.5
+step 1100  ELBO loss: 304,670.5
+step 1200  ELBO loss: 303,822.4
+step 1300  ELBO loss: 303,062.6
+step 1400  ELBO loss: 302,210.6
+step 1500  ELBO loss: 301,771.6
+step 1600  ELBO loss: 301,256.8
+step 1700  ELBO loss: 300,893.7
+step 1800  ELBO loss: 300,780.0
+step 1900  ELBO loss: 300,468.8
+step 2000  ELBO loss: 300,394.2
+step 2100  ELBO loss: 300,302.9
+step 2200  ELBO loss: 300,134.7
+step 2300  ELBO loss: 300,281.0
+step 2400  ELBO loss: 300,526.7
+step 2500  ELBO loss: 300,230.8
+step 2600  ELBO loss: 300,382.6
+step 2700  ELBO loss: 300,159.1
+step 2800  ELBO loss: 300,451.6
+step 2900  ELBO loss: 300,457.0
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:0:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_0/train/pyramidal --dimensions 1 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_0/holdout/pyramidal
+Rows: 67,080  Players: 1,186  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_0/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_0/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=1 fold=2 survival_chunk_rows=81920 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:2:42 --degree 3 --dimensions 1 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_2/train/pyramidal
+Rows: 281,564  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238862
+BUZZ         38657
+NO-BUZZ       4045
+step    0  ELBO loss: 16,780,629.9
+step  100  ELBO loss: 4,687,610.6
+step  200  ELBO loss: 678,207.8
+step  300  ELBO loss: 340,834.6
+step  400  ELBO loss: 320,411.9
+step  500  ELBO loss: 315,285.6
+step  600  ELBO loss: 312,615.4
+step  700  ELBO loss: 310,641.6
+step  800  ELBO loss: 308,850.9
+step  900  ELBO loss: 307,437.6
+step 1000  ELBO loss: 306,078.7
+step 1100  ELBO loss: 304,879.0
+step 1200  ELBO loss: 304,018.7
+step 1300  ELBO loss: 303,256.7
+step 1400  ELBO loss: 302,402.5
+step 1500  ELBO loss: 301,980.1
+step 1600  ELBO loss: 301,475.5
+step 1700  ELBO loss: 301,096.9
+step 1800  ELBO loss: 300,980.4
+step 1900  ELBO loss: 300,663.8
+step 2000  ELBO loss: 300,579.0
+step 2100  ELBO loss: 300,501.6
+step 2200  ELBO loss: 300,322.9
+step 2300  ELBO loss: 300,488.5
+step 2400  ELBO loss: 300,747.7
+step 2500  ELBO loss: 300,443.5
+step 2600  ELBO loss: 300,588.4
+step 2700  ELBO loss: 300,354.4
+step 2800  ELBO loss: 300,613.9
+step 2900  ELBO loss: 300,690.8
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:2:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_2/train/pyramidal --dimensions 1 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_2/holdout/pyramidal
+Rows: 66,840  Players: 1,197  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_2/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_2/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=1 fold=4 survival_chunk_rows=81920 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:4:42 --degree 3 --dimensions 1 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_4/train/pyramidal
+Rows: 280,464  Players: 1,455  Tossups: 1,260
+z
+CENSORED    237696
+BUZZ         38644
+NO-BUZZ       4124
+step    0  ELBO loss: 16,733,554.9
+step  100  ELBO loss: 4,673,349.5
+step  200  ELBO loss: 675,577.1
+step  300  ELBO loss: 340,735.6
+step  400  ELBO loss: 320,312.7
+step  500  ELBO loss: 315,187.6
+step  600  ELBO loss: 312,501.8
+step  700  ELBO loss: 310,539.4
+step  800  ELBO loss: 308,750.1
+step  900  ELBO loss: 307,348.1
+step 1000  ELBO loss: 305,995.0
+step 1100  ELBO loss: 304,799.7
+step 1200  ELBO loss: 303,930.8
+step 1300  ELBO loss: 303,176.3
+step 1400  ELBO loss: 302,320.0
+step 1500  ELBO loss: 301,875.9
+step 1600  ELBO loss: 301,368.2
+step 1700  ELBO loss: 300,998.4
+step 1800  ELBO loss: 300,894.2
+step 1900  ELBO loss: 300,561.3
+step 2000  ELBO loss: 300,488.7
+step 2100  ELBO loss: 300,426.0
+step 2200  ELBO loss: 300,241.0
+step 2300  ELBO loss: 300,396.1
+step 2400  ELBO loss: 300,650.4
+step 2500  ELBO loss: 300,333.8
+step 2600  ELBO loss: 300,492.7
+step 2700  ELBO loss: 300,273.2
+step 2800  ELBO loss: 300,518.3
+step 2900  ELBO loss: 300,585.3
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:4:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_4/train/pyramidal --dimensions 1 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_4/holdout/pyramidal
+Rows: 67,940  Players: 1,196  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_4/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_1/fold_4/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=2 fold=1 survival_chunk_rows=40960 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:1:42 --degree 3 --dimensions 2 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_2/fold_1/train/pyramidal
+Rows: 282,124  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239379
+BUZZ         38821
+NO-BUZZ       3924
+step    0  ELBO loss: 16,823,219.7
+step  100  ELBO loss: 4,690,054.8
+step  200  ELBO loss: 701,105.5
+step  300  ELBO loss: 379,822.9
+step  400  ELBO loss: 359,084.5
+step  500  ELBO loss: 351,465.7
+step  600  ELBO loss: 345,095.0
+step  700  ELBO loss: 340,005.2
+step  800  ELBO loss: 335,439.8
+step  900  ELBO loss: 331,792.6
+step 1000  ELBO loss: 328,267.6
+step 1100  ELBO loss: 325,129.8
+step 1200  ELBO loss: 322,927.5
+step 1300  ELBO loss: 320,842.1
+step 1400  ELBO loss: 318,912.5
+step 1500  ELBO loss: 317,466.1
+step 1600  ELBO loss: 316,292.9
+step 1700  ELBO loss: 315,307.7
+step 1800  ELBO loss: 314,563.9
+step 1900  ELBO loss: 313,847.6
+step 2000  ELBO loss: 313,850.9
+step 2100  ELBO loss: 312,718.4
+step 2200  ELBO loss: 312,781.5
+step 2300  ELBO loss: 312,400.8
+step 2400  ELBO loss: 312,445.0
+step 2500  ELBO loss: 312,394.2
+step 2600  ELBO loss: 311,580.2
+step 2700  ELBO loss: 311,511.2
+step 2800  ELBO loss: 311,440.3
+step 2900  ELBO loss: 311,186.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:1:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_2/fold_1/train/pyramidal --dimensions 2 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_2/fold_1/holdout/pyramidal
+Rows: 66,280  Players: 1,167  Tossups: 1,220
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_2/fold_1/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_2/fold_1/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=2 fold=3 survival_chunk_rows=40960 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:3:42 --degree 3 --dimensions 2 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_2/fold_3/train/pyramidal
+Rows: 282,044  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239288
+BUZZ         38834
+NO-BUZZ       3922
+step    0  ELBO loss: 16,846,753.7
+step  100  ELBO loss: 4,689,899.6
+step  200  ELBO loss: 701,452.4
+step  300  ELBO loss: 380,353.2
+step  400  ELBO loss: 359,467.7
+step  500  ELBO loss: 351,738.0
+step  600  ELBO loss: 345,377.9
+step  700  ELBO loss: 340,491.4
+step  800  ELBO loss: 336,094.5
+step  900  ELBO loss: 332,524.3
+step 1000  ELBO loss: 328,996.4
+step 1100  ELBO loss: 325,806.1
+step 1200  ELBO loss: 323,569.9
+step 1300  ELBO loss: 321,423.9
+step 1400  ELBO loss: 319,436.2
+step 1500  ELBO loss: 317,941.5
+step 1600  ELBO loss: 316,728.8
+step 1700  ELBO loss: 315,773.4
+step 1800  ELBO loss: 314,960.7
+step 1900  ELBO loss: 314,172.8
+step 2000  ELBO loss: 314,292.2
+step 2100  ELBO loss: 313,055.1
+step 2200  ELBO loss: 313,168.6
+step 2300  ELBO loss: 312,798.5
+step 2400  ELBO loss: 312,997.8
+step 2500  ELBO loss: 312,928.7
+step 2600  ELBO loss: 312,118.9
+step 2700  ELBO loss: 312,191.0
+step 2800  ELBO loss: 312,134.7
+step 2900  ELBO loss: 312,003.1
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:3:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_2/fold_3/train/pyramidal --dimensions 2 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_2/fold_3/holdout/pyramidal
+Rows: 66,360  Players: 1,133  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_2/fold_3/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_2/fold_3/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=3 fold=0 survival_chunk_rows=27306 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:0:42 --degree 3 --dimensions 3 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_0/train/pyramidal
+Rows: 281,324  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238670
+BUZZ         38619
+NO-BUZZ       4035
+step    0  ELBO loss: 16,823,776.5
+step  100  ELBO loss: 4,657,875.3
+step  200  ELBO loss: 730,128.7
+step  300  ELBO loss: 416,390.9
+step  400  ELBO loss: 394,238.3
+step  500  ELBO loss: 384,165.9
+step  600  ELBO loss: 374,949.1
+step  700  ELBO loss: 366,728.7
+step  800  ELBO loss: 359,084.4
+step  900  ELBO loss: 352,389.6
+step 1000  ELBO loss: 346,807.4
+step 1100  ELBO loss: 341,812.1
+step 1200  ELBO loss: 337,595.2
+step 1300  ELBO loss: 334,102.5
+step 1400  ELBO loss: 330,559.5
+step 1500  ELBO loss: 327,889.7
+step 1600  ELBO loss: 325,366.2
+step 1700  ELBO loss: 323,724.6
+step 1800  ELBO loss: 322,187.7
+step 1900  ELBO loss: 320,712.9
+step 2000  ELBO loss: 319,417.7
+step 2100  ELBO loss: 318,561.7
+step 2200  ELBO loss: 317,697.6
+step 2300  ELBO loss: 316,589.7
+step 2400  ELBO loss: 316,363.0
+step 2500  ELBO loss: 316,010.6
+step 2600  ELBO loss: 315,430.5
+step 2700  ELBO loss: 315,227.9
+step 2800  ELBO loss: 314,369.1
+step 2900  ELBO loss: 314,502.3
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:0:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_0/train/pyramidal --dimensions 3 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_0/holdout/pyramidal
+Rows: 67,080  Players: 1,186  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_0/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_0/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=3 fold=2 survival_chunk_rows=27306 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:2:42 --degree 3 --dimensions 3 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_2/train/pyramidal
+Rows: 281,564  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238862
+BUZZ         38657
+NO-BUZZ       4045
+step    0  ELBO loss: 16,817,986.5
+step  100  ELBO loss: 4,654,901.3
+step  200  ELBO loss: 729,036.7
+step  300  ELBO loss: 416,671.3
+step  400  ELBO loss: 394,562.0
+step  500  ELBO loss: 384,593.7
+step  600  ELBO loss: 375,505.4
+step  700  ELBO loss: 367,325.0
+step  800  ELBO loss: 359,537.6
+step  900  ELBO loss: 352,652.7
+step 1000  ELBO loss: 346,852.5
+step 1100  ELBO loss: 341,854.6
+step 1200  ELBO loss: 337,534.9
+step 1300  ELBO loss: 334,004.0
+step 1400  ELBO loss: 330,516.3
+step 1500  ELBO loss: 327,831.0
+step 1600  ELBO loss: 325,414.8
+step 1700  ELBO loss: 323,783.2
+step 1800  ELBO loss: 322,373.3
+step 1900  ELBO loss: 320,957.3
+step 2000  ELBO loss: 319,788.5
+step 2100  ELBO loss: 319,088.6
+step 2200  ELBO loss: 318,264.1
+step 2300  ELBO loss: 317,328.9
+step 2400  ELBO loss: 317,239.8
+step 2500  ELBO loss: 317,038.9
+step 2600  ELBO loss: 316,567.5
+step 2700  ELBO loss: 316,387.8
+step 2800  ELBO loss: 315,616.9
+step 2900  ELBO loss: 315,830.3
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:2:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_2/train/pyramidal --dimensions 3 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_2/holdout/pyramidal
+Rows: 66,840  Players: 1,197  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_2/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_2/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=3 fold=4 survival_chunk_rows=27306 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:4:42 --degree 3 --dimensions 3 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_4/train/pyramidal
+Rows: 280,464  Players: 1,455  Tossups: 1,260
+z
+CENSORED    237696
+BUZZ         38644
+NO-BUZZ       4124
+step    0  ELBO loss: 16,775,813.5
+step  100  ELBO loss: 4,635,703.6
+step  200  ELBO loss: 727,566.7
+step  300  ELBO loss: 416,578.7
+step  400  ELBO loss: 394,350.9
+step  500  ELBO loss: 384,350.0
+step  600  ELBO loss: 375,245.9
+step  700  ELBO loss: 367,125.2
+step  800  ELBO loss: 359,374.2
+step  900  ELBO loss: 352,638.9
+step 1000  ELBO loss: 346,985.7
+step 1100  ELBO loss: 342,007.6
+step 1200  ELBO loss: 337,710.1
+step 1300  ELBO loss: 334,254.6
+step 1400  ELBO loss: 330,826.4
+step 1500  ELBO loss: 328,087.3
+step 1600  ELBO loss: 325,757.0
+step 1700  ELBO loss: 324,177.5
+step 1800  ELBO loss: 322,783.5
+step 1900  ELBO loss: 321,401.0
+step 2000  ELBO loss: 320,239.2
+step 2100  ELBO loss: 319,610.6
+step 2200  ELBO loss: 318,760.8
+step 2300  ELBO loss: 317,899.6
+step 2400  ELBO loss: 317,906.8
+step 2500  ELBO loss: 317,678.9
+step 2600  ELBO loss: 317,369.7
+step 2700  ELBO loss: 317,320.0
+step 2800  ELBO loss: 316,640.5
+step 2900  ELBO loss: 316,934.5
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:4:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_4/train/pyramidal --dimensions 3 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_4/holdout/pyramidal
+Rows: 67,940  Players: 1,196  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_4/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_3/fold_4/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=4 fold=1 survival_chunk_rows=20480 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:1:42 --degree 3 --dimensions 4 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_4/fold_1/train/pyramidal
+Rows: 282,124  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239379
+BUZZ         38821
+NO-BUZZ       3924
+step    0  ELBO loss: 16,850,152.7
+step  100  ELBO loss: 4,680,215.7
+step  200  ELBO loss: 761,531.7
+step  300  ELBO loss: 454,623.2
+step  400  ELBO loss: 430,009.1
+step  500  ELBO loss: 416,874.4
+step  600  ELBO loss: 404,961.7
+step  700  ELBO loss: 394,514.5
+step  800  ELBO loss: 384,749.9
+step  900  ELBO loss: 375,637.8
+step 1000  ELBO loss: 368,155.1
+step 1100  ELBO loss: 361,080.7
+step 1200  ELBO loss: 355,252.6
+step 1300  ELBO loss: 350,404.3
+step 1400  ELBO loss: 345,999.8
+step 1500  ELBO loss: 342,490.2
+step 1600  ELBO loss: 339,254.9
+step 1700  ELBO loss: 337,002.3
+step 1800  ELBO loss: 335,341.1
+step 1900  ELBO loss: 333,741.1
+step 2000  ELBO loss: 332,427.6
+step 2100  ELBO loss: 331,168.4
+step 2200  ELBO loss: 330,318.3
+step 2300  ELBO loss: 329,632.1
+step 2400  ELBO loss: 329,087.8
+step 2500  ELBO loss: 328,413.2
+step 2600  ELBO loss: 327,373.5
+step 2700  ELBO loss: 326,891.2
+step 2800  ELBO loss: 325,987.8
+step 2900  ELBO loss: 325,483.5
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:1:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_4/fold_1/train/pyramidal --dimensions 4 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_4/fold_1/holdout/pyramidal
+Rows: 66,280  Players: 1,167  Tossups: 1,220
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_4/fold_1/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_4/fold_1/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=4 fold=3 survival_chunk_rows=20480 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:3:42 --degree 3 --dimensions 4 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_4/fold_3/train/pyramidal
+Rows: 282,044  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239288
+BUZZ         38834
+NO-BUZZ       3922
+step    0  ELBO loss: 16,880,413.7
+step  100  ELBO loss: 4,687,020.3
+step  200  ELBO loss: 762,703.1
+step  300  ELBO loss: 455,226.5
+step  400  ELBO loss: 430,499.5
+step  500  ELBO loss: 417,316.4
+step  600  ELBO loss: 405,424.0
+step  700  ELBO loss: 395,098.0
+step  800  ELBO loss: 385,585.6
+step  900  ELBO loss: 376,744.6
+step 1000  ELBO loss: 369,381.6
+step 1100  ELBO loss: 362,188.1
+step 1200  ELBO loss: 356,216.2
+step 1300  ELBO loss: 351,199.0
+step 1400  ELBO loss: 346,550.8
+step 1500  ELBO loss: 342,835.7
+step 1600  ELBO loss: 339,279.7
+step 1700  ELBO loss: 336,556.2
+step 1800  ELBO loss: 334,599.0
+step 1900  ELBO loss: 332,663.0
+step 2000  ELBO loss: 330,980.1
+step 2100  ELBO loss: 329,321.8
+step 2200  ELBO loss: 328,333.0
+step 2300  ELBO loss: 327,092.3
+step 2400  ELBO loss: 326,340.8
+step 2500  ELBO loss: 325,391.9
+step 2600  ELBO loss: 324,323.1
+step 2700  ELBO loss: 323,553.4
+step 2800  ELBO loss: 322,957.1
+step 2900  ELBO loss: 322,527.7
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:3:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_4/fold_3/train/pyramidal --dimensions 4 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_4/fold_3/holdout/pyramidal
+Rows: 66,360  Players: 1,133  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_4/fold_3/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_4/fold_3/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=5 fold=0 survival_chunk_rows=16384 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:0:42 --degree 3 --dimensions 5 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_0/train/pyramidal
+Rows: 281,324  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238670
+BUZZ         38619
+NO-BUZZ       4035
+step    0  ELBO loss: 16,877,040.7
+step  100  ELBO loss: 4,688,017.6
+step  200  ELBO loss: 790,668.1
+step  300  ELBO loss: 489,863.5
+step  400  ELBO loss: 462,447.7
+step  500  ELBO loss: 446,336.2
+step  600  ELBO loss: 431,969.0
+step  700  ELBO loss: 418,570.9
+step  800  ELBO loss: 406,582.6
+step  900  ELBO loss: 395,217.0
+step 1000  ELBO loss: 385,463.2
+step 1100  ELBO loss: 376,130.8
+step 1200  ELBO loss: 368,442.0
+step 1300  ELBO loss: 361,913.8
+step 1400  ELBO loss: 355,334.5
+step 1500  ELBO loss: 350,394.2
+step 1600  ELBO loss: 345,847.1
+step 1700  ELBO loss: 341,912.4
+step 1800  ELBO loss: 338,531.1
+step 1900  ELBO loss: 336,108.7
+step 2000  ELBO loss: 333,704.0
+step 2100  ELBO loss: 331,133.8
+step 2200  ELBO loss: 329,281.6
+step 2300  ELBO loss: 327,361.6
+step 2400  ELBO loss: 325,977.4
+step 2500  ELBO loss: 324,608.7
+step 2600  ELBO loss: 323,825.5
+step 2700  ELBO loss: 322,489.5
+step 2800  ELBO loss: 321,679.2
+step 2900  ELBO loss: 320,979.3
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:0:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_0/train/pyramidal --dimensions 5 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_0/holdout/pyramidal
+Rows: 67,080  Players: 1,186  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_0/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_0/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=5 fold=2 survival_chunk_rows=16384 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:2:42 --degree 3 --dimensions 5 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_2/train/pyramidal
+Rows: 281,564  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238862
+BUZZ         38657
+NO-BUZZ       4045
+step    0  ELBO loss: 16,873,422.7
+step  100  ELBO loss: 4,685,976.6
+step  200  ELBO loss: 790,561.7
+step  300  ELBO loss: 490,150.7
+step  400  ELBO loss: 462,786.7
+step  500  ELBO loss: 446,712.0
+step  600  ELBO loss: 432,268.7
+step  700  ELBO loss: 418,626.7
+step  800  ELBO loss: 406,596.5
+step  900  ELBO loss: 395,300.2
+step 1000  ELBO loss: 385,768.6
+step 1100  ELBO loss: 376,573.4
+step 1200  ELBO loss: 368,818.9
+step 1300  ELBO loss: 362,251.1
+step 1400  ELBO loss: 355,643.4
+step 1500  ELBO loss: 350,722.5
+step 1600  ELBO loss: 345,991.0
+step 1700  ELBO loss: 342,094.0
+step 1800  ELBO loss: 338,511.6
+step 1900  ELBO loss: 336,041.1
+step 2000  ELBO loss: 333,872.9
+step 2100  ELBO loss: 331,422.6
+step 2200  ELBO loss: 329,840.2
+step 2300  ELBO loss: 328,162.5
+step 2400  ELBO loss: 327,133.4
+step 2500  ELBO loss: 325,992.0
+step 2600  ELBO loss: 325,658.0
+step 2700  ELBO loss: 324,618.8
+step 2800  ELBO loss: 323,907.3
+step 2900  ELBO loss: 323,427.7
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:2:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_2/train/pyramidal --dimensions 5 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_2/holdout/pyramidal
+Rows: 66,840  Players: 1,197  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_2/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_2/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=5 fold=4 survival_chunk_rows=16384 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:4:42 --degree 3 --dimensions 5 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_4/train/pyramidal
+Rows: 280,464  Players: 1,455  Tossups: 1,260
+z
+CENSORED    237696
+BUZZ         38644
+NO-BUZZ       4124
+step    0  ELBO loss: 16,826,727.7
+step  100  ELBO loss: 4,671,661.9
+step  200  ELBO loss: 789,492.2
+step  300  ELBO loss: 489,956.6
+step  400  ELBO loss: 462,618.1
+step  500  ELBO loss: 446,625.6
+step  600  ELBO loss: 432,456.8
+step  700  ELBO loss: 419,057.0
+step  800  ELBO loss: 407,035.1
+step  900  ELBO loss: 395,639.3
+step 1000  ELBO loss: 385,849.8
+step 1100  ELBO loss: 376,459.1
+step 1200  ELBO loss: 368,721.4
+step 1300  ELBO loss: 362,123.6
+step 1400  ELBO loss: 355,522.5
+step 1500  ELBO loss: 350,641.0
+step 1600  ELBO loss: 346,065.3
+step 1700  ELBO loss: 342,275.8
+step 1800  ELBO loss: 339,024.2
+step 1900  ELBO loss: 336,478.3
+step 2000  ELBO loss: 333,977.8
+step 2100  ELBO loss: 331,501.5
+step 2200  ELBO loss: 329,608.2
+step 2300  ELBO loss: 327,732.0
+step 2400  ELBO loss: 326,382.3
+step 2500  ELBO loss: 324,820.1
+step 2600  ELBO loss: 324,065.0
+step 2700  ELBO loss: 322,729.7
+step 2800  ELBO loss: 321,843.1
+step 2900  ELBO loss: 321,096.3
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:4:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_4/train/pyramidal --dimensions 5 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_4/holdout/pyramidal
+Rows: 67,940  Players: 1,196  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_4/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_5/fold_4/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=6 fold=1 survival_chunk_rows=13653 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:1:42 --degree 3 --dimensions 6 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_6/fold_1/train/pyramidal
+Rows: 282,124  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239379
+BUZZ         38821
+NO-BUZZ       3924
+step    0  ELBO loss: 16,873,371.8
+step  100  ELBO loss: 4,705,203.4
+step  200  ELBO loss: 822,324.0
+step  300  ELBO loss: 526,329.4
+step  400  ELBO loss: 496,244.3
+step  500  ELBO loss: 477,115.7
+step  600  ELBO loss: 460,496.5
+step  700  ELBO loss: 444,567.6
+step  800  ELBO loss: 430,364.2
+step  900  ELBO loss: 417,279.0
+step 1000  ELBO loss: 405,549.5
+step 1100  ELBO loss: 394,719.5
+step 1200  ELBO loss: 385,424.1
+step 1300  ELBO loss: 377,269.9
+step 1400  ELBO loss: 369,176.7
+step 1500  ELBO loss: 363,267.2
+step 1600  ELBO loss: 357,723.1
+step 1700  ELBO loss: 352,907.0
+step 1800  ELBO loss: 349,336.1
+step 1900  ELBO loss: 345,749.6
+step 2000  ELBO loss: 342,920.5
+step 2100  ELBO loss: 340,156.2
+step 2200  ELBO loss: 338,390.9
+step 2300  ELBO loss: 336,361.0
+step 2400  ELBO loss: 334,414.6
+step 2500  ELBO loss: 332,848.1
+step 2600  ELBO loss: 331,433.9
+step 2700  ELBO loss: 329,931.1
+step 2800  ELBO loss: 328,712.5
+step 2900  ELBO loss: 328,009.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:1:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_6/fold_1/train/pyramidal --dimensions 6 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_6/fold_1/holdout/pyramidal
+Rows: 66,280  Players: 1,167  Tossups: 1,220
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_6/fold_1/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_6/fold_1/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=6 fold=3 survival_chunk_rows=13653 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:3:42 --degree 3 --dimensions 6 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_6/fold_3/train/pyramidal
+Rows: 282,044  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239288
+BUZZ         38834
+NO-BUZZ       3922
+step    0  ELBO loss: 16,897,894.8
+step  100  ELBO loss: 4,708,787.5
+step  200  ELBO loss: 822,862.1
+step  300  ELBO loss: 526,872.3
+step  400  ELBO loss: 496,701.2
+step  500  ELBO loss: 477,513.6
+step  600  ELBO loss: 460,847.3
+step  700  ELBO loss: 445,022.2
+step  800  ELBO loss: 431,043.6
+step  900  ELBO loss: 418,082.6
+step 1000  ELBO loss: 406,388.8
+step 1100  ELBO loss: 395,545.2
+step 1200  ELBO loss: 386,163.6
+step 1300  ELBO loss: 378,026.8
+step 1400  ELBO loss: 370,078.8
+step 1500  ELBO loss: 364,024.5
+step 1600  ELBO loss: 358,399.0
+step 1700  ELBO loss: 353,148.0
+step 1800  ELBO loss: 349,387.3
+step 1900  ELBO loss: 345,654.8
+step 2000  ELBO loss: 342,137.8
+step 2100  ELBO loss: 339,173.0
+step 2200  ELBO loss: 337,070.5
+step 2300  ELBO loss: 334,621.6
+step 2400  ELBO loss: 332,487.6
+step 2500  ELBO loss: 331,336.6
+step 2600  ELBO loss: 329,931.4
+step 2700  ELBO loss: 328,605.1
+step 2800  ELBO loss: 327,491.2
+step 2900  ELBO loss: 326,752.0
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:3:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_6/fold_3/train/pyramidal --dimensions 6 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_6/fold_3/holdout/pyramidal
+Rows: 66,360  Players: 1,133  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_6/fold_3/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_6/fold_3/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=7 fold=0 survival_chunk_rows=11702 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:0:42 --degree 3 --dimensions 7 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_0/train/pyramidal
+Rows: 281,324  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238670
+BUZZ         38619
+NO-BUZZ       4035
+step    0  ELBO loss: 16,942,155.6
+step  100  ELBO loss: 4,727,465.6
+step  200  ELBO loss: 853,782.5
+step  300  ELBO loss: 559,739.4
+step  400  ELBO loss: 526,363.5
+step  500  ELBO loss: 504,055.9
+step  600  ELBO loss: 484,406.5
+step  700  ELBO loss: 466,327.1
+step  800  ELBO loss: 449,948.4
+step  900  ELBO loss: 434,871.7
+step 1000  ELBO loss: 420,896.9
+step 1100  ELBO loss: 407,419.8
+step 1200  ELBO loss: 395,813.1
+step 1300  ELBO loss: 385,937.7
+step 1400  ELBO loss: 375,785.7
+step 1500  ELBO loss: 368,385.7
+step 1600  ELBO loss: 361,435.6
+step 1700  ELBO loss: 355,181.4
+step 1800  ELBO loss: 350,362.6
+step 1900  ELBO loss: 346,420.8
+step 2000  ELBO loss: 342,484.8
+step 2100  ELBO loss: 338,598.8
+step 2200  ELBO loss: 335,983.5
+step 2300  ELBO loss: 333,653.9
+step 2400  ELBO loss: 331,741.7
+step 2500  ELBO loss: 330,020.9
+step 2600  ELBO loss: 328,737.1
+step 2700  ELBO loss: 327,143.3
+step 2800  ELBO loss: 325,723.5
+step 2900  ELBO loss: 325,677.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:0:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_0/train/pyramidal --dimensions 7 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_0/holdout/pyramidal
+Rows: 67,080  Players: 1,186  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_0/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_0/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=7 fold=2 survival_chunk_rows=11702 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:2:42 --degree 3 --dimensions 7 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_2/train/pyramidal
+Rows: 281,564  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238862
+BUZZ         38657
+NO-BUZZ       4045
+step    0  ELBO loss: 16,940,395.6
+step  100  ELBO loss: 4,731,533.5
+step  200  ELBO loss: 854,725.5
+step  300  ELBO loss: 560,014.9
+step  400  ELBO loss: 526,627.4
+step  500  ELBO loss: 504,280.8
+step  600  ELBO loss: 484,512.3
+step  700  ELBO loss: 466,167.8
+step  800  ELBO loss: 449,699.3
+step  900  ELBO loss: 434,589.2
+step 1000  ELBO loss: 420,571.7
+step 1100  ELBO loss: 407,324.3
+step 1200  ELBO loss: 396,122.6
+step 1300  ELBO loss: 386,296.2
+step 1400  ELBO loss: 376,202.0
+step 1500  ELBO loss: 368,731.0
+step 1600  ELBO loss: 361,806.0
+step 1700  ELBO loss: 355,622.3
+step 1800  ELBO loss: 350,981.8
+step 1900  ELBO loss: 347,068.0
+step 2000  ELBO loss: 343,112.2
+step 2100  ELBO loss: 339,338.2
+step 2200  ELBO loss: 336,839.9
+step 2300  ELBO loss: 334,596.9
+step 2400  ELBO loss: 332,864.8
+step 2500  ELBO loss: 331,000.4
+step 2600  ELBO loss: 329,920.2
+step 2700  ELBO loss: 328,174.0
+step 2800  ELBO loss: 326,993.8
+step 2900  ELBO loss: 326,745.6
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:2:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_2/train/pyramidal --dimensions 7 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_2/holdout/pyramidal
+Rows: 66,840  Players: 1,197  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_2/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_2/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=7 fold=4 survival_chunk_rows=11702 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:4:42 --degree 3 --dimensions 7 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_4/train/pyramidal
+Rows: 280,464  Players: 1,455  Tossups: 1,260
+z
+CENSORED    237696
+BUZZ         38644
+NO-BUZZ       4124
+step    0  ELBO loss: 16,891,094.6
+step  100  ELBO loss: 4,716,345.7
+step  200  ELBO loss: 852,811.4
+step  300  ELBO loss: 559,746.1
+step  400  ELBO loss: 526,305.3
+step  500  ELBO loss: 503,911.1
+step  600  ELBO loss: 484,176.7
+step  700  ELBO loss: 465,946.6
+step  800  ELBO loss: 449,488.5
+step  900  ELBO loss: 434,404.9
+step 1000  ELBO loss: 420,315.8
+step 1100  ELBO loss: 406,927.1
+step 1200  ELBO loss: 395,691.8
+step 1300  ELBO loss: 385,981.1
+step 1400  ELBO loss: 376,121.6
+step 1500  ELBO loss: 368,854.9
+step 1600  ELBO loss: 362,063.0
+step 1700  ELBO loss: 356,052.8
+step 1800  ELBO loss: 351,713.2
+step 1900  ELBO loss: 347,905.9
+step 2000  ELBO loss: 344,941.5
+step 2100  ELBO loss: 341,646.7
+step 2200  ELBO loss: 339,157.6
+step 2300  ELBO loss: 337,453.4
+step 2400  ELBO loss: 335,913.6
+step 2500  ELBO loss: 334,472.0
+step 2600  ELBO loss: 333,407.9
+step 2700  ELBO loss: 331,882.5
+step 2800  ELBO loss: 331,239.9
+step 2900  ELBO loss: 331,195.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:4:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_4/train/pyramidal --dimensions 7 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_4/holdout/pyramidal
+Rows: 67,940  Players: 1,196  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_4/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_7/fold_4/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=8 fold=1 survival_chunk_rows=10240 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:1:42 --degree 3 --dimensions 8 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_8/fold_1/train/pyramidal
+Rows: 282,124  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239379
+BUZZ         38821
+NO-BUZZ       3924
+step    0  ELBO loss: 16,940,731.7
+step  100  ELBO loss: 4,743,583.8
+step  200  ELBO loss: 885,427.1
+step  300  ELBO loss: 594,448.0
+step  400  ELBO loss: 557,611.3
+step  500  ELBO loss: 531,762.3
+step  600  ELBO loss: 508,622.8
+step  700  ELBO loss: 487,176.6
+step  800  ELBO loss: 468,497.4
+step  900  ELBO loss: 451,398.1
+step 1000  ELBO loss: 435,663.8
+step 1100  ELBO loss: 421,210.5
+step 1200  ELBO loss: 408,760.6
+step 1300  ELBO loss: 397,479.3
+step 1400  ELBO loss: 386,669.6
+step 1500  ELBO loss: 377,812.1
+step 1600  ELBO loss: 370,332.9
+step 1700  ELBO loss: 363,422.0
+step 1800  ELBO loss: 357,936.4
+step 1900  ELBO loss: 353,265.0
+step 2000  ELBO loss: 349,076.3
+step 2100  ELBO loss: 345,492.9
+step 2200  ELBO loss: 342,920.0
+step 2300  ELBO loss: 340,660.4
+step 2400  ELBO loss: 338,803.7
+step 2500  ELBO loss: 336,677.3
+step 2600  ELBO loss: 335,607.0
+step 2700  ELBO loss: 334,950.4
+step 2800  ELBO loss: 333,528.7
+step 2900  ELBO loss: 333,094.9
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:1:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_8/fold_1/train/pyramidal --dimensions 8 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_8/fold_1/holdout/pyramidal
+Rows: 66,280  Players: 1,167  Tossups: 1,220
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_8/fold_1/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_8/fold_1/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=8 fold=3 survival_chunk_rows=10240 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:3:42 --degree 3 --dimensions 8 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_8/fold_3/train/pyramidal
+Rows: 282,044  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239288
+BUZZ         38834
+NO-BUZZ       3922
+step    0  ELBO loss: 16,970,642.7
+step  100  ELBO loss: 4,749,654.7
+step  200  ELBO loss: 886,018.7
+step  300  ELBO loss: 595,057.8
+step  400  ELBO loss: 558,153.4
+step  500  ELBO loss: 532,356.8
+step  600  ELBO loss: 509,332.2
+step  700  ELBO loss: 488,145.2
+step  800  ELBO loss: 469,674.9
+step  900  ELBO loss: 452,758.6
+step 1000  ELBO loss: 437,305.5
+step 1100  ELBO loss: 422,961.0
+step 1200  ELBO loss: 410,612.8
+step 1300  ELBO loss: 399,539.2
+step 1400  ELBO loss: 389,216.1
+step 1500  ELBO loss: 380,570.2
+step 1600  ELBO loss: 373,169.4
+step 1700  ELBO loss: 366,984.5
+step 1800  ELBO loss: 361,424.1
+step 1900  ELBO loss: 357,432.8
+step 2000  ELBO loss: 352,996.3
+step 2100  ELBO loss: 349,514.0
+step 2200  ELBO loss: 346,876.9
+step 2300  ELBO loss: 344,797.9
+step 2400  ELBO loss: 342,526.9
+step 2500  ELBO loss: 340,501.0
+step 2600  ELBO loss: 339,315.5
+step 2700  ELBO loss: 337,968.1
+step 2800  ELBO loss: 336,589.5
+step 2900  ELBO loss: 335,783.1
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:3:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_8/fold_3/train/pyramidal --dimensions 8 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_8/fold_3/holdout/pyramidal
+Rows: 66,360  Players: 1,133  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_8/fold_3/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_8/fold_3/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=9 fold=0 survival_chunk_rows=9102 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:0:42 --degree 3 --dimensions 9 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_0/train/pyramidal
+Rows: 281,324  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238670
+BUZZ         38619
+NO-BUZZ       4035
+step    0  ELBO loss: 16,966,338.6
+step  100  ELBO loss: 4,766,868.5
+step  200  ELBO loss: 916,356.1
+step  300  ELBO loss: 626,776.7
+step  400  ELBO loss: 585,926.9
+step  500  ELBO loss: 557,079.4
+step  600  ELBO loss: 531,470.4
+step  700  ELBO loss: 508,313.0
+step  800  ELBO loss: 487,759.5
+step  900  ELBO loss: 468,991.6
+step 1000  ELBO loss: 451,697.8
+step 1100  ELBO loss: 435,492.4
+step 1200  ELBO loss: 421,283.6
+step 1300  ELBO loss: 407,892.3
+step 1400  ELBO loss: 396,020.4
+step 1500  ELBO loss: 385,898.2
+step 1600  ELBO loss: 376,509.5
+step 1700  ELBO loss: 368,619.0
+step 1800  ELBO loss: 362,040.1
+step 1900  ELBO loss: 356,171.2
+step 2000  ELBO loss: 351,288.0
+step 2100  ELBO loss: 347,605.4
+step 2200  ELBO loss: 343,929.1
+step 2300  ELBO loss: 341,282.1
+step 2400  ELBO loss: 339,151.1
+step 2500  ELBO loss: 336,808.8
+step 2600  ELBO loss: 335,961.6
+step 2700  ELBO loss: 334,669.6
+step 2800  ELBO loss: 333,501.0
+step 2900  ELBO loss: 332,930.2
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:0:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_0/train/pyramidal --dimensions 9 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_0/holdout/pyramidal
+Rows: 67,080  Players: 1,186  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_0/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_0/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=9 fold=2 survival_chunk_rows=9102 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:2:42 --degree 3 --dimensions 9 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_2/train/pyramidal
+Rows: 281,564  Players: 1,455  Tossups: 1,260
+z
+CENSORED    238862
+BUZZ         38657
+NO-BUZZ       4045
+step    0  ELBO loss: 16,971,954.6
+step  100  ELBO loss: 4,770,067.4
+step  200  ELBO loss: 916,767.5
+step  300  ELBO loss: 627,038.5
+step  400  ELBO loss: 586,113.2
+step  500  ELBO loss: 557,159.7
+step  600  ELBO loss: 531,381.5
+step  700  ELBO loss: 508,064.6
+step  800  ELBO loss: 487,490.0
+step  900  ELBO loss: 468,653.6
+step 1000  ELBO loss: 451,462.5
+step 1100  ELBO loss: 435,508.3
+step 1200  ELBO loss: 421,415.8
+step 1300  ELBO loss: 408,380.8
+step 1400  ELBO loss: 396,407.3
+step 1500  ELBO loss: 386,506.4
+step 1600  ELBO loss: 377,140.5
+step 1700  ELBO loss: 369,272.0
+step 1800  ELBO loss: 362,825.1
+step 1900  ELBO loss: 356,927.9
+step 2000  ELBO loss: 352,259.6
+step 2100  ELBO loss: 348,565.7
+step 2200  ELBO loss: 345,162.0
+step 2300  ELBO loss: 342,767.3
+step 2400  ELBO loss: 340,780.6
+step 2500  ELBO loss: 338,568.8
+step 2600  ELBO loss: 337,551.8
+step 2700  ELBO loss: 336,262.5
+step 2800  ELBO loss: 335,107.1
+step 2900  ELBO loss: 334,366.0
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:2:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_2/train/pyramidal --dimensions 9 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_2/holdout/pyramidal
+Rows: 66,840  Players: 1,197  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_2/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_2/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=9 fold=4 survival_chunk_rows=9102 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:4:42 --degree 3 --dimensions 9 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_4/train/pyramidal
+Rows: 280,464  Players: 1,455  Tossups: 1,260
+z
+CENSORED    237696
+BUZZ         38644
+NO-BUZZ       4124
+step    0  ELBO loss: 16,921,305.6
+step  100  ELBO loss: 4,755,074.5
+step  200  ELBO loss: 915,411.5
+step  300  ELBO loss: 626,670.1
+step  400  ELBO loss: 585,714.7
+step  500  ELBO loss: 556,777.2
+step  600  ELBO loss: 530,999.7
+step  700  ELBO loss: 507,796.1
+step  800  ELBO loss: 487,170.6
+step  900  ELBO loss: 468,351.9
+step 1000  ELBO loss: 451,254.4
+step 1100  ELBO loss: 435,273.8
+step 1200  ELBO loss: 421,463.1
+step 1300  ELBO loss: 409,041.9
+step 1400  ELBO loss: 397,870.2
+step 1500  ELBO loss: 388,629.7
+step 1600  ELBO loss: 380,152.1
+step 1700  ELBO loss: 373,261.8
+step 1800  ELBO loss: 367,598.6
+step 1900  ELBO loss: 362,470.0
+step 2000  ELBO loss: 358,257.0
+step 2100  ELBO loss: 354,833.7
+step 2200  ELBO loss: 351,750.4
+step 2300  ELBO loss: 349,526.5
+step 2400  ELBO loss: 347,555.0
+step 2500  ELBO loss: 345,009.7
+step 2600  ELBO loss: 344,087.6
+step 2700  ELBO loss: 342,598.3
+step 2800  ELBO loss: 340,729.4
+step 2900  ELBO loss: 340,020.5
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:4:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_4/train/pyramidal --dimensions 9 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_4/holdout/pyramidal
+Rows: 67,940  Players: 1,196  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_4/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_9/fold_4/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=10 fold=1 survival_chunk_rows=8192 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:1:42 --degree 3 --dimensions 10 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_10/fold_1/train/pyramidal
+Rows: 282,124  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239379
+BUZZ         38821
+NO-BUZZ       3924
+step    0  ELBO loss: 17,007,339.9
+step  100  ELBO loss: 4,791,404.6
+step  200  ELBO loss: 949,404.7
+step  300  ELBO loss: 660,183.6
+step  400  ELBO loss: 615,664.7
+step  500  ELBO loss: 583,398.6
+step  600  ELBO loss: 554,756.1
+step  700  ELBO loss: 528,809.5
+step  800  ELBO loss: 506,042.1
+step  900  ELBO loss: 484,906.5
+step 1000  ELBO loss: 465,347.4
+step 1100  ELBO loss: 447,327.5
+step 1200  ELBO loss: 430,734.8
+step 1300  ELBO loss: 415,897.7
+step 1400  ELBO loss: 401,918.9
+step 1500  ELBO loss: 390,410.8
+step 1600  ELBO loss: 379,975.9
+step 1700  ELBO loss: 371,540.2
+step 1800  ELBO loss: 363,758.0
+step 1900  ELBO loss: 357,331.6
+step 2000  ELBO loss: 352,104.7
+step 2100  ELBO loss: 347,974.1
+step 2200  ELBO loss: 344,850.7
+step 2300  ELBO loss: 341,973.0
+step 2400  ELBO loss: 339,753.8
+step 2500  ELBO loss: 338,441.6
+step 2600  ELBO loss: 337,343.4
+step 2700  ELBO loss: 336,231.0
+step 2800  ELBO loss: 335,311.1
+step 2900  ELBO loss: 334,816.1
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:1:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_10/fold_1/train/pyramidal --dimensions 10 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_10/fold_1/holdout/pyramidal
+Rows: 66,280  Players: 1,167  Tossups: 1,220
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_10/fold_1/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_10/fold_1/evaluation
+
+=== model=perceived-difficulty-three-slice dimensions=10 fold=3 survival_chunk_rows=8192 ===
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --split game-holdout:year_2024:train:5:3:42 --degree 3 --dimensions 10 --perception-slices 3 --alpha-prior normal-zero --relevance-concentration 2.0 --drop-concentration 2.0 --steps 3000 --lr 0.005 --seed 42 --device cuda --posterior-draws 0 --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_10/fold_3/train/pyramidal
+Rows: 282,044  Players: 1,455  Tossups: 1,260
+z
+CENSORED    239288
+BUZZ         38834
+NO-BUZZ       3922
+step    0  ELBO loss: 17,025,291.9
+step  100  ELBO loss: 4,796,109.2
+step  200  ELBO loss: 949,985.5
+step  300  ELBO loss: 660,788.2
+step  400  ELBO loss: 616,228.0
+step  500  ELBO loss: 583,985.7
+step  600  ELBO loss: 555,364.9
+step  700  ELBO loss: 529,436.7
+step  800  ELBO loss: 506,552.2
+step  900  ELBO loss: 485,352.5
+step 1000  ELBO loss: 465,362.5
+step 1100  ELBO loss: 446,825.5
+step 1200  ELBO loss: 429,529.3
+step 1300  ELBO loss: 414,015.9
+step 1400  ELBO loss: 399,496.0
+step 1500  ELBO loss: 387,393.0
+step 1600  ELBO loss: 376,826.9
+step 1700  ELBO loss: 368,389.1
+step 1800  ELBO loss: 360,969.0
+step 1900  ELBO loss: 354,808.8
+step 2000  ELBO loss: 350,106.1
+step 2100  ELBO loss: 346,571.8
+step 2200  ELBO loss: 343,827.7
+step 2300  ELBO loss: 341,455.0
+step 2400  ELBO loss: 339,717.1
+step 2500  ELBO loss: 338,702.7
+step 2600  ELBO loss: 337,902.4
+step 2700  ELBO loss: 337,165.3
+step 2800  ELBO loss: 336,439.1
+step 2900  ELBO loss: 336,104.1
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m holdout.frozen_predict tossup --split game-holdout:year_2024:test:5:3:42 --train-pyramidal /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_10/fold_3/train/pyramidal --dimensions 10 --device cuda --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_10/fold_3/holdout/pyramidal
+Rows: 66,360  Players: 1,133  Tossups: 1,240
++ /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -m run_scripts.paper_model_selection.evaluate_fold --pyramidal-results /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_10/fold_3/holdout/pyramidal --output-dir /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/perceived-difficulty-three-slice/dim_10/fold_3/evaluation

@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -131,10 +134,28 @@ def _synergy_panels_and_summary(results_dir):
 def bonus_parameter_distribution_plots(
     results_dir, output_dir, dimension_labels=None
 ):
-    """Plot fitted bonus-part and optional synergy parameter distributions."""
-    part_path = results_dir / "bonus_parts.csv"
+    """Plot saved parameters, resolving the training source for frozen replay.
+
+    Frozen bonus folders contain predictions only. Their sibling training
+    branch owns the fitted parameters and training-roster synergy diagnostics.
+    """
+    results_dir = Path(results_dir)
+    parameter_dir = results_dir
+    part_path = parameter_dir / "bonus_parts.csv"
+    if not part_path.exists():
+        summary_path = results_dir / "summary.json"
+        summary = json.loads(summary_path.read_text()) if summary_path.exists() else {}
+        if summary.get("frozen_predict"):
+            if summary.get("train_compositional"):
+                parameter_dir = Path(summary["train_compositional"])
+            elif results_dir.parent.name == "holdout":
+                parameter_dir = results_dir.parent.parent / "train" / results_dir.name
+            part_path = parameter_dir / "bonus_parts.csv"
+            if not part_path.exists():
+                raise FileNotFoundError(f"Frozen bonus parameter source is unavailable: {part_path}")
     if not part_path.exists():
         return
+    from_training = parameter_dir != results_dir
     parts = pd.read_csv(part_path)
     beta_columns = numeric_columns(parts, "beta_")
     weight_columns = vector_weight_columns(parts)
@@ -151,20 +172,52 @@ def bonus_parameter_distribution_plots(
     if part_panels:
         distribution_dashboard(
             part_panels,
-            "Compositional bonus-part parameter distributions",
+            ("Training-fit bonus-part parameter distributions" if from_training
+             else "Compositional bonus-part parameter distributions"),
             graph_path(
                 output_dir, "bonus_part_parameter_distributions.png", "parameters"
             ),
         )
 
-    synergy_panels, synergy_rows = _synergy_panels_and_summary(results_dir)
+    synergy_panels, synergy_rows = _synergy_panels_and_summary(parameter_dir)
     rows.extend(synergy_rows)
     if synergy_panels:
         distribution_dashboard(
             synergy_panels,
-            "Synergy parameter and contribution distributions",
+            ("Training-fit synergy parameters and training-roster contributions"
+             if from_training else "Synergy parameter and contribution distributions"),
             graph_path(output_dir, "synergy_parameter_distributions.png", "parameters"),
         )
-    pd.DataFrame(rows).to_csv(
+    pd.DataFrame(rows).assign(parameter_source=str(parameter_dir)).to_csv(
         csv_path(output_dir, "bonus_parameter_distribution_summary.csv"), index=False
     )
+
+
+def bonus_prediction_distribution_plots(parts, output_dir):
+    """Plot evaluated row contributions, separately from fitted entity parameters."""
+    panels, rows = [], []
+    specs = [
+        ("predicted_correct", "Predicted part correctness (per part)", "Probability", "bonus_part_row"),
+        ("aggregate", "Aggregate ability (per part)", r"$A_k(T)$", "bonus_part_row"),
+        ("synergy_contribution", "Synergy contribution (per response)", r"$\Phi(T)$", "bonus_response"),
+    ]
+    for column, title, label, entity in specs:
+        if column not in parts:
+            continue
+        frame = parts.drop_duplicates("response_id") if entity == "bonus_response" else parts
+        values = frame[column]
+        panels.append(density_panel_spec(
+            values, title, label, zero_line=column != "predicted_correct",
+            bounds=(0, 1) if column == "predicted_correct" else None,
+        ))
+        summary = distribution_summary(entity, column, values)
+        if summary:
+            rows.append(summary)
+    if panels:
+        distribution_dashboard(
+            panels, "Evaluated bonus prediction distributions",
+            graph_path(output_dir, "bonus_prediction_distributions.png", "bonus"),
+        )
+        pd.DataFrame(rows).to_csv(
+            csv_path(output_dir, "bonus_prediction_distribution_summary.csv"), index=False
+        )

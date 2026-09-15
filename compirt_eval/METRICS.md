@@ -2,15 +2,11 @@
 
 This document is the metric contract for `compirt_eval`. It records which saved
 rows enter each metric, the order of aggregation, the equation, the output
-artifact, and interpretation limits. The standard, topic-weighted, and
-topic-TF-IDF evaluators share these metric definitions; the topic evaluators
-only change how saved difficulty and timing parameters are replayed.
+artifact, and interpretation limits.
 
-This is also the canonical guide for the newer end-to-end diagnostics: Brier
-score and bonus RPS, sharpness and strata, survival-curve metrics,
-first-buzzer identity, match simulation, posterior predictive checks, and
-parameter recovery. They are summarized in dedicated sections below rather
-than in a second metric specification.
+It also covers the end-to-end diagnostics: Brier score and bonus RPS,
+sharpness and strata, survival-curve metrics, first-buzzer identity, and the
+token-threshold game replay.
 
 ## Evaluation regime
 
@@ -44,7 +40,6 @@ more weight. The table states the exact order used:
 | Bonus part accuracy (macro) | Score parts → average within each team or bonus question → average the group means | One vote per team or bonus question | Higher |
 | Exact three-part accuracy | Group parts by `response_id` → mark whether all three labels match → average response marks | One vote per bonus response | Higher |
 | PPB MAE | Sum three part scores within each response → average all responses for each team → take each team's absolute PPB error → average team errors | One vote per team | Lower |
-| Scenario C PPB MAE | Sum parts within each response → average responses within each `(game_id, team_id)` → take absolute game-team error → average errors | One vote per game-team | Lower |
 
 ## How to read the notation
 
@@ -87,8 +82,8 @@ $$
 {\text{total number of eligible rows}}.
 $$
 
-Use 0.5 as the yes/no cutoff, then divide the number of matching labels by
-$N$. Higher is better.
+Negative-class precision and recall use the same decision: an exact tie
+predicts correct. Higher is better.
 
 Binary log loss is
 
@@ -101,7 +96,8 @@ $$
 This sums one penalty per row and divides by $N$. Confident wrong predictions
 receive a large penalty. Lower is better.
 
-AUC is the ordinary ROC AUC and is undefined when the selected rows contain
+AUC is the ordinary ROC AUC, computed from probabilities before the numerical
+clipping used for log loss. It is undefined when the selected rows contain
 only one outcome class.
 
 AUC asks whether a randomly chosen correct row tends to rank above a randomly
@@ -109,8 +105,9 @@ chosen incorrect row. An AUC of 1 is perfect and 0.5 is chance-level. Higher
 is better. Unlike the other shared metrics, AUC compares correct/incorrect
 pairs rather than summing one independent loss per row.
 
-Expected calibration error uses ten equal-width probability bins. Let $C_m$
-be the set of row indices assigned to bin $m$:
+Expected calibration error uses the same ten equal-width probability bins as
+the reliability table: $[0, 0.1], (0.1, 0.2], \ldots, (0.9, 1]$. Let $C_m$ be
+the set of row indices assigned to bin $m$:
 
 $$
 \operatorname{ECE}
@@ -244,7 +241,7 @@ h^{\mathrm{team}}_{et}=1-\prod_{i\in\mathcal P_e}(1-h_{iet}).
 $$
 
 The product is the chance that every present player stays silent; subtracting
-it from 1 gives the chance that at least one teammate buzzes. Survival through
+it from 1 gives the chance that at least one player buzzes. Survival through
 earlier tokens times this team hazard gives first-buzz mass at token $t$.
 
 Aggregation then proceeds separately for each selected tossup $j$:
@@ -259,10 +256,10 @@ Aggregation then proceeds separately for each selected tossup $j$:
 
 This timing reconstruction applies the fitted hazard at every token, including
 the final token, and calls only the probability remaining after that token
-dead. The training likelihood's dead-tossup censoring term instead uses
-survival before the final token. The displayed distribution is therefore an
-end-inclusive diagnostic derived from the fitted hazards, not the exact
-probability term that was optimized for dead tossups.
+dead. Fits recording `terminal_no_buzz_survival = tokens_1_through_T` were
+trained with this same end-inclusive term. Older fits used survival before the
+final token, so for them the displayed no-buzz mass is not the term that was
+optimized.
 
 The selected tossups come from the most frequently observed quartile and are
 spread across mean empirical buzz position. An event is skipped if any rostered
@@ -284,8 +281,7 @@ number of bonus responses.
 ### Part-level classification
 
 Part AUC, log loss, ECE, and accuracy use every $(r,b)$ row directly. The
-part-level accuracy is reported once, as `part_accuracy` (the formerly
-duplicated `accuracy` column was dropped). For these micro metrics, all part
+part-level accuracy is reported as `part_accuracy`. For these micro metrics, all part
 rows are one batch and each part has one vote. Thus a bonus question with ten
 responses has five times the weight of one with two.
 
@@ -391,49 +387,7 @@ metric.
 `graphs/bonus/bonus_team_ppb_predictions.png` scatters predicted against observed
 PPB with one point per team, the same pooling as the metric.
 
-## Scenario C differences
-
-Scenario C uses the shared part metrics and exact three-part accuracy. It adds
-two response-level metrics: group parts by `response_id`, sum their predicted
-points, then average either the absolute expected-score error
-(`per_bonus_points_mae`) or the thresholded exact-score match
-(`exact_score_accuracy`) across responses. Exact-score accuracy requires only
-the correct 0/10/20/30 total; the identities of the predicted parts may differ.
-
-$$
-\operatorname{PerBonusPointsMAE}
-=\frac{1}{R}\sum_{r=1}^{R}|S_r-\widehat S_r|.
-$$
-
-This is retained for Scenario C compatibility; because it compares an expected
-score with one discrete outcome, it also includes outcome randomness.
-
-Scenario C PPB has a different final unit from standard PPB. It averages bonus
-responses within each `(game_id, team_id)`, takes one absolute PPB gap per
-game-team, and averages those gaps. If $\mathcal H$ is the set of eligible
-game-teams and $\mathcal R_h$ contains game-team $h$'s responses, then
-
-$$
-\operatorname{ScenarioPPBMAE}
-=\frac{1}{|\mathcal H|}\sum_{h\in\mathcal H}
-\left|
-\operatorname{mean}_{r\in\mathcal R_h}(S_r)
--\operatorname{mean}_{r\in\mathcal R_h}(\widehat S_r)
-\right|.
-$$
-
-The inner means pool responses within one game-team; the outer sum gives every
-eligible game-team one vote. For a single C1--C4 scenario, game-teams
-containing responses from multiple scenarios are excluded from PPB only; other
-metrics retain their responses. `ppb_excluded_mixed_game_teams` records how
-many were removed.
-
-**Related files:** `csvs/scenario_metrics.csv` stores metrics by model, scope,
-and scenario; `csvs/scenario_counts.csv` records the relevant denominators;
-`csvs/synergy_comparison.csv` stores paired model differences; and
-`graphs/scenario_c_auc.png` visualizes part-level AUC only.
-
-## Player summary and ranking artifacts
+## Player summary
 
 ### Observed-buzz summary
 
@@ -454,73 +408,9 @@ late buzzers can have a high value without being stronger players.
 
 **Related files:** actual buzz rows come from `tossup_predictions.csv`;
 `player_buzz_summary.csv` stores one aggregated row per player beside that
-input file.
-
-### Tournament ranking comparison
-
-The `compirt_eval/player_rankings/` study (run via
-`run_scripts/common/run_player_rankings.py`) ranks players by $\overline p_i$
-and compares that ordering with either
-
-$$
-\operatorname{actualPPG}_i
-=\frac{\operatorname{actual tossup points}_i}{\operatorname{games}_i}
-$$
-
-or
-
-$$
-\operatorname{actualPP20}_i
-=20\frac{\operatorname{actual tossup points}_i}
-{\operatorname{tossups heard}_i}.
-$$
-
-Actual PPG sums a player's tossup points and divides by credited games. PP20
-uses the same point sum but divides by tossups heard and scales to 20. These
-measure scoring volume, unlike $\overline p_i$.
-
-Because the source lacks game-specific lineups, every registered roster member
-is credited with all team games and tossups heard. Sit-outs can therefore
-inflate the denominator. The script correlates the two final rank-number
-columns and computes top-$k$ overlap; it does not batch or average correlations
-by game. Weak agreement is expected because conditional accuracy and scoring
-volume are different quantities.
-
-**Related files:** `player_ranking_comparison.csv`,
-`player_ranking_comparison.md`, and `summary.json` are written under the
-requested ranking output directory. This calculation has no rank graph.
-
-### Noise-floor expected PPG
-
-The noise-floor analysis instead models expected scoring over every tossup a
-player faced. Let $G_i$ be games, $p_{iet}$ be correctness if player $i$ is
-first to buzz in event $e$ at token $t$, and
-$P_{iet}^{\mathrm{first}}$ be the probability of that first-buzz outcome:
-
-$$
-\widehat{\operatorname{PPG}}_i
-=\frac{1}{G_i}\sum_e\sum_t
-P_{iet}^{\mathrm{first}}
-\left(10p_{iet}-5(1-p_{iet})\right).
-$$
-
-For each player, the inner sum combines mutually exclusive token-level
-first-buzz outcomes within an event; the outer sum combines events; division by
-$G_i$ converts total expected points to PPG. Expected score is +10 for correct
-and -5 for incorrect; no-buzz contributes zero and powers are not modeled.
-When teammates can buzz at the same token, team buzz mass is allocated among
-them in proportion to their first-buzz-alone weights. This includes predicted
-buzz frequency and accuracy, so it is neither actual PPG nor the observed-buzz
-ordering above.
-
-`run_scripts/multidimensional/multidim/run_multidim_noise_floor.py` compares the
-resulting rankings across seeds using Kendall $\tau$, Spearman correlation,
-top-$k$ Jaccard similarity, and per-player rank spread. Pass `--collect-only`
-to analyze the completed fits without launching training.
-
-**Related file:** the per-seed values are stored in
-`results/compirt/in_sample/multidim/multidim-tanh-all2024-noisefloor/predicted_ppg_by_seed.csv`;
-the remaining summaries are printed to standard output.
+input file. Model-based player PPG and tournament rankings come from the
+token-threshold replay described under
+[Tossup ownership, game margins, and tournament PPG](#tossup-ownership-game-margins-and-tournament-ppg).
 
 ## Extended probabilistic diagnostics
 
@@ -539,7 +429,6 @@ when their calibration remains credible.
 | Joint tossup event log loss | How much probability reaches the observed dead or player/token/correctness event? | Lower |
 | Integrated Brier score | Is the complete buzz-by-position probability curve accurate? | Lower |
 | First-buzzer top-1/MRR/log loss | Does the model identify the first player to buzz? | Higher / higher / lower |
-| Match-winner accuracy/Brier | Does the simplified simulator identify winners and useful win probabilities? | Higher / lower |
 
 ### Brier score, all-correct baseline, and sharpness
 
@@ -606,7 +495,9 @@ roster survival terms. For a buzz by player $i$ at token $t$ with correctness
 $y$, the probability is
 
 $$
-\left(\prod_{i'} S_{i'}(t)\right)h_i(t)
+\left(\prod_{i'} S_{i'}(t)\right)
+\left[1-\prod_{i'}(1-h_{i'}(t))\right]
+\frac{\exp(\eta_i(t))}{\sum_{i'}\exp(\eta_{i'}(t))}
 p_i(t)^y(1-p_i(t))^{1-y}.
 $$
 
@@ -621,47 +512,60 @@ the predicted probability that someone has buzzed with whether the event has
 actually produced a buzz. Integrating that curve gives
 `integrated_brier_score`. Terminal no-buzz outcomes are part of the curve.
 
-The model does not specify a unique winner when multiple players could buzz at
-the same token. Evaluation allocates that token's event mass among players in
-proportion to their “only this player buzzes” weights, with a normalized-hazard
-fallback for numerical degeneracy. Summing token allocations gives the
-first-buzzer distribution used by top-1 accuracy, mean reciprocal rank, and
-conditional log loss. `first_buzzer_predictions.csv` makes the convention and
-probabilities auditable; it must not be described as uniquely implied by the
-training likelihood. `graphs/tossup/first_buzzer_identity.png` plots top-1 accuracy
-and MRR by roster size against the uniform 1/n chance line, since the
-aggregate top-1 value depends on how many players race for each buzz.
+Conditional on a buzz at a token, winner probabilities are proportional to
+hazard odds, computed with softmax of the logits. Summing across tokens gives
+the first-buzzer distribution used by top-1 accuracy, mean reciprocal rank,
+and conditional log loss. `first_buzzer_predictions.csv` records these
+probabilities. See [the first-buzz likelihood](../docs/first-buzz-likelihood.md)
+for the model definition and run metadata.
 
-### Match-winner simulation
+`graphs/tossup/first_buzzer_identity.png` plots top-1 accuracy and MRR by roster
+size against the uniform 1/n baseline.
 
-The seeded game diagnostic samples a first buzzer/time or dead tossup, samples
-position-specific correctness, awards +10/-5, and samples a bonus total after
-a correct buzz. Bonus distributions fall back from team to tier to the global
-pool when needed. It reports winner accuracy, binary Brier score, expected
-scores, and margin error.
+### Tossup ownership, game margins, and tournament PPG
 
-This is an approximation, not an official score reconstruction: powers,
-bouncebacks, overtime, strategic score effects, and corrections are omitted.
-Fixed seeds must reproduce identical simulations.
-`graphs/match/match_winner_reliability.png` shows whether the win probabilities are
-calibrated; `graphs/match/match_score_predictions.png` scatters simulated against
-actual game-team scores and should be read as a diagnostic of the simulator's
-simplifications, not a score-accuracy claim.
+All downstream scoring uses an end-to-end, tossup-only token replay (outcome
+schema version 3). For each recorded game and its actual question lineups,
+read tokens 1 through T. The first eligible player whose **current-token** buzz
+probability is at least 0.5 buzzes. This is neither a cumulative-hazard threshold
+nor an argmax over integrated first-buzzer/scorer probabilities. Same-token ties
+use uniform random choice over eligible players, with seed 42 and a stable
+event-ID hash. Results are reproducible across roster and event ordering.
 
-### Posterior predictive checks and parameter recovery
+At that token, calibrated correctness of at least 0.5 earns +10 and ends the
+question. An early first miss earns -5, locks out the entire team, and resumes
+reading at the next token for the opponent. A bounceback miss scores zero. The
+terminal cell represents the post-reading window, so a terminal miss also
+scores zero. If nobody reaches the buzz threshold, the tossup is dead. Replay
+decisions use fitted curves at the simulated token, never observed buzz times
+or observed correctness. Ground truth uses literal recorded values, including
+bouncebacks and zero-point late misses.
 
-Posterior predictive checks draw from the fitted AutoNormal guide and compare
-capped, seeded replicated discrepancies with observed dead-tossup rates,
-buzz-position mass, correctness patterns, and bonus-score frequencies. An
-observed value outside the replicated interval is diagnostic evidence of model
-misfit, not a standalone hypothesis-test decision.
+`first_buzzer_team_replay_accuracy` compares the replay's first team to the
+observed first team on questions with an observed buzz. Scorer player/team
+replay accuracies include `no_score` and cover every replayed question. The
+separate first-buzzer probability diagnostics retain their top-1/MRR/log-loss
+meaning; they do not drive scores, game winners, or PPG.
 
-Parameter recovery instead generates a small synthetic problem with known
-truth, fits the normal SVI pipeline, aligns exchangeable dimensions, and
-reports bias, RMSE, approximate 95% interval coverage, and interval width.
-Raw latent-coordinate RMSE without alignment is not interpreted. The default
-run is a smoke test; publication-level identifiability claims require repeated
-seeds and design sweeps.
+Games sum **replayed points** for each team and compare the resulting winner
+and signed tossup margin with recorded tossup totals. Actual ties are omitted
+from decisive-winner accuracy; margin MAE includes ties. The zero-margin MAE
+is the no-information baseline. Winner Brier/log-loss and convolved margin
+PMFs are retired: this deterministic replay does not produce win probabilities.
+
+Player PPG divides replayed or recorded point totals by unique inferred-lineup
+games, including games with no buzz or no points. Full-tournament rankings pool
+single out-of-fold game predictions before computing PPG and ranks once.
+Reports include Spearman, PPG MAE, and top-10 overlap with K=min(10,N), random
+baseline K/N, and adjusted overlap (observed-K/N)/(1-K/N). Tournament metrics
+are macro-averaged after pooling. Round summaries use the same replayed games.
+
+Audit artifacts under `csvs/` include `tossup_outcome_predictions.csv` (with
+full token/buzzer/correctness/points sequences), `tossup_player_predictions.csv`
+(with `predicted_tossup_points`), `tossup_game_predictions.csv`,
+`player_ppg_leaderboard.csv`, `player_ranking_metrics.csv`,
+`tossup_round_metrics.csv`, and `tossup_outcome_metrics.csv`. Schema versions
+invalidate cached expected-points leaderboards when aggregating old runs.
 
 ## Difficulty and parameter figures
 
@@ -681,7 +585,7 @@ position. Each panel draws the
 fitted difficulty curve over a histogram of that tossup's observed first-buzz
 positions — for scalar runs the Eq. 3 curve
 $b_j(t)=\beta_j\,\sigma(\gamma_j(\mu_j - t/T_j))$, for per-dimension runs the
-relevance-weighted sum $\sum_k r_{jk} d_{jk}(t)$. TF-IDF runs plot the
+relevance-weighted sum $\sum_k r_{jk} d_{jk}(t)$. Archived TF-IDF runs plot the
 effective difficulty $d' = d + \delta$ the model trained on, with the base
 curve kept as a dashed reference. Buzz counts and difficulty use separate
 y-axes: read curve shape and transition location against the histogram, and
@@ -700,11 +604,15 @@ figure shows the median with 25th–75th and 5th–95th percentile bands. A
 monotonically falling median with bands that narrow toward the giveaway is
 the fitted-model statement of pyramidal question structure.
 
-The standalone `tfidf.plot_tfidf_difficulty_curves` script writes
-`tfidf_effective_difficulty_curves.png` flat into the graphs directory it is
-given; the run scripts point it at the evaluation `graphs/` folder.
-
 ### Parameter distributions
+
+`graphs/bonus/bonus_prediction_distributions.png` shows evaluated part
+probabilities and aggregate ability $A_k(T)$ once per part row, plus the
+synergy contribution $\Phi(T)$ once per bonus response. Its statistics are in
+`csvs/bonus_prediction_distribution_summary.csv`. These are distributions
+over evaluated observations at saved parameter medians, not uncertainty
+intervals. A negative $\Phi(T)$ lowers the bonus logit relative to aggregation
+alone; this does not establish a causal teamwork effect.
 
 Three dashboards under `graphs/parameters/` (plus a synergy one when that
 branch saved profiles) show each fitted parameter class as a
@@ -732,6 +640,13 @@ Each dashboard also writes its descriptive statistics —
 `csvs/bonus_parameter_distribution_summary.csv`, one row per parameter with
 observations, mean, standard deviation, and the 5/25/50/75/95 percentiles.
 These are the rows `docs/summary.md` renders as its parameter tables.
+
+Frozen bonus replay reads these parameters from the saved `train_compositional`
+source in its summary, falling back to the matching `train/` branch for older runs
+when `holdout/` contains predictions only. The CSV records `parameter_source`;
+the plots label the training source. Pair and team contributions in that
+dashboard describe training rosters. These densities summarize variation
+across fitted posterior medians, not posterior uncertainty for one parameter.
 
 ### Bonus-model comparison
 

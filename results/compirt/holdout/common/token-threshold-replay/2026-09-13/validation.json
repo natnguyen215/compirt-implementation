@@ -1,0 +1,96 @@
+{
+  "models": [
+    {
+      "model": "Single-difficulty Bernstein 5/5/2, legacy",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "DD-Bernstein 3/3/2, no terminal",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "DD-Bernstein 3/3/2, terminal",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "Simplex relevance, no terminal",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "Simplex relevance, terminal",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "Simplex relevance, locations + terminal",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "Simplex relevance 3/3/0.67, locations + terminal",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "Simplex relevance, locations + terminal + player `a_i`",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "Perceived difficulty, unconstrained `alpha`",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "Perceived difficulty, `alpha > 0`",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "Perceived difficulty, three-slice `alpha,beta`",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "Perceived logit, unconstrained `alpha`",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "Perceived logit, `alpha > 0`",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "DD linear spline",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    },
+    {
+      "model": "Monotone DD linear spline",
+      "games": 2331,
+      "trace_and_score_conservation": true,
+      "identical_ground_truth": true
+    }
+  ],
+  "raw_recorded_game_scores_match": true,
+  "folds": 75
+}

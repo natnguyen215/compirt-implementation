@@ -1,0 +1,107 @@
+[
+  {
+    "fold": 0,
+    "events": 277,
+    "outcomes_erased_before_prediction": true,
+    "replay_maximum_errors": {
+      "predicted_dead": 5.960464477539063e-08,
+      "predicted_position": 2.384185791015625e-07,
+      "predicted_neg": 1.2612633737418832e-07,
+      "mark_only_neg": 5.960464477539063e-08,
+      "timing_nll": 4.0206463491898603e-07,
+      "race_nll": 4.0206463491898603e-07,
+      "first_buzzer_nll": 3.771393370932685e-07,
+      "integrated_brier": 8.940696710757479e-08
+    },
+    "maximum_pmf_error": 1.1920928955078125e-07,
+    "pmfs": 277,
+    "quadrature_48_vs_96_maximum_neg_difference": 7.5041639002737526e-06,
+    "quadrature_48_vs_96_mean_neg_difference": 4.710791811528568e-08,
+    "eight_vs_sixteen_mean_absolute_neg_difference": 0.0036705850242842873,
+    "eight_vs_sixteen_mean_absolute_position_difference": 0.007364447043917853
+  },
+  {
+    "fold": 1,
+    "events": 275,
+    "outcomes_erased_before_prediction": true,
+    "replay_maximum_errors": {
+      "predicted_dead": 2.9802322443206464e-08,
+      "predicted_position": 1.7881393432617188e-07,
+      "predicted_neg": 1.646190636028777e-07,
+      "mark_only_neg": 1.1920928955078125e-07,
+      "timing_nll": 1.0460378341292653e-06,
+      "race_nll": 1.0460378341292653e-06,
+      "first_buzzer_nll": 3.374240943321283e-07,
+      "integrated_brier": 2.980232247096204e-08
+    },
+    "maximum_pmf_error": 1.1920928955078125e-07,
+    "pmfs": 275,
+    "quadrature_48_vs_96_maximum_neg_difference": 2.540525925187609e-06,
+    "quadrature_48_vs_96_mean_neg_difference": 3.495541518216133e-08,
+    "eight_vs_sixteen_mean_absolute_neg_difference": 0.003823870779330019,
+    "eight_vs_sixteen_mean_absolute_position_difference": 0.009020186738764986
+  },
+  {
+    "fold": 2,
+    "events": 279,
+    "outcomes_erased_before_prediction": true,
+    "replay_maximum_errors": {
+      "predicted_dead": 2.980232247096204e-08,
+      "predicted_position": 2.384185791015625e-07,
+      "predicted_neg": 1.358882745217116e-07,
+      "mark_only_neg": 5.960464483090178e-08,
+      "timing_nll": 3.063271023506786e-07,
+      "race_nll": 3.6035704731318674e-07,
+      "first_buzzer_nll": 2.926795432678375e-07,
+      "integrated_brier": 5.960464483090178e-08
+    },
+    "maximum_pmf_error": 1.1920928955078125e-07,
+    "pmfs": 279,
+    "quadrature_48_vs_96_maximum_neg_difference": 3.2266380917134185e-07,
+    "quadrature_48_vs_96_mean_neg_difference": 1.587796327983343e-08,
+    "eight_vs_sixteen_mean_absolute_neg_difference": 0.00382761728172511,
+    "eight_vs_sixteen_mean_absolute_position_difference": 0.00863281123059564
+  },
+  {
+    "fold": 3,
+    "events": 273,
+    "outcomes_erased_before_prediction": true,
+    "replay_maximum_errors": {
+      "predicted_dead": 5.960464477539063e-08,
+      "predicted_position": 2.384185791015625e-07,
+      "predicted_neg": 1.2718690189927884e-07,
+      "mark_only_neg": 5.960464483090178e-08,
+      "timing_nll": 1.8764412779148643e-06,
+      "race_nll": 1.9473275152392944e-06,
+      "first_buzzer_nll": 3.8290742621072127e-07,
+      "integrated_brier": 8.940696721859709e-08
+    },
+    "maximum_pmf_error": 1.1920928955078125e-07,
+    "pmfs": 273,
+    "quadrature_48_vs_96_maximum_neg_difference": 9.619807300076388e-06,
+    "quadrature_48_vs_96_mean_neg_difference": 7.697320693944456e-08,
+    "eight_vs_sixteen_mean_absolute_neg_difference": 0.003860836307403809,
+    "eight_vs_sixteen_mean_absolute_position_difference": 0.007168438941112403
+  },
+  {
+    "fold": 4,
+    "events": 270,
+    "outcomes_erased_before_prediction": true,
+    "replay_maximum_errors": {
+      "predicted_dead": 5.960464477539063e-08,
+      "predicted_position": 1.7881393432617188e-07,
+      "predicted_neg": 1.5812697462536107e-07,
+      "mark_only_neg": 5.960464477539063e-08,
+      "timing_nll": 4.0642269771851147e-07,
+      "race_nll": 4.0642269771851147e-07,
+      "first_buzzer_nll": 4.1600902500604775e-07,
+      "integrated_brier": 8.940696710757479e-08
+    },
+    "maximum_pmf_error": 1.1920928955078125e-07,
+    "pmfs": 270,
+    "quadrature_48_vs_96_maximum_neg_difference": 3.940171461602748e-06,
+    "quadrature_48_vs_96_mean_neg_difference": 4.086323220114537e-08,
+    "eight_vs_sixteen_mean_absolute_neg_difference": 0.004701053155187777,
+    "eight_vs_sixteen_mean_absolute_position_difference": 0.008331396787062935
+  }
+]

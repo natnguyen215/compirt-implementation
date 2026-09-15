@@ -1,0 +1,46 @@
+2026-09-14T02:54:29+00:00 Queue: 22 tasks; 0 resumed; GPUs [0, 1], 3 slots/GPU, 4 CPU workers
+2026-09-14T02:54:29+00:00 START dd-prepare on CPU pid=1421107
+2026-09-14T02:54:32+00:00 DONE dd-prepare on CPU
+2026-09-14T02:54:32+00:00 START dd-0-train on GPU 0 pid=1421160
+2026-09-14T02:54:32+00:00 START dd-1-train on GPU 1 pid=1421161
+2026-09-14T02:54:32+00:00 START dd-2-train on GPU 0 pid=1421162
+2026-09-14T02:54:32+00:00 START dd-3-train on GPU 1 pid=1421163
+2026-09-14T02:54:32+00:00 START dd-4-train on GPU 0 pid=1421164
+2026-09-14T04:06:21+00:00 DONE dd-1-train on GPU 1
+2026-09-14T04:06:21+00:00 START dd-1-frozen-replay on GPU 1 pid=1435196
+2026-09-14T04:06:25+00:00 DONE dd-3-train on GPU 1
+2026-09-14T04:06:25+00:00 START dd-3-frozen-replay on GPU 1 pid=1435281
+2026-09-14T04:06:33+00:00 DONE dd-1-frozen-replay on GPU 1
+2026-09-14T04:06:33+00:00 START dd-1-normalized-score on CPU pid=1435367
+2026-09-14T04:06:33+00:00 START dd-1-evaluation on CPU pid=1435368
+2026-09-14T04:06:37+00:00 DONE dd-3-frozen-replay on GPU 1
+2026-09-14T04:06:37+00:00 START dd-3-normalized-score on CPU pid=1435414
+2026-09-14T04:06:37+00:00 START dd-3-evaluation on CPU pid=1435415
+2026-09-14T04:07:23+00:00 DONE dd-1-normalized-score on CPU
+2026-09-14T04:07:27+00:00 DONE dd-3-normalized-score on CPU
+2026-09-14T04:09:35+00:00 DONE dd-1-evaluation on CPU
+2026-09-14T04:09:40+00:00 DONE dd-3-evaluation on CPU
+2026-09-14T04:22:41+00:00 DONE dd-4-train on GPU 0
+2026-09-14T04:22:41+00:00 START dd-4-frozen-replay on GPU 1 pid=1438667
+2026-09-14T04:22:48+00:00 DONE dd-2-train on GPU 0
+2026-09-14T04:22:48+00:00 START dd-2-frozen-replay on GPU 0 pid=1438784
+2026-09-14T04:22:49+00:00 DONE dd-0-train on GPU 0
+2026-09-14T04:22:49+00:00 START dd-0-frozen-replay on GPU 0 pid=1438808
+2026-09-14T04:22:54+00:00 DONE dd-4-frozen-replay on GPU 1
+2026-09-14T04:22:54+00:00 START dd-4-normalized-score on CPU pid=1438961
+2026-09-14T04:22:54+00:00 START dd-4-evaluation on CPU pid=1438962
+2026-09-14T04:23:13+00:00 DONE dd-2-frozen-replay on GPU 0
+2026-09-14T04:23:13+00:00 START dd-2-normalized-score on CPU pid=1439069
+2026-09-14T04:23:13+00:00 START dd-2-evaluation on CPU pid=1439070
+2026-09-14T04:23:14+00:00 DONE dd-0-frozen-replay on GPU 0
+2026-09-14T04:23:43+00:00 DONE dd-4-normalized-score on CPU
+2026-09-14T04:23:43+00:00 START dd-0-normalized-score on CPU pid=1439309
+2026-09-14T04:24:02+00:00 DONE dd-2-normalized-score on CPU
+2026-09-14T04:24:02+00:00 START dd-0-evaluation on CPU pid=1439356
+2026-09-14T04:24:32+00:00 DONE dd-0-normalized-score on CPU
+2026-09-14T04:25:57+00:00 DONE dd-4-evaluation on CPU
+2026-09-14T04:26:14+00:00 DONE dd-2-evaluation on CPU
+2026-09-14T04:27:05+00:00 DONE dd-0-evaluation on CPU
+2026-09-14T04:27:05+00:00 START dd-aggregate on CPU pid=1440258
+2026-09-14T05:24:50+00:00 DONE dd-aggregate on CPU
+2026-09-14T05:24:50+00:00 Queue complete: 22/22 tasks completed

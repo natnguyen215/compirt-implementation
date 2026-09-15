@@ -52,10 +52,10 @@ def buzz_position_bias_table(events, edges, labels):
 def tossup_joint_event_scores(predictions):
     """Return one fitted competing-risks log-score row per tossup event.
 
-    The saved prediction rows contain the three factors used by the model
-    likelihood: every rostered player's survival to the stopping token, the
-    first buzzer's hazard at that token, and the probability of the observed
-    correctness result. A dead tossup contains only the roster survival term.
+    Use roster survival, the normalized exclusive-winner probability at the
+    stopping token, and observed correctness. Dead survival must include the
+    final token. Saved probabilities lose precision at saturation; full-grid
+    reconstruction from parameters is preferred for historical comparisons.
     """
     columns = [
         "event_id",
@@ -125,7 +125,13 @@ def tossup_joint_event_scores(predictions):
                     f"Tossup event {event_id!r} requires exactly one BUZZ row"
                 )
             observed = buzz.iloc[0]
-            hazard = float(np.clip(observed["predicted_hazard"], 0.0, 1.0))
+            hazards = np.clip(event["predicted_hazard"].to_numpy(dtype=float), 0.0, 1.0)
+            any_buzz = 1.0 - np.prod(1.0 - hazards)
+            safe = np.clip(hazards, 1e-15, 1.0 - 1e-15)
+            logits = np.log(safe) - np.log1p(-safe)
+            weights = np.exp(logits - logits.max())
+            winner = np.flatnonzero(event["z"].to_numpy() == "BUZZ")[0]
+            hazard = float(any_buzz * weights[winner] / weights.sum())
             correctness = float(np.clip(observed["predicted_correct"], 0.0, 1.0))
             observed_correct = int(observed["y"])
             correctness_outcome = (

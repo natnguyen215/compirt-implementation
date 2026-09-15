@@ -2,7 +2,7 @@
 
 Issues in the 2024–25 season slice, how this analysis handles each, and what a downstream model should know. Machine-readable counts are in [data/missingness_summary.csv](data/missingness_summary.csv) and [data/validation.json](data/validation.json).
 
-This slice is materially cleaner than the corpus as a whole. The corpus-wide issues are catalogued in [`../full_dataset_eda/DATA_QUALITY.md`](../full_dataset_eda/DATA_QUALITY.md); this file records only what actually applies here.
+This slice is materially cleaner than the corpus as a whole; this file records only what applies here.
 
 ## Integrity checks that pass
 
@@ -24,7 +24,7 @@ All automated checks pass on the current build:
 
 The corpus's one unlabelled question set is 2024 Regionals (336 tossups, 336 bonuses), and it belongs to season **2023–24**, not this one. Every question in the 2024–25 season carries a category.
 
-This is the strongest practical reason to prefer this slice for any category- or topic-conditioned work: the `topic/fixed/` family gets full supervision here with no set carved out.
+This is the strongest practical reason to prefer this slice for any category-conditioned work: every question is supervised, with no set carved out.
 
 Subcategory is missing for 29.3% of questions, spread across events, so it remains unusable as a grouping variable. No analysis here uses it.
 
@@ -40,7 +40,7 @@ The builder links a bonus to the player whose correct tossup buzz earned it, mat
 
 ## 3. Player identity is raw-slug matching only
 
-Identity is exact slug equality — no fuzzy matching, no manual linking. This is the limitation named in the root `CLAUDE.md`.
+Identity is exact slug equality — no fuzzy matching, no manual linking (see [`docs/dataset-schema.md`](../../docs/dataset-schema.md#player-slug-review)).
 
 **It bears directly on the progression analysis.** Sections 4 and 5 of [EDA_REPORT.md](EDA_REPORT.md) track players across the four tiers of the season. A player whose registered slug changed between October and April is counted as two separate IDs and appears as two different one-tier players.
 

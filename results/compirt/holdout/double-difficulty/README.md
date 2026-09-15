@@ -19,12 +19,16 @@ folds.
 | [`ablations/hyperparameter-grid/`](ablations/hyperparameter-grid/) | Degree 3–6, dimensions 1–5, and drop concentration 0.67–2.0. See the [`grid summary`](ablations/hyperparameter-grid/aggregate/summary.md). |
 | [`model-comparisons/double-vs-single-difficulty/`](model-comparisons/double-vs-single-difficulty/) | Separate versus shared correctness and hazard curves. See the [`comparison`](model-comparisons/double-vs-single-difficulty/aggregate/comparison.md). |
 | [`model-comparisons/curve-family/`](model-comparisons/curve-family/) | Bernstein, sigmoid, linear-spline, and monotone-linear-spline models. |
-| [`model-comparisons/compact-parameterization/`](model-comparisons/compact-parameterization/) | Compact scalar projection versus full Bernstein 3/3/2. |
 | [`variants/`](variants/) | Perceived-difficulty, perceived-logit, and player-neg-propensity models. |
 | [`2023-2025-season/`](2023-2025-season/) | Reference model on 2023–25 data. These metrics are not comparable with the 2024 runs. |
+| `ablations/high-degree/` | Degree-10 Bernstein (three dimensions, drop concentration 0.67, simplex, locations, terminal) at 3,000 and 10,000 steps. |
+| `ablations/perception-dimensions-unconstrained/`, `ablations/perception-dimensions-unconstrained-10000-steps/` | Perceived-logit and three-slice perceived-difficulty sweeps over 1–10 dimensions with Normal alpha priors, at 3,000 and 10,000 steps. See `aggregate/summary.md` and `aggregate/comparison.md`. |
+| `dd-332-normalized-v1-20260913-150350/`, `dd-332-normalized-v1-10000-20260913-195429/` | Reference configuration refit under the normalized first-buzz likelihood, at 3,000 and 10,000 steps. |
+| `bonuses-normalized-v1-20260913-150350/` | Compositional and synergy bonus models on the 3,000-step normalized folds. |
+| `compositional/` | Compositional and synergy bonus models on the reference folds. |
 
-The full interpretation is in [`RESEARCH_LOG.md`](../../../../RESEARCH_LOG.md),
-Sections 3.1–3.11.
+The full interpretation is in the "Historical CompIRT evidence" section of
+[`RESEARCH_LOG.md`](../../../../RESEARCH_LOG.md).
 
 ### Run outputs
 
@@ -45,7 +49,9 @@ above the folds. Resume markers depend on this layout.
 
 Values are pooled over the five held-out folds. Lower is better for log loss,
 ECE, and MAE; higher is better for accuracy. The always-correct accuracy
-baseline is 0.7670.
+baseline is 0.7670. Every run in this table was fit before the normalized
+first-buzz likelihood (`docs/first-buzz-likelihood.md`); the
+`dd-332-normalized-*` runs refit the reference under it.
 
 | Experiment | Joint event LL | Correctness LL | ECE | Accuracy | Position MAE |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -77,7 +83,8 @@ pooled aggregate. Their unweighted fold means are reported in the main table in
 
 Additional aggregate reports are in
 [`results/compirt/holdout/aggregate_correctness_metrics.md`](../aggregate_correctness_metrics.md)
-and [`docs/dd-linear-spline-vs-bernstein-3-3-2.md`](../../../../docs/dd-linear-spline-vs-bernstein-3-3-2.md).
+and [`model-comparisons/curve-family/README.md`](model-comparisons/curve-family/README.md)
+(linear spline versus Bernstein 3/3/2).
 
 ## Limitations
 

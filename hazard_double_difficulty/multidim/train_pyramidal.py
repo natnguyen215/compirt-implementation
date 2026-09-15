@@ -41,7 +41,6 @@ from compirt_data import (
     load_hf_tables,
     tossup_tensors,
 )
-from compirt_eval.diagnostics.posterior_predictive import save_pyramidal_ppc
 from holdout.player_priors import attach_player_priors, player_tier_map
 from hazard_double_difficulty.multidim.pyramidal_model import (
     DEFAULT_RELEVANCE_PRIOR,
@@ -51,10 +50,6 @@ from hazard_double_difficulty.multidim.pyramidal_model import (
     expected_first_buzz_positions,
     posterior_row_predictions,
     validate_relevance_prior,
-)
-from compirt_eval.drop_robustness.perturbations import (
-    drop_tossup_events,
-    load_event_drop_list,
 )
 from utils.saving import (
     add_numbered_tensor_columns,
@@ -127,13 +122,6 @@ def run_experiment(args, *, tables=None):
     )
     if observations.empty:
         raise ValueError("No tossup observations matched the requested data selection")
-    # Robustness studies pass a drop list to refit without the listed events.
-    drop_info = None
-    if args.drop_events:
-        observations, drop_info = drop_tossup_events(
-            observations, load_event_drop_list(args.drop_events)
-        )
-        print(f"Dropped events: {drop_info}")
     data = tossup_tensors(observations, args.device)
     print(
         f"Rows: {len(observations):,}  "
@@ -198,16 +186,6 @@ def run_experiment(args, *, tables=None):
     save_tossup_predictions(
         args.output_dir, observations, correct, hazard, survival, buzz_expected=buzz_expected
     )
-    save_pyramidal_ppc(
-        args.output_dir,
-        observations,
-        data,
-        guide,
-        model_kwargs,
-        draws=args.ppc_draws,
-        max_events=args.ppc_max_events,
-        seed=args.seed,
-    )
 
     relevance_parameters = (
         2 * (args.dimensions - 1)
@@ -255,9 +233,6 @@ def run_experiment(args, *, tables=None):
         "include_bounceback": args.include_bounceback,
         "observation_counts": observations["z"].value_counts().to_dict(),
     }
-    if drop_info is not None:
-        summary["drop_events_file"] = str(args.drop_events)
-        summary.update(drop_info)
     write_summary(args.output_dir, summary, posterior)
     return summary
 
@@ -307,8 +282,6 @@ def parse_args(argv=None):
         "risk set (paper Section 3.1 / Appendix A); off by default so runs are "
         "unchanged unless requested",
     )
-    parser.add_argument("--ppc-draws", type=int, default=0)
-    parser.add_argument("--ppc-max-events", type=int, default=500)
     parser.add_argument(
         "--train-posterior",
         type=Path,
@@ -319,12 +292,6 @@ def parse_args(argv=None):
         choices=("tier", "flat"),
         default="tier",
         help="prior for players unseen in training",
-    )
-    parser.add_argument(
-        "--drop-events",
-        type=Path,
-        help="text file of event_ids (one per line) to exclude before fitting; "
-        "used by the data-dropping robustness study",
     )
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     args = parser.parse_args(argv)

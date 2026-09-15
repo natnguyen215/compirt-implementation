@@ -1,0 +1,52 @@
+[
+  {
+    "fold": 0,
+    "family": "regularized",
+    "maximum_probability_error": 1.1102230246251565e-16
+  },
+  {
+    "fold": 0,
+    "family": "frozen_skills",
+    "maximum_probability_error": 1.1102230246251565e-16
+  },
+  {
+    "fold": 1,
+    "family": "regularized",
+    "maximum_probability_error": 1.1102230246251565e-16
+  },
+  {
+    "fold": 1,
+    "family": "frozen_skills",
+    "maximum_probability_error": 1.1102230246251565e-16
+  },
+  {
+    "fold": 2,
+    "family": "regularized",
+    "maximum_probability_error": 1.1102230246251565e-16
+  },
+  {
+    "fold": 2,
+    "family": "frozen_skills",
+    "maximum_probability_error": 1.1102230246251565e-16
+  },
+  {
+    "fold": 3,
+    "family": "regularized",
+    "maximum_probability_error": 1.1102230246251565e-16
+  },
+  {
+    "fold": 3,
+    "family": "frozen_skills",
+    "maximum_probability_error": 1.1102230246251565e-16
+  },
+  {
+    "fold": 4,
+    "family": "regularized",
+    "maximum_probability_error": 1.1102230246251565e-16
+  },
+  {
+    "fold": 4,
+    "family": "frozen_skills",
+    "maximum_probability_error": 1.1102230246251565e-16
+  }
+]

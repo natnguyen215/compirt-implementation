@@ -1,0 +1,51 @@
+{
+  "family": "whole_prefix",
+  "config": {
+    "text": 1.0,
+    "text_column": "prefix_text"
+  },
+  "candidates": [
+    {
+      "config": {
+        "text": 1.0,
+        "text_column": "prefix_text"
+      },
+      "validation_ap": 0.47577098812922436,
+      "validation_log_loss": 0.5021419629655935,
+      "fit": {
+        "iterations": 863,
+        "parameters": 23300
+      }
+    },
+    {
+      "config": {
+        "text": 3.0,
+        "text_column": "prefix_text"
+      },
+      "validation_ap": 0.4749616545459505,
+      "validation_log_loss": 0.5095292746688554,
+      "fit": {
+        "iterations": 894,
+        "parameters": 23300
+      }
+    }
+  ],
+  "thresholds": {
+    "default": 0.5,
+    "accuracy": 0.609625808395478,
+    "precision60": 0.5875879348206332,
+    "f1_accuracy77": 0.43863088578443193,
+    "f1_accuracy78": 0.609625808395478,
+    "f1_accuracy80p6": null
+  },
+  "fit": {
+    "iterations": 783,
+    "parameters": 23494
+  },
+  "seconds": 32.5738046169281,
+  "n_train": 38644,
+  "n_fit": 30881,
+  "n_val": 7763,
+  "n_test": 9270,
+  "inner_split_sha256": "7c25bc6b3d577d8ff604e17a36a25a0287778999b9424ff5313854ac85cdc2f3"
+}

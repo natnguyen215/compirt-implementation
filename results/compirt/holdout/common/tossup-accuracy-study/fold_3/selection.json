@@ -1,0 +1,109 @@
+{
+  "regularized": {
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 3.0,
+      "curve": "spline"
+    },
+    "steps": null,
+    "thresholds": {
+      "default": 0.5,
+      "accuracy": 0.537859526824241,
+      "precision60": 0.6001896415547531,
+      "f1_accuracy77": 0.4174616262283527,
+      "f1_accuracy78": 0.4831561667246087,
+      "f1_accuracy80p6": null
+    },
+    "validation_neg_ap": 0.4731279110075852
+  },
+  "frozen_skills": {
+    "config": {
+      "player": 1.0,
+      "item": 1.0,
+      "local": 3.0,
+      "curve": "spline",
+      "skill": 0.25
+    },
+    "steps": null,
+    "thresholds": {
+      "default": 0.5,
+      "accuracy": 0.5816323077795248,
+      "precision60": 0.577330543102608,
+      "f1_accuracy77": 0.4010011427734534,
+      "f1_accuracy78": 0.5074830007882041,
+      "f1_accuracy80p6": null
+    },
+    "validation_neg_ap": 0.47498163792054265
+  },
+  "frozen_head": {
+    "config": {
+      "family": "frozen_head"
+    },
+    "steps": 800,
+    "thresholds": {
+      "default": 0.5,
+      "accuracy": 0.635723888874054,
+      "precision60": 0.6351377964019775,
+      "f1_accuracy77": 0.4486027657985687,
+      "f1_accuracy78": null,
+      "f1_accuracy80p6": null
+    },
+    "validation_neg_ap": 0.4359338078476531
+  },
+  "joint_head": {
+    "config": {
+      "family": "joint_head"
+    },
+    "steps": 140,
+    "thresholds": {
+      "default": 0.5,
+      "accuracy": 0.6589966416358948,
+      "precision60": 0.7136676907539368,
+      "f1_accuracy77": 0.5284320116043091,
+      "f1_accuracy78": null,
+      "f1_accuracy80p6": null
+    },
+    "validation_neg_ap": 0.4138168420546722
+  },
+  "neural": {
+    "config": {
+      "family": "neural",
+      "dimension": 16,
+      "width": 64,
+      "regularization": 5.0
+    },
+    "steps": 60,
+    "thresholds": {
+      "default": 0.5,
+      "accuracy": 0.6078431606292725,
+      "precision60": 0.6753593683242798,
+      "f1_accuracy77": 0.49769869446754456,
+      "f1_accuracy78": null,
+      "f1_accuracy80p6": null
+    },
+    "validation_neg_ap": 0.43764873853010333
+  },
+  "ensemble": {
+    "config": {
+      "members": [
+        "regularized",
+        "neural"
+      ],
+      "weights": [
+        0.5,
+        0.5
+      ]
+    },
+    "steps": null,
+    "thresholds": {
+      "default": 0.5,
+      "accuracy": 0.5766105401466807,
+      "precision60": 0.5400081581737978,
+      "f1_accuracy77": 0.4132115601711477,
+      "f1_accuracy78": 0.4805088943140839,
+      "f1_accuracy80p6": null
+    },
+    "validation_neg_ap": 0.4721703841860506
+  }
+}

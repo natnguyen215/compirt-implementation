@@ -1,0 +1,4 @@
+Perception dimension ablation: 2 models x 10 dimensions x 5 folds = 100 fits; root=/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained
+Aggregate results: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/aggregate/summary.md
+Perception dimension ablation: 2 models x 10 dimensions x 5 folds = 100 fits; root=/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained
+Aggregate results: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/aggregate/summary.md

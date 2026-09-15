@@ -1,37 +1,54 @@
 # CompIRT research log
 
-_Last reviewed: 2026-08-26._
+_Last reviewed: 2026-09-13._
 
-## 1. Scope and evaluation protocol
+Bonus results, compositional math, and synergy interpretation are in
+[research log II](RESEARCH_LOG_2.md).
 
-This log reports Stage-1 tossup results from frozen matrix-infill holdouts. For
-each five-fold split, the model trains on four whole-game folds. Saved player
-and question posterior medians are replayed on the fifth fold by
-`holdout/frozen_predict.py`; held-out outcomes do not update parameters. A run
-is included only when its holdout `summary.json` records `frozen_predict: true`.
+This log focuses on models that account for buzz timing and correctness, their
+shared player representations, and downstream event predictions. Different
+models lead different tasks.
 
-Unless noted otherwise, the results use `year_2024`, game-split seed 42,
-optimization seed 42, 3,000 training steps, and no bouncebacks. The five held-out
-folds contain 46,640 player-question events in total. Summary values below are
-unweighted means of the five fold-level `evaluation/csvs/tossup_metrics.csv`
-rows, so minor differences from pooled reports are expected.
+This log retains model definitions, priors, numerical comparisons and the
+reasoning behind the experiments. Run directories for each double-difficulty
+experiment are indexed in
+[`results/compirt/holdout/double-difficulty/README.md`](results/compirt/holdout/double-difficulty/README.md).
+The frozen-skills models and results are archived in
+[`archive/docs/frozen-skills-results.md`](archive/docs/frozen-skills-results.md).
 
-The evaluation population has the following reference rates:
+Jump to [model definitions](#model-reference),
+[historical experiments](#historical-compirt-evidence), or
+[next experiments](#limits-and-next-experiments).
 
-- 76.70% of observed buzzes are correct. This is the accuracy of an
-  always-correct classifier.
-- 1.38% of player-question events end with no buzz.
-- 17.56% of all events, or 17.80% of buzzes, occur in the final question decile.
+## Evaluation and comparability
 
-Results from other evaluation protocols, including in-sample fits and Stage-2
-bonus models, are excluded.
+The common population is `year_2024`: five whole-game holdout folds, split seed
+42, **46,640 first-buzz race events**, of which **45,995 contain a buzz** and
+645 contain no buzz. Each race has a roster of player rows. Correctness is
+76.70%, so an always-correct classifier reaches 76.70% accuracy and zero neg F1.
+The incorrect class includes zero-point incorrect attempts, not only −5 negs.
+No-buzz prevalence is 1.38%; the final decile contains 17.56% of all events or
+17.80% of buzzes.
 
-Model equations are documented in
-[`docs/compirt_deep_dive.md`](docs/compirt_deep_dive.md), and reproducible
-commands are in
-[`docs/compirt-experiments.md`](docs/compirt-experiments.md).
+| Evidence | Fitting and evaluation | Aggregation |
+| --- | --- | --- |
+| Historical CompIRT comparisons | Usually seed 42, 3,000 SVI steps, trained without a bounceback likelihood; four training folds and a fifth fold with `frozen_predict: true` | Unweighted fold means unless explicitly labeled pooled |
+| Token-threshold downstream replay | Saved fits, 0.5 current-token buzz/correctness thresholds, seeded random token ties, tossup-only scoring and opponent continuations | Event/game fold means; pooled tournament PPG; separately labeled round-macro summaries |
 
-## 2. Model reference
+These are repeatedly used development folds, not an untouched test set. This is
+matrix infill with known player/question identities, not a future-season or
+unseen-question evaluation. The historical conditional-correctness metrics
+condition on the observed buzzer and position; the downstream replay resolves
+correctness at its simulated buzzer and token. Position MAE predicts `E[t/T | a buzz occurs]`; timing distribution
+scores include no-buzz events. Log losses use natural logarithms; smaller is
+better. AUC/AP measure ranking across thresholds; precision, recall, F1 and
+accuracy depend on the decision threshold.
+
+The [normalized first-buzz likelihood repair](docs/first-buzz-likelihood.md)
+changes subsequent CompIRT fits, not historical parameters. Normalized replay
+of a historical fit does not constitute a repaired refit.
+
+## Model reference
 
 Let `i` index players, `j` tossups, `t` tokens, and `x = t/T_j`:
 
@@ -57,7 +74,7 @@ z^C_{ijt}=\sum_k r^C_{jk}[\theta_{ik}-d^C_{jk}(x)],
 z^H_{ijt}=\sum_k r^H_{jk}[\theta_{ik}-d^H_{jk}(x)]-c_i.
 $$
 
-### 2.1 Variants
+### Variants
 
 | Variant | Definition |
 | --- | --- |
@@ -65,7 +82,6 @@ $$
 | DD sigmoid | Separate sigmoid-shaped `d^C` and `d^H` curves. |
 | Full DD-Bernstein | One monotone curve per dimension and branch: `d(x) = sum_m q_m B_m,p(x)`, with `q_0 >= ... >= q_p`. |
 | Full DD-Bernstein + player propensity | Full DD-Bernstein with a partially pooled player correctness intercept `a_i`; negative values represent greater neg propensity. |
-| Compact DD-Bernstein | `s_ij = a_j w_j^T theta_i`; `z^C = s_ij-b^C_j(x)` and `z^H = s_ij-b^H_j(x)-c_i`. One scalar curve per branch. |
 | DD linear spline | Linear interpolation between clue-aligned landmarks. The monotone variant constrains successive landmarks to decrease. |
 | Perceived difficulty Bernstein | `z^C = sum_k r_jk(theta_ik-d_jk)`; `z^H = sum_k r_jk(theta_ik-alpha_ik d_jk+beta_ik)`. Player-vector transform with `alpha_ik > 0`. |
 | Perceived logit Bernstein | `z^C = sum_k r_jk(theta_ik-d_jk)`; `z^H = alpha_i z^C + beta_i`. Player-scalar transform with `alpha_i > 0`. |
@@ -79,7 +95,7 @@ concentration `k`. Thus `3/3/2` uses concentration 2 and `3/3/0.67` uses
 concentration 0.67. The last value controls how the total curve drop is
 distributed across control-point steps; it is unrelated to the relevance prior.
 
-### 2.2 Terminal intercepts versus learned locations
+### Terminal intercepts versus learned locations
 
 Terminal intercepts modify only the final cell:
 
@@ -104,19 +120,11 @@ $$
 
 Without locations, `mu_C = mu_H = 0`. A location is a vertical difficulty
 baseline, not a horizontal shift in token position. In full Bernstein the same
-branch location centers every latent dimension's item-specific start; compact
-Bernstein has one scalar start per item and branch.
+branch location centers every latent dimension's item-specific start. Full
+Bernstein has a matched location comparison under simplex relevance; the
+[location comparison](#learned-curve-locations-in-simplex-bernstein) reports it.
 
-| Compact arm | Terminal intercepts | Learned locations |
-| --- | ---: | ---: |
-| `terminal only` | Yes | No |
-| `locations + terminal` | Yes | Yes |
-
-Their difference estimates the location effect conditional on terminal
-intercepts. Full Bernstein now has the corresponding matched comparison under
-simplex relevance; Section 3.6 reports it.
-
-### 2.3 Prior reference
+### Prior reference
 
 Normal and LogNormal arguments below are `(location, scale)`; the second Gamma
 argument is a rate. Sites are independent across players, items, dimensions,
@@ -153,11 +161,10 @@ Relevance and skill-direction priors:
 | Full DD, Gamma arms | $r^C_{jk},r^H_{jk}\sim\operatorname{Gamma}(2,2)$ | Positive direction and magnitude. |
 | Full DD, simplex arms | $r^C_j,r^H_j\sim\operatorname{Dirichlet}(\mathbf 1_K)$ | Direction only; each vector sums to one. |
 | Perceived models | $r_j\sim\operatorname{Dirichlet}(2\mathbf 1_K)$ | One shared, less edge-seeking simplex. |
-| Compact DD | $w_j\sim\operatorname{Dirichlet}(\mathbf 1_K)$ | Shared skill direction; $\sum_k w_{jk}=1$. |
 
 The single-curve Bernstein baseline uses one Gamma relevance vector and one
 Bernstein curve under the same priors, rather than separate branch draws.
-In the main results table, plain `DD-Bernstein` rows use Gamma relevance;
+In the historical results table, plain `DD-Bernstein` rows use Gamma relevance;
 `Simplex relevance` rows use `Dirichlet(1)`.
 
 Bernstein-curve priors:
@@ -174,13 +181,7 @@ $$
 `s` is starting difficulty, `D > 0` is total curve drop, and `pi` divides that
 drop across the `p` Bernstein steps. Reported `3/3/2` runs use `p=3` and
 `kappa=2`. Without learned locations, `mu_C=mu_H=0`; perceived models use one
-shared curve with zero location. Compact DD uses scalar `s,D,pi` and also
-
-$$
-a_j\sim\operatorname{LogNormal}(0,0.5)
-$$
-
-for positive item discrimination. When enabled, terminal effects use
+shared curve with zero location. When enabled, terminal effects use
 
 $$
 e_C,e_H\sim N(0,2).
@@ -206,7 +207,7 @@ Other curve families:
 | Monotone DD spline | Start $\sim N(0,1)$ and each successive drop $\sim\operatorname{HalfNormal}(0.5)$. |
 | Optional correctness calibration | Scale $\sim\operatorname{LogNormal}(0,0.5)$ and bias $\sim N(0,3)$; disabled in the reported main-table runs. |
 
-### 2.4 Metric reference
+### Metric reference
 
 | Metric | Read as |
 | --- | --- |
@@ -217,22 +218,19 @@ Other curve families:
 | Joint event LL | No buzz, or first buzzer + position + correctness; lower is better. |
 | Integrated Brier / position MAE | Timing error; lower is better. |
 | First-buzzer top-1 | Fraction of buzz events where the highest-probability player is the observed first buzzer; higher is better. |
+| Replayed first-player/team accuracy | Fraction of recorded-buzz questions where the first player/team produced by token replay matches ground truth; higher is better. Separate from probability-argmax top-1. |
+| Tossup scoring-player/team accuracy | Fraction of replayed questions where the player/team earning +10 matches ground truth, including opponent continuations and `no_score`; higher is better. |
+| Tossup-only game winner | Accuracy of the winner obtained by summing replayed tossup points, compared with recorded tossup totals. Recorded ties are excluded; higher is better. No winner probability is produced. |
+| Average tossup margin error / zero baseline | Average absolute error in the predicted tossup-point difference between the two teams. The zero-margin error is the no-information comparison; lower is better. |
+| Tournament PPG rank correlation / PPG error / top-10 overlap | Agreement between predicted and recorded tossup PPG after pooling every game's one out-of-fold prediction. Random top-10 overlap is `K/N`; adjusted overlap removes that chance level. Higher correlation/overlap and lower PPG error are better. |
 | No-buzz error | Predicted minus observed rate; zero is ideal. |
 | Final-decile mass | Unconditional late-buzz mass; observed value is 17.56%. |
 
-## 3. Current evidence
+## Historical CompIRT evidence
 
-Results differ by objective:
-
-| Objective | Strongest result in the current runs |
-| --- | --- |
-| Joint marked-event likelihood | Compact double-Bernstein with learned curve locations and terminal intercepts: 6.4157 log loss |
-| Correctness probability and calibration | Simplex-relevance double-Bernstein 3/3/0.67 with learned locations and terminal intercepts: 0.4873 log loss, 0.1581 Brier, 0.0110 ECE |
-| Threshold accuracy | Simplex-relevance double-Bernstein 3/3/2 with learned locations, terminal intercepts, and player propensity: 77.95% accuracy |
-| Correctness ranking | Unconstrained DD linear spline: 0.7228 AUC |
-| Buzz timing | Unconstrained DD linear spline: 0.0928 integrated Brier and 0.1359 position MAE |
-| First-buzzer identity | Legacy single-difficulty Bernstein 5/5/2: 40.07% first-buzzer top-1 |
-| No-buzz calibration | Simplex-relevance double-Bernstein with learned locations, terminal intercepts, and player propensity: +0.07 percentage-point error |
+Unless explicitly labeled pooled, these saved fits' tables use unweighted five-fold means. Historical
+“best” claims below refer to the stated arms and scoring conventions, not all
+current predictors.
 
 The main five-fold means are:
 
@@ -254,47 +252,135 @@ The main five-fold means are:
 | [DD linear spline](results/compirt/holdout/double-difficulty/model-comparisons/curve-family/linear-spline/seed_42/) | 73.45% | **46.28%** | −3.25 pp | 6.4596 | 0.5651 | **0.7228** | 0.1185 | **0.1359** | 39.74% | +3.37 pp | 17.76% |
 | [Monotone DD linear spline](results/compirt/holdout/double-difficulty/model-comparisons/curve-family/monotone-linear-spline/) | 63.40% | 43.01% | −13.30 pp | 8.1446 | 0.8367 | 0.6571 | 0.2265 | 0.1510 | 32.47% | +18.22 pp | 16.39% |
 
-Each model name links to the run directory it was measured from. The seven
-degree-3 Bernstein rows all live in
-[`results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/`](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/),
-one folder per configuration, named for its own settings:
+### Token-threshold game and tournament replay
 
-| Row | Directory |
-| --- | --- |
-| `DD-Bernstein 3/3/2, no terminal` | `dd-bernstein-332-unconstrained/` |
-| `DD-Bernstein 3/3/2, terminal` | `dd-bernstein-332-unconstrained-terminal/` |
-| `Simplex relevance, no terminal` | `dd-bernstein-332-simplex/` |
-| `Simplex relevance, terminal` | `dd-bernstein-332-simplex-terminal/` |
-| `Simplex relevance, locations + terminal` | `dd-bernstein-332-simplex-locations-terminal/` |
-| `Simplex relevance 3/3/0.67, locations + terminal` | `dd-bernstein-330p67-simplex-locations-terminal/` |
+**Reevaluated September 13, 2026:** all 15 historical model arms below were
+replayed from their five saved held-out fits, without retraining or model
+selection. The rule is the first **current-token** buzz probability at least
+0.5, followed by correctness at least 0.5 at that simulated token. Same-token
+ties use uniform random choice with seed 42 and a stable event-ID hash. Buzzes
+are not chosen by an argmax over first-buzzer or scoring probabilities.
 
-The naming split is the relevance parameterization, not the curve family: rows
-named `DD-Bernstein` use the unconstrained per-dimension relevance, rows named
-`Simplex relevance` use `Dirichlet(ones(k))`. Both are degree-3 Bernstein.
+Correct answers earn +10 and end the tossup. An early first miss earns −5,
+locks out the team, and allows the opponent to continue from the next token.
+Terminal and bounceback misses earn zero. A question with no threshold crossing
+is dead. Games, rounds and PPG all use these replayed points. Ground truth
+uses literal recorded tossup values, including opponent conversions and late
+misses. Saved correctness calibration and player intercept `a_i` are applied
+when present.
 
-`dd-bernstein-332-unconstrained/` is also the `degree_3/curves_3/dirichlet_2`
-cell of the hyperparameter grid, and `dd-bernstein-332-unconstrained-terminal/`
-is also the Bernstein arm of the curve-family and compact-parameterization
-comparisons — the latter still holds a second copy of that same fit
-(both report `final_loss = 286419.26131153107` on fold 0).
+Every model covers the same **46,620 tossups, 2,331 games and
+29 tournaments**. First-player/team accuracy uses the 45,976
+questions with an observed buzz. Tossup-winner accuracy uses 2,265 decisive
+recorded games; margin error includes recorded ties. The direct event/game
+table uses **unweighted five-fold means**. The zero-predicted-margin baseline
+is **57.16 points MAE** on this coverage. The earlier expected-point/argmax
+tables are [superseded](results/compirt/holdout/common/token-threshold-replay/2026-09-13/superseded-probability-tables.md).
 
-The learned-location simplex models improve on the always-correct baseline by
-1.24–1.25 percentage points. The earlier simplex models improve it by 0.46–0.61
-points. Most other models remain at or below the baseline.
+#### Direct replay and tournament PPG prediction quality
+
+Player PPG divides point totals by distinct inferred-lineup games, including
+games with no buzz or no points. Each tournament is ranked once after pooling
+the five test folds; PPG metrics are macro-averages over the 29 tournaments.
+The parenthesized count after PPG rank correlation is the number of tournaments
+with a defined correlation. Random top-10 overlap is 23.11%; adjusted overlap
+removes that chance expectation.
+
+| Model | Replayed first player | Replayed first team | Tossup game winner | Margin MAE | PPG rank correlation (n) | PPG MAE | Top-10 overlap | Chance-adjusted overlap |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| [Single-difficulty Bernstein 5/5/2, legacy](results/compirt/holdout/common/token-threshold-replay/2026-09-13/single-difficulty-bernstein-5-5-2-legacy/) | 8.30% | 12.34% | 58.50% | 49.37 | 0.6707 (29) | 17.97 | 59.31% | 46.77% |
+| [DD-Bernstein 3/3/2, no terminal](results/compirt/holdout/common/token-threshold-replay/2026-09-13/dd-bernstein-3-3-2-no-terminal/) | 4.55% | 6.61% | 46.09% | 51.82 | 0.6265 (29) | 20.06 | 61.03% | 48.55% |
+| [DD-Bernstein 3/3/2, terminal](results/compirt/holdout/common/token-threshold-replay/2026-09-13/dd-bernstein-3-3-2-terminal/) | **23.89%** | **54.94%** | **69.27%** | **48.33** | **0.8305 (29)** | **6.43** | **75.17%** | **68.36%** |
+| [Simplex relevance, no terminal](results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-no-terminal/) | 0.80% | 1.37% | 19.12% | 55.63 | 0.4948 (26) | 22.05 | 50.00% | 32.99% |
+| [Simplex relevance, terminal](results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-terminal/) | 18.16% | 45.79% | 65.70% | 50.74 | 0.7868 (29) | 7.43 | 71.38% | 62.80% |
+| [Simplex relevance, locations + terminal](results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-locations-terminal/) | 18.37% | 47.53% | 64.73% | 49.62 | 0.7829 (29) | 7.72 | 69.31% | 60.63% |
+| [Simplex relevance 3/3/0.67, locations + terminal](results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-3-3-0-67-locations-terminal/) | 18.34% | 47.44% | 65.52% | 49.45 | 0.7799 (29) | 7.62 | 70.34% | 61.96% |
+| [Simplex relevance, locations + terminal + player `a_i`](results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-locations-terminal-player-a-i/) | 18.93% | 47.93% | 66.05% | 49.37 | 0.7879 (29) | 7.62 | 72.41% | 64.83% |
+| [Perceived difficulty, unconstrained `alpha`](results/compirt/holdout/common/token-threshold-replay/2026-09-13/perceived-difficulty-unconstrained-alpha/) | 0.00% | 0.00% | 0.04% | 57.16 | -0.1621 (1) | 22.65 | 22.76% | -1.97% |
+| [Perceived difficulty, `alpha > 0`](results/compirt/holdout/common/token-threshold-replay/2026-09-13/perceived-difficulty-alpha-0/) | 4.16% | 8.20% | 49.99% | 52.95 | 0.5909 (29) | 19.54 | 52.41% | 38.28% |
+| [Perceived difficulty, three-slice `alpha,beta`](results/compirt/holdout/common/token-threshold-replay/2026-09-13/perceived-difficulty-three-slice-alpha-beta/) | 2.73% | 5.89% | 45.79% | 53.95 | 0.6416 (29) | 20.32 | 55.86% | 43.13% |
+| [Perceived logit, unconstrained `alpha`](results/compirt/holdout/common/token-threshold-replay/2026-09-13/perceived-logit-unconstrained-alpha/) | 0.00% | 0.00% | 0.00% | 57.16 | — (0) | 22.65 | 22.76% | -1.97% |
+| [Perceived logit, `alpha > 0`](results/compirt/holdout/common/token-threshold-replay/2026-09-13/perceived-logit-alpha-0/) | 3.65% | 6.83% | 42.97% | 54.31 | 0.3280 (29) | 20.15 | 36.21% | 15.82% |
+| [DD linear spline](results/compirt/holdout/common/token-threshold-replay/2026-09-13/dd-linear-spline/) | 8.14% | 11.41% | 58.59% | 49.44 | 0.6890 (29) | 18.65 | 65.17% | 54.75% |
+| [Monotone DD linear spline](results/compirt/holdout/common/token-threshold-replay/2026-09-13/monotone-dd-linear-spline/) | 3.25% | 4.73% | 32.71% | 54.22 | 0.3870 (29) | 21.40 | 44.48% | 24.45% |
+
+#### Replay behavior and round summaries
+
+The observed no-buzz rate is **1.38%**.
+A per-token 0.5 threshold can leave a question dead even when many smaller
+hazards accumulate substantial total buzz probability. Predicted game ties
+remain ties, so they count as incorrect against a decisive recorded winner.
+The following rates expose those effects rather than forcing a winner.
+Round-macro metrics average each tournament-round's game accuracy or margin
+error across **365 tournament-rounds**; these weight rounds equally and
+therefore differ from the fold means above.
+
+| Model | Replayed no-buzz rate | Replayed tied games | Round-macro winner accuracy | Round-macro margin MAE |
+| --- | ---: | ---: | ---: | ---: |
+| Single-difficulty Bernstein 5/5/2, legacy | 82.65% | 18.92% | 58.15% | 50.37 |
+| DD-Bernstein 3/3/2, no terminal | 90.71% | 36.51% | 46.50% | 52.49 |
+| DD-Bernstein 3/3/2, terminal | 5.49% | 5.75% | **68.21%** | **49.07** |
+| Simplex relevance, no terminal | 97.85% | 74.13% | 18.81% | 56.36 |
+| Simplex relevance, terminal | 17.84% | 6.95% | 65.69% | 51.83 |
+| Simplex relevance, locations + terminal | 15.41% | 6.56% | 63.24% | 50.98 |
+| Simplex relevance 3/3/0.67, locations + terminal | 15.05% | 6.82% | 64.31% | 51.40 |
+| Simplex relevance, locations + terminal + player `a_i` | 14.57% | 7.76% | 66.17% | 50.00 |
+| Perceived difficulty, unconstrained `alpha` | 100.00% | 99.96% | 0.07% | 57.86 |
+| Perceived difficulty, `alpha > 0` | 86.46% | 23.68% | 49.61% | 54.25 |
+| Perceived difficulty, three-slice `alpha,beta` | 89.87% | 29.34% | 45.69% | 54.57 |
+| Perceived logit, unconstrained `alpha` | 100.00% | 100.00% | 0.00% | 57.88 |
+| Perceived logit, `alpha > 0` | 89.34% | 33.16% | 40.48% | 55.87 |
+| DD linear spline | 84.35% | 19.82% | 58.53% | 50.06 |
+| Monotone DD linear spline | 93.32% | 51.78% | 29.58% | 55.28 |
+
+Team-point MAE is the mean absolute difference between replayed and recorded
+tossup points per team, over 4,662 team-game rows (two per game); the
+round-macro version weights the 365 tournament-rounds equally. Recorded teams
+average **81.75** tossup points per game, and predicting zero for every team
+gives an MAE of **81.83** (a few recorded totals are negative). Margin MAE hides
+this failure, because both teams can be under-predicted by similar amounts.
+Dead tossups also explain the tie rates: Simplex relevance, no terminal has no
+live replayed tossup in 1,699 of 2,331 games, so 0–0 games account for 72.89 of
+its 74.13 percentage points of ties.
+
+| Model | Team-point MAE | Round-macro team-point MAE | Mean replayed team points | Replayed 0–0 games |
+| --- | ---: | ---: | ---: | ---: |
+| Single-difficulty Bernstein 5/5/2, legacy | 64.95 | 64.51 | 17.35 | 10.73% |
+| DD-Bernstein 3/3/2, no terminal | 72.76 | 72.96 | 9.24 | 30.67% |
+| DD-Bernstein 3/3/2, terminal | **26.77** | **26.71** | **76.75** | **0.00%** |
+| Simplex relevance, no terminal | 79.73 | 80.65 | 2.14 | 72.89% |
+| Simplex relevance, terminal | 31.63 | 30.57 | 72.03 | 0.86% |
+| Simplex relevance, locations + terminal | 30.78 | 30.22 | 69.24 | 0.64% |
+| Simplex relevance 3/3/0.67, locations + terminal | 30.23 | 30.14 | 69.70 | 0.73% |
+| Simplex relevance, locations + terminal + player `a_i` | 30.16 | 29.39 | 70.04 | 0.64% |
+| Perceived difficulty, unconstrained `alpha` | 81.83 | 82.70 | 0.00 | 99.96% |
+| Perceived difficulty, `alpha > 0` | 70.24 | 70.67 | 11.82 | 17.85% |
+| Perceived difficulty, three-slice `alpha,beta` | 72.98 | 73.97 | 8.96 | 22.35% |
+| Perceived logit, unconstrained `alpha` | 81.83 | 82.71 | 0.00 | 100.00% |
+| Perceived logit, `alpha > 0` | 71.48 | 71.94 | 10.67 | 27.33% |
+| DD linear spline | 68.07 | 67.80 | 14.04 | 13.90% |
+| Monotone DD linear spline | 76.88 | 77.43 | 5.04 | 50.32% |
+
+Artifacts: [run manifest and command](results/compirt/holdout/common/token-threshold-replay/2026-09-13/README.md),
+[fold rows](results/compirt/holdout/common/token-threshold-replay/2026-09-13/fold_metrics.csv),
+[model metrics](results/compirt/holdout/common/token-threshold-replay/2026-09-13/model_metrics.csv),
+[round/replay diagnostics](results/compirt/holdout/common/token-threshold-replay/2026-09-13/replay_diagnostics.csv), and
+[scored game IDs](results/compirt/holdout/common/token-threshold-replay/2026-09-13/game_coverage.csv).
+
+Model names link directly to their artifacts. Plain DD-Bernstein uses Gamma
+relevance; simplex rows use Dirichlet(1). The no-terminal Gamma 3/3/2 fit also
+appears in the hyperparameter grid; its terminal fit is reused in the curve-family
+comparison, not an independent replication.
 
 No frozen single-difficulty Bernstein 3/3/2 fit is saved in the repository. The
 table uses the available single-difficulty Bernstein 5/5/2 model
-(degree 5, five latent dimensions, drop concentration 2). Its values are the
+(degree 5, five latent dimensions, drop concentration 2). Its historical timing/correctness values are the
 unweighted means of the same five fold-level metric files used for the other
 main-table rows. This is a legacy fit under older training conventions, so its
 comparison with DD-Bernstein 3/3/2 is descriptive rather than a controlled
 single-versus-double-difficulty ablation.
 
-### 3.1 Separate correctness and hazard curves
-
-The double-difficulty models give correctness and buzz hazard separate
-relevance vectors and difficulty curves. The earlier single-curve model instead
-derived hazard from the correctness logit by subtracting player confidence.
+### Separate correctness and hazard curves
 
 The four-arm, five-dimensional comparison in the
 [`matrix-infill` report](results/compirt/holdout/double-difficulty/model-comparisons/double-vs-single-difficulty/aggregate/comparison.md)
@@ -311,11 +397,8 @@ shows the following pooled results:
 | Joint marked-event log loss | 6.801 | 6.528 | 6.729 | **6.514** |
 | Conditional final-decile mass | 9.71% | 11.36% | 14.83% | **16.57%** |
 
-Relative to its saved single-curve parent, double Bernstein improves AUC by 0.078,
-neg average precision by 0.104, correctness log loss by 0.201, and accuracy by
-9.0 percentage points. Double sigmoid improves AUC by 0.043, correctness log
-loss by 0.264, ECE by 0.143, and accuracy by 11.4 points. The source report
-confirms that each of these improvements has the same sign in all five folds.
+The source report confirms the correctness improvements have the same sign
+in all five folds.
 
 Bernstein places more mass in the late-question tail, but separating the curves
 does not improve
@@ -329,14 +412,11 @@ under the current terminal-survival convention, positive-amplitude prior, or
 learning rate. The parent-to-double differences are strong descriptive evidence,
 not an isolated causal estimate.
 
-The saved single-difficulty fold artifacts are under
-[`single-curve-bernstein-baseline`](results/compirt/holdout/double-difficulty/model-comparisons/double-vs-single-difficulty/single-curve-bernstein-baseline/).
-
-### 3.2 Terminal-cell intercepts
+### Terminal-cell intercepts
 
 The final token position also represents the entire post-reading buzz window.
 The descriptive analysis in
-[`docs/terminal-cell.md`](docs/terminal-cell.md) measures an empirical team
+[terminal-cell note](docs/double-difficulty-bernstein.md#terminal-cell-intercepts) measures an empirical team
 first-buzz hazard of about 0.05 mid-question, 0.29 with one token remaining, and
 0.75 in the final cell. A smooth position curve cannot represent that one-cell
 jump directly.
@@ -371,42 +451,10 @@ all-correct baseline, and joint event log loss is 6.4737. This reproduces the
 calibration problem on a second split; it does not test the benefit
 of terminal intercepts, because the matching terminal arm has not been run.
 
-For evaluation validity, the NumPy replay path applies the same learned
-intercepts as the fitted model. The implementation check reported in
-[`docs/terminal-cell.md`](docs/terminal-cell.md) agrees with model predictions to
-`7e-8`. Readers treat missing intercept keys as zero, preserving older fits.
-
-### 3.3 Compact double-Bernstein
-
-The compact model uses a scalar skill projection and one Bernstein curve per
-branch, rather than a separate curve for every latent dimension. At three skill
-dimensions and degree 3, it has 11 effective item parameters, compared with 30
-for full double-Bernstein. The selected compact specification also has four
-global parameters: two curve-location means and two terminal intercepts.
-
-| Model | Item parameters | Joint event LL | Correctness LL | AUC | ECE | Accuracy | Neg F1 | First-buzzer top-1 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Full DD-Bernstein, terminal | 30 | 6.4375 | **0.5059** | **0.7166** | 0.0706 | 76.55% | 41.11% | 37.99% |
-| Compact, terminal only | 11 | 6.4776 | 0.5302 | 0.7091 | 0.0812 | 74.93% | **41.57%** | 39.41% |
-| Compact, locations + terminal | 11 | **6.4157** | 0.5151 | 0.7045 | **0.0550** | **76.64%** | 35.64% | **39.50%** |
-
-The compact locations-plus-terminal model has the lowest joint event log loss
-and uses fewer item parameters. It improves ECE, accuracy, and first-buzzer
-top-1, but has worse correctness log loss, AUC, and position MAE than the full
-model.
-
-Learned curve locations improve the terminal-only compact model by 0.0619 joint
-event log loss, 0.0262 ECE, and 1.71 accuracy points. This attribution is
-conditional on terminal intercepts. The planned 2×2 also includes `compact-base`
-and `compact-locations`, but those two arms have not been run, so the effects of
-the two global parameter pairs cannot yet be separated fully. The specification
-and ablation design are documented in
-[`docs/compact-double-bernstein.md`](docs/compact-double-bernstein.md).
-
-### 3.4 Bernstein and linear-spline curves
+### Bernstein and linear-spline curves
 
 The completed five-fold comparison in
-[`docs/dd-linear-spline-vs-bernstein-3-3-2.md`](docs/dd-linear-spline-vs-bernstein-3-3-2.md)
+[curve-family comparison](results/compirt/holdout/double-difficulty/model-comparisons/curve-family/README.md)
 shows a stable correctness/timing tradeoff:
 
 - Bernstein 3/3/2 is better in all five folds on correctness log loss
@@ -428,11 +476,7 @@ The current monotone linear-spline implementation has 8.1446 joint event log
 loss, 0.8367 correctness log loss, 0.2265 ECE, and 63.40% accuracy. These results
 apply to this implementation, not to monotone splines in general.
 
-### 3.5 Relevance prior
-
-The simplex variant replaces independent `Gamma(2, 2)` relevance coordinates
-with a `Dirichlet(1, ..., 1)` vector for each branch. This fixes relevance
-magnitude at one and retains only its direction.
+### Relevance prior
 
 | Metric | Gamma + terminal | Simplex + terminal |
 | --- | ---: | ---: |
@@ -455,7 +499,7 @@ lower AUC, higher neg precision, lower neg recall, and narrower prediction
 distribution (standard deviation 0.164 vs 0.202) indicate a change in
 calibration and threshold behavior rather than better discrimination.
 
-### 3.6 Learned curve locations in simplex Bernstein
+### Learned curve locations in simplex Bernstein
 
 The full 3/3/2 simplex model now has a clean learned-location comparison with
 terminal intercepts held on. The only structural change is two global
@@ -494,13 +538,8 @@ locations and two terminal intercepts), only two globals more than the earlier
 simplex-terminal arm.
 
 At concentration 2.0, this model has the highest threshold accuracy, but its
-joint LL and position MAE trail the compact and Gamma alternatives. The mean
+joint LL and position MAE trail the Gamma alternatives. The mean
 final-100-step slope is −4.25, so the 3,000-step fits have not plateaued.
-
-Artifacts are under
-[`dd-bernstein-332-simplex-locations-terminal`](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/),
-with fold means in
-[`aggregate/fold_mean_std.csv`](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/aggregate/fold_mean_std.csv).
 
 #### Accuracy-tuned neg thresholds
 
@@ -580,7 +619,7 @@ Artifacts are under
 with pooled metrics in
 [`aggregate/pooled.csv`](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-330p67-simplex-locations-terminal/aggregate/pooled.csv).
 
-### 3.7 Bernstein hyperparameter grid
+### Bernstein hyperparameter grid
 
 The
 [`dd-bernstein-ablation` summary](results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/aggregate/summary.md)
@@ -608,9 +647,9 @@ Dirichlet drop concentration 0.67–2.0.
 The reported winner was selected on the same cross-validation folds used to
 score it. It is a model-selection result, not an unbiased test estimate.
 
-### 3.8 Perceived difficulty Bernstein
+### Perceived difficulty Bernstein
 
-The player transform is inside the hazard equation:
+The vector perception transform acts inside the hazard equation:
 
 $$
 z^C_{ijt}=\sum_k r_{jk}[\theta_{ik}-d_{jk}(x)],
@@ -618,12 +657,7 @@ z^C_{ijt}=\sum_k r_{jk}[\theta_{ik}-d_{jk}(x)],
 z^H_{ijt}=\sum_k r_{jk}[\theta_{ik}-\alpha_{ik}d_{jk}(x)+\beta_{ik}].
 $$
 
-Current priors are
-
-$$
-\alpha_{ik}\sim\operatorname{LogNormal}(0,1)>0,
-\qquad \beta_{ik}\sim N(0,1).
-$$
+This compares unconstrained alpha with the positive-alpha prior documented above.
 
 | Metric | Unconstrained `alpha` | `alpha > 0` | Change |
 | --- | ---: | ---: | ---: |
@@ -725,22 +759,16 @@ Artifacts: [alternating 3k](results/compirt/holdout/double-difficulty/variants/p
 [alternating 10k](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/three-slice-alternating-10000-steps/configuration.json),
 and [standard 10k](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/three-slice-10000-steps/configuration.json).
 
-### 3.9 Perceived logit Bernstein
+### Perceived logit Bernstein
 
-The scalar affine transform is applied to the completed correctness logit:
+The scalar player transform acts on the completed correctness logit:
 
 $$
 z^C_{ijt}=\sum_k r_{jk}[\theta_{ik}-d_{jk}(x)],
-\qquad
-z^H_{ijt}=\alpha_i z^C_{ijt}+\beta_i.
+\qquad z^H_{ijt}=\alpha_i z^C_{ijt}+\beta_i.
 $$
 
-Current priors are
-
-$$
-\alpha_i\sim\operatorname{LogNormal}(0,1)>0,
-\qquad \beta_i\sim N(0,1).
-$$
+This compares unconstrained alpha with the positive-alpha prior documented above.
 
 | Metric | Unconstrained `alpha` | `alpha > 0` | Change |
 | --- | ---: | ---: | ---: |
@@ -763,10 +791,54 @@ scalar coupling underperforms the reference model.
 Artifacts: [unconstrained](results/compirt/holdout/double-difficulty/variants/perceived-logit/unconstrained/configuration.json),
 [positive `alpha`](results/compirt/holdout/double-difficulty/variants/perceived-logit/positive-alpha/configuration.json).
 
-### 3.10 Hierarchical player neg propensity
+#### Unconstrained dimension and optimization-budget ablation
+
+The [dimension/budget comparison](results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained-10000-steps/aggregate/comparison.md)
+links the complete [3,000-step grid](results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/aggregate/summary.md)
+and the 10,000-step [logit](results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained-10000-steps/perceived-logit-grid/aggregate/summary.md)
+and [three-slice difficulty](results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained-10000-steps/three-slice-grid/aggregate/summary.md)
+follow-ups. These sweeps use unconstrained alpha: `Normal(1,1)` for scalar logit and independent
+`Normal(0,1)` for each player/slice/dimension in three-slice difficulty.
+Both use beta `Normal(0,1)`, degree 3, relevance/drop concentration 2, learning
+rate 0.005, and the five `year_2024` game-holdout folds with split/optimizer
+seed 42. The models differ in transform placement, prior and parameter count;
+this is not a controlled comparison of slicing alone.
+
+Select the smallest **tested** K within 1% of each grid's best pooled joint
+event loss. Unlike the earlier fold-mean tables, the predictive scores below
+are recomputed from pooled held-out rows.
+
+| Model | Steps | Tested K | Selected K | Best K | Selected joint LL | Effective parameters | Accuracy | Neg F1 |
+| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Scalar perceived logit | 3,000 | 1–10 | 6 | 10 | 7.69439 | 48,180 | 76.58% | 4.86% |
+| Scalar perceived logit | 10,000 | 6, 8, 10 | 8 | 10 | 6.66725 | 63,690 | 71.73% | 33.36% |
+| Three-slice perceived difficulty | 3,000 | 1–10 | 3 | 5 | 6.89727 | 48,195 | 76.71% | 16.54% |
+| Three-slice perceived difficulty | 10,000 | 3, 5, 6 | 3 | 5 | 6.93492 | 48,195 | 76.78% | 20.91% |
+
+At matched K=8, extending scalar-logit training reduces joint loss from
+7.67617 to 6.66725 and position MAE from 0.32324 to 0.16586. Joint loss improves
+in all five folds at each rerun K. However, correctness loss at K=8 increases
+by 0.01251 and accuracy falls by 4.81 percentage points while neg F1 rises by
+26.68 points. The 10,000-step K=8 selection is only 0.245% above K=10's best
+loss of 6.65095. Mean fitted scalar alpha is 0.8954, with 22.05% of fitted
+player alphas still negative; the final-100-step loss slope averages −0.630.
+
+Longer three-slice training increases pooled joint loss at every rerun K:
+by 0.03765 at K=3, 0.02709 at K=5, and 0.04836 at K=6. Only one of the 15
+matched fold comparisons improves. Extra steps therefore do not explain
+away this arm's held-out loss.
+
+The sparse 10,000-step follow-ups do not establish the minimum adequate K
+among dimensions that were not rerun. Logit's best loss is still at the grid
+boundary. The tolerance is a capacity rule, not a statistical plateau test;
+these same-fold selection scores require a separate test or nested selection
+for an unbiased final estimate, and one optimizer seed does not establish
+seed robustness.
+
+### Hierarchical player neg propensity
 
 The selected full DD-Bernstein 3/3/2 model was augmented with the zero-centered
-player hierarchy from Section 2.3 while retaining simplex relevance, learned
+player hierarchy in the [prior reference](#prior-reference) while retaining simplex relevance, learned
 curve locations, terminal intercepts, and the ordinary unweighted likelihood.
 The new player effect enters correctness only; hazard remains unchanged
 conditionally, although shared skill can move when the joint model is refit.
@@ -805,7 +877,7 @@ and average-precision changes require optimization-seed replication.
 Artifacts: [configuration](results/compirt/holdout/double-difficulty/variants/player-neg-propensity/configuration.json)
 and [aggregate results](results/compirt/holdout/double-difficulty/variants/player-neg-propensity/aggregate/).
 
-### 3.11 Incorrect-response loss balancing and threshold equivalence
+### Incorrect-response loss balancing and threshold equivalence
 
 The selected full DD-Bernstein 3/3/2 model was refit with incorrect correctness
 terms weighted by 1×, 1.5×, 2×, and 3×. Only the correctness loss was
@@ -884,35 +956,51 @@ Artifacts: [1× baseline](results/compirt/holdout/double-difficulty/ablations/re
 [2× incorrect loss](results/compirt/holdout/double-difficulty/ablations/incorrect-loss-weight/weight-2/configuration.json),
 and [3× incorrect loss](results/compirt/holdout/double-difficulty/ablations/incorrect-loss-weight/weight-3/configuration.json).
 
-## 4. Limits on interpretation
+### Tossup ownership, game outcomes, and player leaderboards
 
-- One optimization seed: the five folds are held-out data partitions, not
-  independent training replications. Fold standard deviations describe split
-  variation but omit optimizer-seed variation.
-- Confounded comparisons: the spline comparison
-  changes dimensionality and learning rate; the legacy single-curve baselines
-  were not retrained under current conventions; and the compact 2×2 is incomplete.
-- Cross-validation selection bias: the Bernstein grid winner was chosen and
-  reported on the same folds. It needs nested cross-validation or a separate
-  test set for an unbiased final estimate.
-- Limited dataset coverage: most arms use the `year_2024` split. The
-  `season_2024_25` run reproduces the no-terminal calibration problem only.
-- Small threshold-accuracy margins: the best lift is 1.25 percentage points.
-  Its five-fold consistency is encouraging, but it has not been tested across
-  optimization seeds.
-- Stage 1 only: these results do not support claims about bonuses, PPB, or
-  team synergy.
+The current [token-threshold comparison](#token-threshold-game-and-tournament-replay)
+supersedes the previous integrated-probability and expected-point tables.
+Every game is replayed tossup-only, from the first token through any eligible
+opponent continuation, using 0.5 buzz/correctness thresholds and seeded random
+ties. Player, team, game, round and tournament metrics share those same points.
 
-## 5. Recommended next experiments
+Under this threshold policy, **DD-Bernstein 3/3/2 with terminal intercepts**
+leads the 15 saved arms on the reported direct-scoring, round and PPG metrics:
+**69.27%** tossup-winner accuracy, **48.33 points** margin MAE, **0.8305** tournament PPG rank correlation, and
+**6.43 points/game** PPG MAE. These are comparisons under the requested
+threshold policy, not a new fit or evidence of superiority on other tasks.
 
-1. Run the `season_2024_25` Gamma model with terminal intercepts to test the
-   terminal-cell result on the second split.
-2. Complete the compact 2×2 with `compact-base` and `compact-locations` to
-   separate location and terminal-intercept effects.
-3. Repeat the main models across optimization seeds: compact
-   locations-plus-terminal, Gamma-plus-terminal, both simplex terminal arms,
-   and the unconstrained linear spline.
-4. Repeat the standard and alternating three-slice 10,000-step runs across
-   optimization seeds. The matched seed-42 result favors standard updates.
-5. Retrain the single-curve baselines under the current survival convention,
-   amplitude prior, learning rate, and checkpoint policy.
+## Limits and next experiments
+
+The main unresolved issues are repeated development-fold selection, one
+optimization seed per historical arm, incomplete
+matched ablations, and limited season coverage. Bootstrap intervals conditional
+on saved predictions do not cover training randomness, model search, or
+dependence across games sharing questions. Stage-1 results do not
+establish bonus prediction, PPB, synergy, future-season skill transfer or match
+simulation performance. Model selection should consider the timing distribution,
+first-buzzer identity, conditional correctness and joint event scores together;
+correctness accuracy alone does not establish a better tossup model.
+
+The token-threshold replay covers 2,331 of 2,332 held-out games (the filtered
+season has 2,431); one game whose saved predictions are missing a tossup is
+excluded. Opponent continuations reuse phase-0 fitted hazards because
+these historical models were trained without a separate bounceback likelihood.
+Terminal misses score zero; predicted ties remain ties, with no overtime model.
+High replay no-buzz and tie rates are visible above and materially affect
+winner accuracy. A 0.5 per-token decision policy is a different prediction task
+from evaluating an integrated event distribution, so its numbers cannot inherit
+the previous model ordering or probability-calibration claims.
+
+1. Refit the saved DD reference under the normalized likelihood with multiple
+   seeds and explicit optimization budgets.
+2. Validate DD-Bernstein on an independent season or nested outer test,
+   measuring timing, identity, correctness and joint event scores. Test whether
+   player representations transfer beyond same-item infill.
+3. Complete the second-season terminal comparison; replicate Gamma + terminal,
+   both simplex terminal arms, and the unconstrained spline across seeds.
+4. Preserve the earlier controls: retrain single-curve baselines under matched
+   survival/prior/learning-rate/checkpoint conventions, and replicate standard
+   versus alternating three-slice 10k fits if that family is pursued again.
+
+Reproduction: [CompIRT experiment commands](docs/compirt-experiments.md).

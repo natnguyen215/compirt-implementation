@@ -24,7 +24,6 @@ from compirt_data import (
     load_hf_tables,
 )
 from compositional_model import compositional_model, posterior_predictions
-from compirt_eval.diagnostics.posterior_predictive import save_bonus_ppc
 from utils.saving import (
     add_numbered_tensor_columns,
     save_bonus_predictions,
@@ -34,7 +33,7 @@ from utils.saving import (
     write_summary,
 )
 from utils.posterior import add_posterior_output_args
-from utils.training import fit_svi, require_device
+from utils.training import convergence_summary, fit_svi, require_device
 
 
 ROOT = Path(__file__).parent
@@ -43,7 +42,10 @@ DEFAULT_OUTPUT_DIR = ROOT / "results" / "compirt" / "compositional"
 
 def load_player_skills(path, device):
     """Load player IDs and fixed theta vectors from pyramidal 'players.csv'."""
-    players = pd.read_csv(path)
+    players = pd.read_csv(path, dtype={"player_id": str})
+    if (players.empty or players["player_id"].isna().any()
+            or players["player_id"].duplicated().any()):
+        raise ValueError(f"Expected nonempty, unique player IDs in {path}")
     # Sort by numeric suffix so theta_10 follows theta_9, not theta_1.
     theta_columns = sorted(
         (
@@ -61,6 +63,8 @@ def load_player_skills(path, device):
     theta = torch.tensor(
         players[theta_columns].to_numpy(), dtype=torch.float32, device=device
     )
+    if not torch.isfinite(theta).all():
+        raise ValueError(f"Nonfinite player skills in {path}")
     return players["player_id"].astype(str).tolist(), theta
 
 
@@ -84,6 +88,7 @@ def run_experiment(args):
         bool(roster) and all(player in known_players for player in roster)
         for roster in observations["player_ids"]
     ]
+    dropped_rows_unknown_roster = int(len(observations) - sum(known_roster))
     observations = observations[known_roster].reset_index(drop=True)
     if observations.empty:
         raise ValueError(
@@ -133,26 +138,16 @@ def run_experiment(args):
     save_bonus_predictions(
         args.output_dir, observations, probabilities, aggregates, synergy
     )
-    save_bonus_ppc(
-        args.output_dir,
-        observations,
-        data,
-        theta,
-        guide,
-        model_kwargs,
-        draws=args.ppc_draws,
-        max_responses=args.ppc_max_responses,
-        seed=args.seed,
-    )
 
     save_loss_plot(args.output_dir, losses, "Compositional IRT training loss")
-    if args.use_synergy and args.save_synergy_details:
+    if args.use_synergy:
         save_synergy_outputs(
             args.output_dir,
             player_ids,
             observations,
             posterior,
             tensor_values(synergy),
+            details=args.save_synergy_details,
         )
 
     summary = {
@@ -161,7 +156,9 @@ def run_experiment(args):
         "steps": args.steps,
         "lr": args.lr,
         "seed": args.seed,
-        "final_loss": losses[-1],
+        **convergence_summary(losses),
+        "player_skills": str(args.player_skills.resolve()),
+        "dropped_rows_unknown_roster": dropped_rows_unknown_roster,
         "use_synergy": args.use_synergy,
         "synergy_dimensions": args.synergy_dimensions if args.use_synergy else 0,
         "saved_synergy_details": args.use_synergy and args.save_synergy_details,
@@ -201,8 +198,6 @@ def parse_args():
     parser.add_argument("--synergy-dimensions", type=int, default=1)
     parser.add_argument("--save-synergy-details", action="store_true")
     parser.add_argument("--calibrate-correctness", action="store_true")
-    parser.add_argument("--ppc-draws", type=int, default=0)
-    parser.add_argument("--ppc-max-responses", type=int, default=500)
     parser.add_argument(
         "--alpha-prior",
         choices=("normal", "gamma"),

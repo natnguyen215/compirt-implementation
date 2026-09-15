@@ -15,8 +15,8 @@ index, call those replay functions, and hand the results to the existing
 ``save_*`` writers.  The output directories are byte-schema-identical to a
 trainer's, so ``evaluate_compirt`` consumes them unchanged.
 
-The tossup scorer auto-detects the supported multidimensional, spline, and
-Bernstein schemas. Bonus replay remains the standard compositional family.
+The tossup scorer auto-detects the supported multidimensional and Bernstein
+schemas. Bonus replay remains the standard compositional family.
 
 Usage::
 
@@ -60,12 +60,7 @@ from compositional_model import posterior_predictions
 from multidimensional.multidim_mirt import pyramidal_model as multidim_model
 from train_compositional import load_player_skills
 from multidimensional.multidim_mirt.train_pyramidal import save_multidim_parameters
-from polynomial_compirt import pyramidal_model as polynomial_model
-from polynomial_compirt.train_pyramidal import save_polynomial_parameters
 from hazard_double_difficulty.bernstein import pyramidal_model as full_bernstein_model
-from hazard_double_difficulty.compact_bernstein import (
-    pyramidal_model as compact_bernstein_model,
-)
 from hazard_double_difficulty.perceived_difficulty_bernstein import (
     pyramidal_model as perceived_difficulty_bernstein_model,
 )
@@ -76,9 +71,6 @@ from hazard_double_difficulty.multidim import pyramidal_model as double_sigmoid_
 from hazard_double_difficulty.bernstein.train_pyramidal import (
     save_double_difficulty_parameters as save_full_bernstein_parameters,
 )
-from hazard_double_difficulty.compact_bernstein.train_pyramidal import (
-    save_compact_parameters,
-)
 from hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal import (
     save_perceived_parameters,
 )
@@ -88,17 +80,11 @@ from hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal import (
 from hazard_double_difficulty.multidim.train_pyramidal import (
     save_double_difficulty_parameters as save_double_sigmoid_parameters,
 )
-from dd_linear_spline.clues import attach_spline_knot_positions
-from dd_linear_spline import pyramidal_model as linear_spline_model
-from dd_linear_spline.train_pyramidal import (
-    save_spline_parameters as save_linear_spline_parameters,
-)
 from utils.saving import save_bonus_predictions, save_tossup_predictions
 from utils.training import require_device
 
 
 FULL_BERNSTEIN = "full-double-bernstein"
-COMPACT_BERNSTEIN = "compact-double-bernstein"
 POLYNOMIAL_BERNSTEIN = "single-curve-bernstein"
 PERCEIVED_DIFFICULTY_BERNSTEIN = "perceived-difficulty-bernstein"
 PERCEIVED_DIFFICULTY_SLICED_BERNSTEIN = (
@@ -153,8 +139,6 @@ def detect_tossup_parameter_schema(
     columns = set(tossups.columns)
     if "hazard_spline_y_0_d1" in columns:
         return LINEAR_SPLINE
-    if "start_difficulty" in columns and "hazard_start_difficulty" in columns:
-        return COMPACT_BERNSTEIN
     if "hazard_start_difficulty_d1" in columns:
         return FULL_BERNSTEIN
     if (
@@ -253,43 +237,6 @@ def _load_full_bernstein_parameters(tossups, data, dimensions, device):
     }
 
 
-def _aligned_scalar_bernstein_curve(frame, ids, prefix, degree, device):
-    indexed = frame.set_index(frame["tossup_id"].astype(str)).loc[list(ids)]
-    shares = [f"{prefix}drop_share_{m}" for m in range(1, degree + 1)]
-    return (
-        torch.tensor(
-            indexed[f"{prefix}start_difficulty"].to_numpy(dtype="float32"),
-            device=device,
-        ),
-        torch.tensor(
-            indexed[f"{prefix}total_drop"].to_numpy(dtype="float32"),
-            device=device,
-        ),
-        torch.tensor(indexed[shares].to_numpy(dtype="float32"), device=device),
-    )
-
-
-def _load_compact_bernstein_parameters(tossups, data, dimensions, device):
-    degree = sum(
-        column.startswith("drop_share_")
-        and column.removeprefix("drop_share_").isdigit()
-        for column in tossups.columns
-    )
-    effective_r = _tossup_matrix(tossups, data, "r", dimensions, device)
-    discrimination = effective_r.sum(-1)
-    if torch.any(discrimination <= 0):
-        raise ValueError("Compact Bernstein effective relevance must have positive sum")
-    return {
-        "skill_weights": effective_r / discrimination.unsqueeze(-1),
-        "discrimination": discrimination,
-        **_both_curves(
-            lambda prefix: _aligned_scalar_bernstein_curve(
-                tossups, data["tossup_ids"], prefix, degree, device
-            )
-        ),
-    }
-
-
 def _load_polynomial_parameters(tossups, data, dimensions, device):
     degree = sum(
         column.startswith("drop_share_") and column.endswith("_d1")
@@ -324,48 +271,6 @@ def _load_multidim_parameters(tossups, data, dimensions, device):
         name: _tossup_matrix(tossups, data, name, dimensions, device)
         for name in ("r", "beta", "gamma", "mu")
     }
-
-
-def _load_linear_spline_parameters(tossups, data, dimensions, device):
-    """Align saved variable-length knots and landmarks to frozen test tensors."""
-    indexed = tossups.assign(
-        tossup_id=tossups["tossup_id"].astype(str)
-    ).set_index("tossup_id").loc[list(data["tossup_ids"])]
-    if "clue_count" not in indexed:
-        raise ValueError("Linear-spline parameters are missing clue_count")
-    counts = indexed["clue_count"].to_numpy(dtype=int) + 1
-    max_knots = int(counts.max())
-    x_columns = [f"spline_knot_x_{knot}" for knot in range(max_knots)]
-    missing_x = [column for column in x_columns if column not in indexed]
-    if missing_x:
-        raise ValueError(f"Linear-spline knot columns {missing_x} missing")
-    positions_by_tossup = {
-        tossup_id: indexed.loc[tossup_id, x_columns[: counts[row]]]
-        .to_numpy(dtype=float)
-        .tolist()
-        for row, tossup_id in enumerate(data["tossup_ids"])
-    }
-    attach_spline_knot_positions(data, positions_by_tossup, device)
-
-    posterior = _double_relevance(tossups, data, dimensions, device)
-    for prefix, suffix in (("", "correct"), ("hazard_", "hazard")):
-        values = []
-        for row, tossup_id in enumerate(data["tossup_ids"]):
-            for knot in range(counts[row]):
-                columns = [
-                    f"{prefix}spline_y_{knot}_d{dimension}"
-                    for dimension in range(1, dimensions + 1)
-                ]
-                missing = [column for column in columns if column not in indexed]
-                if missing:
-                    raise ValueError(f"Linear-spline columns {missing} missing")
-                values.append(
-                    indexed.loc[tossup_id, columns].to_numpy(dtype="float32")
-                )
-        posterior[f"spline_y_{suffix}"] = torch.tensor(
-            np.asarray(values), dtype=torch.float32, device=device
-        )
-    return posterior
 
 
 @dataclass(frozen=True)
@@ -406,27 +311,10 @@ TOSSUP_SCHEMAS = {
         save_perceived_parameters,
         sliced_perceived_players=True,
     ),
-    COMPACT_BERNSTEIN: TossupSchema(
-        _load_compact_bernstein_parameters,
-        compact_bernstein_model,
-        save_compact_parameters,
-    ),
-    LINEAR_SPLINE: TossupSchema(
-        _load_linear_spline_parameters,
-        linear_spline_model,
-        save_linear_spline_parameters,
-        calibration_aware=True,
-    ),
     FULL_BERNSTEIN: TossupSchema(
         _load_full_bernstein_parameters,
         full_bernstein_model,
         save_full_bernstein_parameters,
-        calibration_aware=True,
-    ),
-    POLYNOMIAL_BERNSTEIN: TossupSchema(
-        _load_polynomial_parameters,
-        polynomial_model,
-        save_polynomial_parameters,
         calibration_aware=True,
     ),
     DOUBLE_SIGMOID: TossupSchema(
@@ -446,6 +334,24 @@ TOSSUP_SCHEMAS = {
 }
 
 
+# Archived families are still detected so their saved fits fail clearly instead
+# of being misread as the multidim default.
+ARCHIVED_SCHEMAS = {
+    POLYNOMIAL_BERNSTEIN: "archive/polynomial_compirt",
+    LINEAR_SPLINE: "archive/dd_linear_spline",
+}
+
+
+def _tossup_schema(schema):
+    """Resolve a replay family, rejecting schemas whose package was archived."""
+    if schema in ARCHIVED_SCHEMAS:
+        raise ValueError(
+            f"{schema} replay is no longer supported; its model package was "
+            f"moved to {ARCHIVED_SCHEMAS[schema]}"
+        )
+    return TOSSUP_SCHEMAS[schema]
+
+
 def _load_tossup_posterior(players, tossups, data, dimensions, device, schema):
     """Assemble the shared player parameters plus one family's item parameters."""
     posterior = {
@@ -457,7 +363,7 @@ def _load_tossup_posterior(players, tossups, data, dimensions, device, schema):
             device,
         ),
     }
-    family = TOSSUP_SCHEMAS[schema]
+    family = _tossup_schema(schema)
     if family.scalar_perception:
         posterior.update(
             {
@@ -648,7 +554,7 @@ def frozen_predict_tossups(args) -> dict:
     )
 
     schema = detect_tossup_parameter_schema(tossups, players)
-    family = TOSSUP_SCHEMAS[schema]
+    family = _tossup_schema(schema)
     if args.calibrate_correctness and not family.calibration_aware:
         raise ValueError(f"{schema} does not support correctness calibration")
     posterior = _load_tossup_posterior(
@@ -735,6 +641,15 @@ def frozen_predict_bonuses(args) -> dict:
     train_pyr = Path(args.train_pyramidal)
     train_bonus = Path(args.train_compositional)
 
+    summary_path = train_bonus / "summary.json"
+    training_summary = json.loads(summary_path.read_text()) if summary_path.exists() else {}
+    for setting in ("use_synergy", "calibrate_correctness"):
+        if setting in training_summary and bool(training_summary[setting]) != getattr(args, setting):
+            raise ValueError(
+                f"Replay {setting}={getattr(args, setting)} disagrees with the "
+                f"saved bonus fit ({training_summary[setting]}): {summary_path}"
+            )
+
     player_ids, theta = load_player_skills(train_pyr / "players.csv", args.device)
     tables = filter_tournament(
         load_hf_tables(args.data_dir, args.split), args.tournament
@@ -749,7 +664,12 @@ def frozen_predict_bonuses(args) -> dict:
         for roster in observations["player_ids"]
     ]
     unknown_roster = int(len(observations) - sum(known_roster))
-    observations = observations[known_roster].reset_index(drop=True)
+    if unknown_roster and args.on_missing == "error":
+        raise ValueError(f"{unknown_roster} bonus part rows have empty or uncovered rosters")
+    uncovered_responses = set(observations.loc[np.logical_not(known_roster), "response_id"])
+    observations = observations[
+        ~observations["response_id"].isin(uncovered_responses)
+    ].reset_index(drop=True)
 
     bonus_parts = pd.read_csv(train_bonus / "bonus_parts.csv")
     known_parts = set(bonus_parts["bonus_part_id"].astype(str))
@@ -757,6 +677,7 @@ def frozen_predict_bonuses(args) -> dict:
         observations, known_parts, args.on_missing
     )
     drop_info["dropped_rows_unknown_roster"] = unknown_roster
+    drop_info["dropped_responses_unknown_roster"] = len(uncovered_responses)
     if observations.empty:
         raise ValueError("Every test bonus response was dropped for missing training fits")
 
@@ -780,20 +701,27 @@ def frozen_predict_bonuses(args) -> dict:
         ),
     }
     if args.use_synergy:
-        profiles = pd.read_csv(train_bonus / "player_synergy_profiles.csv")
+        profiles = pd.read_csv(train_bonus / "player_synergy_profiles.csv", dtype={"player_id": str})
         synergy_dimensions = sum(
             1
             for column in profiles.columns
             if column.startswith("psi_") and column.removeprefix("psi_").isdigit()
         )
         psi_columns = _numbered_columns(profiles, "psi", synergy_dimensions)
-        # Align to the frozen theta player order; players absent from the saved
-        # synergy profiles fall back to a zero (no-synergy) profile.
+        if not synergy_dimensions or profiles["player_id"].astype(str).duplicated().any():
+            raise ValueError(f"Invalid synergy profiles in {train_bonus}")
+        # Unused players may be absent; every evaluated roster needs fitted psi.
         indexed = profiles.set_index(profiles["player_id"].astype(str))
+        active = {str(player) for roster in observations["player_ids"] for player in roster}
+        missing = active - set(indexed.index)
+        if missing:
+            raise ValueError(f"Missing fitted synergy profiles for {len(missing)} evaluated players")
         present = [pid for pid in player_ids if pid in indexed.index]
         psi = torch.zeros((len(player_ids), synergy_dimensions), device=args.device)
         if present:
             aligned = indexed.loc[present, psi_columns].to_numpy(dtype="float32")
+            if not np.isfinite(aligned).all():
+                raise ValueError(f"Nonfinite synergy profiles in {train_bonus}")
             row_of = {pid: row for row, pid in enumerate(player_ids)}
             psi[[row_of[pid] for pid in present]] = torch.tensor(
                 aligned, dtype=torch.float32, device=args.device
@@ -816,6 +744,8 @@ def frozen_predict_bonuses(args) -> dict:
     )
     summary = {
         "frozen_predict": True,
+        "train_pyramidal": str(train_pyr.resolve()),
+        "train_compositional": str(train_bonus.resolve()),
         "split": args.split,
         "tournament": args.tournament or "",
         "use_synergy": args.use_synergy,

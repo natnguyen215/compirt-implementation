@@ -28,20 +28,21 @@ from compirt_eval.scenario_a_tossups.difficulty import (
 )
 from compirt_eval.scenario_a_tossups.distributions import pyramidal_parameter_distribution_plots
 from compirt_eval.scenario_a_tossups.metrics import tossup_joint_event_scores
+from compirt_eval.scenario_a_tossups.outcomes import evaluate_tossup_outcomes
 from compirt_eval.scenario_a_tossups.position import evaluate_buzz_positions
 from compirt_eval.scenario_a_tossups.reliability import (
     BUZZ_POSITION_EDGES,
     BUZZ_POSITION_LABELS,
     stratified_tossup_reliability_plot,
 )
-from compirt_eval.scenario_a_tossups.timing import (
-    buzz_density_fit_plot,
-    evaluate_survival_and_first_buzzer,
-)
-from topic.utils.categories import top_level_category
+from compirt_eval.scenario_a_tossups.timing import buzz_density_fit_plot
+from compirt_eval.scenario_a_tossups.survival import evaluate_survival_and_first_buzzer
+from compirt_eval.common.categories import top_level_category
 
 
-def evaluate_tossups(results_dir, output_dir):
+def evaluate_tossups(
+    results_dir, output_dir, recorded_buzzes=None, official_games=None
+):
     """Evaluate first-buzz correctness and expected first-buzz position."""
     predictions = pd.read_csv(results_dir / "tossup_predictions.csv")
     event_scores = tossup_joint_event_scores(predictions)
@@ -93,6 +94,13 @@ def evaluate_tossups(results_dir, output_dir):
     multidim_difficulty_components_plot(results_dir, output_dir)
     buzz_density_fit_plot(results_dir, output_dir)
     metrics.update(evaluate_survival_and_first_buzzer(results_dir, output_dir))
+    outcome_metrics, *_ = evaluate_tossup_outcomes(
+        results_dir,
+        output_dir,
+        recorded_buzzes=recorded_buzzes,
+        official_games=official_games,
+    )
+    metrics.update(outcome_metrics)
     pyramidal_parameter_distribution_plots(results_dir, output_dir)
 
     position_path = results_dir / "buzz_event_predictions.csv"

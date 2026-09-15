@@ -1,0 +1,86 @@
+{
+  "saved_compirt": {
+    "retrospective_max_accuracy": 0.7795629959778236,
+    "max_f1_at_accuracy_0.77": {
+      "accuracy": 0.7700837047505164,
+      "f1": 0.38585283698240314,
+      "precision": 0.5109197170101507,
+      "recall": 0.3099748063823831,
+      "threshold": 0.3714703299999999
+    },
+    "max_f1_at_accuracy_0.78": null,
+    "max_f1_at_accuracy_0.806": null
+  },
+  "regularized": {
+    "retrospective_max_accuracy": 0.7901945863680835,
+    "max_f1_at_accuracy_0.77": {
+      "accuracy": 0.7700184802695946,
+      "f1": 0.473312089225254,
+      "precision": 0.5074196647806128,
+      "recall": 0.4435009797517962,
+      "threshold": 0.3825352802384404
+    },
+    "max_f1_at_accuracy_0.78": {
+      "accuracy": 0.7800413088379172,
+      "f1": 0.4488150367747208,
+      "precision": 0.5392772977219167,
+      "recall": 0.38434263319958945,
+      "threshold": 0.4350160448569816
+    },
+    "max_f1_at_accuracy_0.806": null
+  },
+  "frozen_skills": {
+    "retrospective_max_accuracy": 0.7913686270246766,
+    "max_f1_at_accuracy_0.77": {
+      "accuracy": 0.7700837047505164,
+      "f1": 0.47749394732941347,
+      "precision": 0.5074564167191766,
+      "recall": 0.4508724456471027,
+      "threshold": 0.3789556395857292
+    },
+    "max_f1_at_accuracy_0.78": {
+      "accuracy": 0.7800413088379172,
+      "f1": 0.4551672141741612,
+      "precision": 0.5382068262862965,
+      "recall": 0.3943267705514603,
+      "threshold": 0.429281571646189
+    },
+    "max_f1_at_accuracy_0.806": null
+  },
+  "boosting": {
+    "retrospective_max_accuracy": 0.7911729535819111,
+    "max_f1_at_accuracy_0.77": {
+      "accuracy": 0.7700619632568757,
+      "f1": 0.4893781382773272,
+      "precision": 0.5070535267633817,
+      "recall": 0.472893533638145,
+      "threshold": 0.324926543725586
+    },
+    "max_f1_at_accuracy_0.78": {
+      "accuracy": 0.7800413088379172,
+      "f1": 0.4587813620071685,
+      "precision": 0.5376128385155466,
+      "recall": 0.40011197163385276,
+      "threshold": 0.3638890764315267
+    },
+    "max_f1_at_accuracy_0.806": null
+  },
+  "boosting_ensemble": {
+    "retrospective_max_accuracy": 0.7926296336558322,
+    "max_f1_at_accuracy_0.77": {
+      "accuracy": 0.7700184802695945,
+      "f1": 0.49503532556807334,
+      "precision": 0.5067930798553416,
+      "recall": 0.48381076793878885,
+      "threshold": 0.3373712301451054
+    },
+    "max_f1_at_accuracy_0.78": {
+      "accuracy": 0.7800630503315578,
+      "f1": 0.4780724383448561,
+      "precision": 0.5346797461050202,
+      "recall": 0.4323038163665205,
+      "threshold": 0.3709522511736398
+    },
+    "max_f1_at_accuracy_0.806": null
+  }
+}

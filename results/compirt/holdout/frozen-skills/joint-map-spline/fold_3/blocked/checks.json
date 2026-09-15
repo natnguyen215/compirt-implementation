@@ -1,0 +1,9 @@
+{
+  "maximum_pmf_error": 1.1920928955078125e-07,
+  "pmfs": 9220,
+  "initial_saved_prediction_max_error": 2.409185141827308e-06,
+  "replay_max_error": 1.1920928955078125e-07,
+  "train_test_games_disjoint": true,
+  "original_training_games_match": true,
+  "theta_change_norm": 0.31795409321784973
+}

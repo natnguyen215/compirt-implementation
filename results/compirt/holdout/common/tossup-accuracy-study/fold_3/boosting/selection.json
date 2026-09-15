@@ -1,0 +1,62 @@
+{
+  "boosting": {
+    "config": {
+      "depth": 4,
+      "l2_leaf_reg": 20,
+      "learning_rate": 0.05,
+      "iterations": 610,
+      "loss_function": "Logloss",
+      "eval_metric": "AUC",
+      "random_seed": 45,
+      "thread_count": 4,
+      "allow_writing_files": false,
+      "verbose": false,
+      "cat_features": [
+        "player_id",
+        "tossup_id",
+        "category",
+        "player_category",
+        "item_clue"
+      ]
+    },
+    "thresholds": {
+      "default": 0.5,
+      "accuracy": 0.4749160760354825,
+      "precision60": 0.4382530105252535,
+      "f1_accuracy77": 0.3450480675371121,
+      "f1_accuracy78": 0.38770701708805066,
+      "f1_accuracy80p6": null
+    },
+    "validation_neg_ap": 0.4873402299353273
+  },
+  "boosting_ensemble": {
+    "config": {
+      "depth": 4,
+      "l2_leaf_reg": 20,
+      "learning_rate": 0.05,
+      "iterations": 610,
+      "loss_function": "Logloss",
+      "eval_metric": "AUC",
+      "random_seed": 45,
+      "thread_count": 4,
+      "allow_writing_files": false,
+      "verbose": false,
+      "cat_features": [
+        "player_id",
+        "tossup_id",
+        "category",
+        "player_category",
+        "item_clue"
+      ]
+    },
+    "thresholds": {
+      "default": 0.5,
+      "accuracy": 0.5411268418945377,
+      "precision60": 0.48813895704208765,
+      "f1_accuracy77": 0.36459303742619587,
+      "f1_accuracy78": 0.4097783178076737,
+      "f1_accuracy80p6": null
+    },
+    "validation_neg_ap": 0.4904897179416345
+  }
+}

@@ -76,8 +76,8 @@ SEGMENT_COLUMNS = [
 class LineupRecord:
     """One resolved lineup segment plus the evidence used to infer it.
 
-    'LineupIndex.roster_for' returns the player list, while a second lookup
-    exposes the inference provenance used by Scenario C.
+    'LineupIndex.roster_for' returns the player list, while 'record_for'
+    also exposes the inference provenance.
     """
 
     game_id: str

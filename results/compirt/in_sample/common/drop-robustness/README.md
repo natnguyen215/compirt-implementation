@@ -4,12 +4,13 @@ This directory holds one completed Tier-1 run of the data-dropping robustness
 study: for each drop fraction and replicate, a random set of buzz events is
 deleted, each Stage-1 ranking method is refit at the fixed model seed, and the
 refit ranking is scored against the same method's full-data ranking. The
-mathematical contract (functionals, agreement metrics, AMIP relation) is
-`compirt_eval/drop_robustness/README.md`; commands and general interpretation are in
-`docs/compirt-experiments.md`. This README records what *this* run found.
+study is retired: its code (evaluation package, runners, and tests) is kept in
+[`code/`](code/), and the mathematical contract (functionals, agreement
+metrics, AMIP relation) is `code/drop_robustness/README.md`. This README
+records what *this* run found.
 
-Tier 2 (targeted worst-case drops, `run_scripts/common/run_targeted_drop.py`) has not
-been run yet; see "Status" at the end.
+Tier 2 (targeted worst-case drops, `code/run_targeted_drop.py`) was never run;
+see "Status" at the end.
 
 ## Setup
 
@@ -116,13 +117,9 @@ data effect on actual PPG at 5% is ≈ 0.95 PPG mean absolute change.
 
 ## Status and next steps
 
-- Tier 2 has not been run. The recommended invocation reuses this directory's
-  full and noise-floor fits:
-
-  ```bash
-  .venv/bin/python run_scripts/common/run_targeted_drop.py \
-      --reuse-full results/compirt/in_sample/common/drop-robustness
-  ```
+- Tier 2 has not been run. It would reuse this directory's full and noise-floor
+  fits via `code/run_targeted_drop.py --reuse-full` on this directory, after
+  restoring the code (and the trainers' `--drop-events` option) to the live tree.
 
   Given the floors above, a Tier-2 result will only be meaningful for pairs
   whose gap change clearly exceeds `noise_gap_std`, and the baseline's

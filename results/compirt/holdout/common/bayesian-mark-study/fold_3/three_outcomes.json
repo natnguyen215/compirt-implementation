@@ -1,0 +1,50 @@
+{
+  "family": "three_outcomes",
+  "config": {
+    "multinomial": true,
+    "player_curve": 1.0
+  },
+  "candidates": [
+    {
+      "config": {
+        "multinomial": true
+      },
+      "validation_ap": 0.4696577882121038,
+      "validation_log_loss": 0.5114215707659985,
+      "fit": {
+        "iterations": 1689,
+        "parameters": 34401
+      }
+    },
+    {
+      "config": {
+        "multinomial": true,
+        "player_curve": 1.0
+      },
+      "validation_ap": 0.469791782860683,
+      "validation_log_loss": 0.5123797817819291,
+      "fit": {
+        "iterations": 1425,
+        "parameters": 42675
+      }
+    }
+  ],
+  "thresholds": {
+    "default": 0.5,
+    "accuracy": 0.64529902350699,
+    "precision60": 0.6409460577865858,
+    "f1_accuracy77": 0.430808165203577,
+    "f1_accuracy78": 0.5255207742167193,
+    "f1_accuracy80p6": null
+  },
+  "fit": {
+    "iterations": 1563,
+    "parameters": 42918
+  },
+  "seconds": 27.77327060699463,
+  "n_train": 38834,
+  "n_fit": 31073,
+  "n_val": 7761,
+  "n_test": 9080,
+  "inner_split_sha256": "f4d789d9e4dcdc1f28dad22d135c03dbf10753fab1f84b3370d6bd262906666d"
+}

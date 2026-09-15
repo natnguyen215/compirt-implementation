@@ -1,0 +1,59 @@
+{
+  "family": "recent_prefix",
+  "config": {
+    "text": 1.0
+  },
+  "candidates": [
+    {
+      "config": {
+        "text": 0.3
+      },
+      "validation_ap": 0.49154990291780565,
+      "validation_log_loss": 0.4963405691580014,
+      "fit": {
+        "iterations": 820,
+        "parameters": 23470
+      }
+    },
+    {
+      "config": {
+        "text": 1.0
+      },
+      "validation_ap": 0.49226268266818385,
+      "validation_log_loss": 0.49909908040728845,
+      "fit": {
+        "iterations": 824,
+        "parameters": 23470
+      }
+    },
+    {
+      "config": {
+        "text": 3.0
+      },
+      "validation_ap": 0.47897206918743884,
+      "validation_log_loss": 0.5276075285096695,
+      "fit": {
+        "iterations": 879,
+        "parameters": 23470
+      }
+    }
+  ],
+  "thresholds": {
+    "default": 0.5,
+    "accuracy": 0.5760476498240967,
+    "precision60": 0.5540895911299231,
+    "f1_accuracy77": 0.42852820561950156,
+    "f1_accuracy78": 0.5043155092159093,
+    "f1_accuracy80p6": null
+  },
+  "fit": {
+    "iterations": 1098,
+    "parameters": 23496
+  },
+  "seconds": 22.50828981399536,
+  "n_train": 38657,
+  "n_fit": 30888,
+  "n_val": 7769,
+  "n_test": 9257,
+  "inner_split_sha256": "69ecfa844a36f578e47b5bd845b1f652fef5fad851d61ff56092d3033b1afffa"
+}

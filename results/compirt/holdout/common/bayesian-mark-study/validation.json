@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "family_fold_artifacts": 15,
+  "fits": 25,
+  "unique_scored_events": 45995,
+  "largest_variational_objective_gradient": 1.872356717088368e-06,
+  "source_files_changed_since_original_fits": [
+    "compirt_data.py",
+    "analysis/paper_readiness/neg_target_experiments.py",
+    "analysis/tossup_accuracy_study/run.py"
+  ],
+  "note": "Validates saved artifacts, not source equivalence or fresh refits. Retired experiments were removed after the original fits."
+}

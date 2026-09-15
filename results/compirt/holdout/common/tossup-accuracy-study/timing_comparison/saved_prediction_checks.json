@@ -1,0 +1,27 @@
+[
+  {
+    "fold": 0,
+    "events": 9295,
+    "maximum_difference": 4.683367727076337e-06
+  },
+  {
+    "fold": 1,
+    "events": 9093,
+    "maximum_difference": 2.833890638931358e-06
+  },
+  {
+    "fold": 2,
+    "events": 9257,
+    "maximum_difference": 2.6063064602066532e-06
+  },
+  {
+    "fold": 3,
+    "events": 9080,
+    "maximum_difference": 2.7660523043149254e-06
+  },
+  {
+    "fold": 4,
+    "events": 9270,
+    "maximum_difference": 2.2913608959118648e-06
+  }
+]

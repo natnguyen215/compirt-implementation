@@ -69,7 +69,7 @@ def synergy_contribution(psi, roster, roster_mask):
 
     'psi' has shape (n_players, synergy_dimensions)
 
-    When rosters are mostly fixed, can behave like a learned team intercept. Its
+    When rosters are mostly fixed, this can behave like a learned team intercept. Its
     sign should not be read as teamwork quality without held-out
     recombined-roster validation.
     """
@@ -183,8 +183,6 @@ def compositional_model(
     with pyro.plate("bonus_observations", len(data["y"])):
         pyro.sample("obs", dist.Bernoulli(logits=logits), obs=data["y"])
 
-
-# Posterior prediction
 
 def posterior_predictions(
     data, theta, posterior, use_synergy=False, calibrate_correctness=False

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Configurable CUDA CompIRT experiment runner.
 
-'run_compirt.sh' is a thin wrapper around this script. Environment variables:
+Environment variables:
 
 * 'TOURNAMENT=""' includes every tournament in the selected split.
 * 'ROOT' chooses the output root.

@@ -1,0 +1,7 @@
+{
+  "player": 1.0,
+  "item": 1.0,
+  "local": 3.0,
+  "curve": "spline",
+  "skill": 0.25
+}

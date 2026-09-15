@@ -2,7 +2,7 @@
 
 This folder analyses the **2024–25 ACF season** — the one complete competitive season in the local dataset. It runs Fall (2024-10-19) → Winter (2024-11-16) → Regionals (2025-02-01) → Nationals (2025-04-19) across 33 mirror sites.
 
-Because this is a single season, calendar year is perfectly collinear with tier (Fall and Winter are 2024, Regionals and Nationals are 2025), so **year is dropped as an axis entirely**. Tier is the chronological axis here, and it happens to be the difficulty axis too. That is the structural difference from [`../full_dataset_eda/`](../full_dataset_eda/), which analyses both calendar years and treats year as a comparison axis.
+Because this is a single season, calendar year is perfectly collinear with tier (Fall and Winter are 2024, Regionals and Nationals are 2025), so **year is dropped as an axis entirely**. Tier is the chronological axis here, and it happens to be the difficulty axis too.
 
 ## Season at a glance
 

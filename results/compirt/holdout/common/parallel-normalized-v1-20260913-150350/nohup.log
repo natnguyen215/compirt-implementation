@@ -1,0 +1,192 @@
+2026-09-13T22:03:52+00:00 Queue: 95 tasks; 0 resumed; GPUs [0, 1], 2 slots/GPU, 2 CPU workers
+2026-09-13T22:03:52+00:00 START dd-prepare on CPU pid=1393949
+2026-09-13T22:03:55+00:00 DONE dd-prepare on CPU
+2026-09-13T22:03:55+00:00 START dd-0-train on GPU 0 pid=1393972
+2026-09-13T22:03:55+00:00 START multidim-0-train-pyramidal on GPU 1 pid=1393973
+2026-09-13T22:03:55+00:00 START dd-1-train on GPU 0 pid=1393974
+2026-09-13T22:03:55+00:00 START multidim-1-train-pyramidal on GPU 1 pid=1393975
+2026-09-13T22:18:39+00:00 DONE multidim-0-train-pyramidal on GPU 1
+2026-09-13T22:18:39+00:00 START dd-2-train on GPU 1 pid=1396960
+2026-09-13T22:18:40+00:00 DONE multidim-1-train-pyramidal on GPU 1
+2026-09-13T22:18:40+00:00 START multidim-2-train-pyramidal on GPU 1 pid=1396964
+2026-09-13T22:26:11+00:00 DONE dd-0-train on GPU 0
+2026-09-13T22:26:11+00:00 DONE dd-1-train on GPU 0
+2026-09-13T22:26:11+00:00 START dd-3-train on GPU 0 pid=1398468
+2026-09-13T22:26:11+00:00 START multidim-3-train-pyramidal on GPU 0 pid=1398469
+2026-09-13T22:33:42+00:00 DONE multidim-2-train-pyramidal on GPU 1
+2026-09-13T22:33:42+00:00 START dd-4-train on GPU 1 pid=1398868
+2026-09-13T22:40:18+00:00 DONE dd-2-train on GPU 1
+2026-09-13T22:40:18+00:00 START multidim-4-train-pyramidal on GPU 1 pid=1399233
+2026-09-13T22:41:16+00:00 DONE multidim-3-train-pyramidal on GPU 0
+2026-09-13T22:41:16+00:00 START multidim-0-train-compositional on GPU 0 pid=1399811
+2026-09-13T22:41:56+00:00 DONE multidim-0-train-compositional on GPU 0
+2026-09-13T22:41:56+00:00 START multidim-0-train-synergy on GPU 0 pid=1399978
+2026-09-13T22:42:56+00:00 DONE multidim-0-train-synergy on GPU 0
+2026-09-13T22:42:56+00:00 START multidim-1-train-compositional on GPU 0 pid=1400334
+2026-09-13T22:43:37+00:00 DONE multidim-1-train-compositional on GPU 0
+2026-09-13T22:43:37+00:00 START multidim-1-train-synergy on GPU 0 pid=1400532
+2026-09-13T22:44:38+00:00 DONE multidim-1-train-synergy on GPU 0
+2026-09-13T22:44:38+00:00 START multidim-2-train-compositional on GPU 0 pid=1400625
+2026-09-13T22:45:19+00:00 DONE multidim-2-train-compositional on GPU 0
+2026-09-13T22:45:19+00:00 START multidim-2-train-synergy on GPU 0 pid=1400701
+2026-09-13T22:46:20+00:00 DONE multidim-2-train-synergy on GPU 0
+2026-09-13T22:46:20+00:00 START multidim-3-train-compositional on GPU 0 pid=1400858
+2026-09-13T22:47:01+00:00 DONE multidim-3-train-compositional on GPU 0
+2026-09-13T22:47:01+00:00 START multidim-3-train-synergy on GPU 0 pid=1400932
+2026-09-13T22:47:45+00:00 DONE dd-3-train on GPU 0
+2026-09-13T22:47:45+00:00 START dd-0-frozen-replay on GPU 0 pid=1401036
+2026-09-13T22:47:54+00:00 DONE multidim-3-train-synergy on GPU 0
+2026-09-13T22:47:54+00:00 START multidim-0-frozen-pyramidal on GPU 0 pid=1401122
+2026-09-13T22:47:56+00:00 DONE dd-0-frozen-replay on GPU 0
+2026-09-13T22:47:56+00:00 START dd-0-evaluation on CPU pid=1401150
+2026-09-13T22:47:56+00:00 START multidim-0-frozen-compositional on GPU 0 pid=1401151
+2026-09-13T22:48:01+00:00 DONE multidim-0-frozen-compositional on GPU 0
+2026-09-13T22:48:01+00:00 START multidim-0-frozen-synergy on GPU 0 pid=1401276
+2026-09-13T22:48:06+00:00 DONE multidim-0-frozen-pyramidal on GPU 0
+2026-09-13T22:48:06+00:00 DONE multidim-0-frozen-synergy on GPU 0
+2026-09-13T22:48:06+00:00 START multidim-0-holdout-evaluation on CPU pid=1401371
+2026-09-13T22:48:06+00:00 START dd-1-frozen-replay on GPU 0 pid=1401372
+2026-09-13T22:48:06+00:00 START multidim-1-frozen-pyramidal on GPU 0 pid=1401373
+2026-09-13T22:48:31+00:00 DONE multidim-1-frozen-pyramidal on GPU 0
+2026-09-13T22:48:31+00:00 START multidim-1-frozen-compositional on GPU 0 pid=1401516
+2026-09-13T22:48:32+00:00 DONE dd-1-frozen-replay on GPU 0
+2026-09-13T22:48:32+00:00 START multidim-1-frozen-synergy on GPU 0 pid=1401518
+2026-09-13T22:48:38+00:00 DONE multidim-1-frozen-compositional on GPU 0
+2026-09-13T22:48:38+00:00 DONE multidim-1-frozen-synergy on GPU 0
+2026-09-13T22:48:38+00:00 START dd-2-frozen-replay on GPU 0 pid=1401631
+2026-09-13T22:48:38+00:00 START multidim-2-frozen-pyramidal on GPU 0 pid=1401632
+2026-09-13T22:49:03+00:00 DONE multidim-2-frozen-pyramidal on GPU 0
+2026-09-13T22:49:03+00:00 START multidim-2-frozen-compositional on GPU 0 pid=1401741
+2026-09-13T22:49:04+00:00 DONE dd-2-frozen-replay on GPU 0
+2026-09-13T22:49:04+00:00 START multidim-2-frozen-synergy on GPU 0 pid=1401743
+2026-09-13T22:49:10+00:00 DONE multidim-2-frozen-compositional on GPU 0
+2026-09-13T22:49:10+00:00 DONE multidim-2-frozen-synergy on GPU 0
+2026-09-13T22:49:10+00:00 START dd-3-frozen-replay on GPU 0 pid=1401902
+2026-09-13T22:49:10+00:00 START multidim-3-frozen-pyramidal on GPU 0 pid=1401903
+2026-09-13T22:49:35+00:00 DONE multidim-3-frozen-pyramidal on GPU 0
+2026-09-13T22:49:35+00:00 START multidim-3-frozen-compositional on GPU 0 pid=1402022
+2026-09-13T22:49:36+00:00 DONE dd-3-frozen-replay on GPU 0
+2026-09-13T22:49:36+00:00 START multidim-3-frozen-synergy on GPU 0 pid=1402024
+2026-09-13T22:49:42+00:00 DONE multidim-3-frozen-compositional on GPU 0
+2026-09-13T22:49:42+00:00 DONE multidim-3-frozen-synergy on GPU 0
+2026-09-13T22:50:59+00:00 DONE dd-0-evaluation on CPU
+2026-09-13T22:50:59+00:00 START multidim-0-holdout-synergy-evaluation on CPU pid=1402361
+2026-09-13T22:54:57+00:00 DONE multidim-0-holdout-evaluation on CPU
+2026-09-13T22:54:57+00:00 START dd-1-evaluation on CPU pid=1402824
+2026-09-13T22:55:14+00:00 DONE multidim-4-train-pyramidal on GPU 1
+2026-09-13T22:55:14+00:00 START multidim-4-train-compositional on GPU 0 pid=1402959
+2026-09-13T22:55:14+00:00 START multidim-4-train-synergy on GPU 0 pid=1402960
+2026-09-13T22:55:14+00:00 START multidim-4-frozen-pyramidal on GPU 1 pid=1402961
+2026-09-13T22:55:16+00:00 DONE dd-4-train on GPU 1
+2026-09-13T22:55:16+00:00 START dd-4-frozen-replay on GPU 1 pid=1402997
+2026-09-13T22:55:39+00:00 DONE multidim-4-frozen-pyramidal on GPU 1
+2026-09-13T22:55:40+00:00 DONE dd-4-frozen-replay on GPU 1
+2026-09-13T22:56:03+00:00 DONE multidim-4-train-compositional on GPU 0
+2026-09-13T22:56:03+00:00 START multidim-4-frozen-compositional on GPU 1 pid=1403524
+2026-09-13T22:56:09+00:00 DONE multidim-4-train-synergy on GPU 0
+2026-09-13T22:56:09+00:00 START multidim-4-frozen-synergy on GPU 0 pid=1403648
+2026-09-13T22:56:10+00:00 DONE multidim-4-frozen-compositional on GPU 1
+2026-09-13T22:56:17+00:00 DONE multidim-4-frozen-synergy on GPU 0
+2026-09-13T22:57:56+00:00 DONE dd-1-evaluation on CPU
+2026-09-13T22:57:56+00:00 START multidim-1-holdout-evaluation on CPU pid=1404048
+2026-09-13T22:57:57+00:00 DONE multidim-0-holdout-synergy-evaluation on CPU
+2026-09-13T22:57:57+00:00 START multidim-0-compare-bonus-models on CPU pid=1404071
+2026-09-13T22:57:59+00:00 DONE multidim-0-compare-bonus-models on CPU
+2026-09-13T22:57:59+00:00 START multidim-1-holdout-synergy-evaluation on CPU pid=1404130
+2026-09-13T23:04:45+00:00 DONE multidim-1-holdout-evaluation on CPU
+2026-09-13T23:04:45+00:00 DONE multidim-1-holdout-synergy-evaluation on CPU
+2026-09-13T23:04:45+00:00 START multidim-1-compare-bonus-models on CPU pid=1405248
+2026-09-13T23:04:45+00:00 START dd-2-evaluation on CPU pid=1405249
+2026-09-13T23:04:47+00:00 DONE multidim-1-compare-bonus-models on CPU
+2026-09-13T23:04:47+00:00 START multidim-2-holdout-evaluation on CPU pid=1405310
+2026-09-13T23:07:47+00:00 DONE dd-2-evaluation on CPU
+2026-09-13T23:07:47+00:00 START multidim-2-holdout-synergy-evaluation on CPU pid=1406005
+2026-09-13T23:11:41+00:00 DONE multidim-2-holdout-evaluation on CPU
+2026-09-13T23:11:41+00:00 START dd-3-evaluation on CPU pid=1406660
+2026-09-13T23:14:41+00:00 DONE multidim-2-holdout-synergy-evaluation on CPU
+2026-09-13T23:14:41+00:00 START multidim-2-compare-bonus-models on CPU pid=1406991
+2026-09-13T23:14:43+00:00 DONE dd-3-evaluation on CPU
+2026-09-13T23:14:43+00:00 DONE multidim-2-compare-bonus-models on CPU
+2026-09-13T23:14:43+00:00 START multidim-3-holdout-evaluation on CPU pid=1407035
+2026-09-13T23:14:43+00:00 START multidim-3-holdout-synergy-evaluation on CPU pid=1407036
+2026-09-13T23:21:31+00:00 DONE multidim-3-holdout-evaluation on CPU
+2026-09-13T23:21:31+00:00 START dd-4-evaluation on CPU pid=1407581
+2026-09-13T23:21:37+00:00 DONE multidim-3-holdout-synergy-evaluation on CPU
+2026-09-13T23:21:37+00:00 START multidim-3-compare-bonus-models on CPU pid=1407654
+2026-09-13T23:21:39+00:00 DONE multidim-3-compare-bonus-models on CPU
+2026-09-13T23:21:39+00:00 START multidim-4-holdout-evaluation on CPU pid=1407729
+2026-09-13T23:24:34+00:00 DONE dd-4-evaluation on CPU
+2026-09-13T23:24:34+00:00 START multidim-4-holdout-synergy-evaluation on CPU pid=1407969
+2026-09-13T23:28:33+00:00 DONE multidim-4-holdout-evaluation on CPU
+2026-09-13T23:28:33+00:00 START bonus-prepare on CPU pid=1408463
+2026-09-13T23:28:35+00:00 DONE bonus-prepare on CPU
+2026-09-13T23:28:35+00:00 START bonus-0-compositional-train on GPU 0 pid=1408465
+2026-09-13T23:28:35+00:00 START bonus-0-synergy-train on GPU 1 pid=1408466
+2026-09-13T23:28:35+00:00 START bonus-1-compositional-train on GPU 0 pid=1408467
+2026-09-13T23:28:35+00:00 START bonus-1-synergy-train on GPU 1 pid=1408468
+2026-09-13T23:28:35+00:00 START dd-aggregate on CPU pid=1408469
+2026-09-13T23:29:17+00:00 DONE bonus-0-compositional-train on GPU 0
+2026-09-13T23:29:17+00:00 START bonus-2-compositional-train on GPU 0 pid=1408623
+2026-09-13T23:29:18+00:00 DONE bonus-1-compositional-train on GPU 0
+2026-09-13T23:29:18+00:00 START bonus-2-synergy-train on GPU 0 pid=1408625
+2026-09-13T23:29:35+00:00 DONE bonus-0-synergy-train on GPU 1
+2026-09-13T23:29:35+00:00 DONE bonus-1-synergy-train on GPU 1
+2026-09-13T23:29:35+00:00 START bonus-3-compositional-train on GPU 1 pid=1408700
+2026-09-13T23:29:35+00:00 START bonus-3-synergy-train on GPU 1 pid=1408701
+2026-09-13T23:30:04+00:00 DONE bonus-2-compositional-train on GPU 0
+2026-09-13T23:30:04+00:00 START bonus-4-compositional-train on GPU 0 pid=1408783
+2026-09-13T23:30:08+00:00 DONE bonus-2-synergy-train on GPU 0
+2026-09-13T23:30:08+00:00 START bonus-4-synergy-train on GPU 0 pid=1408819
+2026-09-13T23:30:20+00:00 DONE bonus-3-compositional-train on GPU 1
+2026-09-13T23:30:20+00:00 START bonus-0-compositional-replay on GPU 1 pid=1408856
+2026-09-13T23:30:27+00:00 DONE bonus-3-synergy-train on GPU 1
+2026-09-13T23:30:27+00:00 DONE bonus-0-compositional-replay on GPU 1
+2026-09-13T23:30:27+00:00 START bonus-0-synergy-replay on GPU 1 pid=1408891
+2026-09-13T23:30:27+00:00 START bonus-1-compositional-replay on GPU 1 pid=1408892
+2026-09-13T23:30:36+00:00 DONE bonus-0-synergy-replay on GPU 1
+2026-09-13T23:30:36+00:00 DONE bonus-1-compositional-replay on GPU 1
+2026-09-13T23:30:36+00:00 START bonus-1-synergy-replay on GPU 1 pid=1409035
+2026-09-13T23:30:36+00:00 START bonus-2-compositional-replay on GPU 1 pid=1409036
+2026-09-13T23:30:45+00:00 DONE bonus-1-synergy-replay on GPU 1
+2026-09-13T23:30:45+00:00 DONE bonus-2-compositional-replay on GPU 1
+2026-09-13T23:30:45+00:00 START bonus-2-synergy-replay on GPU 1 pid=1409115
+2026-09-13T23:30:45+00:00 START bonus-3-compositional-replay on GPU 1 pid=1409116
+2026-09-13T23:30:46+00:00 DONE bonus-4-compositional-train on GPU 0
+2026-09-13T23:30:46+00:00 START bonus-3-synergy-replay on GPU 0 pid=1409119
+2026-09-13T23:30:54+00:00 DONE bonus-2-synergy-replay on GPU 1
+2026-09-13T23:30:54+00:00 DONE bonus-3-compositional-replay on GPU 1
+2026-09-13T23:30:54+00:00 DONE bonus-3-synergy-replay on GPU 0
+2026-09-13T23:30:54+00:00 START bonus-4-compositional-replay on GPU 1 pid=1409217
+2026-09-13T23:30:57+00:00 DONE bonus-4-synergy-train on GPU 0
+2026-09-13T23:30:57+00:00 START bonus-4-synergy-replay on GPU 0 pid=1409224
+2026-09-13T23:31:04+00:00 DONE bonus-4-compositional-replay on GPU 1
+2026-09-13T23:31:06+00:00 DONE bonus-4-synergy-replay on GPU 0
+2026-09-13T23:31:30+00:00 DONE multidim-4-holdout-synergy-evaluation on CPU
+2026-09-13T23:31:30+00:00 START multidim-4-compare-bonus-models on CPU pid=1409304
+2026-09-13T23:31:32+00:00 DONE multidim-4-compare-bonus-models on CPU
+2026-09-13T23:31:32+00:00 START bonus-0-compositional-evaluate on CPU pid=1409306
+2026-09-13T23:31:41+00:00 DONE bonus-0-compositional-evaluate on CPU
+2026-09-13T23:31:41+00:00 START bonus-0-synergy-evaluate on CPU pid=1409323
+2026-09-13T23:31:51+00:00 DONE bonus-0-synergy-evaluate on CPU
+2026-09-13T23:31:51+00:00 START bonus-1-compositional-evaluate on CPU pid=1409325
+2026-09-13T23:32:00+00:00 DONE bonus-1-compositional-evaluate on CPU
+2026-09-13T23:32:00+00:00 START bonus-1-synergy-evaluate on CPU pid=1409329
+2026-09-13T23:32:09+00:00 DONE bonus-1-synergy-evaluate on CPU
+2026-09-13T23:32:09+00:00 START bonus-2-compositional-evaluate on CPU pid=1409333
+2026-09-13T23:32:18+00:00 DONE bonus-2-compositional-evaluate on CPU
+2026-09-13T23:32:18+00:00 START bonus-2-synergy-evaluate on CPU pid=1409340
+2026-09-13T23:32:27+00:00 DONE bonus-2-synergy-evaluate on CPU
+2026-09-13T23:32:27+00:00 START bonus-3-compositional-evaluate on CPU pid=1409342
+2026-09-13T23:32:36+00:00 DONE bonus-3-compositional-evaluate on CPU
+2026-09-13T23:32:36+00:00 START bonus-3-synergy-evaluate on CPU pid=1409363
+2026-09-13T23:32:45+00:00 DONE bonus-3-synergy-evaluate on CPU
+2026-09-13T23:32:45+00:00 START bonus-4-compositional-evaluate on CPU pid=1409379
+2026-09-13T23:32:54+00:00 DONE bonus-4-compositional-evaluate on CPU
+2026-09-13T23:32:54+00:00 START bonus-4-synergy-evaluate on CPU pid=1409382
+2026-09-13T23:33:03+00:00 DONE bonus-4-synergy-evaluate on CPU
+2026-09-13T23:33:03+00:00 START bonus-aggregate on CPU pid=1409384
+2026-09-13T23:33:45+00:00 DONE bonus-aggregate on CPU
+2026-09-13T23:33:45+00:00 START multidim-aggregate on CPU pid=1409398
+2026-09-14T00:23:15+00:00 DONE multidim-aggregate on CPU
+2026-09-14T00:25:51+00:00 DONE dd-aggregate on CPU
+2026-09-14T00:25:51+00:00 Queue complete: 95/95 tasks completed

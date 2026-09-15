@@ -18,60 +18,10 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-# The root suite runs under pytest, not `unittest discover`: `tests/` holds both
-# TestCase classes and bare `test_*` functions, and unittest discovery silently
-# skips the latter. The family suites below are TestCase-only and stay on
-# unittest so each keeps its own discovery root and PYTHONPATH.
+# Pytest collects both TestCase classes and bare test functions in tests/.
+# Family suites use unittest with their own discovery roots and PYTHONPATH.
 TEST_SUITES = [
     ("root tests", ["-m", "pytest", "-q", "tests"], None),
-    (
-        "TF-IDF tests",
-        ["-m", "unittest", "discover", "-s", "tfidf/tests", "-t", ".", "-v"],
-        None,
-    ),
-    (
-        "fixed-topic tests",
-        ["-m", "unittest", "discover", "-s", "topic/fixed/tests", "-v"],
-        ".:topic/fixed",
-    ),
-    (
-        "learned-topic tests",
-        ["-m", "unittest", "discover", "-s", "topic/learned/tests", "-v"],
-        ".:topic/fixed:topic/learned",
-    ),
-    (
-        "topic TF-IDF tests",
-        ["-m", "unittest", "topic.tfidf.tests.test_topic_tfidf", "-v"],
-        ".:topic/fixed:topic/learned",
-    ),
-    (
-        "embedding tests",
-        [
-            "-m",
-            "unittest",
-            "discover",
-            "-s",
-            "multidimensional/embedding_mirt/tests",
-            "-t",
-            ".",
-            "-v",
-        ],
-        None,
-    ),
-    (
-        "polynomial CompIRT tests",
-        [
-            "-m",
-            "unittest",
-            "discover",
-            "-s",
-            "polynomial_compirt/tests",
-            "-t",
-            ".",
-            "-v",
-        ],
-        None,
-    ),
     (
         "double-difficulty tests",
         [
@@ -86,6 +36,9 @@ TEST_SUITES = [
         ],
         None,
     ),
+    # The correctness studies keep their tests beside the code they check, and
+    # mix TestCase classes with bare test functions, so they need pytest.
+    ("correctness study tests", ["-m", "pytest", "-q", "analysis/correctness"], None),
 ]
 
 
@@ -114,11 +67,13 @@ def _repository_files(pattern: str) -> list[str]:
         text=True,
     )
     # A dirty tree may contain tracked deletions; tools should see only files
-    # that are present in the working tree being checked.
+    # that are present in the working tree being checked. Code kept beside
+    # results and in archive/ is a record, not maintained source.
     return [
         path
         for path in result.stdout.splitlines()
         if (REPO_ROOT / path).is_file()
+        and not path.startswith(("results/", "archive/"))
     ]
 
 

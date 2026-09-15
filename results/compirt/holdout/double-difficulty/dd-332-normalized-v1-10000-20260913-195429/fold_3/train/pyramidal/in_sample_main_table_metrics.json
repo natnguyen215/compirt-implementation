@@ -1,0 +1,51 @@
+{
+  "source_signature": {
+    "players.csv": [
+      97327,
+      1789358725461373437
+    ],
+    "tossups.csv": [
+      601558,
+      1789358725504708290
+    ],
+    "tossup_predictions.csv": [
+      104699257,
+      1789358784286767607
+    ],
+    "buzz_event_predictions.csv": [
+      4259926,
+      1789358784480107708
+    ],
+    "summary.json": [
+      1806,
+      1789358784488850758
+    ],
+    "tossup_outcome_schema_version": 3
+  },
+  "metrics": {
+    "accuracy": 0.8008703713240974,
+    "neg_f1": 0.3377579857840199,
+    "accuracy_lift_over_all_correct": 0.03424833908430758,
+    "joint_tossup_event_log_loss": 6.2269364432722805,
+    "log_loss": 0.4292053397845044,
+    "auc": 0.821642502608634,
+    "ece": 0.05398569215156822,
+    "buzz_position_mae": 0.13614078321889578,
+    "first_buzzer_top1_accuracy": 0.40389864551681515,
+    "no_buzz_calibration_error": 0.007517588407833742,
+    "full_pmf_final_decile_mass": 0.17584005758324545,
+    "first_buzzer_player_replay_accuracy": 0.23658379492464254,
+    "first_buzzer_team_replay_accuracy": 0.481540641504573,
+    "tossup_scorer_player_replay_accuracy": 0.25693386162755255,
+    "tossup_scorer_team_replay_accuracy": 0.45062480950929595,
+    "tossup_game_winner_accuracy": 0.6962885520125457,
+    "tossup_model_official_winner_accuracy": 0.7201435161455664,
+    "tossup_game_margin_mae": 46.3610970035551,
+    "tossup_game_zero_margin_mae": 56.48806500761808,
+    "tournament_player_ppg_spearman": 0.8245837939485613,
+    "tournament_player_ppg_mae": 7.136235202289111,
+    "tournament_player_ppg_top10_overlap": 0.7482758620689653,
+    "tournament_player_ppg_top10_random_overlap": 0.2209275808335067,
+    "tournament_player_ppg_top10_adjusted_overlap": 0.6844858587415161
+  }
+}

@@ -19,10 +19,12 @@ from compirt_data import (
 from hazard_double_difficulty.perceived_difficulty_bernstein.pyramidal_model import (
     DEFAULT_DROP_CONCENTRATION,
     DEFAULT_RELEVANCE_CONCENTRATION,
+    ALPHA_PRIOR_LOGNORMAL,
     ALPHA_LOG_SCALE,
     MIN_DEGREE,
     PERCEPTION_SLICE_NAMES,
     SUPPORTED_DEGREES,
+    SUPPORTED_ALPHA_PRIORS,
     SUPPORTED_PERCEPTION_SLICES,
     TOTAL_DROP_LOG_SCALE,
     competing_risks_model,
@@ -154,6 +156,7 @@ def run_experiment(args, *, tables=None):
         "relevance_concentration": args.relevance_concentration,
         "drop_concentration": args.drop_concentration,
         "perception_slices": args.perception_slices,
+        "alpha_prior": args.alpha_prior,
     }
     fit_kwargs = {
         "model_kwargs": model_kwargs,
@@ -214,13 +217,19 @@ def run_experiment(args, *, tables=None):
             [1.0 / 3.0, 2.0 / 3.0] if sliced else []
         ),
         "theta_prior": "Normal(0, 1) per dimension",
-        "alpha_prior": f"LogNormal(0, {ALPHA_LOG_SCALE})",
+        "alpha_prior": {
+            "lognormal": f"LogNormal(0, {ALPHA_LOG_SCALE})",
+            "normal-zero": "Normal(0, 1)",
+            "normal-one": "Normal(1, 1)",
+        }[args.alpha_prior],
         "alpha_prior_sharing": (
             "independent_per_player_slice_dimension"
             if sliced
             else "independent_per_player_dimension"
         ),
-        "alpha_constraint": "positive",
+        "alpha_constraint": (
+            "positive" if args.alpha_prior == ALPHA_PRIOR_LOGNORMAL else "unconstrained"
+        ),
         "beta_prior": "Normal(0, 1)",
         "beta_prior_sharing": (
             "independent_per_player_slice_dimension"
@@ -297,6 +306,15 @@ def parse_args(argv=None):
         "--degree", type=int, choices=SUPPORTED_DEGREES, default=MIN_DEGREE
     )
     parser.add_argument("--dimensions", type=int, default=3)
+    parser.add_argument(
+        "--alpha-prior",
+        choices=SUPPORTED_ALPHA_PRIORS,
+        default=ALPHA_PRIOR_LOGNORMAL,
+        help=(
+            "player alpha prior: positive LogNormal(0,1), unconstrained "
+            "Normal(0,1), or unconstrained Normal(1,1)"
+        ),
+    )
     parser.add_argument(
         "--perception-slices",
         type=int,

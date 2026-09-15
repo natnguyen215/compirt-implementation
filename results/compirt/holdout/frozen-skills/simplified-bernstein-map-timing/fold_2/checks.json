@@ -1,0 +1,9 @@
+{
+  "train_test_games_disjoint": true,
+  "original_training_games_match": true,
+  "correctness_events_match": true,
+  "timing_unchanged": true,
+  "timing_sha256": "18c325a15b7a7ee7a6472d2c77158c3340e8fc7615e3bc2de931af13ade6a540",
+  "cpu_replay_max_error": 1.1920928955078125e-07,
+  "replay_events": 9257
+}

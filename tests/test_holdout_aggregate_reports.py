@@ -5,8 +5,11 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from compirt_eval.scenario_a_tossups.outcomes import OUTCOME_SCHEMA_VERSION
+
 from holdout.aggregate_reports import (
     MAIN_TABLE_METRICS,
+    OUTCOME_METRIC_NAMES,
     add_in_sample_correctness_metrics,
     add_in_sample_main_table_fold_means,
     add_main_table_fold_means,
@@ -15,6 +18,7 @@ from holdout.aggregate_reports import (
     pooled_correctness_metrics,
     write_correctness_markdown,
     write_overview_from_reports,
+    write_pooled_player_leaderboards,
 )
 
 
@@ -171,3 +175,75 @@ def test_overview_collects_all_model_markdown_reports(tmp_path: Path) -> None:
     assert "`family/model`" in report
     assert "| in-sample | 0.500000 | 0.500000 |" in report
     assert "| held-out | 0.250000 | 0.250000 |" in report
+
+
+def test_pooled_player_leaderboard_sums_fold_numerators(tmp_path: Path) -> None:
+    runs = [tmp_path / f"model/fold_{fold}" for fold in range(2)]
+    for fold, run in enumerate(runs):
+        path = run / "holdout/evaluation/csvs/player_ppg_leaderboard.csv"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame(
+            {
+                "tournament_id": ["t", "t"],
+                "player_id": ["p1", "p2"],
+                "actual_tossup_points": [10 + 10 * fold, 0],
+                "predicted_tossup_points": [5, 8],
+                "tossup_outcome_schema_version": [OUTCOME_SCHEMA_VERSION] * 2,
+                "games": [1, 1],
+            }
+        ).to_csv(path, index=False)
+
+    paths = write_pooled_player_leaderboards(runs, tmp_path / "model/aggregate")
+
+    assert paths is not None
+    leaderboard = pd.read_csv(paths[0]).set_index("player_id")
+    assert leaderboard.loc["p1", "actual_tossup_points"] == 30
+    assert leaderboard.loc["p1", "predicted_tossup_points"] == 10
+    assert leaderboard.loc["p1", "games"] == 2
+    assert leaderboard.loc["p1", "actual_ppg"] == 15
+
+
+def test_overview_keeps_legacy_report_with_blank_downstream_metrics(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "legacy/model/aggregate/correctness_metrics.md"
+    path.parent.mkdir(parents=True)
+    lines = [
+        "| accuracy | 0.8 | 0.7 | 0.1 |",
+        "| auc | 0.8 | 0.7 | 0.1 |",
+        "| log loss | 0.5 | 0.6 | 0.1 |",
+    ]
+    for name, label in MAIN_TABLE_METRICS:
+        if name not in OUTCOME_METRIC_NAMES:
+            lines.append(f"| {label} | 0.5 | 0.4 |")
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    report = write_overview_from_reports(tmp_path).read_text(encoding="utf-8")
+
+    assert "`legacy/model`" in report
+    assert "| `legacy/model` | held-out |  |  |  |" in report
+
+
+def test_pooled_leaderboard_rejects_stale_expected_points_without_replay_inputs(tmp_path):
+    run = tmp_path / "fold_0"
+    path = run / "holdout/evaluation/csvs/player_ppg_leaderboard.csv"
+    path.parent.mkdir(parents=True)
+    pd.DataFrame({
+        "tournament_id": ["t"], "player_id": ["p"], "games": [1],
+        "actual_tossup_points": [10], "predicted_tossup_points": [6.2],
+        "tossup_outcome_schema_version": [2],
+    }).to_csv(path, index=False)
+    with pytest.raises(ValueError, match="Stale replay leaderboard"):
+        write_pooled_player_leaderboards([run], tmp_path / "aggregate")
+
+
+def test_unreconstructable_legacy_game_scores_are_not_reported_as_replay(tmp_path):
+    run = tmp_path / "fold_0"
+    path = run / "holdout/evaluation/csvs/tossup_metrics.csv"
+    path.parent.mkdir(parents=True)
+    pd.DataFrame({"accuracy": [0.7], "tossup_game_winner_accuracy": [0.99],
+                  "tossup_outcome_schema_version": [2]}).to_csv(path, index=False)
+    result = {}
+    add_main_table_fold_means(result, [run])
+    assert pd.isna(result["main_table_tossup_game_winner_accuracy"])
+    assert result["main_table_accuracy"] == 0.7

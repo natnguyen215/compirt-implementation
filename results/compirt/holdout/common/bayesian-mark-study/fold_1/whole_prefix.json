@@ -1,0 +1,51 @@
+{
+  "family": "whole_prefix",
+  "config": {
+    "text": 3.0,
+    "text_column": "prefix_text"
+  },
+  "candidates": [
+    {
+      "config": {
+        "text": 1.0,
+        "text_column": "prefix_text"
+      },
+      "validation_ap": 0.46588343163260537,
+      "validation_log_loss": 0.48737149470193025,
+      "fit": {
+        "iterations": 779,
+        "parameters": 23315
+      }
+    },
+    {
+      "config": {
+        "text": 3.0,
+        "text_column": "prefix_text"
+      },
+      "validation_ap": 0.4675003922437904,
+      "validation_log_loss": 0.4934178872644918,
+      "fit": {
+        "iterations": 866,
+        "parameters": 23315
+      }
+    }
+  ],
+  "thresholds": {
+    "default": 0.5,
+    "accuracy": 0.5769895871257646,
+    "precision60": 0.6264024296634724,
+    "f1_accuracy77": 0.4251993321682319,
+    "f1_accuracy78": 0.4704424059119365,
+    "f1_accuracy80p6": null
+  },
+  "fit": {
+    "iterations": 1149,
+    "parameters": 23495
+  },
+  "seconds": 34.75385856628418,
+  "n_train": 38821,
+  "n_fit": 31063,
+  "n_val": 7758,
+  "n_test": 9093,
+  "inner_split_sha256": "df8f9b2b752ccc9d1088c7ab25f5195f1fcde27f961ae83b0250f14c5ea010f0"
+}

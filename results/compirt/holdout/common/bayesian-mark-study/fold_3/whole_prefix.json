@@ -1,0 +1,51 @@
+{
+  "family": "whole_prefix",
+  "config": {
+    "text": 3.0,
+    "text_column": "prefix_text"
+  },
+  "candidates": [
+    {
+      "config": {
+        "text": 1.0,
+        "text_column": "prefix_text"
+      },
+      "validation_ap": 0.47448529048819543,
+      "validation_log_loss": 0.4940762914939057,
+      "fit": {
+        "iterations": 892,
+        "parameters": 23467
+      }
+    },
+    {
+      "config": {
+        "text": 3.0,
+        "text_column": "prefix_text"
+      },
+      "validation_ap": 0.47731842425138493,
+      "validation_log_loss": 0.4999213524946809,
+      "fit": {
+        "iterations": 919,
+        "parameters": 23467
+      }
+    }
+  ],
+  "thresholds": {
+    "default": 0.5,
+    "accuracy": 0.6604307512721496,
+    "precision60": 0.6084417644352501,
+    "f1_accuracy77": 0.42096077918730856,
+    "f1_accuracy78": 0.4998984765569339,
+    "f1_accuracy80p6": null
+  },
+  "fit": {
+    "iterations": 1059,
+    "parameters": 23494
+  },
+  "seconds": 35.09735703468323,
+  "n_train": 38834,
+  "n_fit": 31073,
+  "n_val": 7761,
+  "n_test": 9080,
+  "inner_split_sha256": "f4d789d9e4dcdc1f28dad22d135c03dbf10753fab1f84b3370d6bd262906666d"
+}

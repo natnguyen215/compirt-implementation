@@ -1,0 +1,109 @@
+{
+  "purpose": "Exploratory model development; previously reused outer panel is not an untouched test set",
+  "target": "All incorrect first buzzes, including zero-point incorrect answers; neg=1-correct",
+  "outer": "Original five frozen year_2024 game folds, seed 42; score exact saved BUZZ event IDs",
+  "inner": "Reuse tossup-accuracy-study fold-specific 80/20 whole-game splits verbatim",
+  "selection": "Maximize inner validation neg average precision within each new family; also report family selected by inner AP",
+  "thresholds": "Default .5; maximize accuracy; max recall with empirical precision>=.60 and >=50 predicted positives; max F1 subject to validation accuracy>=.77/.78/.806. Infeasible policies are missing, never silently converted into an all-negative policy.",
+  "calibration": "No test-label calibration. Empirical constraints may fail on outer data.",
+  "features": "Conditional on observed first buzzer and buzz position. Text vocabulary/SVD fit on training prefixes only, no answer strings or unrevealed tokens.",
+  "base": "Reuse strongest previously selected regularized feature structure (all five folds: item spline scale3, other scales1); do not repeat old hyperparameter sweeps.",
+  "families": {
+    "player_position": [
+      {
+        "player_curve": 0.3
+      },
+      {
+        "player_curve": 1.0
+      },
+      {
+        "player_curve": 3.0
+      }
+    ],
+    "subcategory_pooling": [
+      {
+        "subcategory": 0.3
+      },
+      {
+        "subcategory": 1.0
+      }
+    ],
+    "recent_prefix": [
+      {
+        "text": 0.3
+      },
+      {
+        "text": 1.0
+      },
+      {
+        "text": 3.0
+      }
+    ],
+    "whole_prefix": [
+      {
+        "text": 1.0,
+        "text_column": "prefix_text"
+      },
+      {
+        "text": 3.0,
+        "text_column": "prefix_text"
+      }
+    ],
+    "three_outcomes": [
+      {
+        "multinomial": true
+      },
+      {
+        "multinomial": true,
+        "player_curve": 1.0
+      }
+    ],
+    "vb_base": [
+      {
+        "vb": true
+      }
+    ],
+    "vb_player": [
+      {
+        "vb": true,
+        "player_curve": 1.0
+      }
+    ],
+    "prefix_expertise": [
+      {
+        "expertise": 0.3
+      },
+      {
+        "expertise": 1.0
+      },
+      {
+        "expertise": 3.0
+      }
+    ]
+  },
+  "mixture": "Additional validation-log-score convex combination of vb_base and whole_prefix; motivated by separating calibration and discrimination. Single validation split analogue of stacking.",
+  "bayesian": "Diagonal Gaussian variational posterior, Gaussian grouped priors with type-II MAP log-scale estimates and N(0,.75^2) log-scale hyperpriors; global N(0,3^2). Not full hyperparameter Bayes. 16-point Gauss-Hermite prediction integration; Adam then LBFGS ELBO optimization using training data only.",
+  "unknown_ids": "One-hot unknowns map to zero: conditional pooled-mean fallback, not prior predictive integration for unseen players. Outer unknown-player proportion below .07%; all scored questions are seen in training.",
+  "bootstrap": "1000 paired whole-game bootstrap samples; conditional on fitted predictions, no retraining, not uncertainty from repeated model selection or shared questions across games",
+  "exclusions": "No new timing or identity modeling; no repeated class weighting, Bernstein dimensions, free neural interaction or timing coupling experiments.",
+  "sources": [
+    "https://mc-stan.org/learn-stan/case-studies/pool-binary-trials.html",
+    "https://www.jmlr.org/papers/v14/challis13a.html",
+    "https://arxiv.org/abs/2011.01808",
+    "https://aclanthology.org/2020.acl-main.662/",
+    "https://arxiv.org/abs/2410.06524",
+    "https://arxiv.org/abs/1704.02030"
+  ],
+  "python": "3.13.14 (main, Jun 12 2026, 09:14:25) [GCC 14.3.1 20260213]",
+  "git_head": "cd526c7aec4ed4c9e023274490d98770bcf7434e",
+  "versions": {
+    "torch": "2.13.0",
+    "scikit_learn": "1.9.0",
+    "scipy": "1.17.1",
+    "pandas": "3.0.5",
+    "numpy": "2.5.1"
+  },
+  "completed_fits": 125,
+  "completed_family_fold_artifacts": 45,
+  "concurrent_existing_comparator": "Other task completed boosting and boosting_ensemble; read-only inclusion, not refitted by this study."
+}

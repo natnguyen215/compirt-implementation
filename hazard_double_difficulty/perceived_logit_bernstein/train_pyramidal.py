@@ -17,11 +17,13 @@ from compirt_data import (
     tossup_tensors,
 )
 from hazard_double_difficulty.perceived_logit_bernstein.pyramidal_model import (
+    ALPHA_PRIOR_LOGNORMAL,
     ALPHA_LOG_SCALE,
     DEFAULT_DROP_CONCENTRATION,
     DEFAULT_RELEVANCE_CONCENTRATION,
     MIN_DEGREE,
     SUPPORTED_DEGREES,
+    SUPPORTED_ALPHA_PRIORS,
     TOTAL_DROP_LOG_SCALE,
     competing_risks_model,
     expected_first_buzz_positions,
@@ -116,6 +118,7 @@ def run_experiment(args, *, tables=None):
             "degree": args.degree,
             "relevance_concentration": args.relevance_concentration,
             "drop_concentration": args.drop_concentration,
+            "alpha_prior": args.alpha_prior,
         },
         n_steps=args.steps,
         lr=args.lr,
@@ -148,8 +151,14 @@ def run_experiment(args, *, tables=None):
         "perception_multiplier": "player_scalar_alpha",
         "perception_intercept": "player_scalar_beta",
         "theta_prior": "Normal(0, 1) per dimension",
-        "alpha_prior": f"LogNormal(0, {ALPHA_LOG_SCALE})",
-        "alpha_constraint": "positive",
+        "alpha_prior": {
+            "lognormal": f"LogNormal(0, {ALPHA_LOG_SCALE})",
+            "normal-zero": "Normal(0, 1)",
+            "normal-one": "Normal(1, 1)",
+        }[args.alpha_prior],
+        "alpha_constraint": (
+            "positive" if args.alpha_prior == ALPHA_PRIOR_LOGNORMAL else "unconstrained"
+        ),
         "beta_prior": "Normal(0, 1)",
         "relevance_prior": f"Dirichlet({args.relevance_concentration})",
         "polynomial_degree": args.degree,
@@ -193,6 +202,15 @@ def parse_args(argv=None):
         "--degree", type=int, choices=SUPPORTED_DEGREES, default=MIN_DEGREE
     )
     parser.add_argument("--dimensions", type=int, default=3)
+    parser.add_argument(
+        "--alpha-prior",
+        choices=SUPPORTED_ALPHA_PRIORS,
+        default=ALPHA_PRIOR_LOGNORMAL,
+        help=(
+            "player alpha prior: positive LogNormal(0,1), unconstrained "
+            "Normal(0,1), or unconstrained Normal(1,1)"
+        ),
+    )
     parser.add_argument(
         "--relevance-concentration",
         type=float,

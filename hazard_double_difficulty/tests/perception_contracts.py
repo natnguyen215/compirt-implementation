@@ -3,8 +3,8 @@
 `perceived_difficulty_bernstein` (per-dimension alpha/beta, optionally sliced by
 thirds of the question) and `perceived_logit_bernstein` (one scalar alpha/beta
 per player) differ only in the shape of the player perception parameters. The
-save/reload/replay contract and the imaginary-tournament wiring are identical,
-so they live here instead of being written out once per suite.
+save/reload/replay contract is identical, so it lives here instead of being
+written out once per suite.
 """
 
 from __future__ import annotations
@@ -13,8 +13,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from compirt_eval.imaginary_tournament.evaluation import TournamentInputs
-from compirt_eval.scenario_a_tossups.timing import event_first_buzz_components
+from compirt_eval.scenario_a_tossups.reconstruction import event_first_buzz_components
 from holdout.frozen_predict import (
     _load_tossup_posterior,
     detect_tossup_parameter_schema,
@@ -94,38 +93,3 @@ def _assert_evaluator_masses_match_model(model, data, fit, players, tossups):
     )
     expected_dead = torch.prod(1.0 - hazard).item()
     assert np.isclose(components["dead_mass"], expected_dead, rtol=1e-5)
-
-
-def perception_tournament_inputs(*, question_lengths, **perception):
-    """Build `TournamentInputs` for a one-dimension, eight-player tournament.
-
-    Every field except `question_lengths` and the `perception_*` keyword the
-    caller's model reads is fixed, so each suite only states the parameters its
-    own perception term consumes.
-    """
-    tossup_ids = [f"q{index}" for index in range(3)]
-    return TournamentInputs(
-        player_ids=np.asarray([f"p{index}" for index in range(8)]),
-        theta=np.linspace(-0.8, 1.2, 8).reshape(-1, 1),
-        thresholds=np.zeros(8),
-        tossups=pd.DataFrame(
-            {
-                "r_1": np.ones(3),
-                "start_difficulty_d1": np.ones(3),
-                "end_difficulty_d1": np.zeros(3),
-                "total_drop_d1": np.ones(3),
-                "drop_share_1_d1": np.full(3, 0.3),
-                "drop_share_2_d1": np.full(3, 0.4),
-                "drop_share_3_d1": np.full(3, 0.3),
-            },
-            index=tossup_ids,
-        ),
-        question_lengths=pd.Series(question_lengths, index=tossup_ids),
-        bonus_probability=np.asarray([0.1, 0.2, 0.4, 0.3]),
-        adjustments=None,
-        difficulty_link="sigmoid",
-        difficulty_scale=1.0,
-        correctness_scale=1.0,
-        correctness_bias=0.0,
-        **perception,
-    )

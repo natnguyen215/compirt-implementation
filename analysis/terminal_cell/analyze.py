@@ -7,7 +7,7 @@ position 'T_j' also absorbs the whole post-reading buzz window, so its cell
 covers much more real time than any other. This script reports the empirical
 team hazard indexed by tokens remaining, which is the evidence behind the
 double-difficulty families' terminal-cell intercepts (see
-'docs/terminal-cell.md').
+'docs/double-difficulty-bernstein.md').
 
 Reproduce with::
 

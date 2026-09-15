@@ -1,0 +1,10 @@
+{
+  "output": "results/compirt/holdout/frozen-skills/pyro-cut-vi",
+  "timing_steps": 3000,
+  "correctness_steps": 3000,
+  "timing_draws": 16,
+  "lr": 0.005,
+  "intercept_sd": 10.0,
+  "seed": 42,
+  "device": "cuda"
+}

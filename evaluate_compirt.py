@@ -35,17 +35,8 @@ from compirt_eval.common.reports import (
     write_eval_docs_summary,
 )
 from compirt_eval.common.figures import stratified_ece_plot
-from compirt_eval.diagnostics.match_simulation import simulate_match_winners
 from compirt_eval.common.report_paths import csv_path, evaluation_output_dirs, graph_path
-from compirt_eval.diagnostics.posterior_predictive import evaluate_saved_ppc
 from compirt_eval.scenario_a_tossups import evaluate_tossups
-
-# Public evaluation helpers available from this entry-point module.
-from compirt_eval.common.figures import density_estimate
-from compirt_eval.scenario_b_bonuses.metrics import bonus_metrics
-from compirt_eval.scenario_a_tossups import first_buzz_distribution
-
-__all__ = ["bonus_metrics", "density_estimate", "first_buzz_distribution", "main"]
 
 
 def main():
@@ -57,34 +48,22 @@ def main():
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--split", default="all")
     parser.add_argument("--tournament")
-    parser.add_argument("--game-simulations", type=int, default=500)
-    parser.add_argument("--game-seed", type=int, default=42)
-    parser.add_argument(
-        "--skip-game-simulation",
-        action="store_true",
-        help="skip the optional raw-game match winner diagnostic",
-    )
     args = parser.parse_args()
     evaluation_output_dirs(args.output_dir)
-    # Saved CSVs make evaluation repeatable without rerunning model training.
-    tossup = evaluate_tossups(args.pyramidal_results, args.output_dir)
-    bonus = evaluate_bonuses(args.compositional_results, args.output_dir)
-    evaluate_saved_ppc(
-        args.pyramidal_results, args.compositional_results, args.output_dir
+    tables = filter_tournament(
+        load_hf_tables(args.data_dir, args.split), args.tournament
     )
-    game = {}
-    if not args.skip_game_simulation:
-        tables = filter_tournament(
-            load_hf_tables(args.data_dir, args.split), args.tournament
-        )
-        game, _ = simulate_match_winners(
-            args.pyramidal_results,
-            args.compositional_results,
-            args.output_dir,
-            tables["games"],
-            simulations=args.game_simulations,
-            seed=args.game_seed,
-        )
+    # Saved CSVs make evaluation repeatable without rerunning model training.
+    tossup = evaluate_tossups(
+        args.pyramidal_results,
+        args.output_dir,
+        recorded_buzzes=tables["tossup_buzzes"],
+        official_games=tables["games"],
+    )
+    bonus = evaluate_bonuses(args.compositional_results, args.output_dir)
+    # Game evaluation is the same tossup-only replay used for tournament PPG.
+    game = {key: value for key, value in tossup.items()
+            if key.startswith("tossup_game_") or key == "tossup_outcome_schema_version"}
     pd.DataFrame([tossup]).to_csv(
         csv_path(args.output_dir, "tossup_metrics.csv"), index=False
     )

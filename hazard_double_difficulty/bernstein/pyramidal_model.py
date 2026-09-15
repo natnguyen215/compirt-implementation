@@ -1,6 +1,6 @@
 """Bernstein pyramidal model with separate correctness/hazard difficulty.
 
-The parent family ('polynomial_compirt') fits one strictly-decreasing Bernstein
+The parent family ('archive/polynomial_compirt') fits one strictly-decreasing Bernstein
 difficulty curve per tossup and uses it for two jobs: how hard the tossup is to
 answer correctly, and how tempting it is to buzz on. The hazard is the
 correctness logit shifted by a single per-player scalar, so the two only differ
@@ -47,23 +47,26 @@ from __future__ import annotations
 
 import math
 
+from compirt_race import winner_log_prob
 import pyro
 import pyro.distributions as dist
 import torch
 import torch.nn.functional as F
 from torch.utils.checkpoint import checkpoint
 
+from utils.prediction import event_rosters
 from utils.training import survival_chunk_size
 
 
 MIN_DEGREE = 3
-MAX_DEGREE = 6
+MAX_DEGREE = 10
 SUPPORTED_DEGREES = range(MIN_DEGREE, MAX_DEGREE + 1)
 DEFAULT_DROP_CONCENTRATION = 2.0
 TOTAL_DROP_LOG_SCALE = 0.5
 CURVE_LOCATION_PRIOR_SCALE = 1.0
 CURVE_START_PRIOR_SCALE = 1.0
 PLAYER_PROPENSITY_SCALE_PRIOR = 1.0
+TERMINAL_PRIOR_SCALE = 2.0
 DEFAULT_RELEVANCE_PRIOR = "gamma"
 SUPPORTED_RELEVANCE_PRIORS = (DEFAULT_RELEVANCE_PRIOR, "simplex")
 
@@ -245,8 +248,8 @@ def log_survival(
     # Shared token-position grid [1, ..., max_t], broadcast to '(n_rows, max_t)'.
     max_t = int(t_star.max().item())
     positions = torch.arange(1, max_t + 1, device=t_star.device).unsqueeze(0)
-    # Eq. 6 is strict-before survival, and Eq. 13 uses S(T_j) for dead tossups,
-    # so this comparison must stay strict.
+    # Sum strictly before the exclusive stop. survival_stop advances terminal
+    # no-buzz rows to T_j + 1 so their final token contributes too.
     before_stop = positions < t_star.unsqueeze(1)
     if t_start is not None:
         # Bounceback rows survive only from t_start onward; phase-0 rows pass
@@ -340,9 +343,6 @@ def sample_curve_parameters(
         f"drop_proportions_{suffix}", dist.Dirichlet(concentration).to_event(1)
     )
     return start_difficulty, total_drop, drop_proportions
-
-
-TERMINAL_PRIOR_SCALE = 2.0
 
 
 def sample_terminal_intercepts(data):
@@ -449,7 +449,7 @@ def sample_correctness_calibration(data, with_scale=True):
 
     `with_scale=False` drops the multiplicative term and returns `None` in its
     place, leaving a bias-only shift that moves the correctness level without
-    compressing its spread (see `neg_test/README.md`).
+    compressing its spread (see `archive/neg_test/README.md`).
     """
     zero = data["y"].new_tensor(0.0)
     scale = (
@@ -495,7 +495,7 @@ def competing_risks_model(
     """Define the monotone double-difficulty competing-risks likelihood.
 
     Every rostered player contributes survival before the stopping position. The
-    actual first buzzer additionally contributes a hazard-at-'t_star' factor and
+    actual first buzzer contributes a normalized exclusive-winner factor and
     an observed correctness factor, and the hand-computed joint log-likelihood is
     added with 'pyro.factor'. Survival and hazard read the hazard curve;
     correctness reads the correctness curve.
@@ -518,9 +518,8 @@ def competing_risks_model(
         )
     )
 
-    # Survival: every BUZZ, CENSORED, and NO-BUZZ row contributes over its risk
-    # interval [t_start, t_star). 'data.get' keeps manual data dicts (no t_start)
-    # on the historical [1, t_star) path.
+    # Every row contributes survival; terminal no-buzz rows include the final
+    # token. Bounceback rows begin their risk interval at t_start.
     survival = log_survival(
         row_theta,
         row_hazard_r,
@@ -531,15 +530,15 @@ def competing_risks_model(
         t_start=data.get("t_start"),
         end=end_hazard,
     )
-    # Event term: only observed first buzzers contribute hazard and correctness.
+    # Event term: all roster hazards determine the exclusive winner probability.
     buzz = data["is_buzz"]
-    buzz_logits = hazard_logit(
-        row_theta[buzz],
-        row_hazard_r[buzz],
-        *(parameter[buzz] for parameter in row_hazard),
-        row_c[buzz],
-        data["t_star"][buzz],
-        data["T_j"][buzz],
+    stop_hazard_logits = hazard_logit(
+        row_theta,
+        row_hazard_r,
+        *row_hazard,
+        row_c,
+        data["t_star"],
+        data["T_j"],
         end_hazard,
     )
     correctness = correctness_logit(
@@ -557,11 +556,10 @@ def competing_risks_model(
         scale, bias = sample_correctness_calibration(data, with_scale=calibrate_scale)
         correctness = apply_correctness_calibration(correctness, scale, bias)
 
+    # Combine survival for the full roster with the observed buzzer terms.
     log_likelihood = (
-        # Sum log survival over every player-event row.
         survival.sum()
-        # Sum log hazard and correctness log likelihood over first-buzzer rows.
-        + F.logsigmoid(buzz_logits).sum()
+        + winner_log_prob(data, stop_hazard_logits).sum()
         + correctness_log_likelihood(
             correctness, data["y"][buzz], incorrect_weight
         )
@@ -641,36 +639,9 @@ def expected_first_buzz_positions(data, posterior):
     used for evaluation. Timing is a pure hazard quantity, so only the hazard
     curve is read here.
     """
-    n_events = len(data["event_ids"])
-    # First-buzz timing is a full-field phase-0 quantity; skip phase-1 bounceback
-    # rows (they share an event_id but are an opponent-only continuation).
-    # Absent 'is_phase0' (pre-bounceback data) means every row is phase 0.
-    phase0 = data.get("is_phase0")
-    if phase0 is None:
-        phase0 = torch.ones(
-            len(data["event"]), dtype=torch.bool, device=data["event"].device
-        )
-    counts = torch.bincount(data["event"][phase0], minlength=n_events)
-    max_roster = int(counts.max().item())
-    # Training rows are one player at a time; regroup them into per-event roster
-    # matrices so all of an event's players can be stepped through together.
-    roster = data["player"].new_zeros((n_events, max_roster))
-    roster_mask = torch.zeros(
-        (n_events, max_roster), dtype=torch.bool, device=data["event"].device
-    )
-    next_slot = [0] * n_events
-    event_tossup = data["tossup"].new_zeros(n_events)
-    event_T = data["T_j"].new_ones(n_events)
-    for row in range(len(data["event"])):
-        if not bool(phase0[row]):
-            continue
-        event = int(data["event"][row].item())
-        slot = next_slot[event]
-        roster[event, slot] = data["player"][row]
-        roster_mask[event, slot] = True
-        event_tossup[event] = data["tossup"][row]
-        event_T[event] = data["T_j"][row]
-        next_slot[event] += 1
+    # Rebuild the full first-buzz field before broadcasting fitted parameters.
+    roster, roster_mask, event_tossup, event_T = event_rosters(data)
+    n_events, max_roster = roster.shape
 
     # Parameter shapes now begin with (n_events, max_roster, ...). The extra
     # unsqueeze(1) on the tossup parameters broadcasts them across the roster.

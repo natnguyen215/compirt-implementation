@@ -1,0 +1,23 @@
+{
+  "split": "game-holdout:year_2024:train:5:1:42",
+  "tournament": "",
+  "steps": 2000,
+  "lr": 0.01,
+  "seed": 42,
+  "initial_loss": 139737.51580944657,
+  "final_loss": 55626.17834997177,
+  "best_loss": 55465.324140906334,
+  "last_100_loss_slope": -0.24945910410166586,
+  "finite_losses": true,
+  "player_skills": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/pyramidal/players.csv",
+  "dropped_rows_unknown_roster": 0,
+  "use_synergy": false,
+  "synergy_dimensions": 0,
+  "saved_synergy_details": false,
+  "calibrate_correctness": false,
+  "alpha_prior": "normal",
+  "skill_dimensions": 5,
+  "bonus_part_observations": 108201,
+  "bonus_parts": 3768,
+  "tau": 0.1307666152715683
+}

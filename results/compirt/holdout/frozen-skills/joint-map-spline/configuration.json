@@ -1,0 +1,6 @@
+{
+  "steps": 1000,
+  "lr": 0.005,
+  "initialization": "original saved MAP",
+  "gradient_control": "detach theta and speed from correctness"
+}

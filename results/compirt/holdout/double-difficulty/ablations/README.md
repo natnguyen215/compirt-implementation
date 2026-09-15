@@ -11,6 +11,8 @@ whole model families evaluated side by side live in
 | [`optimization-steps/`](optimization-steps/) | SVI steps: `steps-6000/`, `steps-20000/` (reference is 3,000) | Joint event LL continues to improve at 20,000 steps; the 3,000-step fits have not converged. |
 | [`incorrect-loss-weight/`](incorrect-loss-weight/) | likelihood weight on incorrect responses: `weight-1.5`, `weight-2`, `weight-3` (reference is 1x) | Upweighting incorrect responses monotonically degrades correctness LL, ECE and accuracy while leaving position MAE flat. §3.11 |
 | `hyperparameter-grid/` | degree 3–6 x dimensions 1–5 x drop-concentration 0.67–2.0; 100 points | Ignored by git as regenerable (~2.7 GB); its 3/3/2 point is tracked below as `dd-bernstein-332-unconstrained/`. §3.7 |
+| `high-degree/` | degree 10 (three dimensions, drop concentration 0.67, simplex, locations, terminal) at 3,000 and 10,000 steps | See each run's `configuration.json` and fold evaluations. |
+| `perception-dimensions-unconstrained/`, `perception-dimensions-unconstrained-10000-steps/` | 1–10 dimensions for perceived-logit and three-slice perceived-difficulty with Normal alpha priors, at 3,000 and 10,000 steps | Selection and budget comparison in each folder's `aggregate/`. |
 
 ## relevance-locations-terminal
 
@@ -30,8 +32,7 @@ configuration, so the name alone says which run it is:
 | [`dd-bernstein-332-gamma-locations-terminal/`](relevance-locations-terminal/dd-bernstein-332-gamma-locations-terminal/) | **Gamma(2,2)** | 2.0 | **yes** | **yes** | not in the main table |
 
 `dd-bernstein-332-simplex-locations-terminal/` is the reference configuration
-for the other ablation folders. It is not a separate `reference/` directory,
-because that name said nothing about what it configures.
+for the other ablation folders.
 
 The progression down the table adds one setting at a time, so adjacent rows are
 the comparable pairs. `unconstrained` means a free per-dimension relevance
@@ -47,11 +48,8 @@ Two layout quirks, both inherited from the runner that produced the run:
 - `dirichlet_N` in those paths, and in `hyperparameter-grid/`, is the
   **drop**-concentration, not the relevance Dirichlet, which stays at `ones(k)`.
 
-The two `unconstrained` runs are also arms of other comparisons:
-`dd-bernstein-332-unconstrained/` is the `degree_3/curves_3/dirichlet_2` cell of
-`hyperparameter-grid/`, and `dd-bernstein-332-unconstrained-terminal/` is the
+`dd-bernstein-332-unconstrained/` is also an arm of two other comparisons: it
+is the `degree_3/curves_3/dirichlet_2` cell of `hyperparameter-grid/` and the
 Bernstein arm of
-[`../model-comparisons/curve-family/`](../model-comparisons/curve-family/) and
-the "full" arm of
-[`../model-comparisons/compact-parameterization/`](../model-comparisons/compact-parameterization/),
-which still holds a second copy of that same fit.
+[`../model-comparisons/curve-family/`](../model-comparisons/curve-family/)
+(its fold metrics match that comparison's Bernstein column).

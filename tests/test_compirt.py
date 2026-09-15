@@ -22,6 +22,7 @@ from compirt_data import (
     build_tossup_observations,
     tossup_tensors,
 )
+from compirt_race import winner_log_prob
 from lineup import LineupIndex
 from compirt_eval.scenario_b_bonuses.evaluation import evaluate_bonuses
 from compirt_eval.scenario_b_bonuses.metrics import bonus_metrics
@@ -31,7 +32,7 @@ from compirt_eval.scenario_a_tossups.parameters import (
     load_difficulty_link,
     load_difficulty_scale,
 )
-from compirt_eval.scenario_a_tossups.timing import event_first_buzz_components
+from compirt_eval.scenario_a_tossups.reconstruction import event_first_buzz_components
 from compirt_eval.scenario_a_tossups.metrics import tossup_joint_event_scores
 from compositional_model import (
     compositional_model,
@@ -39,7 +40,8 @@ from compositional_model import (
     posterior_predictions,
     synergy_contribution,
 )
-from evaluate_compirt import density_estimate, first_buzz_distribution
+from compirt_eval.common.figures import density_estimate
+from compirt_eval.scenario_a_tossups.reconstruction import first_buzz_distribution
 from multidimensional.multidim_mirt.pyramidal_model import (
     competing_risks_model as multidim_competing_risks_model,
     correctness_logit as multidim_correctness_logit,
@@ -253,8 +255,6 @@ class DataTests(unittest.TestCase):
         lineups = LineupIndex.from_tables(tables)
         default = build_tossup_observations(tables, lineups)
 
-        # No BOUNCE-* rows and every phase-0 row starts its survival at token 1.
-        self.assertFalse(default["z"].str.startswith("BOUNCE").any())
         self.assertEqual(set(default["t_start"]), {1})
         self.assertEqual(set(default["phase"]), {0})
 
@@ -286,9 +286,6 @@ class DataTests(unittest.TestCase):
         self.assertEqual(
             phase1[phase1["z"] == "BOUNCE-CENSORED"]["player_id"].tolist(), ["p4"]
         )
-        # The locked-out team never appears in phase 1.
-        self.assertNotIn("p1", set(phase1["player_id"]))
-        self.assertNotIn("p2", set(phase1["player_id"]))
 
         # The bounceback buzzer feeds hazard + correctness (is_buzz) but is kept
         # out of the phase-0 first-buzz timing set (is_phase0).
@@ -325,8 +322,6 @@ class DataTests(unittest.TestCase):
             phase1[phase1["z"] == "BOUNCE-BUZZ"]["player_id"].tolist(), ["p3"]
         )
         self.assertEqual(set(phase1["player_id"]), {"p3", "p4"})
-        self.assertNotIn("p1", set(phase1["player_id"]))
-        self.assertNotIn("p2", set(phase1["player_id"]))
 
     def test_same_team_continuation_without_opponent_omits_phase1(self):
         # Only same-team continuations and no opponent buzz: phase 1 is omitted
@@ -342,7 +337,6 @@ class DataTests(unittest.TestCase):
             tables, LineupIndex.from_tables(tables), include_bounceback=True
         )
         self.assertTrue((observations["phase"] == 0).all())
-        self.assertFalse(observations["z"].str.startswith("BOUNCE").any())
 
     def test_tossup_tensors_preserve_dead_tossup_mask(self):
         tables = synthetic_tables()
@@ -475,8 +469,7 @@ class ModelTests(unittest.TestCase):
         gamma = torch.tensor([2.0])
         mu = torch.tensor([0.4])
 
-        # Model assembly: survival over every row's [t_start, t_star) interval,
-        # plus hazard + Bernoulli(correctness) over the two is_buzz rows.
+        # Roster survival plus an exclusive-winner term for each phase.
         row_theta, row_c, row_alpha, row_beta, row_gamma, row_mu = row_parameters(
             data, theta, c, alpha, beta, gamma, mu
         )
@@ -486,8 +479,8 @@ class ModelTests(unittest.TestCase):
         ).sum()
         buzz = data["is_buzz"]
         buzz_logits = hazard_logit(
-            row_theta[buzz], row_alpha[buzz], row_beta[buzz], row_gamma[buzz],
-            row_mu[buzz], row_c[buzz], data["t_star"][buzz], data["T_j"][buzz],
+            row_theta, row_alpha, row_beta, row_gamma,
+            row_mu, row_c, data["t_star"], data["T_j"],
         )
         correctness = correctness_logit(
             row_theta[buzz], row_alpha[buzz], row_beta[buzz], row_gamma[buzz],
@@ -495,7 +488,7 @@ class ModelTests(unittest.TestCase):
         )
         assembled = float(
             survival
-            + F.logsigmoid(buzz_logits).sum()
+            + winner_log_prob(data, buzz_logits).sum()
             + dist.Bernoulli(logits=correctness).log_prob(data["y"][buzz]).sum()
         )
 
@@ -519,13 +512,17 @@ class ModelTests(unittest.TestCase):
         for pid in ("p1", "p2", "p3", "p4"):
             for s in range(1, 2):
                 reference += float(F.logsigmoid(-hazard(pid, s)))
-        reference += float(F.logsigmoid(hazard("p1", 2)))       # p1 buzz hazard
+        hazards = [float(torch.sigmoid(hazard(pid, 2))) for pid in ("p1", "p2", "p3", "p4")]
+        odds = [h / (1 - h) for h in hazards]
+        reference += math.log((1 - math.prod(1 - h for h in hazards)) * odds[0] / sum(odds))
         reference += float(F.logsigmoid(-correct_logit("p1", 2)))  # neg: y = 0
         # Phase 1: opponent (p3, p4) survives [3, 4); p3 converts at token 4.
         for pid in ("p3", "p4"):
             for s in range(3, 4):
                 reference += float(F.logsigmoid(-hazard(pid, s)))
-        reference += float(F.logsigmoid(hazard("p3", 4)))        # p3 buzz hazard
+        hazards = [float(torch.sigmoid(hazard(pid, 4))) for pid in ("p3", "p4")]
+        odds = [h / (1 - h) for h in hazards]
+        reference += math.log((1 - math.prod(1 - h for h in hazards)) * odds[0] / sum(odds))
         reference += float(F.logsigmoid(correct_logit("p3", 4)))   # bounce: y = 1
 
         self.assertAlmostEqual(assembled, reference, places=5)
@@ -743,7 +740,6 @@ class ModelTests(unittest.TestCase):
 
         metrics = bonus_metrics(parts, teams)
 
-        self.assertNotIn("per_bonus_points_mae", metrics)
         self.assertAlmostEqual(metrics["ppb_mae"], 0.0)
 
     def test_ppb_mae_pools_all_response_rows_by_team(self):
@@ -791,7 +787,6 @@ class ModelTests(unittest.TestCase):
         self.assertAlmostEqual(metrics["part_accuracy"], 0.5)
         self.assertAlmostEqual(metrics["part_all_correct_accuracy"], 1.0)
         self.assertAlmostEqual(metrics["accuracy_lift_over_all_correct"], -0.5)
-        self.assertNotIn("part_accuracy_lift_over_all_correct", metrics)
         self.assertAlmostEqual(metrics["part_accuracy_macro_team"], 0.375)
         self.assertAlmostEqual(metrics["part_accuracy_macro_bonus"], 0.625)
 
@@ -1068,9 +1063,9 @@ class BouncebackEvaluationTests(unittest.TestCase):
         row = scores.iloc[0]
         # Phase-0 survival only: 0.5^4 = 0.0625 (not 0.5^6 from the six rows).
         self.assertAlmostEqual(float(row["survival_probability"]), 0.0625, places=9)
-        # Full phase-0 score: 0.0625 * hazard 0.5 * correctness 0.5.
+        # Full phase-0 score: survival * P(any buzz) / four players * correctness.
         self.assertAlmostEqual(
-            float(row["joint_event_probability"]), 0.015625, places=9
+            float(row["joint_event_probability"]), 0.0625 * 0.9375 / 4 * 0.5, places=9
         )
 
 

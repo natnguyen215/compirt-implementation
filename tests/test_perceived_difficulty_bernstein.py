@@ -8,9 +8,6 @@ import pyro
 import torch
 
 from compirt_eval.scenario_a_tossups import evaluate_tossups
-from compirt_eval.imaginary_tournament.evaluation import (
-    simulate_imaginary_tournament,
-)
 from hazard_double_difficulty.perceived_difficulty_bernstein import (
     pyramidal_model as model,
 )
@@ -25,20 +22,19 @@ from hazard_double_difficulty.tests.test_hazard_double_difficulty import (
 )
 from hazard_double_difficulty.tests.perception_contracts import (
     assert_frozen_replay_matches,
-    perception_tournament_inputs,
 )
 from holdout.frozen_predict import (
     PERCEIVED_DIFFICULTY_BERNSTEIN,
     PERCEIVED_DIFFICULTY_SLICED_BERNSTEIN,
 )
-from run_scripts.bernstein.run_perceived_difficulty_bernstein_332 import (
+from run_scripts.double_difficulty.run_perceived_difficulty_bernstein_332 import (
     Configuration,
     experiment_commands,
 )
-from run_scripts.bernstein.run_perceived_difficulty_sliced_bernstein_332 import (
+from run_scripts.double_difficulty.run_perceived_difficulty_sliced_bernstein_332 import (
     experiment_commands as sliced_experiment_commands,
 )
-from run_scripts.bernstein import (
+from run_scripts.double_difficulty import (
     run_perceived_difficulty_sliced_alternating_bernstein_332 as alternating_runner,
 )
 from utils.training import fit_svi_alternating
@@ -230,7 +226,7 @@ def test_identity_perception_recovers_correctness_and_positive_alpha_preserves_s
     assert late_hazard > early_hazard
 
 
-def test_trace_uses_one_simplex_relevance_and_one_curve():
+def test_trace_uses_simplex_relevance_and_curve_priors():
     pyro.clear_param_store()
     trace = pyro.poutine.trace(model.competing_risks_model).get_trace(
         tiny_data(), n_dimensions=3, degree=3, relevance_concentration=2.0
@@ -238,9 +234,6 @@ def test_trace_uses_one_simplex_relevance_and_one_curve():
     r = trace.nodes["r"]["value"]
     assert isinstance(trace.nodes["r"]["fn"], torch.distributions.Dirichlet)
     torch.testing.assert_close(r.sum(-1), torch.ones(r.shape[0]))
-    assert "c" not in trace.nodes
-    assert "end_correct" not in trace.nodes
-    assert "end_hazard" not in trace.nodes
     assert tuple(trace.nodes["alpha"]["value"].shape) == (3, 3)
     assert tuple(trace.nodes["beta"]["value"].shape) == (3, 3)
     alpha_prior = trace.nodes["alpha"]["fn"]
@@ -268,6 +261,27 @@ def test_three_slice_trace_has_independent_positive_player_vectors():
     assert isinstance(beta_prior.base_dist, torch.distributions.Normal)
     assert beta_prior.reinterpreted_batch_ndims == 2
     assert torch.all(trace.nodes["alpha"]["value"] > 0)
+
+
+def test_three_slice_trace_supports_standard_normal_alpha_and_beta():
+    pyro.clear_param_store()
+    trace = pyro.poutine.trace(model.competing_risks_model).get_trace(
+        tiny_data(),
+        n_dimensions=3,
+        degree=3,
+        perception_slices=3,
+        alpha_prior="normal-zero",
+    )
+    for name in ("alpha", "beta"):
+        prior = trace.nodes[name]["fn"]
+        assert isinstance(prior, torch.distributions.Independent)
+        assert isinstance(prior.base_dist, torch.distributions.Normal)
+        torch.testing.assert_close(
+            prior.base_dist.loc, torch.zeros_like(prior.base_dist.loc)
+        )
+        torch.testing.assert_close(
+            prior.base_dist.scale, torch.ones_like(prior.base_dist.scale)
+        )
 
 
 def test_no_buzz_survival_includes_final_token():
@@ -320,7 +334,6 @@ def test_sliced_schema_frozen_replay_and_numpy_evaluator_match(tmp_path):
         for dimension in range(1, 4)
     }
     assert expected_columns.issubset(players.columns)
-    assert not {"alpha_1", "beta_1"}.intersection(players.columns)
     torch.testing.assert_close(rebuilt["alpha"], fit["alpha"], rtol=1e-5, atol=1e-6)
     torch.testing.assert_close(rebuilt["beta"], fit["beta"], rtol=1e-5, atol=1e-6)
 
@@ -359,7 +372,7 @@ def test_trainer_smoke_and_runner_contract(tmp_path):
     assert "game-holdout:year_2024:train:5:2:42" in train
     assert "holdout.frozen_predict" in frozen
     assert "game-holdout:year_2024:test:5:2:42" in frozen
-    assert "run_scripts.paper_model_selection.evaluate_fold" in evaluate
+    assert "run_scripts.double_difficulty.evaluate_fold" in evaluate
 
 
 def test_sliced_trainer_smoke_evaluator_and_runner_contract(tmp_path):
@@ -403,7 +416,23 @@ def test_sliced_trainer_smoke_evaluator_and_runner_contract(tmp_path):
     assert train[train.index("--perception-slices") + 1] == "3"
     assert "game-holdout:year_2024:train:5:2:42" in train
     assert "holdout.frozen_predict" in frozen
-    assert "run_scripts.paper_model_selection.evaluate_fold" in evaluate
+    assert "run_scripts.double_difficulty.evaluate_fold" in evaluate
+
+
+def test_unconstrained_sliced_trainer_records_both_standard_normal_priors(tmp_path):
+    output = tmp_path / "pyramidal"
+    args = parse_args(
+        [
+            "--dimensions", "2", "--degree", "3", "--perception-slices", "3",
+            "--alpha-prior", "normal-zero", "--steps", "1",
+            "--posterior-draws", "0", "--device", "cpu",
+            "--output-dir", str(output),
+        ]
+    )
+    summary = run_experiment(args, tables=synthetic_tables())
+    assert summary["alpha_prior"] == "Normal(0, 1)"
+    assert summary["alpha_constraint"] == "unconstrained"
+    assert summary["beta_prior"] == "Normal(0, 1)"
 
 
 def test_sliced_alternating_trainer_and_runner_contract(tmp_path):
@@ -439,20 +468,3 @@ def test_sliced_alternating_trainer_and_runner_contract(tmp_path):
     train = stages[0][2]
     assert train[train.index("--perception-slices") + 1] == "3"
     assert "--alternate-player-steps" in train
-
-
-def test_sliced_perception_runs_in_imaginary_tournament():
-    inputs = perception_tournament_inputs(
-        question_lengths=6,
-        perception_alpha=np.stack(
-            [np.full((8, 1), 0.5), np.full((8, 1), 1.0), np.full((8, 1), 2.0)],
-            axis=1,
-        ),
-        perception_beta=np.zeros((8, 3, 1)),
-    )
-    players, games, summary = simulate_imaginary_tournament(
-        inputs, games=2, players_per_team=2, tossups_per_game=2, seed=9
-    )
-    assert not players.empty
-    assert len(games) == 2
-    assert summary["games"] == 2

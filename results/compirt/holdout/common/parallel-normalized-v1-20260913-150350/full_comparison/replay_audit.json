@@ -1,0 +1,22 @@
+{
+  "validation": "30 existing first-buzz likelihood tests passed, including DD model-factor normalization and saved-parameter probability agreement. No model or replay code changed.",
+  "correctness_population": "45995 observed first buzzes",
+  "observed_incorrect_rate": 0.23300358734645066,
+  "historical_mean_predicted_incorrect_rate": 0.22383087804561366,
+  "retrained_mean_predicted_incorrect_rate": 0.22382334655097294,
+  "replay_population": "46620 outcome rows with available replay artifacts",
+  "historical_replay": {
+    "predicted_buzzes": 39437,
+    "terminal_first_buzzes": 38403,
+    "incorrect_first_buzzes": 7156,
+    "minus5_first_buzzes": 0
+  },
+  "retrained_replay": {
+    "predicted_buzzes": 32673,
+    "terminal_first_buzzes": 31811,
+    "incorrect_first_buzzes": 5424,
+    "minus5_first_buzzes": 0
+  },
+  "observed_replay_questions_with_minus5_rate": 0.19753324753324752,
+  "interpretation": "The 0.5 individual-token hazard policy concentrates simulated buzzes at the terminal cell, where incorrect answers cost zero. Both historical and retrained replay generate zero minus5 penalties. This deterministic policy is not sampling from the fitted normalized race distribution."
+}

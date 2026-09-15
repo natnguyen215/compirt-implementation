@@ -86,7 +86,7 @@ property of the reading protocol, modulated by how hard the set is — not an
 artifact of one tournament.
 
 This is the evidence behind the double-difficulty families' terminal-cell
-intercepts; see [`../../docs/terminal-cell.md`](../../docs/terminal-cell.md).
+intercepts; see [`../../docs/double-difficulty-bernstein.md`](../../docs/double-difficulty-bernstein.md#terminal-cell-intercepts).
 
 ## Reproduce
 

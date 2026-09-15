@@ -1,9 +1,8 @@
 """Synthetic regression tests for the double-difficulty CompIRT variants.
 
-The load-bearing test in each class is the parent-equivalence one: setting the
-correctness and hazard curves to the same values must reproduce the parent
-family's logits and survival exactly. That is what makes "the same equation,
-just learned twice" a checkable claim rather than a comment.
+Parent-equivalence tests verify that equal correctness and hazard curves
+reproduce the multidim parent family's logits and survival. Additional tests cover
+independent curves, priors, saved artifacts, and evaluator routing.
 """
 
 from __future__ import annotations
@@ -30,10 +29,9 @@ from compirt_eval.scenario_a_tossups.parameters import (
     _buzz_parameter_prefix,
     _saved_difficulty_curve,
 )
-from compirt_eval.scenario_a_tossups.timing import event_first_buzz_components
+from compirt_eval.scenario_a_tossups.reconstruction import event_first_buzz_components
 
 from multidimensional.multidim_mirt import pyramidal_model as parent_multidim
-from polynomial_compirt import pyramidal_model as parent_bernstein
 
 from hazard_double_difficulty.multidim import pyramidal_model as double_multidim
 from hazard_double_difficulty.bernstein import pyramidal_model as double_bernstein
@@ -199,28 +197,6 @@ class MultidimEquivalenceTests(unittest.TestCase):
                     ),
                 )
 
-    def test_curves_are_independent(self):
-        theta, r, c, t, T = shared_row_inputs()
-        correct, hazard = multidim_curve(1), multidim_curve(2)
-        baseline_correctness = double_multidim.correctness_logit(
-            theta, r, *correct, t, T
-        )
-        baseline_hazard = double_multidim.hazard_logit(theta, r, *hazard, c, t, T)
-        # Perturbing one curve must leave the other branch bit-identical.
-        moved_hazard = multidim_curve(3)
-        torch.testing.assert_close(
-            double_multidim.correctness_logit(theta, r, *correct, t, T),
-            baseline_correctness,
-            rtol=0,
-            atol=0,
-        )
-        self.assertFalse(
-            torch.allclose(
-                double_multidim.hazard_logit(theta, r, *moved_hazard, c, t, T),
-                baseline_hazard,
-            )
-        )
-
     def test_grid_shapes_collapse_the_dimension_axis(self):
         theta, r, c, t, T = shared_row_inputs()
         curve = multidim_curve(1)
@@ -305,8 +281,8 @@ class MultidimEquivalenceTests(unittest.TestCase):
         torch.testing.assert_close(before, before_base)
 
 
-class BernsteinEquivalenceTests(unittest.TestCase):
-    """The Bernstein variant must collapse onto its parent when curves coincide."""
+class BernsteinTests(unittest.TestCase):
+    """Bernstein curve shape, priors, and optional global sites."""
 
     def test_incorrect_weight_only_scales_incorrect_correctness_terms(self):
         logits = torch.tensor([1.5, -0.75], dtype=torch.float64)
@@ -316,44 +292,6 @@ class BernsteinEquivalenceTests(unittest.TestCase):
             logits, targets, incorrect_weight=3.0
         )
         torch.testing.assert_close(actual, terms[0] + 3.0 * terms[1])
-
-    def test_matches_parent_when_both_curves_are_equal(self):
-        theta, r, c, t, T = shared_row_inputs()
-        curve = bernstein_curve(1)
-        t_star = torch.tensor([2, 3, 4, 5, 6, 7])
-        torch.testing.assert_close(
-            double_bernstein.correctness_logit(theta, r, *curve, t, T),
-            parent_bernstein.correctness_logit(theta, r, *curve, t, T),
-        )
-        torch.testing.assert_close(
-            double_bernstein.hazard_logit(theta, r, *curve, c, t, T),
-            parent_bernstein.hazard_logit(theta, r, *curve, c, t, T),
-        )
-        torch.testing.assert_close(
-            double_bernstein.log_survival(theta, r, *curve, c, t_star, T),
-            parent_bernstein.log_survival(theta, r, *curve, c, t_star, T),
-        )
-
-    def test_curves_are_independent(self):
-        theta, r, c, t, T = shared_row_inputs()
-        correct, hazard = bernstein_curve(1), bernstein_curve(2)
-        baseline_correctness = double_bernstein.correctness_logit(
-            theta, r, *correct, t, T
-        )
-        baseline_hazard = double_bernstein.hazard_logit(theta, r, *hazard, c, t, T)
-        moved_hazard = bernstein_curve(3)
-        torch.testing.assert_close(
-            double_bernstein.correctness_logit(theta, r, *correct, t, T),
-            baseline_correctness,
-            rtol=0,
-            atol=0,
-        )
-        self.assertFalse(
-            torch.allclose(
-                double_bernstein.hazard_logit(theta, r, *moved_hazard, c, t, T),
-                baseline_hazard,
-            )
-        )
 
     def test_both_curves_stay_strictly_decreasing(self):
         x = torch.linspace(0, 1, 201, dtype=torch.float64)

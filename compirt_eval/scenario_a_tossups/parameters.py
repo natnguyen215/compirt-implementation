@@ -4,7 +4,7 @@ Stage 1 training ('train_pyramidal.py') can save tossup difficulty either
 as a single scalar curve ('beta'/'gamma'/'mu' columns, one per tossup)
 or, for vector-weighted fits, as one curve per skill dimension
 ('beta_1'/'gamma_1'/'mu_1', 'beta_2'/... alongside a matching
-'alpha_1'/'alpha_2'/... discrimination vector or embedding-run
+'alpha_1'/'alpha_2'/... discrimination vector or
 'r_1'/'r_2'/... relevance vector). Polynomial-ridge fits instead save raw-power
 coefficients as 'poly_coef_p<power>_d<dimension>' beside the same relevance
 vector. Monotone Bernstein-polynomial fits instead save start/end difficulty,

@@ -1,0 +1,59 @@
+{
+  "family": "player_position",
+  "config": {
+    "player_curve": 1.0
+  },
+  "candidates": [
+    {
+      "config": {
+        "player_curve": 0.3
+      },
+      "validation_ap": 0.4896073344129398,
+      "validation_log_loss": 0.48863101331315173,
+      "fit": {
+        "iterations": 882,
+        "parameters": 14270
+      }
+    },
+    {
+      "config": {
+        "player_curve": 1.0
+      },
+      "validation_ap": 0.49024371596428634,
+      "validation_log_loss": 0.4884615066098702,
+      "fit": {
+        "iterations": 758,
+        "parameters": 14270
+      }
+    },
+    {
+      "config": {
+        "player_curve": 3.0
+      },
+      "validation_ap": 0.4760831043000444,
+      "validation_log_loss": 0.497745982666954,
+      "fit": {
+        "iterations": 669,
+        "parameters": 14270
+      }
+    }
+  ],
+  "thresholds": {
+    "default": 0.5,
+    "accuracy": 0.5899399549224705,
+    "precision60": 0.5492881530326483,
+    "f1_accuracy77": 0.4017015157646999,
+    "f1_accuracy78": 0.44971888984176955,
+    "f1_accuracy80p6": null
+  },
+  "fit": {
+    "iterations": 807,
+    "parameters": 14306
+  },
+  "seconds": 7.980840444564819,
+  "n_train": 38619,
+  "n_fit": 30890,
+  "n_val": 7729,
+  "n_test": 9295,
+  "inner_split_sha256": "daf6cce3f78b7bae22911517b0ea80db99d73c9a087f47a9d5fc5b43d39b2097"
+}

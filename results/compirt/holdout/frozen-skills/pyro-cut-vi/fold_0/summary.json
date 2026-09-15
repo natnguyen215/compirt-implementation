@@ -1,0 +1,40 @@
+{
+  "model": "pyro-frozen-skills",
+  "inference": "AutoNormal SVI; finite-mixture cut posterior",
+  "timing": {
+    "initial_loss": 452281.9525693655,
+    "final_loss": 246197.66362965107,
+    "best_loss": 246085.5825201273,
+    "last_100_loss_slope": -0.8698423193509631,
+    "finite_losses": true
+  },
+  "correctness": {
+    "initial_loss": 915524.8563480377,
+    "final_loss": 333811.597240448,
+    "best_loss": 333054.05050086975,
+    "last_100_loss_slope": -1.569135164551209,
+    "finite_losses": true
+  },
+  "seconds": 238.73427740717307,
+  "split": "game-holdout:year_2024:test:5:0:42",
+  "frozen_predict": true,
+  "seed": 42,
+  "timing_draws": 16,
+  "intercept_prior_sd": 10.0,
+  "timing_steps": 3000,
+  "correctness_steps": 3000,
+  "lr": 0.005,
+  "threshold": 0.5,
+  "hyperparameter_selection": "reuse original inner-selected feature settings",
+  "training_races": 39192,
+  "heldout_races": 9420,
+  "players": 1455,
+  "items": 1260,
+  "feature_config": {
+    "player": 1.0,
+    "item": 1.0,
+    "local": 3.0,
+    "curve": "spline",
+    "skill": 0.25
+  }
+}

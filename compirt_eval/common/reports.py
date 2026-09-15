@@ -7,7 +7,7 @@ Everything a reader can consume without loading pandas. Two products:
   the Stage 1 and Stage 2 metric rows grouped into themed tables
   ('TOSSUP_METRIC_GROUPS' / 'BONUS_METRIC_GROUPS', with short interpretation
   notes), the buzz-position bias bands, the synergy section (synergy branch
-  only), the match simulation, and calibration by stratum.
+  only), tossup game replay, and calibration by stratum.
 * 'write_eval_docs_summary' -- 'docs/summary.md', which consolidates the metric
   CSVs, no-synergy-versus-synergy comparison deltas, and fitted-parameter
   distribution summaries for one evaluation folder.
@@ -78,6 +78,23 @@ TOSSUP_METRIC_GROUPS: list[tuple[str, list[str]]] = [
             "first_buzzer_events",
         ],
     ),
+    (
+        "Token Replay: Tossup Outcomes, Games, and Tournament PPG",
+        [
+            "first_buzzer_player_replay_accuracy",
+            "first_buzzer_team_replay_accuracy",
+            "tossup_scorer_player_replay_accuracy",
+            "tossup_scorer_team_replay_accuracy",
+            "tossup_game_winner_accuracy",
+            "tossup_game_margin_mae",
+            "tossup_game_zero_margin_mae",
+            "tournament_player_ppg_spearman",
+            "tournament_player_ppg_mae",
+            "tournament_player_ppg_top10_overlap",
+            "tournament_player_ppg_top10_random_overlap",
+            "tournament_player_ppg_top10_adjusted_overlap",
+        ],
+    ),
 ]
 BONUS_METRIC_GROUPS: list[tuple[str, list[str]]] = [
     (
@@ -140,13 +157,21 @@ METRIC_GROUP_NOTES = {
         "to the observed buzzer (lower is better), conditional on someone "
         "buzzing. `first_buzzer_events` is the shared denominator."
     ),
+    "Token Replay: Tossup Outcomes, Games, and Tournament PPG": (
+        "These Stage-1 metrics use literal recorded tossup values, including "
+        "post-neg bouncebacks and zero-point late misses. Predicted outcomes "
+        "replay every token until a player reaches 0.5 buzz probability, resolve "
+        "correctness at 0.5, and continue with the opponent after an early miss. "
+        "Games sum replayed tossup points. Full tournament rankings pool "
+        "each game's out-of-fold prediction before computing PPG and ranks."
+    ),
 }
 
 GAME_METRICS = [
-    "match_winner_accuracy",
-    "match_winner_brier",
-    "match_games",
-    "match_simulations_per_game",
+    "tossup_game_winner_accuracy",
+    "tossup_game_margin_mae",
+    "tossup_game_zero_margin_mae",
+    "tossup_game_margin_mae_games",
 ]
 
 STRATUM_REPORT_COLUMNS = [
@@ -248,7 +273,12 @@ def evaluation_regime_notes(evaluation_dir: Path) -> list[str]:
     pyramidal_summary = _read_json(
         stage_base_for_evaluation(evaluation_dir) / "pyramidal" / "summary.json"
     )
-    if pyramidal_summary.get("frozen_predict"):
+    bonus_summary = _read_json(
+        stage_base_for_evaluation(evaluation_dir) / bonus_stage_name(evaluation_dir) / "summary.json"
+    )
+    if pyramidal_summary.get("frozen_predict") or (
+        not pyramidal_summary and bonus_summary.get("frozen_predict")
+    ):
         notes = [
             "**Evaluation regime: frozen matrix-infill holdout.** Player and "
             "question parameters were fit on the training folds and replayed "
@@ -548,7 +578,7 @@ def _synergy_section_lines(evaluation_dir: Path) -> list[str]:
         "for example absorbing the unnormalized Eq. 8 log-sum-exp's growth "
         "with roster size — so a predominantly one-signed distribution says "
         "as much about the logit's other terms as about the teams. A "
-        "held-out recombined-roster experiment (Scenario C) is required "
+        "held-out recombined-roster experiment is required "
         "before interpreting synergy as teamwork.",
         "",
     ]
@@ -566,6 +596,10 @@ def _stratum_table_lines(evaluation_dir: Path) -> list[str]:
                 "tossup_prediction_diagnostics_by_stratum.csv",
             )
         )
+    if diagnostics.empty:
+        diagnostics = _read_csv(
+            metrics_path(Path(evaluation_dir), "bonus_prediction_diagnostics_by_stratum.csv")
+        )
     lines = ["## Calibration By Stratum", ""]
     if diagnostics.empty:
         lines.extend(["No stratified prediction diagnostics CSV was found.", ""])
@@ -577,7 +611,7 @@ def _stratum_table_lines(evaluation_dir: Path) -> list[str]:
         [
             "Strata are fixed bands, not equal-count quantiles; read each row "
             "against its `observations` count. Sharpness columns stay in "
-            "`csvs/prediction_diagnostics_by_stratum.csv`.",
+            "the diagnostic CSVs under `csvs/`.",
             "",
             markdown_table(diagnostics[columns]),
             "",
@@ -588,7 +622,7 @@ def _stratum_table_lines(evaluation_dir: Path) -> list[str]:
 
 def experiment_report_markdown(
     evaluation_dir: Path,
-    tossup: dict[str, object],
+    tossup: dict[str, object] | None,
     bonus: dict[str, object] | None,
     game: dict[str, object] | None = None,
     title: str = "CompIRT Experiment Report",
@@ -597,27 +631,28 @@ def experiment_report_markdown(
 
     Sections: regime caveats, grouped Stage 1/Stage 2 metric tables with the
     buzz-position bias bands, synergy contributions (synergy branch only),
-    the match simulation, and calibration by stratum; figures stay in
-    'graphs/'. 'game=None' omits the match-simulation section entirely
-    (evaluators that never simulate matches); an empty dict renders it with a
+    tossup game replay, and calibration by stratum; figures stay in
+    'graphs/'. 'game=None' omits the game section entirely
+    (evaluators that do not provide game summaries); an empty dict renders it with a
     skipped note.
     """
     lines = [f"# {title}", ""]
     for note in evaluation_regime_notes(evaluation_dir):
         lines.extend([note, ""])
-    lines.extend(["## Stage 1: Tossup Metrics", ""])
-    lines.extend(_grouped_metric_lines(tossup, TOSSUP_METRIC_GROUPS))
-    lines.extend(_position_bias_lines(evaluation_dir))
+    if tossup is not None:
+        lines.extend(["## Stage 1: Tossup Metrics", ""])
+        lines.extend(_grouped_metric_lines(tossup, TOSSUP_METRIC_GROUPS))
+        lines.extend(_position_bias_lines(evaluation_dir))
     if bonus is not None:
         lines.extend(["## Stage 2: Bonus Metrics", ""])
         lines.extend(_grouped_metric_lines(bonus, BONUS_METRIC_GROUPS))
         lines.extend(_synergy_section_lines(evaluation_dir))
     if game is not None:
-        lines.extend(["## Match Winner Simulation", ""])
+        lines.extend(["## Tossup Game Replay", ""])
         if game:
             lines.extend([markdown_table(_metric_frame(game, GAME_METRICS)), ""])
         else:
-            lines.extend(["Match simulation was unavailable or skipped.", ""])
+            lines.extend(["Tossup game replay was unavailable.", ""])
     lines.extend(_stratum_table_lines(evaluation_dir))
     return "\n".join(lines).rstrip() + "\n"
 
@@ -634,6 +669,8 @@ def _summary_sections(
         diagnostics = _read_csv(
             csv_dir / "tossup_prediction_diagnostics_by_stratum.csv"
         )
+    if diagnostics.empty:
+        diagnostics = _read_csv(csv_dir / "bonus_prediction_diagnostics_by_stratum.csv")
     sections = [
         (
             "Run Variables And Stage Scalars",
@@ -661,21 +698,16 @@ def _summary_sections(
             "No tossup metrics CSV was found.",
         ),
         (
-            "Match Winner Simulation",
+            "Tossup Game Replay",
             _metric_frame(
                 load_metrics_row(evaluation_dir, "game_metrics.csv"), GAME_METRICS
             ),
-            "No match-simulation metrics CSV was found.",
+            "No tossup game replay metrics CSV was found.",
         ),
         (
             "Calibration And Sharpness By Stratum",
             diagnostics,
             "No stratified prediction diagnostics CSV was found.",
-        ),
-        (
-            "Posterior Predictive Checks",
-            _read_csv(csv_dir / "posterior_predictive_summary.csv"),
-            "No saved posterior predictive draws were available.",
         ),
         (
             "No-Synergy Versus Synergy Deltas",
@@ -700,7 +732,6 @@ def _summary_sections(
     bonus_titles = {
         "Bonus Stage Scalars",
         "Stage 2 Bonus Metrics",
-        "Match Winner Simulation",
         "No-Synergy Versus Synergy Deltas",
         "Bonus And Synergy Parameters",
     }

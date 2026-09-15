@@ -2,39 +2,100 @@
 
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import torch
-from pyro.infer import Predictive
 
-from compirt_eval.synergy_comparison import LOWER_IS_BETTER, NON_COMPARATIVE_METRICS
 from compirt_eval.common.metrics import (
     binary_brier_score,
+    calibration_table,
     classification_metrics,
+    expected_calibration_error,
     negative_class_metrics,
     ranked_probability_score,
-    stratified_prediction_metrics,
 )
-from compirt_eval.diagnostics.match_simulation import _game_model, simulate_match_winners
-from compirt_eval.parameter_recovery import generate_recovery_data
-from compirt_eval.scenario_a_tossups.timing import (
+from compirt_eval.scenario_a_tossups.survival import (
     _full_pmf_score_row,
-    buzz_density_fit_plot,
     evaluate_survival_and_first_buzzer,
-    event_first_buzz_components,
 )
+from compirt_eval.scenario_a_tossups.timing import buzz_density_fit_plot
+from compirt_eval.scenario_a_tossups.reconstruction import event_first_buzz_components
 from compirt_eval.scenario_a_tossups.metrics import tossup_joint_event_scores
 from compirt_eval.scenario_b_bonuses.metrics import (
     bonus_ranked_probability_scores,
     bonus_score_distribution,
 )
+from compirt_eval.scenario_b_bonuses.distributions import bonus_parameter_distribution_plots
+
+
+class FrozenBonusParameterPlotTests(unittest.TestCase):
+    def test_frozen_replay_plots_training_parameters_and_synergy(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            train = root / "train" / "synergy"
+            holdout = root / "holdout" / "synergy"
+            output = root / "synergy-evaluation"
+            train.mkdir(parents=True)
+            holdout.mkdir(parents=True)
+            (holdout / "summary.json").write_text(json.dumps({"frozen_predict": True}))
+            pd.DataFrame({"bonus_part_id": ["a", "b", "c"],
+                          "beta": [-1., 0., 1.], "alpha_1": [0.5, 1., 1.5]}).to_csv(
+                train / "bonus_parts.csv", index=False)
+            pd.DataFrame({"player_id": ["p1", "p2", "p3"],
+                          "psi_1": [-0.2, 0.1, 0.3]}).to_csv(
+                train / "player_synergy_profiles.csv", index=False)
+            bonus_parameter_distribution_plots(holdout, output)
+            for name in ("bonus_part_parameter_distributions.png", "synergy_parameter_distributions.png"):
+                self.assertTrue((output / "graphs" / "parameters" / name).is_file())
+            summary = pd.read_csv(output / "csvs" / "bonus_parameter_distribution_summary.csv")
+            self.assertEqual(set(summary.parameter_source), {str(train)})
+            self.assertFalse((holdout / "bonus_parts.csv").exists())
+
+    def test_nonfrozen_predictions_do_not_borrow_training_parameters(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            train = root / "train" / "compositional"
+            holdout = root / "holdout" / "compositional"
+            train.mkdir(parents=True)
+            holdout.mkdir(parents=True)
+            pd.DataFrame({"beta": [1.]}).to_csv(train / "bonus_parts.csv", index=False)
+            (holdout / "summary.json").write_text(json.dumps({"frozen_predict": False}))
+            bonus_parameter_distribution_plots(holdout, root / "evaluation")
+            self.assertFalse((root / "evaluation").exists())
 
 
 class ProperScoreTests(unittest.TestCase):
+    def test_ece_matches_reliability_table_at_bin_boundaries(self):
+        labels = [1, 0, 1, 0, 1]
+        probabilities = [0.0, 0.1, 0.2, 0.9, 1.0]
+        table = calibration_table(labels, probabilities)
+        expected = (
+            (table["observed"] - table["predicted"]).abs() * table["count"]
+        ).sum() / len(labels)
+
+        self.assertAlmostEqual(
+            expected_calibration_error(labels, probabilities), expected
+        )
+        self.assertEqual(table["count"].sum(), len(labels))
+
+    def test_auc_preserves_order_of_extreme_probabilities(self):
+        for probabilities in ([1e-20, 2e-20], [1e-8, 2e-8], [1 - 2e-8, 1 - 1e-8]):
+            with self.subTest(probabilities=probabilities):
+                metrics = classification_metrics([0, 1], probabilities)
+                self.assertEqual(metrics["auc"], 1.0)
+                self.assertTrue(np.isfinite(metrics["log_loss"]))
+                neg_metrics = negative_class_metrics([0, 1], probabilities)
+                self.assertEqual(neg_metrics["neg_auroc"], 1.0)
+                self.assertEqual(neg_metrics["neg_average_precision"], 1.0)
+
+    def test_negative_prediction_complements_correctness_at_threshold(self):
+        metrics = negative_class_metrics([0, 0, 0], [0.5, 0.4, np.nextafter(0.5, 0)])
+        self.assertEqual(metrics["neg_recall"], 2 / 3)
+
     def test_full_pmf_uses_saved_calibrated_correctness(self):
         event = pd.DataFrame(
             {
@@ -57,16 +118,6 @@ class ProperScoreTests(unittest.TestCase):
         score = _full_pmf_score_row("e", event, components)
 
         self.assertAlmostEqual(score["observed_probability"], 0.18)
-
-    def test_comparison_directions_handle_new_metrics(self):
-        self.assertTrue(
-            {
-                "brier",
-                "ranked_probability_score",
-                "bonus_total_score_log_loss",
-            }.issubset(LOWER_IS_BETTER)
-        )
-        self.assertIn("probability_std", NON_COMPARATIVE_METRICS)
 
     def test_binary_brier_and_all_correct_baseline(self):
         self.assertAlmostEqual(binary_brier_score([0, 1], [0.2, 0.8]), 0.04)
@@ -126,138 +177,22 @@ class ProperScoreTests(unittest.TestCase):
 
         scores = tossup_joint_event_scores(predictions).set_index("event_id")
 
+        winner_probability = (1 - 0.75 * 0.9) * (
+            (0.25 / 0.75) / (0.25 / 0.75 + 0.1 / 0.9)
+        )
+        expected = 0.8 * 0.9 * winner_probability * 0.7
         self.assertAlmostEqual(
             scores.loc["buzzed", "joint_event_probability"],
-            0.8 * 0.9 * 0.25 * 0.7,
+            expected,
         )
         self.assertAlmostEqual(
             scores.loc["dead", "joint_event_probability"], 0.6 * 0.5
         )
         self.assertAlmostEqual(
             scores.loc["buzzed", "joint_event_log_loss"],
-            -np.log(0.8 * 0.9 * 0.25 * 0.7),
+            -np.log(expected),
         )
         self.assertEqual(scores.loc["dead", "observed_outcome"], "dead")
-
-    def test_strata_include_aggregate_and_sharpness(self):
-        frame = pd.DataFrame(
-            {"y": [0, 1, 1, 0], "p": [0.1, 0.8, 0.7, 0.3], "tier": ["a", "a", "b", "b"]}
-        )
-        result = stratified_prediction_metrics(
-            frame, "y", "p", "test", {"tier": "tier"}
-        )
-        self.assertEqual(set(result["stratum"]), {"aggregate", "tier"})
-        self.assertIn("mean_predictive_variance", result)
-
-
-class SeededGameSimulationTests(unittest.TestCase):
-    def test_pyro_generative_process_scores_buzzes_bonuses_and_dead_tossups(self):
-        def event(first_buzz, correct, team_slot, bonus):
-            return {
-                "first_buzz": torch.tensor(first_buzz, dtype=torch.float32),
-                "correct": torch.tensor([correct], dtype=torch.float32),
-                "team_slot": torch.tensor([team_slot]),
-                "bonus": torch.tensor(bonus, dtype=torch.float32),
-            }
-
-        events = [
-            event([1, 0], 1, 1, [[1, 0, 0, 0], [0, 0, 0, 1]]),
-            event([1, 0], 0, 0, [[1, 0, 0, 0], [1, 0, 0, 0]]),
-            event([0, 1], 1, 0, [[0, 1, 0, 0], [1, 0, 0, 0]]),
-        ]
-
-        scores = Predictive(
-            _game_model,
-            num_samples=1,
-            return_sites=("_RETURN",),
-            parallel=True,
-        )(events)["_RETURN"]
-
-        torch.testing.assert_close(scores, torch.tensor([[-5.0, 40.0]]))
-
-    def test_complete_seeded_game_output_is_deterministic(self):
-        players = pd.DataFrame(
-            {
-                "player_id": ["p1", "p2"],
-                "c": [1.5, 1.8],
-                "theta_1": [0.7, 0.3],
-            }
-        )
-        tossups = pd.DataFrame(
-            {
-                "tossup_id": ["q1"],
-                "alpha_1": [1.0],
-                "beta": [0.8],
-                "gamma": [7.0],
-                "mu": [0.5],
-            }
-        )
-        predictions = pd.DataFrame(
-            {
-                "event_id": ["e1", "e1"],
-                "game_id": ["g1", "g1"],
-                "team_id": ["a", "b"],
-                "player_id": ["p1", "p2"],
-                "tossup_id": ["q1", "q1"],
-                "T_j": [20, 20],
-                "tier": ["Open", "Open"],
-                "z": ["BUZZ", "CENSORED"],
-            }
-        )
-        bonus_parts = pd.DataFrame(
-            {
-                "response_id": ["r1"] * 3 + ["r2"] * 3,
-                "team_id": ["a"] * 3 + ["b"] * 3,
-                "tier": ["Open"] * 6,
-                "part_index": [0, 1, 2, 0, 1, 2],
-                "correct": [1, 1, 0, 1, 0, 0],
-                "predicted_correct": [0.8, 0.7, 0.4, 0.6, 0.3, 0.2],
-            }
-        )
-        games = pd.DataFrame(
-            {
-                "game_id": ["g1"],
-                "team_ids": [["a", "b"]],
-                "final_scores": [[200, 150]],
-            }
-        )
-
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            pyramidal = root / "pyramidal"
-            compositional = root / "compositional"
-            pyramidal.mkdir()
-            compositional.mkdir()
-            players.to_csv(pyramidal / "players.csv", index=False)
-            tossups.to_csv(pyramidal / "tossups.csv", index=False)
-            predictions.to_csv(pyramidal / "tossup_predictions.csv", index=False)
-            bonus_parts.to_csv(
-                compositional / "bonus_part_predictions.csv", index=False
-            )
-
-            first_metrics, first = simulate_match_winners(
-                pyramidal, compositional, root / "first", games,
-                simulations=64, seed=17,
-            )
-            second_metrics, second = simulate_match_winners(
-                pyramidal, compositional, root / "second", games,
-                simulations=64, seed=17,
-            )
-
-        pd.testing.assert_frame_equal(first, second)
-        self.assertEqual(first_metrics, second_metrics)
-        self.assertEqual(
-            first.columns.tolist(),
-            [
-                "game_id", "team_1_id", "team_2_id",
-                "actual_team_1_score", "actual_team_2_score",
-                "predicted_team_1_score", "predicted_team_2_score",
-                "team_1_win_probability", "actual_winner", "predicted_winner",
-                "winner_correct", "usable_tossups", "simulations",
-            ],
-        )
-        self.assertTrue(first["team_1_win_probability"].between(0, 1).all())
-        self.assertEqual(first["simulations"].tolist(), [64])
 
 
 class TimingAndRecoveryTests(unittest.TestCase):
@@ -373,14 +308,6 @@ class TimingAndRecoveryTests(unittest.TestCase):
                     "predicted_dead_rate",
                 ],
             )
-
-    def test_recovery_generator_emits_model_rows(self):
-        observations, truth = generate_recovery_data(
-            players=6, tossups=4, events=6, seed=7
-        )
-        self.assertEqual(set(truth), {"theta", "c", "r", "beta", "gamma", "mu"})
-        self.assertEqual(observations["event_id"].nunique(), 6)
-        self.assertTrue(set(observations["z"]).issubset({"BUZZ", "CENSORED", "NO-BUZZ"}))
 
 
 if __name__ == "__main__":

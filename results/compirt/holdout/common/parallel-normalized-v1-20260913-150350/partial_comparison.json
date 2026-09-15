@@ -1,0 +1,152 @@
+{
+  "as_of": "2026-09-13T15:57:58.064952-07:00",
+  "notes": [
+    "Preliminary: pooled correctness and multidimensional bonuses use folds 0-3 on both sides.",
+    "Observation identities and labels were matched before pooling.",
+    "DD timing uses fold 0 only; historical timing reference is normalized full-grid replay.",
+    "Downstream games use the September 13 token-threshold replay reference.",
+    "No DD bonus scores or final five-fold conclusions are available in this snapshot."
+  ],
+  "new_roots": {
+    "root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/parallel-normalized-v1-20260913-150350",
+    "dd-root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350",
+    "bonus-root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350",
+    "multidim-root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350"
+  },
+  "old_dd_root": "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal",
+  "old_multidim_root": "results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold",
+  "old_normalized_timing_reference": "results/compirt/holdout/frozen-skills/pyro-cut-vi/fold_metrics.csv",
+  "old_downstream_reference": "results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-locations-terminal/fold_0/csvs/tossup_outcome_metrics.csv",
+  "matched_four_folds": {
+    "DD_correctness": {
+      "folds": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "buzzes": 36725,
+      "old": {
+        "auc": 0.7127555024142818,
+        "log_loss": 0.49114214950673357,
+        "accuracy": 0.7769911504424779,
+        "brier": 0.15951903892822475,
+        "neg_precision": 0.6071428571428571,
+        "neg_recall": 0.14008820798514393,
+        "neg_average_precision": 0.44734909963244357
+      },
+      "new": {
+        "auc": 0.7126298186166315,
+        "log_loss": 0.4911603609789532,
+        "accuracy": 0.7768822328114363,
+        "brier": 0.15951650192751207,
+        "neg_precision": 0.6057114228456913,
+        "neg_recall": 0.14032033426183843,
+        "neg_average_precision": 0.44762502782077357
+      }
+    },
+    "Multidim_correctness": {
+      "folds": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "buzzes": 36725,
+      "old": {
+        "auc": 0.6311134768573844,
+        "log_loss": 0.8055391153596111,
+        "accuracy": 0.6285364193328795,
+        "brier": 0.25763949918139073,
+        "neg_precision": 0.3227285553047404,
+        "neg_recall": 0.5309888579387186,
+        "neg_average_precision": 0.3288453206906664
+      },
+      "new": {
+        "auc": 0.6315090676324256,
+        "log_loss": 0.8033839084758309,
+        "accuracy": 0.6289448604492852,
+        "brier": 0.2573030641426995,
+        "neg_precision": 0.32304541281163923,
+        "neg_recall": 0.5308727948003714,
+        "neg_average_precision": 0.3291182864099965
+      }
+    },
+    "Multidim_bonus_compositional": {
+      "folds": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "parts": 102234,
+      "old": {
+        "auc": 0.8873853233448096,
+        "log_loss": 0.42372819276720686,
+        "part_accuracy": 0.8078134475810396,
+        "exact_acc": 0.5116790891484242,
+        "ppb_mae": 2.0607058792428488
+      },
+      "new": {
+        "auc": 0.8875393702034078,
+        "log_loss": 0.4235898657642556,
+        "part_accuracy": 0.8079992957333176,
+        "exact_acc": 0.5121486002699689,
+        "ppb_mae": 2.0540527692949513
+      }
+    },
+    "Multidim_bonus_synergy": {
+      "folds": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "parts": 102234,
+      "old": {
+        "auc": 0.8950489186493811,
+        "log_loss": 0.41179546086468966,
+        "part_accuracy": 0.813379110667684,
+        "exact_acc": 0.5231527671811727,
+        "ppb_mae": 1.2270300890361607
+      },
+      "new": {
+        "auc": 0.8950585634339419,
+        "log_loss": 0.4118542910859846,
+        "part_accuracy": 0.8132421699239001,
+        "exact_acc": 0.5229180116204003,
+        "ppb_mae": 1.2309110717249
+      }
+    }
+  },
+  "dd_fold0": {
+    "events": 9420,
+    "observed_no_buzz_rate": 0.0132696390658174,
+    "metrics": {
+      "joint_event_log_loss": {
+        "old": 6.62412828737558,
+        "new": 6.613223135172919
+      },
+      "position_mae": {
+        "old": 0.1525707289596508,
+        "new": 0.1553695219066023
+      },
+      "predicted_no_buzz_rate": {
+        "old": 0.0159886795095307,
+        "new": 0.0331827015049096
+      },
+      "first_buzzer_accuracy": {
+        "old": 0.3544916621839699,
+        "new": 0.3571812802582033
+      },
+      "tossup_game_winner_accuracy": {
+        "old": 0.6319290465631929,
+        "new": 0.6541019955654102
+      },
+      "game_margin_mae": {
+        "old": 48.53503184713376,
+        "new": 49.49044585987261
+      }
+    }
+  }
+}

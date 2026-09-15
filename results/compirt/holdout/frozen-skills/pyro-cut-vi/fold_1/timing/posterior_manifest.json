@@ -1,0 +1,64 @@
+{
+  "approximation": "Pyro AutoNormal variational posterior",
+  "mean_field": true,
+  "quantile_probabilities": [
+    0.025,
+    0.5,
+    0.975
+  ],
+  "draws": 16,
+  "draw_seed": 1043,
+  "estimated_draw_bytes": 775744,
+  "draw_alignment": "The same leading draw index across every site file is one joint variational-posterior draw.",
+  "interpretation": "Intervals are approximate SVI credible intervals conditional on this model and fitted dataset; they are not bootstrap intervals.",
+  "sites": {
+    "theta": {
+      "shape": [
+        1455,
+        3
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "theta",
+      "draw_file": "posterior_draws/theta.npy"
+    },
+    "speed": {
+      "shape": [
+        1455
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "speed",
+      "draw_file": "posterior_draws/speed.npy"
+    },
+    "relevance": {
+      "shape": [
+        1260,
+        3
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "relevance",
+      "draw_file": "posterior_draws/relevance.npy"
+    },
+    "start": {
+      "shape": [
+        1260
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "start",
+      "draw_file": "posterior_draws/start.npy"
+    },
+    "slope": {
+      "shape": [
+        1260
+      ],
+      "dtype": "float32",
+      "quantile_prefix": "slope",
+      "draw_file": "posterior_draws/slope.npy"
+    },
+    "end": {
+      "shape": [],
+      "dtype": "float32",
+      "quantile_prefix": "end",
+      "draw_file": "posterior_draws/end.npy"
+    }
+  }
+}

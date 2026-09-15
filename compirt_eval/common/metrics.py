@@ -26,7 +26,8 @@ def inverse_logit(logits):
 def expected_calibration_error(y, probability, n_bins=10):
     """Measure how closely predicted probabilities match observed frequencies.
 
-    Predictions are grouped into probability bins. For each non-empty bin, the
+    Predictions use the same right-closed bins as :func:`calibration_table`,
+    with zero included in the first bin. For each non-empty bin, the
     absolute gap between mean confidence and observed success rate is weighted
     by the bin's fraction of all observations.
     """
@@ -36,7 +37,7 @@ def expected_calibration_error(y, probability, n_bins=10):
         return float("nan")
 
     bins = np.linspace(0.0, 1.0, n_bins + 1)
-    bucket = np.clip(np.digitize(probability, bins) - 1, 0, n_bins - 1)
+    bucket = np.clip(np.digitize(probability, bins, right=True) - 1, 0, n_bins - 1)
     error = 0.0
     for index in range(n_bins):
         selected = bucket == index
@@ -87,7 +88,7 @@ def sharpness_metrics(probability):
 
 
 def calibration_table(y, probability, n_bins=10):
-    """Summarize confidence, accuracy, and sample count by probability bin."""
+    """Summarize forecasts in right-closed bins, including zero in the first."""
     frame = pd.DataFrame(
         {
             "y": np.asarray(y, dtype=float),
@@ -110,8 +111,8 @@ def classification_metrics(y, probability):
     """Return AUC, binary log loss, expected calibration error, and accuracy.
 
     These are the standard binary-classification metrics the paper reports for
-    tossup correctness and bonus parts (Scenarios A and B); they are computed
-    here on the in-sample fitted predictions.
+    tossup correctness and bonus parts (Scenarios A and B). The caller selects
+    the scored population, including in-sample or held-out predictions.
     """
     y = np.asarray(y, dtype=float)
     if len(y) == 0:
@@ -126,11 +127,11 @@ def classification_metrics(y, probability):
         }
         return {**empty, **sharpness_metrics([])}
 
-    # Clip away exact 0/1 so log loss never sees log(0).
+    # Bound log-loss penalties while preserving forecast ranks for AUC.
     raw_probability = np.clip(np.asarray(probability, dtype=float), 0.0, 1.0)
     probability = np.clip(raw_probability, 1e-6, 1 - 1e-6)
     # AUC is undefined when every label is the same class.
-    auc = float("nan") if len(np.unique(y)) < 2 else roc_auc_score(y, probability)
+    auc = float("nan") if len(np.unique(y)) < 2 else roc_auc_score(y, raw_probability)
     accuracy = float(((raw_probability >= 0.5) == y.astype(bool)).mean())
     all_correct_accuracy = float(y.mean())
     metrics = {
@@ -139,8 +140,7 @@ def classification_metrics(y, probability):
         "ece": expected_calibration_error(y, raw_probability),
         "brier": binary_brier_score(y, raw_probability),
         "accuracy": accuracy,
-        # The canonical reference predicts every attempt correct; it stays
-        # fixed across data slices rather than acting as a majority-class oracle.
+        # The reference predicts every attempt correct across all data slices.
         "all_correct_accuracy": all_correct_accuracy,
         "accuracy_lift_over_all_correct": accuracy - all_correct_accuracy,
     }
@@ -149,9 +149,15 @@ def classification_metrics(y, probability):
 
 
 def negative_class_metrics(y, probability):
-    """Score the negative outcome as the positive class at threshold 0.5."""
+    """Score negs as the positive class, predicting a neg when P(correct) < 0.5.
+
+    An exact tie predicts correct, matching :func:`classification_metrics`.
+    Rank metrics use -P(correct) to preserve distinctions near zero that
+    subtracting from one can round away.
+    """
     y = 1 - np.asarray(y, dtype=int)
-    probability = 1 - np.asarray(probability, dtype=float)
+    correctness_probability = np.asarray(probability, dtype=float)
+    negative_score = -correctness_probability
     metrics = {
         "neg_auroc": float("nan"),
         "neg_average_precision": float("nan"),
@@ -161,15 +167,15 @@ def negative_class_metrics(y, probability):
     if not len(y):
         return metrics
 
-    prediction = probability >= 0.5
+    prediction = correctness_probability < 0.5
     metrics.update(
         neg_precision=float(precision_score(y, prediction, zero_division=0)),
         neg_recall=float(recall_score(y, prediction, zero_division=0)),
     )
     if len(np.unique(y)) == 2:
         metrics.update(
-            neg_auroc=float(roc_auc_score(y, probability)),
-            neg_average_precision=float(average_precision_score(y, probability)),
+            neg_auroc=float(roc_auc_score(y, negative_score)),
+            neg_average_precision=float(average_precision_score(y, negative_score)),
         )
     return metrics
 

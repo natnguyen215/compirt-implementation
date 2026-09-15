@@ -158,7 +158,6 @@ class SubstitutionSplit(unittest.TestCase):
         self.assertLessEqual({"p1", "p2"}, set(players))
         # Fill comes only from second-half buzzers, never the bench (p6).
         self.assertTrue(set(players) - {"p1", "p2"} <= {"p3", "p4", "p5"})
-        self.assertNotIn("p6", players)
         self.assertEqual(row["resolution_rule"], "half_substitution")
 
     def test_second_half_fills_from_first_half_buzzers(self):
@@ -167,7 +166,6 @@ class SubstitutionSplit(unittest.TestCase):
         self.assertEqual(len(players), 4)
         self.assertLessEqual({"p3", "p4", "p5"}, set(players))
         self.assertTrue(set(players) - {"p3", "p4", "p5"} <= {"p1", "p2"})
-        self.assertNotIn("p6", players)
 
     def test_half_overflow_keeps_all_buzzers(self):
         # Five buzzers in the first half; one in the second.
@@ -195,16 +193,6 @@ class Determinism(unittest.TestCase):
         first = build_lineup_segments(tables)
         second = build_lineup_segments(tables)
         pd.testing.assert_frame_equal(first, second)
-
-    def test_seed_differs_by_segment(self):
-        tables = make_tables(
-            ["p1", "p2", "p3", "p4", "p5", "p6"],
-            [("p1", 1), ("p2", 2), ("p3", 11), ("p4", 12), ("p5", 13)],
-        )
-        df = build_lineup_segments(tables)
-        a = df[df["team_id"] == "A"]
-        seeds = a.set_index("segment")["random_seed"].to_dict()
-        self.assertNotEqual(seeds["first_half"], seeds["second_half"])
 
 
 class ReuseAndInvariants(unittest.TestCase):

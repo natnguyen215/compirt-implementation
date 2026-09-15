@@ -1,0 +1,24 @@
+/teapot/students/natnguyen/CompIRT-Implementation/analysis/bayesian_mark_study/models.py:83: UserWarning: Sparse invariant checks are implicitly disabled. Memory errors (e.g. SEGFAULT) will occur when operating on a sparse tensor which violates the invariants, but checks incur performance overhead. To silence this warning, explicitly opt in or out. See `torch.sparse.check_sparse_tensor_invariants.__doc__` for guidance.  (Triggered internally at /var/tmp/portage/sci-ml/pytorch-2.13.0-r3/work/pytorch-2.13.0/aten/src/ATen/Context.cpp:816.)
+  return torch.sparse_coo_tensor(np.stack([a.row, a.col]), a.data,
+/teapot/students/natnguyen/CompIRT-Implementation/analysis/bayesian_mark_study/models.py:97: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /var/tmp/portage/sci-ml/pytorch-2.13.0-r3/work/pytorch-2.13.0/torch/csrc/utils/tensor_numpy.cpp:213.)
+  y = torch.as_tensor(train.neg.to_numpy(), dtype=torch.float64, device=device)
+candidate 0 vb_base {'vb': True} 0.489159
+finished 0 vb_base 18.9
+candidate 0 vb_player {'vb': True, 'player_curve': 1.0} 0.488799
+finished 0 vb_player 16.9
+candidate 1 vb_base {'vb': True} 0.464724
+finished 1 vb_base 15.6
+candidate 1 vb_player {'vb': True, 'player_curve': 1.0} 0.466104
+finished 1 vb_player 16.6
+candidate 2 vb_base {'vb': True} 0.491267
+finished 2 vb_base 17.6
+candidate 2 vb_player {'vb': True, 'player_curve': 1.0} 0.491509
+finished 2 vb_player 17.4
+candidate 3 vb_base {'vb': True} 0.472765
+finished 3 vb_base 17.3
+candidate 3 vb_player {'vb': True, 'player_curve': 1.0} 0.473566
+finished 3 vb_player 17.1
+candidate 4 vb_base {'vb': True} 0.479722
+finished 4 vb_base 18.0
+candidate 4 vb_player {'vb': True, 'player_curve': 1.0} 0.480083
+finished 4 vb_player 17.6

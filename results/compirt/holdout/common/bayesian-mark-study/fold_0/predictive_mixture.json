@@ -1,0 +1,33 @@
+{
+  "family": "predictive_mixture",
+  "config": {
+    "members": [
+      "vb_base",
+      "whole_prefix"
+    ],
+    "vb_weight": 0.7146292951355863,
+    "selection": "minimum inner-validation binary log loss"
+  },
+  "thresholds": {
+    "default": 0.5,
+    "accuracy": 0.5055439298890232,
+    "precision60": 0.45851328556721876,
+    "f1_accuracy77": 0.3646901878482489,
+    "f1_accuracy78": 0.392294334896676,
+    "f1_accuracy80p6": null
+  },
+  "candidates": [
+    {
+      "config": {
+        "members": [
+          "vb_base",
+          "whole_prefix"
+        ],
+        "vb_weight": 0.7146292951355863,
+        "selection": "minimum inner-validation binary log loss"
+      },
+      "validation_ap": 0.49726737894247336,
+      "validation_log_loss": 0.472369853829288
+    }
+  ]
+}

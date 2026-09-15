@@ -1,0 +1,105 @@
+{
+  "stage1_root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal",
+  "root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/compositional/dd-bernstein-332-simplex-locations-terminal",
+  "folds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "arms": [
+    "compositional",
+    "synergy"
+  ],
+  "steps": 2000,
+  "lr": 0.01,
+  "seed": 42,
+  "alpha_prior": "gamma",
+  "device": "cuda",
+  "data_dir": null,
+  "sources": {
+    "0": {
+      "path": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_0/train/pyramidal",
+      "train_split": "game-holdout:year_2024:train:5:0:42",
+      "test_split": "game-holdout:year_2024:test:5:0:42",
+      "players_sha256": "9c5292f73222931ff9c91576a666d365e2be6f925f4f0dacd92e06c344b78529",
+      "summary_sha256": "e93a86cdf1f529114f291a6c29765c023ffd2996521209e1fb4e7cc059f081c9",
+      "tossup_predictions_sha256": "aa158a4892c6cda2b302a4b16349854944d71479233bd17bee26475aced8d50d",
+      "model": "bernstein-double-difficulty-competing-risks",
+      "dimensions": 3,
+      "degree": 3,
+      "relevance_prior": "simplex",
+      "learned_curve_locations": true,
+      "terminal_intercepts": true
+    },
+    "1": {
+      "path": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_1/train/pyramidal",
+      "train_split": "game-holdout:year_2024:train:5:1:42",
+      "test_split": "game-holdout:year_2024:test:5:1:42",
+      "players_sha256": "8a80108d6bcd3dcf058eaa17701005b78329a01a932a065924a587b255757775",
+      "summary_sha256": "de39d8d8cacdec454b8b60485d10dc843bc849c2712034bdab777945b942a838",
+      "tossup_predictions_sha256": "07c04acacdb15fc91dc6c80f1da313b9832f7bcd99a01fb425f6d6c3a75b5266",
+      "model": "bernstein-double-difficulty-competing-risks",
+      "dimensions": 3,
+      "degree": 3,
+      "relevance_prior": "simplex",
+      "learned_curve_locations": true,
+      "terminal_intercepts": true
+    },
+    "2": {
+      "path": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_2/train/pyramidal",
+      "train_split": "game-holdout:year_2024:train:5:2:42",
+      "test_split": "game-holdout:year_2024:test:5:2:42",
+      "players_sha256": "80c8f67ef6970a47661c0f955809eb22bb918b80b841bfb0dd9fc98a778911c5",
+      "summary_sha256": "5028525e80039e3a6ea1b3a95225d89724e2b19fa0777d35e647766f7df203f8",
+      "tossup_predictions_sha256": "b4d268ad084766271c1ffc4290c7133f1d8ec4745d3ec6aa33de860775207f1a",
+      "model": "bernstein-double-difficulty-competing-risks",
+      "dimensions": 3,
+      "degree": 3,
+      "relevance_prior": "simplex",
+      "learned_curve_locations": true,
+      "terminal_intercepts": true
+    },
+    "3": {
+      "path": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_3/train/pyramidal",
+      "train_split": "game-holdout:year_2024:train:5:3:42",
+      "test_split": "game-holdout:year_2024:test:5:3:42",
+      "players_sha256": "a45aa94200d9c2691be1a756db8db253c3754df93b57b89131e4fe8de599ffff",
+      "summary_sha256": "8f5e22ed948a82825beaecb6e1d3fc06582ef9017b757c447ced78b81c25e0e0",
+      "tossup_predictions_sha256": "97fc413bcbd71faafaeab83d322b8c065f63dbadd38ff77b748e35f1347de3ab",
+      "model": "bernstein-double-difficulty-competing-risks",
+      "dimensions": 3,
+      "degree": 3,
+      "relevance_prior": "simplex",
+      "learned_curve_locations": true,
+      "terminal_intercepts": true
+    },
+    "4": {
+      "path": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_4/train/pyramidal",
+      "train_split": "game-holdout:year_2024:train:5:4:42",
+      "test_split": "game-holdout:year_2024:test:5:4:42",
+      "players_sha256": "5211ef86362c539f8a8edf46e7b24516e556d19c96046d7513b9130fd3a1d7c3",
+      "summary_sha256": "95366764260ba9ee07f55b4981341971ff73f65fb7a6759a5544204a98bba69f",
+      "tossup_predictions_sha256": "97bc283a0eedce499944efdf827869a11c0873b871397799017dcef6d8d2a068",
+      "model": "bernstein-double-difficulty-competing-risks",
+      "dimensions": 3,
+      "degree": 3,
+      "relevance_prior": "simplex",
+      "learned_curve_locations": true,
+      "terminal_intercepts": true
+    }
+  },
+  "code_sha256": {
+    "compositional_model.py": "b9070a2672f589ce9fa13f4c497c1a88974d4fc0052c597c3c674e0569bacc3d",
+    "train_compositional.py": "a7999404ff4f6972089509ad30327981aca42b372bfc782a907b73bf0a58c485",
+    "holdout/frozen_predict.py": "d361bf90704d08f3985dc2b5ffb10875db1c41cbca98a9e37d7d9f5452cd7326",
+    "compirt_data.py": "876869c4fad710f56fad4b27ec914a68124326d42dc848b6d88607e7eba423a5",
+    "lineup.py": "ca5355671516a6a371c756da0bb6af2e3cba8db59d0711cc952e63e0629babbf",
+    "holdout/game_splits.py": "b3bc42cd71b69a24b85b4ec7cdad2305c6bbf7bf6f9088f7d33aac4a310140e2",
+    "utils/training.py": "ed2811d9872fef5a5d1aa1dc90536ff51e532ca514734e9d52a9ef86db4d6cb3",
+    "compirt_eval/scenario_b_bonuses/metrics.py": "722ff705b3031b370afe65d96675904e0d509ecb8b8f2e66c074c64f55bef56d",
+    "compirt_eval/common/metrics.py": "1edf5ba8643353765c7eeb2b77a5acb0a933286371a0560a2ad247fb6b23060e",
+    "run_scripts/common/run_compositional_from_folds.py": "5c598b6517a32d0b4bd2abfd66f17f7eb7ff293ca8d7af9144fe3c4b3972ce8c"
+  }
+}

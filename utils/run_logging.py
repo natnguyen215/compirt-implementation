@@ -202,9 +202,8 @@ def tee_run_output(log_path: Path, *, append: bool = False):
     sys.stderr = TeeStream(sys.stderr, handle)
 
     def _restore_and_close():
-        # Restore the real streams before closing the log so the interpreter's
-        # final flush at shutdown does not touch a closed file (which would make
-        # Python exit 120 and look like a failed run).
+        # Restore the real streams before closing the log. Python's shutdown
+        # flush needs an open stream; flushing a closed log causes exit 120.
         sys.stdout = original_stdout
         sys.stderr = original_stderr
         if not handle.closed:
@@ -226,14 +225,9 @@ def run_logged(args: list[str], *, cwd: Path | None = None) -> None:
         bufsize=0,
     )
     assert process.stdout is not None
-    # Read raw bytes rather than iterating "lines": text-mode iteration applies
-    # universal-newline translation, which treats a bare '\r' (how tqdm redraws
-    # a progress bar in place) as a line terminator. That turns every tqdm
-    # refresh into its own logged line instead of one line that updates in
-    # place, so read a fixed chunk size and decode incrementally (chunk
-    # boundaries can split a multi-byte UTF-8 character), writing through
-    # 'sys.stdout.write' -- not '.buffer.write' -- so a 'TeeStream' installed by
-    # 'tee_run_output' still mirrors the bytes to the log file.
+    # Raw reads preserve the carriage returns that tqdm uses to redraw progress
+    # bars in place. Incremental decoding handles UTF-8 characters split across
+    # chunks. Writing through sys.stdout lets TeeStream mirror output to the log.
     decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
     while True:
         chunk = process.stdout.read(4096)

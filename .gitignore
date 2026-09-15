@@ -2,7 +2,6 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
-.project-context.md
 logs/
 # Stray nohup/console logs dropped in the repo root.
 /nohup.out
@@ -12,13 +11,10 @@ logs/
 
 # Local agent context notes. Public documentation under docs/ is tracked.
 CLAUDE.md
-CONTEXT.md
 NATHAN_READ.md
 /CODE_DEEP_DIVE.md
 /COMPIRT_REPOSITORY_GUIDE.md
-/compirt_eval/docs/
 /docs/.*.md
-/docs/code-clarity-audit.md
 /compirt_eval/EVALUATION_TLDR.md
 /tasks/
 
@@ -36,13 +32,16 @@ results/compirt/**/tossup_predictions.csv
 results/compirt/**/bonus_part_predictions.csv
 results/**/*.csv
 
+# Third-party packages installed locally for an experiment are not source.
+results/**/deps/
+
 # Raw posterior draws: ~1.4 GB of regenerable sample arrays. The much smaller
 # posterior_quantiles.npz summaries beside them stay tracked.
 results/**/posterior_draws/
 
 # Scratch experiment tracks, kept local.
-/test_additions/
-/polynomial_compirt/
+/archive/test_additions/
+/archive/polynomial_compirt/
 results/compirt/**/test_additions/
 results/compirt/**/polynomial/
 

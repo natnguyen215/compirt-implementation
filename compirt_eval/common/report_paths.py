@@ -9,7 +9,7 @@ GRAPHS_DIR = "graphs"
 CSVS_DIR = "csvs"
 
 # Themed subdirectories the standard evaluators sort their figures into.
-GRAPH_GROUPS = ("tossup", "bonus", "match", "parameters", "diagnostics")
+GRAPH_GROUPS = ("tossup", "bonus", "parameters", "diagnostics")
 
 
 def evaluation_output_dirs(output_dir: Path) -> tuple[Path, Path]:
@@ -33,9 +33,8 @@ def graph_path(output_dir: Path, filename: str, group: str | None = None) -> Pat
     """Return a graph artifact path under 'graphs/', optionally themed.
 
     The standard evaluators pass a 'GRAPH_GROUPS' name so a run's figures land
-    in 'graphs/<group>/' sorted by scenario. Standalone runners (ablation
-    sweeps, drop robustness, Scenario C) omit it and keep the flat 'graphs/'
-    layout their artifact maps document.
+    in 'graphs/<group>/' sorted by scenario. Standalone runners omit it and
+    keep a flat 'graphs/' layout.
     """
     if group is not None and group not in GRAPH_GROUPS:
         raise ValueError(f"unknown graph group: {group!r}")

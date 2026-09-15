@@ -1,0 +1,20 @@
+candidate 0 prefix_expertise {'expertise': 0.3} 0.489915
+candidate 0 prefix_expertise {'expertise': 1.0} 0.481841
+candidate 0 prefix_expertise {'expertise': 3.0} 0.418842
+finished 0 prefix_expertise 45.1
+candidate 1 prefix_expertise {'expertise': 0.3} 0.465137
+candidate 1 prefix_expertise {'expertise': 1.0} 0.454107
+candidate 1 prefix_expertise {'expertise': 3.0} 0.390569
+finished 1 prefix_expertise 42.2
+candidate 2 prefix_expertise {'expertise': 0.3} 0.491353
+candidate 2 prefix_expertise {'expertise': 1.0} 0.483077
+candidate 2 prefix_expertise {'expertise': 3.0} 0.427569
+finished 2 prefix_expertise 41.5
+candidate 3 prefix_expertise {'expertise': 0.3} 0.474058
+candidate 3 prefix_expertise {'expertise': 1.0} 0.470382
+candidate 3 prefix_expertise {'expertise': 3.0} 0.423697
+finished 3 prefix_expertise 42.6
+candidate 4 prefix_expertise {'expertise': 0.3} 0.475157
+candidate 4 prefix_expertise {'expertise': 1.0} 0.46629
+candidate 4 prefix_expertise {'expertise': 3.0} 0.41355
+finished 4 prefix_expertise 42.3

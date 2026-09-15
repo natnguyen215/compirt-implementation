@@ -35,10 +35,6 @@ from utils.saving import (
     save_tossup_predictions,
     write_summary,
 )
-from compirt_eval.drop_robustness.perturbations import (
-    drop_tossup_events,
-    load_event_drop_list,
-)
 from utils.posterior import add_posterior_output_args
 from utils.training import fit_svi, require_device
 from holdout.player_priors import attach_player_priors, player_tier_map
@@ -61,13 +57,6 @@ def run_experiment(args):
     )
     if observations.empty:
         raise ValueError("No tossup observations matched the requested data selection")
-    # Robustness studies pass a drop list to refit without the listed events.
-    drop_info = None
-    if args.drop_events:
-        observations, drop_info = drop_tossup_events(
-            observations, load_event_drop_list(args.drop_events)
-        )
-        print(f"Dropped events: {drop_info}")
     data = tossup_tensors(observations, args.device)
     print(
         f"Rows: {len(observations):,}  "
@@ -138,9 +127,6 @@ def run_experiment(args):
         "include_bounceback": args.include_bounceback,
         "observation_counts": observations["z"].value_counts().to_dict(),
     }
-    if drop_info is not None:
-        summary["drop_events_file"] = str(args.drop_events)
-        summary.update(drop_info)
     write_summary(output_dir, summary, posterior)
     return summary
 
@@ -176,12 +162,6 @@ def parse_args():
         default="tier",
         help="prior for players unseen in training: tier-conditioned (paper "
         "default) or flat N(0, I) (ablation)",
-    )
-    parser.add_argument(
-        "--drop-events",
-        type=Path,
-        help="text file of event_ids (one per line) to exclude before fitting; "
-        "used by the data-dropping robustness study",
     )
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     return parser.parse_args()

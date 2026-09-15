@@ -1,0 +1,38 @@
+{
+  "state": "complete",
+  "pid": 1421106,
+  "total": 22,
+  "completed": [
+    "dd-0-evaluation",
+    "dd-0-frozen-replay",
+    "dd-0-normalized-score",
+    "dd-0-train",
+    "dd-1-evaluation",
+    "dd-1-frozen-replay",
+    "dd-1-normalized-score",
+    "dd-1-train",
+    "dd-2-evaluation",
+    "dd-2-frozen-replay",
+    "dd-2-normalized-score",
+    "dd-2-train",
+    "dd-3-evaluation",
+    "dd-3-frozen-replay",
+    "dd-3-normalized-score",
+    "dd-3-train",
+    "dd-4-evaluation",
+    "dd-4-frozen-replay",
+    "dd-4-normalized-score",
+    "dd-4-train",
+    "dd-aggregate",
+    "dd-prepare"
+  ],
+  "failed": {},
+  "pending": [],
+  "running": {},
+  "gpus": [
+    0,
+    1
+  ],
+  "jobs_per_gpu": 3,
+  "updated_at": "2026-09-14T05:24:50.343908+00:00"
+}

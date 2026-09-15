@@ -186,7 +186,7 @@ Among the 51,037 scored phase-0 first buzzes used by the baseline Stage-1 event 
 
 The broader terminal tenth of a clue span holds 30.2% of phase-0 first buzzes against 13.3% of token opportunities, an enrichment of 2.27×. This is not merely the season-wide tendency to buzz late in a tossup: each position is measured relative to the start and end of its *current clue*.
 
-**Model implication.** A smooth function of normalized tossup position misses a sharp, repeated within-clue feature of the hazard. The clue-aligned spline variants in this repository are therefore structurally well motivated. A smaller adjustment would add clue phase or a boundary/pause indicator to the hazard branch. The uniform-token comparison is an opportunity baseline, not a fitted survival null, so the choice should still be judged by held-out event likelihood and first-buzz calibration. Boundary heaping may combine actual listening behaviour with how buzz positions were recorded.
+**Model implication.** A smooth function of normalized tossup position misses a sharp, repeated within-clue feature of the hazard. Clue-aligned difficulty curves are therefore structurally well motivated. A smaller adjustment would add clue phase or a boundary/pause indicator to the hazard branch. The uniform-token comparison is an opportunity baseline, not a fitted survival null, so the choice should still be judged by held-out event likelihood and first-buzz calibration. Boundary heaping may combine actual listening behaviour with how buzz positions were recorded.
 
 ### 9.2 Returning-player parameters are stable enough to carry forward
 

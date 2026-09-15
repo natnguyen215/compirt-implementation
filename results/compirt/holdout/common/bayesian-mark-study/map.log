@@ -1,0 +1,85 @@
+candidate 0 player_position {'player_curve': 0.3} 0.489607
+candidate 0 player_position {'player_curve': 1.0} 0.490244
+candidate 0 player_position {'player_curve': 3.0} 0.476083
+finished 0 player_position 8.0
+candidate 0 subcategory_pooling {'subcategory': 0.3} 0.489661
+candidate 0 subcategory_pooling {'subcategory': 1.0} 0.482365
+finished 0 subcategory_pooling 9.2
+candidate 0 recent_prefix {'text': 0.3} 0.490169
+candidate 0 recent_prefix {'text': 1.0} 0.490466
+candidate 0 recent_prefix {'text': 3.0} 0.471627
+finished 0 recent_prefix 21.7
+candidate 0 whole_prefix {'text': 1.0, 'text_column': 'prefix_text'} 0.49115
+candidate 0 whole_prefix {'text': 3.0, 'text_column': 'prefix_text'} 0.494485
+finished 0 whole_prefix 35.0
+candidate 0 three_outcomes {'multinomial': True} 0.477519
+candidate 0 three_outcomes {'multinomial': True, 'player_curve': 1.0} 0.476895
+finished 0 three_outcomes 27.3
+candidate 1 player_position {'player_curve': 0.3} 0.465363
+candidate 1 player_position {'player_curve': 1.0} 0.467331
+candidate 1 player_position {'player_curve': 3.0} 0.464389
+finished 1 player_position 9.0
+candidate 1 subcategory_pooling {'subcategory': 0.3} 0.46454
+candidate 1 subcategory_pooling {'subcategory': 1.0} 0.45485
+finished 1 subcategory_pooling 9.9
+candidate 1 recent_prefix {'text': 0.3} 0.46557
+candidate 1 recent_prefix {'text': 1.0} 0.467198
+candidate 1 recent_prefix {'text': 3.0} 0.45803
+finished 1 recent_prefix 23.9
+candidate 1 whole_prefix {'text': 1.0, 'text_column': 'prefix_text'} 0.465883
+candidate 1 whole_prefix {'text': 3.0, 'text_column': 'prefix_text'} 0.4675
+finished 1 whole_prefix 34.8
+candidate 1 three_outcomes {'multinomial': True} 0.459385
+candidate 1 three_outcomes {'multinomial': True, 'player_curve': 1.0} 0.460623
+finished 1 three_outcomes 28.4
+candidate 2 player_position {'player_curve': 0.3} 0.491528
+candidate 2 player_position {'player_curve': 1.0} 0.493165
+candidate 2 player_position {'player_curve': 3.0} 0.485992
+finished 2 player_position 9.1
+candidate 2 subcategory_pooling {'subcategory': 0.3} 0.491908
+candidate 2 subcategory_pooling {'subcategory': 1.0} 0.48413
+finished 2 subcategory_pooling 9.7
+candidate 2 recent_prefix {'text': 0.3} 0.49155
+candidate 2 recent_prefix {'text': 1.0} 0.492263
+candidate 2 recent_prefix {'text': 3.0} 0.478972
+finished 2 recent_prefix 22.5
+candidate 2 whole_prefix {'text': 1.0, 'text_column': 'prefix_text'} 0.491949
+candidate 2 whole_prefix {'text': 3.0, 'text_column': 'prefix_text'} 0.492627
+finished 2 whole_prefix 35.0
+candidate 2 three_outcomes {'multinomial': True} 0.489484
+candidate 2 three_outcomes {'multinomial': True, 'player_curve': 1.0} 0.489644
+finished 2 three_outcomes 28.4
+candidate 3 player_position {'player_curve': 0.3} 0.473465
+candidate 3 player_position {'player_curve': 1.0} 0.474644
+candidate 3 player_position {'player_curve': 3.0} 0.46627
+finished 3 player_position 8.8
+candidate 3 subcategory_pooling {'subcategory': 0.3} 0.474852
+candidate 3 subcategory_pooling {'subcategory': 1.0} 0.475122
+finished 3 subcategory_pooling 10.6
+candidate 3 recent_prefix {'text': 0.3} 0.474627
+candidate 3 recent_prefix {'text': 1.0} 0.478998
+candidate 3 recent_prefix {'text': 3.0} 0.469498
+finished 3 recent_prefix 20.7
+candidate 3 whole_prefix {'text': 1.0, 'text_column': 'prefix_text'} 0.474485
+candidate 3 whole_prefix {'text': 3.0, 'text_column': 'prefix_text'} 0.477318
+finished 3 whole_prefix 35.1
+candidate 3 three_outcomes {'multinomial': True} 0.469658
+candidate 3 three_outcomes {'multinomial': True, 'player_curve': 1.0} 0.469792
+finished 3 three_outcomes 27.8
+candidate 4 player_position {'player_curve': 0.3} 0.475051
+candidate 4 player_position {'player_curve': 1.0} 0.475217
+candidate 4 player_position {'player_curve': 3.0} 0.468481
+finished 4 player_position 8.6
+candidate 4 subcategory_pooling {'subcategory': 0.3} 0.475417
+candidate 4 subcategory_pooling {'subcategory': 1.0} 0.4678
+finished 4 subcategory_pooling 10.1
+candidate 4 recent_prefix {'text': 0.3} 0.475552
+candidate 4 recent_prefix {'text': 1.0} 0.47465
+candidate 4 recent_prefix {'text': 3.0} 0.452893
+finished 4 recent_prefix 19.9
+candidate 4 whole_prefix {'text': 1.0, 'text_column': 'prefix_text'} 0.475771
+candidate 4 whole_prefix {'text': 3.0, 'text_column': 'prefix_text'} 0.474962
+finished 4 whole_prefix 32.6
+candidate 4 three_outcomes {'multinomial': True} 0.470958
+candidate 4 three_outcomes {'multinomial': True, 'player_curve': 1.0} 0.470893
+finished 4 three_outcomes 29.8

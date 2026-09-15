@@ -1,7 +1,6 @@
-# Experiment Results
+# Experiment results
 
-Result directories are retained in this repository because they record the
-paper's experiment history.
+Saved runs are kept in the repository as the record of the paper's experiments.
 
 ## Layout
 
@@ -14,77 +13,70 @@ results/
   ranking_comparison/<run>/       fitted player rankings vs observed scoring
 ```
 
-- `compirt/in_sample/` — the model is fitted and evaluated on the selected
-  split. These are fit diagnostics, not generalization estimates.
-- `compirt/holdout/` — temporal, game-infill, and fold workflows that train on
-  one set of rows and evaluate another. Read each run's summary: the temporal
-  holdout is player-prior transfer with test-period parameter fitting, not a
-  strict unseen-question holdout, while the fold runners are frozen matrix
-  infill.
-- `compirt/comparisons/` — reports that compare many runs at once
-  (`parameter_comparison.md`, `synergy_bonus_model_comparison.md`). They span
-  both tiers, so they sit beside them rather than inside one.
-- `ranking_comparison/` — comparisons between fitted player rankings and
-  observed tournament scoring. Not a CompIRT run root, so it stays outside
-  `compirt/`.
+- `compirt/in_sample/` — fit diagnostics, not generalization estimates.
+- `compirt/holdout/` — temporal, game-infill, and fold workflows. Read each
+  run's summary: the temporal holdout fits test-period parameters under
+  transferred player priors, while the fold runners are frozen matrix infill.
+- `compirt/comparisons/` — `parameter_comparison.md` and
+  `synergy_bonus_model_comparison.md`, which span both tiers.
+- `ranking_comparison/` — fitted player rankings against observed tournament
+  scoring; not a CompIRT run root.
 
-Every runner resolves its output root through `resolve_result_root`
-(`utils.run_logging` for Python, `run_scripts/common/lib/result_root.sh` for
-shell), which forces outputs into a tier and redirects a bare
-`results/compirt/<name>`.
+Runners resolve output roots through `utils.run_logging.resolve_result_root`,
+which redirects a bare `results/compirt/<name>` into the runner's tier.
 
-## The family level
+## Families
 
-Inside each tier, runs are grouped by model family: `baseline/`, `multidim/`,
-`topic/`, `tfidf/`, `embedding/`, `double-difficulty/`. Two directories are not
-families:
+Within each tier, runs are grouped by model family: `baseline/`, `multidim/`,
+`double-difficulty/`, and results from families whose code is now under
+`archive/` (`topic/`, `tfidf/`, `embedding/`, `frozen-skills/`). Two kinds of
+directory are not families:
 
-- `common/` — studies that span families rather than belonging to one
-  (`in_sample/common/drop-robustness`, `holdout/common/neg-test`).
-- `polynomial/` and `test_additions/` under `in_sample/` — scratch tracks,
-  ignored by git along with their source packages.
+- `common/` — studies that span families or ask about the data.
+  `in_sample/common/` holds the drop-robustness study and the 2024 Nationals
+  comparison fits; [`holdout/common/`](compirt/holdout/common/README.md) has its
+  own index.
+- `in_sample/polynomial/` and `in_sample/test_additions/` — scratch tracks,
+  ignored by git along with their source under `archive/`.
 
-A normal two-stage run root contains `pyramidal/`, `compositional/`, optional
+A two-stage run root contains `pyramidal/`, `compositional/`, optional
 `synergy/`, their evaluation directories, and an optional `comparison/`. Fold
-and sweep runners nest further (`<arm>/seed_N/fold_K/`, or the ablation grid's
+and sweep runners nest further (`<arm>/seed_N/fold_K/`, or
 `degree_D/curves_C/dirichlet_A/fold_K/`).
 
-`holdout/double-difficulty/` is the one family grouped a level deeper, by the
-*question* each run answers rather than as a flat list of runs:
-`ablations/`, `model-comparisons/`, `variants/`, `2023-2025-season/`. It has
-enough runs that a flat listing stopped being navigable. The reference
-configuration is not a top-level folder: it lives in
-`ablations/relevance-locations-terminal/`, alongside the runs that vary the
-relevance parameterization, the learned curve locations, and the terminal
-intercepts, because those three settings are interrelated and are read
-together. Inside that one group the leaves keep their encoded names
-(`dd-bernstein-332-simplex-locations-terminal`), so the name states the
-configuration. See
-[`holdout/double-difficulty/README.md`](compirt/holdout/double-difficulty/README.md)
-for the index.
+[`holdout/double-difficulty/`](compirt/holdout/double-difficulty/README.md) is
+grouped one level deeper, by the question each run answers (`ablations/`,
+`model-comparisons/`, `variants/`, `2023-2025-season/`), and has its own index.
 
-## Naming
+i## Naming
 
-Run leaf names use several historical styles (`all-2024` and `all2024`, for
-example). They are intentionally not renamed: a leaf name is part of the
-recorded experiment provenance, and the `Result root:` lines inside each run's
-`evaluation/docs/summary.md` record the path the run was written to. Only the
-directory *structure* above them has been normalized, so those recorded paths
-may name an older location for the same run.
+Leaf names mix historical styles (`all-2024`, `all2024`) and are not renamed,
+because a leaf name is part of the run's provenance. The directories above the
+leaves have been reorganized, so `Result root:` lines in older
+`evaluation/docs/summary.md` files may name a previous location.
 
-`holdout/double-difficulty/` is the exception: its run leaves *were* renamed
-from encoded settings (`matrix-infill`) to what each run answers
-(`model-comparisons/double-vs-single-difficulty`). Its
-`ablations/relevance-locations-terminal/` leaves are the exception within that
-exception: they keep encoded names
-(`dd-bernstein-332-simplex-locations-terminal`), because there the settings
-*are* the question the group asks. Every recorded path inside
-those runs — `configuration.json`, `command.json`, the `.complete.json` resume
-markers, and the `Result root:` lines — was rewritten to match, so the runners'
-resume logic still works and the reports stay self-consistent. The settings
-those old names encoded are in each run's `configuration.json`.
+`holdout/double-difficulty/` is the exception: its runs were renamed, and their
+recorded paths (`configuration.json`, `command.json`, `.complete.json` resume
+markers, and `Result root:` lines) were rewritten to match, so resume still
+works there. New runs should use the names emitted by the current runners.
 
-New work should follow the names emitted by the current runners.
+## Code kept beside results
 
-Generated prediction CSVs, posterior draws, and plots may be ignored for new
-runs even when older paper artifacts remain tracked.
+Completed studies keep the code that produced them beside their results:
+
+- `in_sample/common/drop-robustness/code/`
+- `in_sample/multidim/multidim-all2024/code/` (posterior predictive checks and
+  match simulation)
+- `in_sample/multidim/multidim-all2024/compirt_eval/parameter-recovery/code/`
+- `in_sample/multidim/multidim-all2024-cal/imaginary-tournament/code/`
+- `holdout/double-difficulty/compositional/dd-bernstein-332-simplex-locations-terminal/code/`
+- `holdout/common/token-threshold-replay/2026-09-13/replay_research_log_outcomes.py`
+- `ranking_comparison/code/`
+
+This code is a record. It is not imported or checked, its imports and READMEs
+name its original locations (for example `compirt_eval.drop_robustness` and
+`run_scripts/common/`), and some helpers it used have been deleted. Copy it back
+and restore those helpers from git history before rerunning it.
+
+Prediction CSVs, posterior draws, and plots from new runs may be ignored by git
+even where older artifacts are tracked.

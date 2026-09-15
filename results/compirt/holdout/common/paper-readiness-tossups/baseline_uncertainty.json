@@ -1,0 +1,18 @@
+{
+  "pooled_n": 45995,
+  "pooled_log_loss_gain": 0.001253254626039808,
+  "game_id": {
+    "clusters": 2332,
+    "conditional_percentile_95_interval": [
+      6.729077231327928e-05,
+      0.0026253909111724357
+    ]
+  },
+  "tossup_id": {
+    "clusters": 1240,
+    "conditional_percentile_95_interval": [
+      -8.57260673800385e-05,
+      0.0026277609661001294
+    ]
+  }
+}

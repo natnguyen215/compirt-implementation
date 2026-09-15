@@ -1,44 +1,36 @@
-# Multidimensional-Difficulty CompIRT
+# Multidimensional-difficulty CompIRT
 
-This package contains the side-by-side MIRT-style tossup variant:
+Stage-1 tossup model with a separate difficulty curve per latent dimension:
 
 ```text
-d_jk(t) = beta_jk * sigmoid(gamma_jk * (mu_jk - t / T_j))
-logit_ij(t) = sum_k r_jk * (theta_ik - d_jk(t))
+d_jk(t)      = beta_jk * sigmoid(gamma_jk * (mu_jk - t / T_j))
+logit_ij(t)  = sum_k r_jk * (theta_ik - d_jk(t))
 hazard_ij(t) = logit_ij(t) - c_i
 ```
 
-The sigmoid inside `d_jk(t)` is the default link; the opt-in
-`--difficulty-link tanh` trainer flag replaces it with tanh so the curve can go
-negative late in the question (`d_jk(t)` spans `(-beta_jk, beta_jk)` instead of
-`(0, beta_jk)`). The choice is recorded as `difficulty_link` in `summary.json`
-and `evaluate_compirt.py` auto-detects it when replaying curves. Runners pass
-it via the `DIFFICULTY_LINK` env var.
+The relevance vector `r` has a positive `Gamma(2, 2)` prior, so more skill on a
+loaded dimension always helps. It is named `r` rather than the baseline's
+`alpha` because it weights the whole per-dimension skill gap, and it is saved as
+`r_1..K` columns in `tossups.csv`.
 
-The tossup relevance vector uses a positive `Gamma(2, 2)` prior on `r`, so
-higher player skill on a loaded dimension always helps. The weight is named `r`
-rather than the baseline's `alpha` because per-dimension difficulty puts it
-outside the skill gap; Stage 1 saves it as `r_1..K` columns.
+`--difficulty-link tanh` replaces the sigmoid, so `d_jk(t)` spans
+`(-beta_jk, beta_jk)` and can go negative late in a question. The choice is
+saved as `difficulty_link` in `summary.json`, where the evaluator reads it.
+Stage 2 and evaluation use the root `train_compositional.py` and
+`evaluate_compirt.py` unchanged.
 
-It keeps the root CompIRT pipeline shape:
-
-```text
-multidimensional/multidim_mirt/train_pyramidal.py
--> train_compositional.py
--> train_compositional.py --use-synergy
--> evaluate_compirt.py
-```
-
-Convenience runs:
+## Running
 
 ```bash
-./run_scripts/multidimensional/multidim/run_multidim_all2024.sh
-./run_scripts/multidimensional/multidim/run_multidim_holdout.sh
+.venv/bin/python -m multidimensional.multidim_mirt.train_pyramidal --help
+
+# Temporal holdout through both stages, with the synergy branch
+MODEL=multidim RUN_SYNERGY=1 .venv/bin/python -m run_scripts.common.run_compirt_holdout
 ```
 
-Both wrappers run no-calibration and calibration variants, and both include the
-synergy bonus branch by default. The default multidim skill/difficulty width is
-5 dimensions, matching the topic-model comparison runs; the synergy term remains
-3-dimensional by default. Evaluation writes the usual aggregate difficulty graph
-plus `tossup_difficulty_curves_by_dimension.png`, the multidim analogue of the
-topic model's per-topic difficulty-curve graph.
+The holdout runner defaults to five skill dimensions and three synergy
+dimensions, and reads `DIFFICULTY_LINK` and `CALIBRATE_CORRECTNESS`; give each
+configuration its own `ROOT`. Whole-game fold runners are listed in the
+[runner guide](../../run_scripts/README.md). Evaluation adds
+`tossup_difficulty_curves_by_dimension.png`, which draws each dimension's curve
+for sampled tossups.

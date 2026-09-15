@@ -7,9 +7,8 @@ module adds two complementary artifacts while the fitted guide is still alive:
 * optional joint posterior draws, stored one memory-mappable ``.npy`` file per
   site with a shared leading draw index.
 
-The draws contain parameters, not replayed row/token predictions.  Keeping
-those concerns separate makes the standard output inexpensive while allowing
-later prediction-uncertainty jobs to replay only the outputs they need.
+Parameter draws support later prediction-uncertainty jobs, which can load and
+replay the sites they need.
 """
 
 from __future__ import annotations
@@ -50,8 +49,8 @@ def _safe_site_name(site):
 
 def _quantile_label(probability):
     """Return compact artifact labels such as ``p025`` and ``p975``."""
-    basis_points = int(round(float(probability) * 1000))
-    return f"p{basis_points:03d}"
+    thousandths = int(round(float(probability) * 1000))
+    return f"p{thousandths:03d}"
 
 
 def _tensor_cuda_devices(value):
@@ -127,8 +126,9 @@ def save_variational_posterior(
 
     Draw arrays use shape ``(draws, *site_shape)``.  Their leading indexes are
     aligned across files: row ``d`` in every site file belongs to the same
-    complete posterior draw.  Files are memory mapped while being written so
-    the implementation never holds all sites and draws in RAM simultaneously.
+    complete posterior draw. Memory-mapped files let the writer stream one
+    joint draw at a time. Quantile labels round probabilities to thousandths,
+    so requested probabilities must remain distinct at that precision.
     """
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -140,6 +140,12 @@ def save_variational_posterior(
         raise ValueError("posterior quantiles must lie strictly between zero and one")
     if tuple(sorted(probabilities)) != probabilities:
         raise ValueError("posterior quantiles must be sorted")
+    labels = [_quantile_label(value) for value in probabilities]
+    if len(set(labels)) != len(labels):
+        raise ValueError(
+            "posterior quantiles must have distinct artifact labels "
+            "after rounding to thousandths"
+        )
 
     with torch.no_grad():
         quantiles = guide.quantiles(list(probabilities), **model_kwargs)
@@ -247,4 +253,3 @@ def save_variational_posterior(
     temporary.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     temporary.replace(output_dir / "posterior_manifest.json")
     return manifest
-

@@ -1,0 +1,182 @@
+{
+  "year2024": {
+    "table_counts": {
+      "tournaments": 29,
+      "teams": 462,
+      "games": 2431,
+      "tossups": 1296,
+      "tossup_buzzes": 58020,
+      "bonus_responses": 44487,
+      "bonuses": 1295
+    },
+    "first_buzz_count": 47914,
+    "raw_buzz_count": 58020,
+    "first_correct_rate": 0.7672705263597278,
+    "first_buzz_per_player": {
+      "0.0": 1.0,
+      "0.1": 3.0,
+      "0.25": 10.0,
+      "0.5": 23.0,
+      "0.75": 46.0,
+      "0.9": 78.10000000000014,
+      "1.0": 256.0
+    },
+    "first_buzz_per_item": {
+      "0.0": 1.0,
+      "0.1": 18.0,
+      "0.25": 22.0,
+      "0.5": 37.0,
+      "0.75": 56.0,
+      "0.9": 64.0,
+      "1.0": 68.0
+    },
+    "first_incorrect_per_item": {
+      "0.0": 0.0,
+      "0.1": 2.0,
+      "0.25": 4.0,
+      "0.5": 7.0,
+      "0.75": 12.0,
+      "0.9": 18.0,
+      "1.0": 60.0
+    },
+    "missing_tossup_categories": 336,
+    "first_buzz_players": 1410,
+    "players_under_20_first_buzzes": 602,
+    "lineup_segments": 4903,
+    "lineup_rules": {
+      "whole_game_small_roster": 3861,
+      "whole_game_exact_four_buzzers": 493,
+      "whole_game_short_handed": 466,
+      "half_substitution": 82,
+      "whole_game_no_evidence": 1
+    },
+    "lineup_sizes": {
+      "1": 154,
+      "2": 246,
+      "3": 1074,
+      "4": 3428,
+      "5": 1
+    },
+    "large_roster_game_teams": 1001
+  },
+  "fold_coverage": [
+    {
+      "fold": 0,
+      "assigned_games": 487,
+      "retained_games": 471
+    },
+    {
+      "fold": 1,
+      "assigned_games": 486,
+      "retained_games": 462
+    },
+    {
+      "fold": 2,
+      "assigned_games": 486,
+      "retained_games": 469
+    },
+    {
+      "fold": 3,
+      "assigned_games": 486,
+      "retained_games": 461
+    },
+    {
+      "fold": 4,
+      "assigned_games": 486,
+      "retained_games": 469
+    }
+  ],
+  "all_sets": [
+    {
+      "set": "2023-acf-nationals::2023-04-22",
+      "sites": 1,
+      "games": 414,
+      "tossups": 460,
+      "bonus_responses": 0
+    },
+    {
+      "set": "2023-acf-winter::2023-11-11",
+      "sites": 1,
+      "games": 99,
+      "tossups": 336,
+      "bonus_responses": 0
+    },
+    {
+      "set": "2023-chicago-open::2023-08-05",
+      "sites": 1,
+      "games": 126,
+      "tossups": 320,
+      "bonus_responses": 0
+    },
+    {
+      "set": "2023-penn-bowl::2023-10-28",
+      "sites": 6,
+      "games": 187,
+      "tossups": 287,
+      "bonus_responses": 0
+    },
+    {
+      "set": "2024-acf-fall::fall",
+      "sites": 8,
+      "games": 744,
+      "tossups": 280,
+      "bonus_responses": 14112
+    },
+    {
+      "set": "2024-acf-nationals::2024-04-21",
+      "sites": 1,
+      "games": 407,
+      "tossups": 360,
+      "bonus_responses": 7017
+    },
+    {
+      "set": "2024-acf-regionals::01272024",
+      "sites": 10,
+      "games": 522,
+      "tossups": 336,
+      "bonus_responses": 9254
+    },
+    {
+      "set": "2024-acf-winter::2024-11-16",
+      "sites": 10,
+      "games": 758,
+      "tossups": 320,
+      "bonus_responses": 14104
+    },
+    {
+      "set": "2025-acf-fall::main",
+      "sites": 15,
+      "games": 1312,
+      "tossups": 280,
+      "bonus_responses": 24680
+    },
+    {
+      "set": "2025-acf-fall::uk",
+      "sites": 2,
+      "games": 136,
+      "tossups": 30,
+      "bonus_responses": 2541
+    },
+    {
+      "set": "2025-acf-nationals::04192025",
+      "sites": 1,
+      "games": 412,
+      "tossups": 440,
+      "bonus_responses": 7594
+    },
+    {
+      "set": "2025-acf-regionals::2025-02-01",
+      "sites": 14,
+      "games": 747,
+      "tossups": 320,
+      "bonus_responses": 13232
+    },
+    {
+      "set": "2025-acf-winter::main",
+      "sites": 7,
+      "games": 666,
+      "tossups": 320,
+      "bonus_responses": 12407
+    }
+  ]
+}

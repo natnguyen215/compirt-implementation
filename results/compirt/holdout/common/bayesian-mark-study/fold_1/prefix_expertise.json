@@ -1,0 +1,59 @@
+{
+  "family": "prefix_expertise",
+  "config": {
+    "expertise": 0.3
+  },
+  "candidates": [
+    {
+      "config": {
+        "expertise": 0.3
+      },
+      "validation_ap": 0.46513655086961453,
+      "validation_log_loss": 0.48690359628375146,
+      "fit": {
+        "iterations": 975,
+        "parameters": 33523
+      }
+    },
+    {
+      "config": {
+        "expertise": 1.0
+      },
+      "validation_ap": 0.4541068437419069,
+      "validation_log_loss": 0.49631462361813683,
+      "fit": {
+        "iterations": 992,
+        "parameters": 33523
+      }
+    },
+    {
+      "config": {
+        "expertise": 3.0
+      },
+      "validation_ap": 0.3905694803912247,
+      "validation_log_loss": 0.5809002495503818,
+      "fit": {
+        "iterations": 872,
+        "parameters": 33523
+      }
+    }
+  ],
+  "thresholds": {
+    "default": 0.5,
+    "accuracy": 0.6409609990168207,
+    "precision60": 0.5868417109071511,
+    "f1_accuracy77": 0.4217632752938607,
+    "f1_accuracy78": 0.48160982258262297,
+    "f1_accuracy80p6": null
+  },
+  "fit": {
+    "iterations": 1194,
+    "parameters": 34023
+  },
+  "seconds": 42.20942258834839,
+  "n_train": 38821,
+  "n_fit": 31063,
+  "n_val": 7758,
+  "n_test": 9093,
+  "inner_split_sha256": "df8f9b2b752ccc9d1088c7ab25f5195f1fcde27f961ae83b0250f14c5ea010f0"
+}

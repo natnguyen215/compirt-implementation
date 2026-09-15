@@ -8,7 +8,8 @@ For tossup ``j``, player ``i``, and relative position ``x=t/T_j`` the model is
 The relevance vector is a simplex and the monotone Bernstein curve is shared
 exactly between the two branches.  Only the player vectors ``alpha`` and
 ``beta`` alter the buzz hazard.  Alpha is positive with median one (identity
-difficulty perception); beta is unconstrained and centred at zero.
+difficulty perception); beta is unconstrained and centred at zero. Experiments
+may instead request a unit Normal alpha prior centred at zero or one.
 
 The optional three-slice experiment gives every player separate ``alpha`` and
 ``beta`` vectors for the first, middle, and final thirds of the question. The
@@ -20,12 +21,14 @@ from __future__ import annotations
 
 import math
 
+from compirt_race import winner_log_prob
 import pyro
 import pyro.distributions as dist
 import torch
 import torch.nn.functional as F
 from torch.utils.checkpoint import checkpoint
 
+from utils.prediction import event_rosters
 from utils.training import survival_chunk_size
 
 
@@ -36,6 +39,14 @@ DEFAULT_RELEVANCE_CONCENTRATION = 2.0
 DEFAULT_DROP_CONCENTRATION = 2.0
 TOTAL_DROP_LOG_SCALE = 0.5
 ALPHA_LOG_SCALE = 1.0
+ALPHA_PRIOR_LOGNORMAL = "lognormal"
+ALPHA_PRIOR_NORMAL_ZERO = "normal-zero"
+ALPHA_PRIOR_NORMAL_ONE = "normal-one"
+SUPPORTED_ALPHA_PRIORS = (
+    ALPHA_PRIOR_LOGNORMAL,
+    ALPHA_PRIOR_NORMAL_ZERO,
+    ALPHA_PRIOR_NORMAL_ONE,
+)
 PERCEPTION_SLICE_NAMES = ("first", "middle", "last")
 SUPPORTED_PERCEPTION_SLICES = (1, len(PERCEPTION_SLICE_NAMES))
 
@@ -57,6 +68,7 @@ def validate_concentration(value: float, name: str = "concentration") -> float:
 
 
 def bernstein_basis(x: torch.Tensor, degree: int) -> torch.Tensor:
+    """Return the nonnegative basis B_m,p(x), which sums to one on [0, 1]."""
     powers = torch.arange(degree + 1, dtype=x.dtype, device=x.device)
     binomial = x.new_tensor([math.comb(degree, m) for m in range(degree + 1)])
     return (
@@ -67,12 +79,14 @@ def bernstein_basis(x: torch.Tensor, degree: int) -> torch.Tensor:
 
 
 def control_values(start_difficulty, total_drop, drop_proportions):
+    """Build decreasing controls by distributing the positive total drop."""
     drops = total_drop.unsqueeze(-1) * drop_proportions
     later = start_difficulty.unsqueeze(-1) - drops.cumsum(-1)
     return torch.cat([start_difficulty.unsqueeze(-1), later], dim=-1)
 
 
 def difficulty_curve(start_difficulty, total_drop, drop_proportions, t, T_j):
+    """Evaluate the shared curve, retaining the trailing skill-dimension axis."""
     basis = bernstein_basis(t / T_j, drop_proportions.shape[-1])
     controls = control_values(start_difficulty, total_drop, drop_proportions)
     return (controls * basis.unsqueeze(-2)).sum(-1)
@@ -225,11 +239,29 @@ def survival_stop(data):
     return data["t_star"] + no_buzz.to(data["t_star"].dtype)
 
 
-def sample_player_perception(data, n_dimensions, perception_slices=1):
+def alpha_distribution(zero, one, alpha_prior=ALPHA_PRIOR_LOGNORMAL):
+    """Return the requested unit-scale alpha population prior."""
+    if alpha_prior == ALPHA_PRIOR_LOGNORMAL:
+        return dist.LogNormal(zero, ALPHA_LOG_SCALE * one)
+    if alpha_prior == ALPHA_PRIOR_NORMAL_ZERO:
+        return dist.Normal(zero, one)
+    if alpha_prior == ALPHA_PRIOR_NORMAL_ONE:
+        return dist.Normal(one, one)
+    raise ValueError(
+        f"alpha_prior must be one of {SUPPORTED_ALPHA_PRIORS}, got {alpha_prior!r}"
+    )
+
+
+def sample_player_perception(
+    data,
+    n_dimensions,
+    perception_slices=1,
+    alpha_prior=ALPHA_PRIOR_LOGNORMAL,
+):
     """Sample player alpha/beta vectors, with an optional three-slice axis.
 
-    Keeping this population-prior boundary separate makes a later hierarchical
-    non-centred alpha parameterization local to this function.
+    Keeping this population-prior boundary separate makes alternate alpha
+    population priors local to this function.
     """
     perception_slices = int(perception_slices)
     if perception_slices not in SUPPORTED_PERCEPTION_SLICES:
@@ -246,9 +278,7 @@ def sample_player_perception(data, n_dimensions, perception_slices=1):
     one = data["y"].new_ones(perception_shape)
     alpha = pyro.sample(
         "alpha",
-        dist.LogNormal(zero, ALPHA_LOG_SCALE * one).to_event(
-            len(perception_shape)
-        ),
+        alpha_distribution(zero, one, alpha_prior).to_event(len(perception_shape)),
     )
     beta = pyro.sample(
         "beta", dist.Normal(zero, one).to_event(len(perception_shape))
@@ -263,6 +293,7 @@ def sample_parameters(
     relevance_concentration=DEFAULT_RELEVANCE_CONCENTRATION,
     drop_concentration=DEFAULT_DROP_CONCENTRATION,
     perception_slices=1,
+    alpha_prior=ALPHA_PRIOR_LOGNORMAL,
 ):
     degree = validate_degree(degree)
     relevance_concentration = validate_concentration(
@@ -276,14 +307,16 @@ def sample_parameters(
     zero = data["y"].new_zeros(n_dimensions)
     one = data["y"].new_ones(n_dimensions)
 
+    # Each player has a skill vector and a transform of the shared difficulty.
     theta_loc = data.get("theta_prior_loc", zero)
     theta_scale = data.get("theta_prior_scale", one)
     with pyro.plate("players", n_players):
         theta = pyro.sample("theta", dist.Normal(theta_loc, theta_scale).to_event(1))
         alpha, beta = sample_player_perception(
-            data, n_dimensions, perception_slices
+            data, n_dimensions, perception_slices, alpha_prior
         )
 
+    # Simplex relevance combines monotone per-dimension difficulty curves.
     relevance = data["y"].new_full(
         (n_dimensions,), relevance_concentration
     )
@@ -310,6 +343,7 @@ def competing_risks_model(
     relevance_concentration=DEFAULT_RELEVANCE_CONCENTRATION,
     drop_concentration=DEFAULT_DROP_CONCENTRATION,
     perception_slices=1,
+    alpha_prior=ALPHA_PRIOR_LOGNORMAL,
 ):
     parameters = sample_parameters(
         data,
@@ -318,8 +352,10 @@ def competing_risks_model(
         relevance_concentration,
         drop_concentration,
         perception_slices,
+        alpha_prior,
     )
     theta, alpha, beta, r, start, total, shares = row_parameters(data, *parameters)
+    # The full roster contributes survival; winner terms use the full risk set at the stopping token.
     stop = survival_stop(data)
     survival = log_survival(
         theta,
@@ -334,16 +370,16 @@ def competing_risks_model(
         t_start=data.get("t_start"),
     )
     buzz = data["is_buzz"]
-    buzz_logits = hazard_logit(
-        theta[buzz],
-        r[buzz],
-        start[buzz],
-        total[buzz],
-        shares[buzz],
-        alpha[buzz],
-        beta[buzz],
-        data["t_star"][buzz],
-        data["T_j"][buzz],
+    stop_hazard_logits = hazard_logit(
+        theta,
+        r,
+        start,
+        total,
+        shares,
+        alpha,
+        beta,
+        data["t_star"],
+        data["T_j"],
     )
     correct_logits = correctness_logit(
         theta[buzz],
@@ -356,7 +392,7 @@ def competing_risks_model(
     )
     likelihood = (
         survival.sum()
-        + F.logsigmoid(buzz_logits).sum()
+        + winner_log_prob(data, stop_hazard_logits).sum()
         + dist.Bernoulli(logits=correct_logits).log_prob(data["y"][buzz]).sum()
     )
     pyro.factor(
@@ -412,31 +448,9 @@ def posterior_row_predictions(data, posterior):
 
 def expected_first_buzz_positions(data, posterior):
     """Return event -> expected relative first-buzz position, conditional on buzz."""
-    n_events = len(data["event_ids"])
-    phase0 = data.get("is_phase0")
-    if phase0 is None:
-        phase0 = torch.ones(
-            len(data["event"]), dtype=torch.bool, device=data["event"].device
-        )
-    counts = torch.bincount(data["event"][phase0], minlength=n_events)
-    max_roster = int(counts.max().item())
-    roster = data["player"].new_zeros((n_events, max_roster))
-    roster_mask = torch.zeros(
-        (n_events, max_roster), dtype=torch.bool, device=data["event"].device
-    )
-    next_slot = [0] * n_events
-    event_tossup = data["tossup"].new_zeros(n_events)
-    event_T = data["T_j"].new_ones(n_events)
-    for row in range(len(data["event"])):
-        if not bool(phase0[row]):
-            continue
-        event = int(data["event"][row].item())
-        slot = next_slot[event]
-        roster[event, slot] = data["player"][row]
-        roster_mask[event, slot] = True
-        event_tossup[event] = data["tossup"][row]
-        event_T[event] = data["T_j"][row]
-        next_slot[event] += 1
+    # Rebuild the full first-buzz field before broadcasting fitted parameters.
+    roster, roster_mask, event_tossup, event_T = event_rosters(data)
+    n_events, max_roster = roster.shape
 
     theta = posterior["theta"][roster]
     alpha = posterior["alpha"][roster]

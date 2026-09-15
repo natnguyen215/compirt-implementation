@@ -1,7 +1,7 @@
 # Variants
 
 These experiments change model structure rather than a reference-model setting.
-Each is compared with [`../reference-model/`](../reference-model/).
+Each is compared with [`dd-bernstein-332-simplex-locations-terminal`](../ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/).
 
 | Folder | Change | Result |
 | --- | --- | --- |

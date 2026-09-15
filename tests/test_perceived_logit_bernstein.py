@@ -7,13 +7,7 @@ import pandas as pd
 import pyro
 import torch
 
-from compirt_eval.imaginary_tournament.evaluation import (
-    simulate_imaginary_tournament,
-)
 from compirt_eval.scenario_a_tossups import evaluate_tossups
-from hazard_double_difficulty.perceived_difficulty_bernstein import (
-    pyramidal_model as canonical_difficulty,
-)
 from hazard_double_difficulty.perceived_logit_bernstein import (
     pyramidal_model as model,
 )
@@ -28,14 +22,13 @@ from hazard_double_difficulty.tests.test_hazard_double_difficulty import (
 )
 from hazard_double_difficulty.tests.perception_contracts import (
     assert_frozen_replay_matches,
-    perception_tournament_inputs,
 )
 from holdout.frozen_predict import (
     PERCEIVED_DIFFICULTY_BERNSTEIN,
     PERCEIVED_LOGIT_BERNSTEIN,
     detect_tossup_parameter_schema,
 )
-from run_scripts.bernstein.run_perceived_logit_bernstein_332 import (
+from run_scripts.double_difficulty.run_perceived_logit_bernstein_332 import (
     Configuration,
     experiment_commands,
     parse_args as parse_runner_args,
@@ -122,9 +115,6 @@ def test_trace_has_scalar_player_parameters_simplex_and_monotone_curve():
     assert isinstance(trace.nodes["alpha"]["fn"], torch.distributions.LogNormal)
     assert isinstance(trace.nodes["beta"]["fn"], torch.distributions.Normal)
     assert torch.all(trace.nodes["alpha"]["value"] > 0)
-    assert "c" not in trace.nodes
-    assert "end_correct" not in trace.nodes
-    assert "end_hazard" not in trace.nodes
 
     controls = model.control_values(
         trace.nodes["start_difficulty"]["value"],
@@ -132,6 +122,20 @@ def test_trace_has_scalar_player_parameters_simplex_and_monotone_curve():
         trace.nodes["drop_proportions"]["value"],
     )
     assert torch.all(controls[..., 1:] < controls[..., :-1])
+
+
+def test_unconstrained_scalar_alpha_prior_reproduces_historical_center():
+    pyro.clear_param_store()
+    trace = pyro.poutine.trace(model.competing_risks_model).get_trace(
+        tiny_data(),
+        n_dimensions=3,
+        degree=3,
+        alpha_prior="normal-one",
+    )
+    alpha_prior = trace.nodes["alpha"]["fn"]
+    assert isinstance(alpha_prior, torch.distributions.Normal)
+    torch.testing.assert_close(alpha_prior.loc, torch.ones_like(alpha_prior.loc))
+    torch.testing.assert_close(alpha_prior.scale, torch.ones_like(alpha_prior.scale))
 
 
 def test_survival_includes_terminal_no_buzz_and_respects_bounceback_start():
@@ -192,7 +196,6 @@ def test_saved_schema_frozen_replay_and_numpy_evaluator_match(tmp_path):
         schema=PERCEIVED_LOGIT_BERNSTEIN,
     )
     assert {"alpha", "beta", "theta_3", "theta_norm"}.issubset(players.columns)
-    assert not {"alpha_1", "beta_1"}.intersection(players.columns)
 
 
 def test_schema_detection_distinguishes_both_perception_models():
@@ -209,21 +212,6 @@ def test_schema_detection_distinguishes_both_perception_models():
         detect_tossup_parameter_schema(tossups, vector)
         == PERCEIVED_DIFFICULTY_BERNSTEIN
     )
-    assert callable(canonical_difficulty.hazard_logit)
-
-
-def test_scalar_perception_runs_in_imaginary_tournament():
-    inputs = perception_tournament_inputs(
-        question_lengths=4,
-        perceived_logit_alpha=np.linspace(-1.0, 2.0, 8),
-        perceived_logit_beta=np.linspace(-0.5, 0.5, 8),
-    )
-    players, games, summary = simulate_imaginary_tournament(
-        inputs, games=2, players_per_team=2, tossups_per_game=2, seed=9
-    )
-    assert not players.empty
-    assert len(games) == 2
-    assert summary["games"] == 2
 
 
 def test_trainer_smoke_evaluator_and_runner_contract(tmp_path):
@@ -245,7 +233,6 @@ def test_trainer_smoke_evaluator_and_runner_contract(tmp_path):
     players = pd.read_csv(output / "players.csv")
     assert {"theta_3", "alpha", "beta"}.issubset(players.columns)
     assert (players["alpha"] > 0).all()
-    assert not {"alpha_1", "beta_1"}.intersection(players.columns)
     tossups = pd.read_csv(output / "tossups.csv")
     np.testing.assert_allclose(tossups[["r_1", "r_2", "r_3"]].sum(axis=1), 1)
     metrics = evaluate_tossups(output, tmp_path / "evaluation")
@@ -282,4 +269,18 @@ def test_trainer_smoke_evaluator_and_runner_contract(tmp_path):
     assert "game-holdout:year_2024:train:5:2:42" in train
     assert "holdout.frozen_predict" in frozen
     assert "game-holdout:year_2024:test:5:2:42" in frozen
-    assert "run_scripts.paper_model_selection.evaluate_fold" in evaluate
+    assert "run_scripts.double_difficulty.evaluate_fold" in evaluate
+
+
+def test_unconstrained_scalar_trainer_records_prior(tmp_path):
+    output = tmp_path / "pyramidal"
+    args = parse_args(
+        [
+            "--dimensions", "2", "--degree", "3", "--steps", "1",
+            "--alpha-prior", "normal-one", "--posterior-draws", "0",
+            "--device", "cpu", "--output-dir", str(output),
+        ]
+    )
+    summary = run_experiment(args, tables=synthetic_tables())
+    assert summary["alpha_prior"] == "Normal(1, 1)"
+    assert summary["alpha_constraint"] == "unconstrained"

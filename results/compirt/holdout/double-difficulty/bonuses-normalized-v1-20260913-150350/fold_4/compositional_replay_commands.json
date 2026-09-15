@@ -1,0 +1,21 @@
+[
+  [
+    "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+    "-u",
+    "-m",
+    "holdout.frozen_predict",
+    "bonus",
+    "--split",
+    "game-holdout:year_2024:test:5:4:42",
+    "--device",
+    "cuda",
+    "--train-pyramidal",
+    "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/train/pyramidal",
+    "--train-compositional",
+    "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_4/train/compositional",
+    "--output-dir",
+    "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350/fold_4/holdout/compositional",
+    "--on-missing",
+    "error"
+  ]
+]

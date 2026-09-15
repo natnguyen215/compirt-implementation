@@ -28,13 +28,11 @@ def require_device(device):
 def survival_chunk_size():
     """Row-chunk size for the per-dimension 'log_survival' hazard grid.
 
-    Read from the 'COMPIRT_SURVIVAL_CHUNK' env var; unset (or non-positive)
-    means full-batch (no chunking), so default runs are byte-identical. When
-    set, each family's 'log_survival' evaluates its '(rows, positions, dims)'
-    grid in row chunks under gradient checkpointing: the summed likelihood is
-    unchanged, but peak memory is capped at one chunk's grid instead of the
-    whole batch. This is the knob that lets high-dimension ablations
-    (m >= 16) fit on the GPU.
+    'COMPIRT_SURVIVAL_CHUNK' sets the number of rows per chunk; unset or
+    non-positive values select full-batch evaluation. Each family's
+    'log_survival' evaluates its '(rows, positions, dims)' grid under gradient
+    checkpointing, preserving the likelihood while limiting grid memory to
+    one chunk. This supports higher-dimensional runs on memory-limited GPUs.
     """
     raw = os.environ.get("COMPIRT_SURVIVAL_CHUNK")
     if not raw:
@@ -78,7 +76,6 @@ def fit_svi(
 
     When ``posterior_output_dir`` is provided, save constrained quantiles and
     optional aligned parameter draws before the in-memory guide is discarded.
-    Existing library/test callers omit it and retain the former behavior.
     """
     # AutoNormal mean-field guide optimized with clipped Adam against the ELBO.
     pyro.clear_param_store()
@@ -106,10 +103,8 @@ def fit_svi(
 def _set_autonormal_site_trainability(frozen_sites):
     """Freeze selected AutoNormal sites, including their optimizer momentum.
 
-    Pyro zeroes gradients after each SVI step instead of setting them to
-    ``None``. Clearing a frozen parameter's gradient explicitly is important:
-    Adam otherwise continues moving it from accumulated momentum even when it
-    does not receive a new gradient.
+    Pyro zeroes gradients after each SVI step. Setting a frozen parameter's
+    gradient to ``None`` also stops Adam from applying accumulated momentum.
     """
     frozen_sites = frozenset(frozen_sites)
     for parameter_name, parameter in pyro.get_param_store().named_parameters():

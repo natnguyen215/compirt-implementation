@@ -1,0 +1,38 @@
+{
+  "correctness": {
+    "n": 9295,
+    "log_loss": 0.5398741364479065,
+    "neg_ap": 0.4204531249385251,
+    "auc": 0.6905117377806969,
+    "accuracy": 0.7672942442173212,
+    "neg_precision": 0.5080851063829788,
+    "neg_recall": 0.27360219981668193,
+    "neg_f1": 0.355674709562109,
+    "retrospective_recall_at_precision_60": 0.09624197983501374,
+    "retrospective_precision_at_recall_50": 0.40785046728971963
+  },
+  "timing": {
+    "events": 9420,
+    "buzz_events": 9295,
+    "timing_mae": 0.14322807533707096,
+    "timing_rmse": 0.17672505070966107,
+    "timing_bias": -0.030524379942710365,
+    "integrated_brier": 0.09482270318884595,
+    "timing_nll": 4.350228976732666,
+    "race_nll": 5.886431473135133,
+    "joint_nll": 6.4191416999921,
+    "first_buzzer_accuracy": 0.4052716514254976,
+    "first_buzzer_nll": 1.5568614864024997,
+    "dead_brier": 0.01276265956413508,
+    "predicted_dead_rate": 0.01663188690849819,
+    "observed_dead_rate": 0.01326963906581741
+  },
+  "convergence": {
+    "initial_loss": 42302.07526528835,
+    "final_loss": 21881.266545057297,
+    "best_loss": 21738.802398085594,
+    "last_100_loss_slope": -0.5099207715726426,
+    "finite_losses": true
+  },
+  "seconds": 60.25919162505306
+}

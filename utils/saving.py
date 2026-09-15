@@ -120,8 +120,8 @@ def save_player_buzz_summary(output_dir, predictions):
     they did), so it is conditioned on each player's own shot selection.
     Cautious late buzzers score high and aggressive early buzzers score low
     regardless of theta, and buzz volume never enters. For a PPG-comparable
-    model quantity use a competing-risks expected-points summary instead
-    (see 'compirt_eval.noise_floor').
+    model quantity use the token-threshold player PPG replay in
+    'compirt_eval.scenario_a_tossups.outcomes' instead.
     """
     summary = (
         predictions[predictions["z"] == "BUZZ"]
@@ -218,6 +218,11 @@ def write_summary(output_dir, summary, posterior):
     run does not have are simply skipped, so this list is a superset across the
     families.
     """
+    if "events" in summary and "tossups" in summary and not summary.get("frozen_predict"):
+        from compirt_race import FIRST_BUZZ_LIKELIHOOD
+
+        summary["first_buzz_likelihood"] = FIRST_BUZZ_LIKELIHOOD
+        summary["terminal_no_buzz_survival"] = "tokens_1_through_T"
     for parameter in (
         "correctness_scale",
         "correctness_bias",
@@ -237,15 +242,20 @@ def write_summary(output_dir, summary, posterior):
     )
 
 
-def save_synergy_outputs(output_dir, player_ids, observations, posterior, synergy_values):
-    """Save optional detailed synergy profiles and observed teammate pairs."""
-    # psi acts like an embedding: pair dot products matter, not the coordinates.
+def save_synergy_outputs(
+    output_dir, player_ids, observations, posterior, synergy_values, *, details=True
+):
+    """Always save replayable profiles; optionally export pairs and contributions."""
+    # Synergy depends on pairwise psi dot products, which are rotation-invariant.
     profiles = {"player_id": player_ids}
     for dimension in range(posterior["psi"].shape[1]):
         profiles[f"psi_{dimension + 1}"] = tensor_values(
             posterior["psi"][:, dimension]
         )
     pd.DataFrame(profiles).to_csv(output_dir / "player_synergy_profiles.csv", index=False)
+
+    if not details:
+        return
 
     psi = tensor_values(posterior["psi"])
     # Export only observed teammate pairs; all pairs would grow quadratically.

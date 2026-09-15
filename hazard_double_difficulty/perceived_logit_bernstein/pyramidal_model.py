@@ -4,12 +4,14 @@
     hazard      = alpha_i * correctness + beta_i
 
 The item relevance and difficulty are shared literally between the branches.
-Each player has only two additional scalar parameters: a positive slope with
-median one and an unconstrained intercept centred at zero.
+Each player has only two additional scalar parameters. The default is a
+positive slope with median one and an unconstrained intercept centred at zero;
+experiments may instead request a unit Normal slope centred at zero or one.
 """
 
 from __future__ import annotations
 
+from compirt_race import winner_log_prob
 import pyro
 import pyro.distributions as dist
 import torch
@@ -17,13 +19,16 @@ import torch.nn.functional as F
 from torch.utils.checkpoint import checkpoint
 
 from hazard_double_difficulty.perceived_difficulty_bernstein.pyramidal_model import (
+    ALPHA_PRIOR_LOGNORMAL,
     ALPHA_LOG_SCALE,
     DEFAULT_DROP_CONCENTRATION,
     DEFAULT_RELEVANCE_CONCENTRATION,
     MAX_DEGREE,
     MIN_DEGREE,
+    SUPPORTED_ALPHA_PRIORS,
     SUPPORTED_DEGREES,
     TOTAL_DROP_LOG_SCALE,
+    alpha_distribution,
     bernstein_basis,
     control_values,
     difficulty_curve,
@@ -31,6 +36,7 @@ from hazard_double_difficulty.perceived_difficulty_bernstein.pyramidal_model imp
     validate_concentration,
     validate_degree,
 )
+from utils.prediction import event_rosters
 from utils.training import survival_chunk_size
 
 
@@ -140,6 +146,7 @@ def sample_parameters(
     degree,
     relevance_concentration=DEFAULT_RELEVANCE_CONCENTRATION,
     drop_concentration=DEFAULT_DROP_CONCENTRATION,
+    alpha_prior=ALPHA_PRIOR_LOGNORMAL,
 ):
     degree = validate_degree(degree)
     relevance_concentration = validate_concentration(
@@ -155,15 +162,17 @@ def sample_parameters(
     zero = data["y"].new_tensor(0.0)
     one = data["y"].new_tensor(1.0)
 
+    # Each player has a skill vector and a scalar transform of correctness evidence.
     theta_loc = data.get("theta_prior_loc", vector_zero)
     theta_scale = data.get("theta_prior_scale", vector_one)
     with pyro.plate("players", n_players):
         theta = pyro.sample(
             "theta", dist.Normal(theta_loc, theta_scale).to_event(1)
         )
-        alpha = pyro.sample("alpha", dist.LogNormal(zero, ALPHA_LOG_SCALE * one))
+        alpha = pyro.sample("alpha", alpha_distribution(zero, one, alpha_prior))
         beta = pyro.sample("beta", dist.Normal(zero, one))
 
+    # Both branches share the item's relevance and monotone difficulty curve.
     relevance = data["y"].new_full(
         (n_dimensions,), relevance_concentration
     )
@@ -191,6 +200,7 @@ def competing_risks_model(
     degree=MIN_DEGREE,
     relevance_concentration=DEFAULT_RELEVANCE_CONCENTRATION,
     drop_concentration=DEFAULT_DROP_CONCENTRATION,
+    alpha_prior=ALPHA_PRIOR_LOGNORMAL,
 ):
     parameters = sample_parameters(
         data,
@@ -198,10 +208,12 @@ def competing_risks_model(
         degree,
         relevance_concentration,
         drop_concentration,
+        alpha_prior,
     )
     theta, alpha, beta, r, start, total, shares = row_parameters(
         data, *parameters
     )
+    # The full roster contributes survival; winner terms use the full risk set at the stopping token.
     survival = log_survival(
         theta,
         r,
@@ -215,16 +227,16 @@ def competing_risks_model(
         t_start=data.get("t_start"),
     )
     buzz = data["is_buzz"]
-    buzz_logits = hazard_logit(
-        theta[buzz],
-        r[buzz],
-        start[buzz],
-        total[buzz],
-        shares[buzz],
-        alpha[buzz],
-        beta[buzz],
-        data["t_star"][buzz],
-        data["T_j"][buzz],
+    stop_hazard_logits = hazard_logit(
+        theta,
+        r,
+        start,
+        total,
+        shares,
+        alpha,
+        beta,
+        data["t_star"],
+        data["T_j"],
     )
     correct_logits = correctness_logit(
         theta[buzz],
@@ -237,7 +249,7 @@ def competing_risks_model(
     )
     likelihood = (
         survival.sum()
-        + F.logsigmoid(buzz_logits).sum()
+        + winner_log_prob(data, stop_hazard_logits).sum()
         + dist.Bernoulli(logits=correct_logits).log_prob(data["y"][buzz]).sum()
     )
     pyro.factor("perceived_logit_bernstein_competing_risks_likelihood", likelihood)
@@ -291,31 +303,9 @@ def posterior_row_predictions(data, posterior):
 
 def expected_first_buzz_positions(data, posterior):
     """Return event -> expected relative first-buzz position, conditional on buzz."""
-    n_events = len(data["event_ids"])
-    phase0 = data.get("is_phase0")
-    if phase0 is None:
-        phase0 = torch.ones(
-            len(data["event"]), dtype=torch.bool, device=data["event"].device
-        )
-    counts = torch.bincount(data["event"][phase0], minlength=n_events)
-    max_roster = int(counts.max().item())
-    roster = data["player"].new_zeros((n_events, max_roster))
-    roster_mask = torch.zeros(
-        (n_events, max_roster), dtype=torch.bool, device=data["event"].device
-    )
-    next_slot = [0] * n_events
-    event_tossup = data["tossup"].new_zeros(n_events)
-    event_T = data["T_j"].new_ones(n_events)
-    for row in range(len(data["event"])):
-        if not bool(phase0[row]):
-            continue
-        event = int(data["event"][row].item())
-        slot = next_slot[event]
-        roster[event, slot] = data["player"][row]
-        roster_mask[event, slot] = True
-        event_tossup[event] = data["tossup"][row]
-        event_T[event] = data["T_j"][row]
-        next_slot[event] += 1
+    # Rebuild the full first-buzz field before broadcasting fitted parameters.
+    roster, roster_mask, event_tossup, event_T = event_rosters(data)
+    n_events, max_roster = roster.shape
 
     theta = posterior["theta"][roster]
     alpha = posterior["alpha"][roster]
@@ -352,10 +342,13 @@ def expected_first_buzz_positions(data, posterior):
 
 
 __all__ = [
+    "ALPHA_LOG_SCALE",
+    "ALPHA_PRIOR_LOGNORMAL",
     "DEFAULT_DROP_CONCENTRATION",
     "DEFAULT_RELEVANCE_CONCENTRATION",
     "MAX_DEGREE",
     "MIN_DEGREE",
+    "SUPPORTED_ALPHA_PRIORS",
     "SUPPORTED_DEGREES",
     "TOTAL_DROP_LOG_SCALE",
     "bernstein_basis",

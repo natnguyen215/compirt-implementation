@@ -1,0 +1,24 @@
+{
+  "python": "3.13.14",
+  "numpy": "2.5.1",
+  "pandas": "3.0.5",
+  "scipy": "1.17.1",
+  "sklearn": "1.9.0",
+  "torch": "2.13.0",
+  "cuda": "12.9",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "catboost": "1.2.8",
+  "outer_seed": 42,
+  "inner_seed_base": 20260908,
+  "new_source_sha256": {
+    "analysis/tossup_accuracy_study/models.py": "9a7572558c01eb65a905d8833d1fe9c09fdea0c5d7e22daf7f4b980e8647ee00",
+    "analysis/tossup_accuracy_study/export.py": "a74aaa81965060b34868e36b5386087e7988ddb55b389999395aa4cac6b2a08a",
+    "analysis/tossup_accuracy_study/boosting.py": "018767e22744807f96bb5655b638d67d082881663cea736c2a11d954c59ac139",
+    "analysis/tossup_accuracy_study/summarize.py": "a0c168d0fc96e3eaf652fd534e833709ca34a222459d9fdf12991232d6215188",
+    "analysis/tossup_accuracy_study/report.py": "24489306a1eb1991696eb649bb4cff75ef0c9a4fd972c42ea9724be6a78843d6",
+    "analysis/tossup_accuracy_study/run.py": "23c50993345f31066584803ce07f92fdedceca10de81156a65542887aee1c243",
+    "analysis/tossup_accuracy_study/predictor.py": "998f09daa30bbcac5853791b900b762dcec7e80759cd4213d062883754f87130",
+    "analysis/tossup_accuracy_study/predict.py": "df185eb36c828116e76fafbc38725f633fdc29764a4ddf11b7a6b4c60a454fb9",
+    "analysis/tossup_accuracy_study/test_contracts.py": "00b182cf1284b3fc6081a2577800d65f2d987325e442f329c336d7b1521ff959"
+  }
+}

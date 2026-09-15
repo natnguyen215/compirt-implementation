@@ -46,8 +46,11 @@ Important Shapes:
 import torch
 import torch.nn.functional as F
 
+from compirt_race import winner_log_prob, survival_stop
 import pyro
 import pyro.distributions as dist
+
+from utils.prediction import event_rosters
 
 
 def difficulty_curve(beta, gamma, mu, t, T_j):
@@ -76,7 +79,7 @@ def correctness_logit(theta, alpha, beta, gamma, mu, t, T_j):
 
 
 def hazard_logit(theta, alpha, beta, gamma, mu, c, t, T_j):
-    """Return the hazard at 't'
+    """Return the log-odds of buzzing at 't', conditional on no earlier buzz.
 
     Given that the player has not buzzed before
     this token, what is the probability that they buzz now?
@@ -93,7 +96,7 @@ def log_survival(theta, alpha, beta, gamma, mu, c, t_star, T_j, t_start=None):
 
     This is the survival term from Eq. 6. For each row, it asks:
 
-        what is the probability this player did not buzz between the row's start
+        What is the probability this player did not buzz between the row's start
         token and its stopping position?
 
     'T_j' is the total number of tokens in the tossup
@@ -119,9 +122,8 @@ def log_survival(theta, alpha, beta, gamma, mu, c, t_star, T_j, t_start=None):
     # Build one shared token-position grid: [1, 2, ..., max_t].
     max_t = int(t_star.max().item())
     positions = torch.arange(1, max_t + 1, device=t_star.device).unsqueeze(0)
-    # Eq. 6 defines S(t) strictly before t, and Eq. 13 assigns a dead tossup
-    # S(T_j). The published indexing therefore uses positions 1 through T_j - 1
-    # for a NO-BUZZ row, so the comparison must stay strict.
+    # Survival is strictly before its exclusive bound. Training and replay
+    # pass T_j + 1 for dead rows so they include the final no-buzz cell.
     # Shape: '(n_rows, max_t)' after broadcasting.
     before_stop = positions < t_star.unsqueeze(1)
     if t_start is not None:
@@ -237,7 +239,7 @@ def competing_risks_model(data, n_dimensions=1, calibrate_correctness=False):
     the event's first recorded buzz. For every game-tossup event:
 
     * all rostered players contribute survival before the stopping position;
-    * the actual first buzzer contributes a hazard at that position;
+    * the winner contributes a normalized categorical probability at that position;
     * the actual first buzzer contributes observed correctness;
     * a dead tossup has only the roster's survival contributions.
     """
@@ -247,11 +249,23 @@ def competing_risks_model(data, n_dimensions=1, calibrate_correctness=False):
         data, theta, c, alpha, beta, gamma, mu
     )
 
-    # Eq. 6 survival. Every BUZZ, CENSORED, and NO-BUZZ row contributes
-    # survival probability over its risk interval [t_start, t_star).
-    # Eq. 13 is represented by t_star = T_j on NO-BUZZ rows. 'data.get' keeps
-    # older/manual data dicts (no t_start) on the historical [1, t_star) path.
+    # Survival is before the observed buzz, or through T_j for a dead race.
+    # Missing t_start means the risk interval begins at token 1.
     survival = log_survival(
+        row_theta,
+        row_alpha,
+        row_beta,
+        row_gamma,
+        row_mu,
+        row_c,
+        survival_stop(data),
+        data["T_j"],
+        data.get("t_start"),
+    )
+    # The exclusive-winner factor requires all roster hazards at t_star.
+    # Only the observed winner contributes a correctness mark.
+    buzz = data["is_buzz"]
+    stop_hazard_logits = hazard_logit(
         row_theta,
         row_alpha,
         row_beta,
@@ -260,20 +274,6 @@ def competing_risks_model(data, n_dimensions=1, calibrate_correctness=False):
         row_c,
         data["t_star"],
         data["T_j"],
-        data.get("t_start"),
-    )
-    # Eq. 7 / Eq. 12 event term. Only actual first buzzers contribute the
-    # hazard-at-t_star factor h_ij(t*) and correctness factor p_ij(t*).
-    buzz = data["is_buzz"]
-    buzz_logits = hazard_logit(
-        row_theta[buzz],
-        row_alpha[buzz],
-        row_beta[buzz],
-        row_gamma[buzz],
-        row_mu[buzz],
-        row_c[buzz],
-        data["t_star"][buzz],
-        data["T_j"][buzz],
     )
     correctness = correctness_logit(
         row_theta[buzz],
@@ -288,21 +288,17 @@ def competing_risks_model(data, n_dimensions=1, calibrate_correctness=False):
         # Apply calibration to correctness; hazard/timing keeps its base logit.
         scale, bias = sample_correctness_calibration(data)
         correctness = scale * correctness + bias
-    # Eq. 7 / Eq. 12 in log space:
-    #   sum_i log S_ij(t*) + log h_i*j(t*) + log Bernoulli(y_i*j | p_i*j(t*)).
+    # Normalized event law in log space:
+    #   roster log survival + log P(winner at t*) + log P(correctness mark).
     # The joint log-likelihood is one scalar for the full dataset.
     log_likelihood = (
-        # Sum log survival over every player-event row: BUZZ, CENSORED, and NO-BUZZ.
         survival.sum()
-        # Sum log hazard only over observed first-buzzer rows.
-        + F.logsigmoid(buzz_logits).sum()
-        # Sum correctness log likelihood only over observed first-buzzer rows.
+        + winner_log_prob(data, stop_hazard_logits).sum()
         + dist.Bernoulli(logits=correctness).log_prob(data["y"][buzz]).sum()
     )
     # Attach the hand-computed competing-risks log-likelihood with pyro.factor.
     pyro.factor("competing_risks_likelihood", log_likelihood)
 
-# Posterior prediction
 
 def posterior_row_predictions(data, posterior, calibrate_correctness=False):
     """Return fitted correctness, hazard, and survival for every input row.
@@ -340,7 +336,7 @@ def posterior_row_predictions(data, posterior, calibrate_correctness=False):
             gamma,
             mu,
             c,
-            data["t_star"],
+            survival_stop(data),
             data["T_j"],
             data.get("t_start"),
         )
@@ -361,36 +357,9 @@ def expected_first_buzz_positions(data, posterior):
     events used for evaluation. Scoring this distribution mean against one draw
     per event gives downstream MAE an irreducible within-event spread floor.
     """
-    n_events = len(data["event_ids"])
-    # First-buzz timing is a full-field phase-0 quantity; skip phase-1 bounceback
-    # rows (they share an event_id but are an opponent-only continuation).
-    # Absent 'is_phase0' (pre-bounceback data) means every row is phase 0.
-    phase0 = data.get("is_phase0")
-    if phase0 is None:
-        phase0 = torch.ones(
-            len(data["event"]), dtype=torch.bool, device=data["event"].device
-        )
-    counts = torch.bincount(data["event"][phase0], minlength=n_events)
-    max_roster = int(counts.max().item())
-    # Training rows are one player at a time; regroup them into per-event roster
-    # matrices so all of an event's players can be stepped through together.
-    roster = data["player"].new_zeros((n_events, max_roster))
-    roster_mask = torch.zeros(
-        (n_events, max_roster), dtype=torch.bool, device=data["event"].device
-    )
-    next_slot = [0] * n_events
-    event_tossup = data["tossup"].new_zeros(n_events)
-    event_T = data["T_j"].new_ones(n_events)
-    for row in range(len(data["event"])):
-        if not bool(phase0[row]):
-            continue
-        event = int(data["event"][row].item())
-        slot = next_slot[event]
-        roster[event, slot] = data["player"][row]
-        roster_mask[event, slot] = True
-        event_tossup[event] = data["tossup"][row]
-        event_T[event] = data["T_j"][row]
-        next_slot[event] += 1
+    # Rebuild the full first-buzz field before broadcasting fitted parameters.
+    roster, roster_mask, event_tossup, event_T = event_rosters(data)
+    n_events, max_roster = roster.shape
 
     # Parameter shapes now begin with (n_events, max_roster, ...).
     theta = posterior["theta"][roster]

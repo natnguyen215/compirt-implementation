@@ -1,0 +1,31 @@
+{
+  "first_post_training_check": {
+    "existing_python_files_checked": 263,
+    "changed_files": []
+  },
+  "later_post_boosting_check": {
+    "existing_python_files_checked": 263,
+    "changed_files": [
+      "tests/test_drop_robustness.py",
+      "tests/test_perception_dimension_ablation.py",
+      "compirt_eval/__init__.py",
+      "utils/saving.py",
+      "run_scripts/bernstein/run_perception_dimension_ablation.py",
+      "run_scripts/multidimensional/multidim/run_multidim_noise_floor.py",
+      "topic/fixed/topic_compirt/pyramidal.py",
+      "topic/fixed/tests/test_topic_compirt.py",
+      "multidimensional/embedding_mirt/embeddings.py",
+      "multidimensional/embedding_mirt/tests/test_embedding_mirt.py",
+      "compirt_eval/noise_floor/__init__.py",
+      "compirt_eval/noise_floor/metrics.py",
+      "compirt_eval/noise_floor/evaluation.py",
+      "compirt_eval/player_rankings/evaluation.py",
+      "compirt_eval/drop_robustness/__init__.py",
+      "compirt_eval/drop_robustness/perturbations.py",
+      "compirt_eval/common/ranking_metrics.py",
+      "compirt_eval/common/__init__.py",
+      "compirt_eval/common/player_scoring.py"
+    ]
+  },
+  "note": "Later changes were outside the experiment edits in this shared workspace and were preserved."
+}

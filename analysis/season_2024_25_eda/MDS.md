@@ -6,8 +6,6 @@ Two MDS maps are produced: team entries and mirror sites. Both use the same algo
 
 The season has four question-set events. Classical MDS embeds `n` points exactly in `n-1` dimensions, so a two-dimensional embedding of four points is near-exact by construction and its stress carries no information about structure. An event map here would look convincing and mean nothing.
 
-The nine-event map in [`../full_dataset_eda/`](../full_dataset_eda/MDS.md) answers that question at a point count where it is meaningful.
-
 ## Algorithm
 
 Classical (Torgerson) metric MDS, implemented in `classical_mds` in [analyze.py](analyze.py) with NumPy only.

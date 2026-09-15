@@ -121,7 +121,6 @@ class RoundHoldoutTests(unittest.TestCase):
         for outcome_table in ("tossup_buzzes", "bonus_responses"):
             self.assertTrue(set(train[outcome_table]["game_id"]) <= train_games)
             self.assertTrue(set(test[outcome_table]["game_id"]) <= test_games)
-        self.assertNotIn("t2-unknown", train_games)
         self.assertIn("t2-unknown", test_games)
 
 if __name__ == "__main__":

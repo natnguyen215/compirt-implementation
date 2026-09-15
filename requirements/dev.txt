@@ -1,2 +1,3 @@
 -r compirt.txt
 pyflakes
+pytest

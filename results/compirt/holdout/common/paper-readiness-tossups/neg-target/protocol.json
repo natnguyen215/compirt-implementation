@@ -1,0 +1,16 @@
+{
+  "purpose": "exploratory development comparison; no untouched final test",
+  "label": "all incorrect first buzzes, including value-zero attempts",
+  "target_precision": 0.6,
+  "target_recall": 0.5,
+  "outer_split": "existing frozen five-fold year_2024 whole-game split, seed 42",
+  "threshold_selection": "20% inner game holdout; maximum recall with empirical precision >= .6 and >=50 predicted incorrect buzzes; then refit on full outer training games",
+  "threshold_caveat": "inner empirical precision is not a guaranteed outer precision bound",
+  "saved_compirt_threshold": ".5; inner-selected thresholds are only available for the new logistic arms",
+  "frontier_caveat": "retrospective_* metrics select on scored outcomes and are descriptive upper envelopes, not deployable threshold estimates",
+  "fixed_hyperparameters": {
+    "C": 1,
+    "spline_knots": 5,
+    "spline_degree": 3
+  }
+}

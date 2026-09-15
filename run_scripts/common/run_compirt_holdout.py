@@ -16,9 +16,7 @@ Per variant the flow is:
 
 Environment variables:
 
-* 'MODEL'           baseline | multidim | topic | learned | tfidf |
-                    tfidf_multidim | topic_tfidf | learned_tfidf
-                    (default baseline)
+* 'MODEL'           baseline | multidim                (default baseline)
 * 'TRAIN_SPLIT' / 'TEST_SPLIT'                    (default year_2024 / year_2025)
 * 'NEW_PLAYER_PRIOR' tier | flat                    (default tier)
 * 'ROOT'            output root                      (default results/compirt/holdout/<MODEL>)
@@ -28,12 +26,6 @@ Environment variables:
 * 'SYNERGY_DIMENSIONS' / 'SAVE_SYNERGY_DETAILS' configure the synergy branch
 * 'CALIBRATE_CORRECTNESS' 1 enables the same Platt scale+bias calibration as
   the full-data runners
-* 'RUN_C1_C4' 1 adds the paper Scenario C roster-generalization evaluation
-* 'C1_C4_ITEM_STEPS' / 'C1_C4_MIN_CROSS_TEAM_GAMES' configure that opt-in
-  evaluation
-* 'TOPIC_VECTORS'   topic variant document-vector CSV (optional override)
-* 'DATABASE'        learned variant question-text DB (optional override)
-* 'TFIDF_EFFECT_PRIOR_SCALE' / 'NO_NORMALIZE_TFIDF' configure cumulative tfidf
 """
 
 from __future__ import annotations
@@ -97,9 +89,7 @@ def bonus_stage_command(
     ]
 
 
-# Per-variant module names (run as 'python -m' from the repo root) and the
-# extra args each stage needs. '{train_pyr}' is filled with the training
-# pyramidal output dir (it holds the frozen topics the learned variant reuses).
+# Per-variant module names (run as 'python -m' from the repo root).
 MODELS = {
     "baseline": {
         "pyramidal": "train_pyramidal",
@@ -108,48 +98,6 @@ MODELS = {
     },
     "multidim": {
         "pyramidal": "multidimensional.multidim_mirt.train_pyramidal",
-        "compositional": "train_compositional",
-        "evaluate": "evaluate_compirt",
-    },
-    # Use d_jk(t) = tanh(... + bias_jk) * scale for Stage 1, followed by the
-    # standard compositional and evaluation stages.
-    "multidim_tanhbias": {
-        "pyramidal": "multidimensional.multidim_mirt.train_pyramidal_tanhbias",
-        "compositional": "train_compositional",
-        "evaluate": "evaluate_compirt",
-    },
-    "topic": {
-        "pyramidal": "topic.fixed.train_topic_pyramidal",
-        "compositional": "topic.fixed.train_topic_compositional",
-        "evaluate": "topic.fixed.evaluate_topic_compirt",
-    },
-    # Route learned-topic weights named 'topic_weight_*' through the evaluator
-    # that produces their difficulty and timing figures.
-    "learned": {
-        "pyramidal": "topic.learned.train_joint_pyramidal",
-        "compositional": "topic.learned.train_joint_compositional",
-        "evaluate": "topic.fixed.evaluate_topic_compirt",
-    },
-    "tfidf": {
-        "pyramidal": "tfidf.train_tfidf_pyramidal",
-        "compositional": "train_compositional",
-        "evaluate": "evaluate_compirt",
-    },
-    # Topic-specific TF-IDF (topic/tfidf): the topic families' Stage 1 with a
-    # per-topic TF-IDF lambda; Stage 2 and metrics reuse the topic packages,
-    # evaluated with the TF-IDF-aware replay evaluator.
-    "topic_tfidf": {
-        "pyramidal": "topic.tfidf.train_fixed_pyramidal",
-        "compositional": "topic.fixed.train_topic_compositional",
-        "evaluate": "topic.tfidf.evaluate",
-    },
-    "learned_tfidf": {
-        "pyramidal": "topic.tfidf.train_learned_pyramidal",
-        "compositional": "topic.learned.train_joint_compositional",
-        "evaluate": "topic.tfidf.evaluate",
-    },
-    "tfidf_multidim": {
-        "pyramidal": "tfidf.multidim.train_pyramidal",
         "compositional": "train_compositional",
         "evaluate": "evaluate_compirt",
     },
@@ -171,7 +119,6 @@ class HoldoutConfig:
     bonus_steps: str
     dimensions: str
     difficulty_link: str
-    difficulty_scale: str
     lr: str
     seed: str
     device: str
@@ -179,15 +126,6 @@ class HoldoutConfig:
     run_synergy: str
     synergy_dimensions: str
     save_synergy_details: str
-    run_c1_c4: str
-    c1_c4_item_steps: str
-    c1_c4_min_cross_team_games: str
-    c1_c4_seed: str
-    topic_vectors: str | None
-    database: str | None
-    tfidf_effect_prior_scale: str
-    no_normalize_tfidf: str
-    tfidf_plot_count: str
     mplconfigdir: str
 
 
@@ -203,13 +141,6 @@ def resolve_config() -> HoldoutConfig:
             f"DIFFICULTY_LINK={difficulty_link!r} is only supported for "
             f"MODEL=multidim; got MODEL={model!r}"
         )
-    run_c1_c4 = env_default("RUN_C1_C4", "0")
-    scenario_c_models = {"baseline", "multidim", "tfidf", "tfidf_multidim"}
-    if run_c1_c4 == "1" and model not in scenario_c_models:
-        raise SystemExit(
-            "RUN_C1_C4=1 supports baseline, multidim, tfidf, and "
-            f"tfidf_multidim; got MODEL={model!r}"
-        )
 
     frozen_predict = env_default("FROZEN_PREDICT", "0")
     if frozen_predict == "1" and model != "multidim":
@@ -217,10 +148,7 @@ def resolve_config() -> HoldoutConfig:
             "FROZEN_PREDICT=1 (frozen matrix-infill scoring) currently supports "
             f"MODEL=multidim only; got MODEL={model!r}"
         )
-    if frozen_predict == "1" and run_c1_c4 == "1":
-        raise SystemExit("FROZEN_PREDICT=1 is incompatible with RUN_C1_C4=1")
 
-    bonus_steps = env_default("BONUS_STEPS", "2000")
     return HoldoutConfig(
         model=model,
         frozen_predict=frozen_predict,
@@ -232,81 +160,26 @@ def resolve_config() -> HoldoutConfig:
             env_default("ROOT", f"results/compirt/holdout/{model}"), "holdout"
         ),
         pyramidal_steps=env_default("PYRAMIDAL_STEPS", "3000"),
-        bonus_steps=bonus_steps,
+        bonus_steps=env_default("BONUS_STEPS", "2000"),
         dimensions=env_default("DIMENSIONS", "5"),
         difficulty_link=difficulty_link,
-        difficulty_scale=env_default("DIFFICULTY_SCALE", "5.0"),
         lr=env_default("LR", "0.01"),
         seed=env_default("SEED", "42"),
         device=env_default("DEVICE", "cpu"),
         calibrate_correctness=env_default("CALIBRATE_CORRECTNESS", "0"),
-        run_synergy=env_default(
-            "RUN_SYNERGY",
-            "1"
-            if model in ("multidim", "multidim_tanhbias", "tfidf_multidim")
-            else "0",
-        ),
+        run_synergy=env_default("RUN_SYNERGY", "1" if model == "multidim" else "0"),
         synergy_dimensions=env_default("SYNERGY_DIMENSIONS", "3"),
         save_synergy_details=env_default("SAVE_SYNERGY_DETAILS", "0"),
-        run_c1_c4=run_c1_c4,
-        c1_c4_item_steps=env_default("C1_C4_ITEM_STEPS", bonus_steps),
-        c1_c4_min_cross_team_games=env_default(
-            "C1_C4_MIN_CROSS_TEAM_GAMES", "10"
-        ),
-        c1_c4_seed=env_default("C1_C4_SEED", "42"),
-        topic_vectors=os.environ.get("TOPIC_VECTORS"),
-        database=os.environ.get("DATABASE"),
-        tfidf_effect_prior_scale=env_default("TFIDF_EFFECT_PRIOR_SCALE", "1.0"),
-        no_normalize_tfidf=env_default("NO_NORMALIZE_TFIDF", "0"),
-        tfidf_plot_count=env_default("TFIDF_PLOT_COUNT", "6"),
         mplconfigdir=env_default("MPLCONFIGDIR", "/tmp/matplotlib-compirt"),
     )
 
 
 def model_stage_args(config: HoldoutConfig, train_pyramidal: str):
     """Return family-specific Stage-1 and Stage-2 CLI arguments."""
-    pyramidal: list[str] = []
+    pyramidal: list[str] = ["--dimensions", config.dimensions]
     compositional: list[str] = []
-    model = config.model
-
-    # Fixed-topic vectors determine dimensionality from their columns, while
-    # learned-topic runs must pass the shared latent dimension to Stage 1.
-    if model in (
-        "baseline",
-        "multidim",
-        "multidim_tanhbias",
-        "tfidf",
-        "tfidf_multidim",
-    ):
-        pyramidal += ["--dimensions", config.dimensions]
-        if model == "multidim":
-            pyramidal += ["--difficulty-link", config.difficulty_link]
-        elif model == "multidim_tanhbias":
-            pyramidal += ["--difficulty-scale", config.difficulty_scale]
-    elif model in ("topic", "topic_tfidf"):
-        if config.topic_vectors:
-            pyramidal += ["--topic-vectors", config.topic_vectors]
-            compositional += ["--topic-vectors", config.topic_vectors]
-    elif model in ("learned", "learned_tfidf"):
-        pyramidal += ["--dimensions", config.dimensions]
-        if config.database:
-            pyramidal += ["--database", config.database]
-            compositional += ["--database", config.database]
-        # Stage 2 uses the frozen topics learned by the training Stage 1.
-        compositional += ["--topic-model-dir", train_pyramidal]
-
-    if model in ("tfidf", "tfidf_multidim"):
-        pyramidal += [
-            "--tfidf-effect-prior-scale",
-            config.tfidf_effect_prior_scale,
-        ]
-        if config.no_normalize_tfidf == "1":
-            pyramidal.append("--no-normalize-tfidf")
-    if model in ("topic_tfidf", "learned_tfidf"):
-        # Topic-TF-IDF passes its per-topic lambda prior through this flag.
-        pyramidal += ["--effect-prior-scale", config.tfidf_effect_prior_scale]
-        if config.no_normalize_tfidf == "1":
-            pyramidal.append("--no-normalize-tfidf")
+    if config.model == "multidim":
+        pyramidal += ["--difficulty-link", config.difficulty_link]
     if config.calibrate_correctness == "1":
         pyramidal.append("--calibrate-correctness")
         compositional.append("--calibrate-correctness")
@@ -326,13 +199,10 @@ class HoldoutPaths:
     holdout_evaluation: str
     holdout_synergy_evaluation: str
     comparison: str
-    scenario_c_root: str
-    scenario_c_evaluation: str
 
 
 def output_paths(root: str) -> HoldoutPaths:
     """Resolve the established train/holdout result-directory contract."""
-    scenario_c_root = f"{root}/holdout/c1-c4"
     return HoldoutPaths(
         train_pyramidal=f"{root}/train/pyramidal",
         train_bonus=f"{root}/train/compositional",
@@ -343,14 +213,11 @@ def output_paths(root: str) -> HoldoutPaths:
         holdout_evaluation=f"{root}/holdout/evaluation",
         holdout_synergy_evaluation=f"{root}/holdout/synergy-evaluation",
         comparison=f"{root}/holdout/comparison",
-        scenario_c_root=scenario_c_root,
-        scenario_c_evaluation=f"{scenario_c_root}/evaluation",
     )
 
 
 def run_log_fields(config: HoldoutConfig, paths: HoldoutPaths):
     """Return the public run metadata in its established field order."""
-    tfidf_models = {"tfidf", "tfidf_multidim", "topic_tfidf", "learned_tfidf"}
     return {
         "RUNNER": "run_scripts/common/run_compirt_holdout.py",
         "ROOT": config.root,
@@ -366,9 +233,6 @@ def run_log_fields(config: HoldoutConfig, paths: HoldoutPaths):
         "DIFFICULTY_LINK": config.difficulty_link
         if config.model == "multidim"
         else "",
-        "DIFFICULTY_SCALE": config.difficulty_scale
-        if config.model == "multidim_tanhbias"
-        else "",
         "PYRAMIDAL_STEPS": config.pyramidal_steps,
         "BONUS_STEPS": config.bonus_steps,
         "LR": config.lr,
@@ -377,25 +241,6 @@ def run_log_fields(config: HoldoutConfig, paths: HoldoutPaths):
         "SYNERGY_DIMENSIONS": config.synergy_dimensions,
         "SAVE_SYNERGY_DETAILS": config.save_synergy_details,
         "CALIBRATE_CORRECTNESS": config.calibrate_correctness,
-        "RUN_C1_C4": config.run_c1_c4,
-        "C1_C4_ITEM_STEPS": config.c1_c4_item_steps
-        if config.run_c1_c4 == "1"
-        else "",
-        "C1_C4_MIN_CROSS_TEAM_GAMES": config.c1_c4_min_cross_team_games
-        if config.run_c1_c4 == "1"
-        else "",
-        "C1_C4_SEED": config.c1_c4_seed if config.run_c1_c4 == "1" else "",
-        "TOPIC_VECTORS": config.topic_vectors or "",
-        "DATABASE": config.database or "",
-        "TFIDF_EFFECT_PRIOR_SCALE": config.tfidf_effect_prior_scale
-        if config.model in tfidf_models
-        else "",
-        "NO_NORMALIZE_TFIDF": config.no_normalize_tfidf
-        if config.model in tfidf_models
-        else "",
-        "TFIDF_PLOT_COUNT": config.tfidf_plot_count
-        if config.model in ("tfidf", "tfidf_multidim")
-        else "",
         "MPLCONFIGDIR": config.mplconfigdir,
         "PYTHON": PYTHON,
         "TRAIN_PYRAMIDAL_OUTPUT": paths.train_pyramidal,
@@ -557,9 +402,6 @@ def build_holdout_stages(
 
     # 2. Stage-1 held-out transductive pass on the test split with informative
     #    player priors built from the training posterior.
-    heldout_pyr_extra = list(pyr_extra)
-    if config.model in ("learned", "learned_tfidf"):
-        heldout_pyr_extra += ["--train-topic-model", paths.train_pyramidal]
     stages.append(HoldoutStage("holdout-pyramidal", [
         PYTHON, "-m", scripts["pyramidal"],
         "--split", config.test_split, *tournament_args(config.tournament),
@@ -567,49 +409,8 @@ def build_holdout_stages(
         "--seed", config.seed, "--device", config.device,
         "--train-posterior", f"{paths.train_pyramidal}/player_posterior.csv",
         "--new-player-prior", config.new_player_prior,
-        "--output-dir", paths.holdout_pyramidal, *heldout_pyr_extra,
+        "--output-dir", paths.holdout_pyramidal, *pyr_extra,
     ]))
-
-    # Scenario C transfers Stage-2 team parameters learned on the historical
-    # split. Its opt-in fits write to dedicated output paths.
-    if config.run_c1_c4 == "1":
-        historical_extra = list(comp_extra)
-        stages.append(HoldoutStage(
-            "train-compositional",
-            bonus_stage_command(
-                scripts,
-                split=config.train_split,
-                tournament=config.tournament,
-                player_skills=f"{paths.train_pyramidal}/players.csv",
-                output_dir=paths.train_bonus,
-                steps=config.bonus_steps,
-                lr=config.lr,
-                seed=config.c1_c4_seed,
-                device=config.device,
-                extra_args=historical_extra,
-            ),
-        ))
-        stages.append(HoldoutStage(
-            "train-synergy",
-            bonus_stage_command(
-                scripts,
-                split=config.train_split,
-                tournament=config.tournament,
-                player_skills=f"{paths.train_pyramidal}/players.csv",
-                output_dir=paths.train_synergy,
-                steps=config.bonus_steps,
-                lr=config.lr,
-                seed=config.c1_c4_seed,
-                device=config.device,
-                extra_args=[
-                    "--use-synergy",
-                    "--synergy-dimensions",
-                    config.synergy_dimensions,
-                    "--save-synergy-details",
-                    *historical_extra,
-                ],
-            ),
-        ))
 
     # 3. Stage-2 bonus model on the test split using the held-out player skills.
     stages.append(HoldoutStage(
@@ -660,48 +461,6 @@ def build_holdout_stages(
         "--compositional-results", paths.holdout_bonus,
         "--output-dir", paths.holdout_evaluation,
     ]))
-
-    if config.model in ("tfidf", "tfidf_multidim"):
-        stages.append(HoldoutStage("tfidf-difficulty-plots", [
-            PYTHON, "-m", "tfidf.plot_tfidf_difficulty_curves",
-            "--results-dir", paths.holdout_pyramidal,
-            "--output-dir", f"{paths.holdout_evaluation}/graphs",
-            "--count", config.tfidf_plot_count,
-        ]))
-
-    if config.run_c1_c4 == "1":
-        stages.append(HoldoutStage("scenario-c", [
-            PYTHON,
-            "-m",
-            "run_scripts.common.run_scenario_c",
-            "--train-split",
-            config.train_split,
-            "--test-split",
-            config.test_split,
-            *tournament_args(config.tournament),
-            "--train-player-skills",
-            f"{paths.train_pyramidal}/players.csv",
-            "--test-player-skills",
-            f"{paths.holdout_pyramidal}/players.csv",
-            "--train-compositional",
-            paths.train_bonus,
-            "--train-synergy",
-            paths.train_synergy,
-            "--output-root",
-            paths.scenario_c_root,
-            "--evaluation-dir",
-            paths.scenario_c_evaluation,
-            "--steps",
-            config.c1_c4_item_steps,
-            "--lr",
-            config.lr,
-            "--seed",
-            config.c1_c4_seed,
-            "--min-cross-team-games",
-            config.c1_c4_min_cross_team_games,
-            "--device",
-            config.device,
-        ], f"Scenario C metrics in {paths.scenario_c_evaluation}."))
 
     if config.run_synergy == "1":
         stages.append(HoldoutStage("holdout-synergy-evaluation", [

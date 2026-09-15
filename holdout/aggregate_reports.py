@@ -13,11 +13,19 @@ import pandas as pd
 
 from compirt_eval.common.metrics import classification_metrics
 from compirt_eval.common.metrics import negative_class_metrics
-from compirt_eval.scenario_a_tossups.timing import (
+from compirt_eval.scenario_a_tossups.survival import (
     _first_buzzer_row,
     _full_pmf_score_row,
+)
+from compirt_eval.scenario_a_tossups.reconstruction import (
     _load_timing_evaluation_inputs,
     event_first_buzz_components,
+)
+from compirt_eval.scenario_a_tossups.outcomes import (
+    OUTCOME_METRICS,
+    OUTCOME_SCHEMA_VERSION,
+    evaluate_tossup_outcomes,
+    rank_player_totals,
 )
 
 
@@ -34,7 +42,30 @@ MAIN_TABLE_METRICS = (
     ("first_buzzer_top1_accuracy", "First-buzzer top-1"),
     ("no_buzz_calibration_error", "No-buzz error"),
     ("full_pmf_final_decile_mass", "Predicted final-decile mass"),
+    ("first_buzzer_player_replay_accuracy", "Replayed first-player accuracy"),
+    ("first_buzzer_team_replay_accuracy", "Team-buzzed-first accuracy"),
+    ("tossup_scorer_player_replay_accuracy", "Tossup scoring-player accuracy"),
+    ("tossup_scorer_team_replay_accuracy", "Tossup scoring-team accuracy"),
+    ("tossup_game_winner_accuracy", "Tossup-only game winner accuracy"),
+    ("tossup_game_margin_mae", "Average tossup margin error"),
+    ("tossup_game_zero_margin_mae", "Zero-margin baseline MAE"),
+    ("tournament_player_ppg_spearman", "Tournament PPG rank correlation"),
+    ("tournament_player_ppg_mae", "Average tournament PPG error"),
+    ("tournament_player_ppg_top10_overlap", "Tournament top-10 overlap"),
+    (
+        "tournament_player_ppg_top10_random_overlap",
+        "Random top-10 overlap",
+    ),
+    (
+        "tournament_player_ppg_top10_adjusted_overlap",
+        "Chance-adjusted top-10 overlap",
+    ),
 )
+
+OUTCOME_METRIC_NAMES = set(OUTCOME_METRICS)
+CORE_METRIC_NAMES = {
+    name for name, _label in MAIN_TABLE_METRICS if name not in OUTCOME_METRIC_NAMES
+}
 
 
 def _buzz_predictions(paths: Iterable[Path]) -> tuple[np.ndarray, np.ndarray]:
@@ -89,6 +120,7 @@ def add_main_table_fold_means(
     result: dict[str, object], run_dirs: Iterable[Path]
 ) -> None:
     """Add held-out fold means using the Research Log main-table convention."""
+    run_dirs = [Path(run_dir) for run_dir in run_dirs]
     rows = []
     for run_dir in run_dirs:
         candidates = (
@@ -99,12 +131,33 @@ def add_main_table_fold_means(
             / "csvs"
             / "tossup_metrics.csv",
         )
-        path = next((candidate for candidate in candidates if candidate.exists()), None)
+        path = next(
+            (candidate for candidate in candidates if candidate.exists()), None
+        )
         if path is None:
             continue
         frame = pd.read_csv(path)
         if not frame.empty:
-            rows.append(frame.iloc[0])
+            row = frame.iloc[0].to_dict()
+            missing = OUTCOME_METRIC_NAMES - set(row)
+            stale_outcomes = (
+                row.get("tossup_outcome_schema_version")
+                != OUTCOME_SCHEMA_VERSION
+            )
+            if missing or stale_outcomes:
+                results_dir = Path(run_dir) / "holdout" / "pyramidal"
+                if not results_dir.exists():
+                    results_dir = Path(run_dir) / "pyramidal"
+                output_dir = (
+                    path.parents[1] if path.parent.name == "csvs" else path.parent
+                )
+                supplemental, *_ = evaluate_tossup_outcomes(results_dir, output_dir)
+                # Never retain expected-score metrics if a saved fit cannot
+                # be reconstructed under the replay contract.
+                if stale_outcomes:
+                    row.update({name: np.nan for name in OUTCOME_METRIC_NAMES})
+                row.update(supplemental)
+            rows.append(pd.Series(row))
     if not rows:
         return
     frame = pd.DataFrame(rows)
@@ -123,6 +176,29 @@ def add_main_table_fold_means(
             pd.to_numeric(values, errors="coerce").mean()
         )
     result["main_table_folds"] = int(len(frame))
+
+    # A tournament leaderboard should cover the tournament, not one 20% fold.
+    # Pool each game's one out-of-fold prediction first, then rank once within
+    # each tournament. This deliberately overrides only the leaderboard
+    # metrics; event and game metrics retain the fold-mean convention.
+    _leaderboard, ranking = _pooled_player_leaderboards(run_dirs)
+    if not ranking.empty:
+        for metric, column in (
+            ("tournament_player_ppg_spearman", "ppg_spearman"),
+            ("tournament_player_ppg_mae", "ppg_mae"),
+            ("tournament_player_ppg_top10_overlap", "top10_overlap_rate"),
+            (
+                "tournament_player_ppg_top10_random_overlap",
+                "top10_random_overlap_rate",
+            ),
+            (
+                "tournament_player_ppg_top10_adjusted_overlap",
+                "top10_adjusted_overlap_rate",
+            ),
+        ):
+            result[f"main_table_{metric}"] = float(ranking[column].mean())
+        result["main_table_tournament_player_ppg_tournaments"] = int(len(ranking))
+        result["main_table_tournament_player_ppg_aggregation"] = "pooled_oof"
 
 
 def _neg_f1(metrics: Mapping[str, object]) -> float:
@@ -143,6 +219,7 @@ def _training_main_table_metrics(run_dir: Path) -> dict[str, float]:
             "tossups.csv",
             "tossup_predictions.csv",
             "buzz_event_predictions.csv",
+            "summary.json",
         )
     ]
     signature = {
@@ -150,6 +227,7 @@ def _training_main_table_metrics(run_dir: Path) -> dict[str, float]:
         for path in source_paths
         if path.exists()
     }
+    signature["tossup_outcome_schema_version"] = OUTCOME_SCHEMA_VERSION
     if cache_path.exists():
         cached = json.loads(cache_path.read_text(encoding="utf-8"))
         if cached.get("source_signature") == signature:
@@ -218,6 +296,8 @@ def _training_main_table_metrics(run_dir: Path) -> dict[str, float]:
             - positions["observed_relative_position"]
         )
         metrics["buzz_position_mae"] = float(error.abs().mean())
+    outcome_metrics, *_ = evaluate_tossup_outcomes(results_dir)
+    metrics.update(outcome_metrics)
 
     selected = {
         name: float(metrics.get(name, np.nan)) for name, _label in MAIN_TABLE_METRICS
@@ -246,6 +326,59 @@ def add_in_sample_main_table_fold_means(
     result["in_sample_main_table_folds"] = int(len(frame))
 
 
+def _pooled_player_leaderboards(
+    run_dirs: Iterable[Path],
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Pool disjoint held-out game totals and rank each tournament once."""
+    frames = []
+    for run_dir in run_dirs:
+        evaluation_dir = Path(run_dir) / "holdout" / "evaluation"
+        leaderboard_path = evaluation_dir / "csvs" / "player_ppg_leaderboard.csv"
+        frame = pd.DataFrame()
+        if leaderboard_path.exists():
+            try:
+                frame = pd.read_csv(leaderboard_path, dtype={"tournament_id": str, "player_id": str})
+            except pd.errors.EmptyDataError:
+                pass
+        current = (
+            not frame.empty and "tossup_outcome_schema_version" in frame
+            and frame["tossup_outcome_schema_version"].eq(OUTCOME_SCHEMA_VERSION).all()
+        )
+        if not current:
+            results_dir = Path(run_dir) / "holdout" / "pyramidal"
+            if results_dir.exists():
+                _summary, _events, _players, _games, frame = evaluate_tossup_outcomes(results_dir, evaluation_dir)
+            elif not frame.empty:
+                raise ValueError(f"Stale replay leaderboard requires saved fitted parameters: {leaderboard_path}")
+        if not frame.empty:
+            frames.append(frame)
+    if not frames:
+        return pd.DataFrame(), pd.DataFrame()
+    pooled = pd.concat(frames, ignore_index=True)
+    totals = pooled.groupby(["tournament_id", "player_id"], as_index=False).agg(
+        actual_tossup_points=("actual_tossup_points", "sum"),
+        predicted_tossup_points=("predicted_tossup_points", "sum"),
+        games=("games", "sum"),
+    )
+    leaderboard, metrics = rank_player_totals(totals)
+    return leaderboard, metrics
+
+
+def write_pooled_player_leaderboards(
+    run_dirs: Iterable[Path], output_dir: Path
+) -> tuple[Path, Path] | None:
+    """Write full-tournament rankings from disjoint out-of-fold games."""
+    leaderboard, metrics = _pooled_player_leaderboards(run_dirs)
+    if leaderboard.empty:
+        return None
+    output_dir.mkdir(parents=True, exist_ok=True)
+    leaderboard_path = output_dir / "player_ppg_leaderboard.csv"
+    metrics_path = output_dir / "player_ranking_metrics.csv"
+    leaderboard.to_csv(leaderboard_path, index=False)
+    metrics.to_csv(metrics_path, index=False)
+    return leaderboard_path, metrics_path
+
+
 def _show(value: object) -> str:
     if value is None or pd.isna(value):
         return ""
@@ -256,6 +389,12 @@ def correctness_markdown(
     metrics: Mapping[str, object], *, title: str = "Holdout correctness summary"
 ) -> str:
     """Render pooled in-sample and held-out correctness metrics as Markdown."""
+    core_metrics = [
+        pair for pair in MAIN_TABLE_METRICS if pair[0] not in OUTCOME_METRIC_NAMES
+    ]
+    downstream_metrics = [
+        pair for pair in MAIN_TABLE_METRICS if pair[0] in OUTCOME_METRIC_NAMES
+    ]
     lines = [
         f"# {title}",
         "",
@@ -298,7 +437,24 @@ def correctness_markdown(
         "| metric | in-sample fold mean | held-out fold mean |",
         "| --- | ---: | ---: |",
     ]
-    for name, label in MAIN_TABLE_METRICS:
+    for name, label in core_metrics:
+        lines.append(
+            f"| {label} | "
+            f"{_show(metrics.get(f'in_sample_main_table_{name}'))} | "
+            f"{_show(metrics.get(f'main_table_{name}'))} |"
+        )
+    lines += [
+        "",
+        "## Downstream tossup, game, and leaderboard metrics",
+        "",
+        "All score-derived metrics use token-by-token tossup replay at 0.5 buzz "
+        "and correctness thresholds, including opponent continuations and "
+        "zero-point terminal misses. Targets use literal recorded tossup values.",
+        "",
+        "| metric | in-sample fold mean | held-out fold mean |",
+        "| --- | ---: | ---: |",
+    ]
+    for name, label in downstream_metrics:
         lines.append(
             f"| {label} | "
             f"{_show(metrics.get(f'in_sample_main_table_{name}'))} | "
@@ -353,6 +509,9 @@ def backfill_markdown(root: Path) -> int:
             experiment_root / "aggregate" / "correctness_metrics.md",
             title=f"{experiment_root.name} correctness summary",
         )
+        write_pooled_player_leaderboards(
+            run_dirs, experiment_root / "aggregate"
+        )
         written += 1
     write_overview_from_reports(root)
     return written
@@ -393,10 +552,13 @@ def write_overview_from_reports(root: Path) -> Path:
                 "holdout_accuracy",
                 "holdout_auc",
                 "holdout_log_loss",
-                *(f"main_train_{name}" for name, _label in MAIN_TABLE_METRICS),
-                *(f"main_holdout_{name}" for name, _label in MAIN_TABLE_METRICS),
+                *(f"main_train_{name}" for name in CORE_METRIC_NAMES),
+                *(f"main_holdout_{name}" for name in CORE_METRIC_NAMES),
             )
         ):
+            for name in OUTCOME_METRIC_NAMES:
+                values.setdefault(f"main_train_{name}", "")
+                values.setdefault(f"main_holdout_{name}", "")
             rows.append(values)
 
     lines = [
@@ -426,6 +588,30 @@ def write_overview_from_reports(root: Path) -> Path:
                 f"{row[f'{prefix}_first_buzzer_top1_accuracy']} | "
                 f"{row[f'{prefix}_no_buzz_calibration_error']} | "
                 f"{row[f'{prefix}_full_pmf_final_decile_mass']} |"
+            )
+    lines += [
+        "",
+        "## Downstream tossup, game, and leaderboard metrics",
+        "",
+        "| model | sample | first team | scorer player | scorer team | "
+        "game winner | margin MAE | PPG Spearman | PPG MAE | top-10 overlap |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for row in rows:
+        for sample, prefix in (
+            ("in-sample", "main_train"),
+            ("held-out", "main_holdout"),
+        ):
+            lines.append(
+                f"| `{row['model']}` | {sample} | "
+                f"{row[f'{prefix}_first_buzzer_team_replay_accuracy']} | "
+                f"{row[f'{prefix}_tossup_scorer_player_replay_accuracy']} | "
+                f"{row[f'{prefix}_tossup_scorer_team_replay_accuracy']} | "
+                f"{row[f'{prefix}_tossup_game_winner_accuracy']} | "
+                f"{row[f'{prefix}_tossup_game_margin_mae']} | "
+                f"{row[f'{prefix}_tournament_player_ppg_spearman']} | "
+                f"{row[f'{prefix}_tournament_player_ppg_mae']} | "
+                f"{row[f'{prefix}_tournament_player_ppg_top10_overlap']} |"
             )
     output_path = root / "aggregate_correctness_metrics.md"
     output_path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")

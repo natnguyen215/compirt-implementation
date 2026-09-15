@@ -1,0 +1,5 @@
+0 {'members': ['vb_base', 'whole_prefix'], 'vb_weight': 0.7146292951355863, 'selection': 'minimum inner-validation binary log loss'}
+1 {'members': ['vb_base', 'whole_prefix'], 'vb_weight': 0.7126972734694783, 'selection': 'minimum inner-validation binary log loss'}
+2 {'members': ['vb_base', 'whole_prefix'], 'vb_weight': 0.7315928233884201, 'selection': 'minimum inner-validation binary log loss'}
+3 {'members': ['vb_base', 'whole_prefix'], 'vb_weight': 0.6859123288364098, 'selection': 'minimum inner-validation binary log loss'}
+4 {'members': ['vb_base', 'whole_prefix'], 'vb_weight': 0.7837935717024764, 'selection': 'minimum inner-validation binary log loss'}

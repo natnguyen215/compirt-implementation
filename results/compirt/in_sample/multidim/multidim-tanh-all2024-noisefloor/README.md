@@ -157,11 +157,13 @@ hypothesis tests.
 
 ## Reproduction and artifacts
 
-- `.venv/bin/python run_scripts/multidimensional/multidim/run_multidim_noise_floor.py`
-  refits any missing seeds and writes
-  [`predicted_ppg_by_seed.csv`](predicted_ppg_by_seed.csv).
-- Add `--collect-only` to recompute the ranking analysis from the saved fits
-  without launching training.
+- The runner, `run_scripts/multidimensional/multidim/run_multidim_noise_floor.py`,
+  and the `compirt_eval/noise_floor/` package it imports are retired; recover
+  both from git history (for example
+  `git show f999da9d^:run_scripts/multidimensional/multidim/run_multidim_noise_floor.py`).
+  It refit any missing seeds and wrote
+  [`predicted_ppg_by_seed.csv`](predicted_ppg_by_seed.csv); `--collect-only`
+  recomputed the ranking analysis from the saved fits without training.
 - Each `seed_*` directory contains its own posterior tables, predictions, loss
   curve, summary, and run log.
 

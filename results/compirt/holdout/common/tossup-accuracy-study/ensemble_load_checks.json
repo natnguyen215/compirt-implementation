@@ -1,0 +1,22 @@
+[
+  {
+    "fold": 0,
+    "maximum_probability_error": 2.220446049250313e-16
+  },
+  {
+    "fold": 1,
+    "maximum_probability_error": 2.220446049250313e-16
+  },
+  {
+    "fold": 2,
+    "maximum_probability_error": 2.220446049250313e-16
+  },
+  {
+    "fold": 3,
+    "maximum_probability_error": 2.220446049250313e-16
+  },
+  {
+    "fold": 4,
+    "maximum_probability_error": 1.5265566588595902e-16
+  }
+]

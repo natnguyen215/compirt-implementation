@@ -1,0 +1,21 @@
+Bonus part rows: 107,595  Parts: 3,768
+step    0  ELBO loss: 129,021.7
+step  100  ELBO loss: 61,942.2
+step  200  ELBO loss: 56,259.7
+step  300  ELBO loss: 54,108.4
+step  400  ELBO loss: 53,412.8
+step  500  ELBO loss: 53,189.6
+step  600  ELBO loss: 53,252.5
+step  700  ELBO loss: 53,161.4
+step  800  ELBO loss: 53,056.3
+step  900  ELBO loss: 53,089.7
+step 1000  ELBO loss: 53,182.6
+step 1100  ELBO loss: 53,227.8
+step 1200  ELBO loss: 53,239.9
+step 1300  ELBO loss: 53,098.9
+step 1400  ELBO loss: 53,241.0
+step 1500  ELBO loss: 53,163.3
+step 1600  ELBO loss: 53,164.6
+step 1700  ELBO loss: 53,126.3
+step 1800  ELBO loss: 53,189.4
+step 1900  ELBO loss: 53,203.3

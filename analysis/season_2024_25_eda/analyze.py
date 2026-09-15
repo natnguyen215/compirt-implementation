@@ -7,8 +7,7 @@ a single season, calendar year is perfectly collinear with tier and is therefore
 dropped as an axis entirely: **tier is the chronological axis**, and it happens
 to be the difficulty axis too.
 
-This scope buys two things the year-split analyses in ``analysis/full_dataset_eda``
-cannot have:
+This scope buys two things a calendar-year split cannot have:
 
 * Complete category metadata.  The only unlabelled set in the corpus is 2024
   Regionals, which belongs to season 2023-24, so every question here is labelled.
@@ -1047,8 +1046,7 @@ def add_mds(outputs: dict[str, pd.DataFrame]) -> dict[str, float]:
 
     # No event-grain MDS here: the season has only four question-set events, and
     # a two-dimensional embedding of four points is near-exact by construction,
-    # so it would carry no information.  The nine-event map in
-    # analysis/full_dataset_eda covers that question.
+    # so it would carry no information.
     for kind, key, coords, features, columns in [
         ("team", "team_id", team_coords, team_features, TEAM_MDS_FEATURES),
         ("site", "tournament_id", site_coords, site_features, SITE_MDS_FEATURES),

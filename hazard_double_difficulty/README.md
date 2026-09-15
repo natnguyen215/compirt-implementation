@@ -23,21 +23,20 @@ correctness_logit = sum_k r^corr_jk * (theta_ik - d^corr_jk(t))
 hazard_logit      = sum_k r^haz_jk * (theta_ik - d^haz_jk(t)) - c_i
 ```
 
-Everything else is the parent's math verbatim. The skill `theta` and confidence
-`c` stay shared. The vector DD families give correctness and hazard independent
-relevance vectors and difficulty curves under matching priors. Set both
-relevance vectors and both curves equal and the model reproduces its parent
-exactly (asserted in `tests/`).
+The skill `theta` and confidence `c` stay shared. The two-curve families give
+correctness and hazard independent relevance vectors and difficulty curves
+under matching priors. `multidim/` is a near-copy of
+`multidimensional/multidim_mirt/`: setting both relevance vectors and both
+curves equal reproduces that model exactly (asserted in `tests/`).
 
 ## Variants
 
-| Subpackage | Parent | Curve |
-| --- | --- | --- |
-| `multidim/` | `multidimensional/multidim_mirt/` | `d_jk(t) = beta_jk · link(gamma_jk · (mu_jk − t/T_j))`, `link ∈ {sigmoid, tanh}` |
-| `bernstein/` | `polynomial_compirt/` | strictly-decreasing degree-`p` Bernstein polynomial in `x = t/T_j` |
-| `compact_bernstein/` | scalar CompIRT spine | normalized skill direction and positive discrimination, with separate scalar correctness/hazard Bernstein curves |
-| `perceived_difficulty_bernstein/` | `polynomial_compirt/` | one shared vector Bernstein curve and simplex relevance; player vectors transform difficulty only for buzzing |
-| `perceived_logit_bernstein/` | `polynomial_compirt/` | one shared vector Bernstein curve and simplex relevance; player scalars transform the complete correctness logit for buzzing |
+| Subpackage | Curve |
+| --- | --- |
+| `multidim/` | `d_jk(t) = beta_jk · link(gamma_jk · (mu_jk − t/T_j))`, `link ∈ {sigmoid, tanh}` |
+| `bernstein/` | strictly decreasing degree-`p` Bernstein polynomial in `x = t/T_j` |
+| `perceived_difficulty_bernstein/` | one shared vector Bernstein curve and simplex relevance; player vectors transform difficulty only for buzzing |
+| `perceived_logit_bernstein/` | one shared vector Bernstein curve and simplex relevance; player scalars transform the complete correctness logit for buzzing |
 
 ### Shared difficulty with player perception
 
@@ -52,11 +51,9 @@ hazard_logit      = sum_k r_jk * (theta_ik - alpha_ik*d_jk(t) + beta_ik)
 Here `r_j ~ Dirichlet(2)`, `alpha_i ~ LogNormal(0, 1)`, and
 `beta_i ~ Normal(0, 1)` coordinate-wise. Thus `alpha > 0` (with prior median
 one), while `beta` is unconstrained. The literal equations have
-no confidence `c`, correctness calibration, or terminal-cell intercepts.  The
-ready-made frozen five-fold arm is
-`python -m run_scripts.bernstein.run_perceived_difficulty_bernstein_332`.
-Completed legacy result directories remain readable because replay detects the
-saved numbered player columns rather than relying on the directory name.
+no confidence `c`, correctness calibration, or terminal-cell intercepts. The
+frozen five-fold runner is
+`python -m run_scripts.double_difficulty.run_perceived_difficulty_bernstein_332`.
 
 An opt-in three-slice arm replaces each player's single perception vectors
 with first/middle/last vectors selected by relative token position:
@@ -71,8 +68,9 @@ hazard_logit      = sum_k r_jk *
 Every sliced `alpha` remains an independent `LogNormal(0, 1)` draw and every
 sliced `beta` an independent `Normal(0, 1)` draw. Enable it directly with
 `--perception-slices 3`, or use the frozen five-fold runner
-`python -m run_scripts.bernstein.run_perceived_difficulty_sliced_bernstein_332`.
-The one-slice default and runner are unchanged.
+`python -m run_scripts.double_difficulty.run_perceived_difficulty_sliced_bernstein_332`.
+`--alternate-player-steps` alternates theta-only and perception-only player
+updates (runner `run_perceived_difficulty_sliced_alternating_bernstein_332`).
 
 `perceived_logit_bernstein/` shares the same correctness evidence literally,
 then applies one scalar affine transform per player:
@@ -87,7 +85,11 @@ for every question heard by player `i`; there are no player-question
 interaction parameters. Thus `alpha > 0` (with prior median one), while `beta`
 is unconstrained. This model likewise has no `c`, correctness calibration, or
 terminal-cell intercepts. Its five-fold runner is
-`python -m run_scripts.bernstein.run_perceived_logit_bernstein_332`.
+`python -m run_scripts.double_difficulty.run_perceived_logit_bernstein_332`.
+
+Both perception trainers accept `--alpha-prior normal-zero` or `normal-one`,
+which replace the LogNormal with `Normal(0, 1)` or `Normal(1, 1)` and leave
+`alpha` unconstrained.
 
 Both curves in a run share the link (multidim) or the degree and Dirichlet
 concentration (Bernstein), so they stay the same functional form.
@@ -108,70 +110,54 @@ vector DD families. The multidim and Bernstein trainers also accept
 `Dirichlet(1, ..., 1)` priors with no separate discrimination scale. In both
 forms, `theta ~ N(0, I)` and `c ~ N(0, 1)` remain shared.
 
-The Bernstein trainer also accepts `--learn-curve-locations`. Like compact DB,
-this learns two global population locations,
+The Bernstein trainer also accepts `--learn-curve-locations`. This learns two
+global population locations,
 `curve_location_correct, curve_location_hazard ~ Normal(0, 1)`, and centers
 each branch's item-by-dimension start difficulties at its corresponding
-location with unit scale. Without the flag both start priors remain
-`Normal(0, 1)`, reproducing earlier fits.
+location with unit scale. Without the flag both start priors are
+`Normal(0, 1)`.
 
 ### Terminal-cell intercepts
 
-`bernstein/` additionally samples two **global** scalars, `end_correct` and
-`end_hazard`, both `Normal(0, 2)`, on by default. They are added to the
-correctness and hazard logits only at `t = T_j`. That final cell is not one more
-token: it also absorbs the whole post-reading buzz window, and the empirical
-team hazard there is 0.75 against 0.29 one token earlier and 0.05 mid-question
-(`analysis/terminal_cell/`). Because they are global they live in
-`summary.json`, not `tossups.csv`; `holdout.frozen_predict` and the Scenario A
-timing replay both read them from there and treat their absence as zero, so
-fits without the sites and every earlier fit are unaffected.
-`--no-terminal-intercepts` drops both sites and reproduces the earlier model
-exactly. `dd_linear_spline/` carries the same two sites.
-
-The multidim family exposes the same sites as an opt-in
-`--terminal-intercepts` feature. Its default remains off so earlier sigmoid and
-tanh protocols are unchanged.
+`bernstein/` adds two global scalars, `end_correct` and `end_hazard`
+(`Normal(0, 2)`), to the correctness and hazard logits at `t = T_j` only. They
+are on by default; `--no-terminal-intercepts` removes them. `multidim/` exposes
+the same sites through opt-in `--terminal-intercepts`. The values are saved in
+`summary.json`, and replay treats a missing key as zero. The measurement behind
+them is in
+[`docs/double-difficulty-bernstein.md`](../docs/double-difficulty-bernstein.md#terminal-cell-intercepts).
 
 ## Commands (modules from the repo root)
 
 ```bash
 .venv/bin/python -m hazard_double_difficulty.multidim.train_pyramidal --help
 .venv/bin/python -m hazard_double_difficulty.bernstein.train_pyramidal --help
-.venv/bin/python -m hazard_double_difficulty.compact_bernstein.train_pyramidal --help
 .venv/bin/python -m hazard_double_difficulty.perceived_difficulty_bernstein.train_pyramidal --help
 .venv/bin/python -m hazard_double_difficulty.perceived_logit_bernstein.train_pyramidal --help
-
-# 5-fold neg/buzz benchmark against the single-curve arms
-CONFIGS=dd-multidim,multidim .venv/bin/python -m neg_test.run_neg_test
 
 # tests (synthetic data only)
 .venv/bin/python -m unittest discover -s hazard_double_difficulty/tests -t . -v
 ```
 
-CLI flags are at parity with each parent (`--dimensions`, `--steps`, `--lr`,
-`--seed`, `--device`, `--calibrate-correctness`, `--calibration-no-scale`,
-`--include-bounceback`, `--train-posterior`, `--new-player-prior`; plus
-`--difficulty-link` / `--relevance-prior` / `--terminal-intercepts` /
-`--ppc-draws` / `--drop-events` for multidim and
-`--degree` / `--drop-concentration` / `--relevance-prior` /
-`--learn-curve-locations` / `--no-terminal-intercepts` for Bernstein), and
-`--perception-slices {1,3}` for perceived difficulty.
+Each trainer's `--help` lists its options. Family-specific ones are
+`--difficulty-link`, `--relevance-prior`, and `--terminal-intercepts` for
+multidim; `--degree`, `--drop-concentration`, `--relevance-prior`,
+`--learn-curve-locations`, and `--no-terminal-intercepts` for Bernstein; and
+`--alpha-prior`, `--relevance-concentration`, plus (perceived difficulty only)
+`--perception-slices` and `--alternate-player-steps` for the perception models.
 
 The 3/3/2 simplex-relevance, learned-location, terminal-intercept arm is:
 
 ```bash
-.venv/bin/python -m run_scripts.bernstein.run_dd_bernstein_332 \
+.venv/bin/python -m run_scripts.double_difficulty.run_dd_bernstein_332 \
   --relevance-prior simplex --learn-curve-locations \
   --root results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal
 ```
 
-Its requested sigmoid counterpart (three dimensions, independent simplex
-relevance, and terminal intercepts) is pinned by a five-fold runner:
-
-```bash
-.venv/bin/python -m run_scripts.multidimensional.multidim.run_dd_sigmoid_simplex_terminal
-```
+Its sigmoid counterpart (three dimensions, independent simplex relevance, and
+terminal intercepts) is the multidim trainer with `--relevance-prior simplex
+--terminal-intercepts --difficulty-link sigmoid`; its completed five folds are in
+`results/compirt/holdout/double-difficulty/model-comparisons/curve-family/sigmoid/`.
 
 ## Saved columns
 

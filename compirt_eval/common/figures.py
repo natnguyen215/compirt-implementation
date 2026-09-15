@@ -117,7 +117,7 @@ def numeric_columns(frame, prefix):
 
 
 def vector_weight_columns(frame):
-    """Return saved vector weights, accepting either alpha_* or embedding r_*."""
+    """Return saved vector weights, accepting either alpha_* or relevance r_*."""
     alpha_columns = numeric_columns(frame, "alpha_")
     relevance_columns = numeric_columns(frame, "r_")
     if alpha_columns and relevance_columns:
