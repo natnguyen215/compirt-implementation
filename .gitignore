@@ -11,11 +11,7 @@ logs/
 
 # Local agent context notes. Public documentation under docs/ is tracked.
 CLAUDE.md
-NATHAN_READ.md
-/CODE_DEEP_DIVE.md
-/COMPIRT_REPOSITORY_GUIDE.md
 /docs/.*.md
-/compirt_eval/EVALUATION_TLDR.md
 /tasks/
 
 # Tests must use synthetic in-memory data or temporary directories.
@@ -45,8 +41,6 @@ results/**/posterior_draws/
 results/compirt/**/test_additions/
 results/compirt/**/polynomial/
 
-# Source paper PDFs and other binaries — kept out of version control.
-*.pdf
 
 # Double-difficulty hyperparameter grid: ~2.7 GB of per-fold loss curves and
 # quantile summaries across 100 points, regenerable from the runner. Its 3/3/2
