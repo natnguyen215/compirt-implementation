@@ -18,6 +18,8 @@ LOWER_IS_BETTER = {
     "ranked_probability_score",
     "bonus_total_score_log_loss",
     "ppb_mae",
+    "tournament_team_bonus_ppg_mae",
+    "bonus_game_margin_mae",
 }
 
 # Sharpness has no standalone "better" direction: it is desirable only subject
@@ -32,6 +34,15 @@ NON_COMPARATIVE_METRICS = {
     "ranked_probability_score_responses",
     "bonus_total_score_log_loss_responses",
     "part_all_correct_accuracy",
+    "part_count_easy",
+    "part_count_medium",
+    "part_count_hard",
+    "part_count_unknown",
+    "bonus_ppg_tournaments",
+    "bonus_ppg_spearman_tournaments",
+    "bonus_ppg_games",
+    "bonus_ppg_incomplete_games",
+    "bonus_game_margin_mae_games",
 }
 
 

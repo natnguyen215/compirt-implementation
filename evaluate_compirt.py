@@ -60,7 +60,7 @@ def main():
         recorded_buzzes=tables["tossup_buzzes"],
         official_games=tables["games"],
     )
-    bonus = evaluate_bonuses(args.compositional_results, args.output_dir)
+    bonus = evaluate_bonuses(args.compositional_results, args.output_dir, tables=tables)
     # Game evaluation is the same tossup-only replay used for tournament PPG.
     game = {key: value for key, value in tossup.items()
             if key.startswith("tossup_game_") or key == "tossup_outcome_schema_version"}

@@ -21,11 +21,13 @@ import sys
 import numpy as np
 import pandas as pd
 
+from compirt_data import DEFAULT_DATA_DIR, load_hf_tables
 from compirt_eval.common.report_paths import csv_path, evaluation_output_dirs
 from compirt_eval.common.reports import experiment_report_markdown, write_eval_docs_summary
 from compirt_eval.scenario_b_bonuses.evaluation import evaluate_bonuses
-from compirt_eval.scenario_b_bonuses.metrics import bonus_metrics
-from holdout.game_splits import game_holdout_split_name, parse_game_holdout_split
+from compirt_eval.scenario_b_bonuses.metrics import bonus_metrics, bonus_parts_with_difficulty
+from compirt_eval.scenario_b_bonuses.outcomes import write_bonus_outcomes
+from holdout.game_splits import game_holdout_split_name, parse_game_holdout_split, select_game_holdout_tables
 from utils.run_logging import resolve_result_root
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -39,6 +41,17 @@ def sha256(path):
 def write_json(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
+
+
+def evaluation_tables(config, folds):
+    """Select the union of evaluated folds, including games with zero bonuses."""
+    specs = [parse_game_holdout_split(config["sources"][str(fold)]["test_split"]) for fold in folds]
+    tables = load_hf_tables(config.get("data_dir") or DEFAULT_DATA_DIR, specs[0].base_split)
+    selected = pd.concat([select_game_holdout_tables(tables, spec)["games"] for spec in specs])
+    if selected["game_id"].duplicated().any():
+        raise ValueError("Evaluation folds overlap in games")
+    tables["games"] = selected
+    return tables
 
 
 def source_fold(stage1_root, fold):
@@ -163,7 +176,7 @@ def run_arm(config, fold, arm, dry_run=False, only_stage=None):
         raise ValueError(f"Nonfinite training losses in {train}")
     evaluation = run / ("evaluation" if arm == "compositional" else "synergy-evaluation")
     evaluation_output_dirs(evaluation)
-    metrics = evaluate_bonuses(test, evaluation)
+    metrics = evaluate_bonuses(test, evaluation, tables=evaluation_tables(config, [fold]))
     pd.DataFrame([metrics]).to_csv(csv_path(evaluation, "bonus_metrics.csv"), index=False)
     report = experiment_report_markdown(
         evaluation, tossup=None, bonus=metrics, title="Frozen Bonus Evaluation"
@@ -188,6 +201,9 @@ def run_arm(config, fold, arm, dry_run=False, only_stage=None):
 
 def aggregate(config):
     rows, pooled = [], []
+    tables = evaluation_tables(config, config["folds"])
+    output = Path(config["root"]) / "aggregate"
+    output.mkdir(parents=True, exist_ok=True)
     for arm in config["arms"]:
         all_parts, all_teams = [], []
         for fold in config["folds"]:
@@ -202,14 +218,14 @@ def aggregate(config):
             all_parts.append(pd.read_csv(test / "bonus_part_predictions.csv"))
             all_teams.append(pd.read_csv(test / "team_predictions.csv"))
         parts, teams = pd.concat(all_parts, ignore_index=True), pd.concat(all_teams, ignore_index=True)
+        parts = bonus_parts_with_difficulty(parts, tables["bonuses"])
         if parts["observation_id"].duplicated().any():
             raise ValueError("A held-out observation was scored in multiple folds")
         pooled.append({"arm": arm, "folds": len(config["folds"]),
                        "parts": len(parts), "responses": len(teams),
                        "games": teams["game_id"].nunique(), "teams": teams["team_id"].nunique(),
-                       **bonus_metrics(parts, teams)})
-    output = Path(config["root"]) / "aggregate"
-    output.mkdir(parents=True, exist_ok=True)
+                       **bonus_metrics(parts, teams),
+                       **write_bonus_outcomes(parts, tables, output / arm)})
     frame = pd.DataFrame(rows)
     frame.to_csv(output / "per_fold.csv", index=False)
     pd.DataFrame(pooled).to_csv(output / "pooled.csv", index=False)
@@ -232,6 +248,25 @@ def aggregate(config):
     for row in pooled:
         names = ("auc", "log_loss", "part_accuracy", "brier", "ece", "exact_acc", "ppb_mae")
         lines.append(f"| {row['arm']} | " + " | ".join(f"{row[k]:.4f}" for k in names) + " |")
+    lines += ["", "## Difficulty, bonus-only team PPG and game margins", "",
+              "Difficulty uses the declared easy/medium/hard part labels. Bonus-only PPG uses "
+              "team bonus totals divided by games played, conditional on the "
+              "recorded bonuses heard. Zero-bonus games "
+              "count, incomplete prediction games are excluded. Pool folds before computing "
+              "team PPG, then average team absolute errors within each tournament and "
+              "macro-average tournament MAE and defined Spearman correlations. Bonus margin "
+              "MAE averages absolute errors in the signed team score difference across games.", "",
+              "| Model | Easy acc. | Medium acc. | Hard acc. | PPG MAE | PPG Spearman | Margin MAE |",
+              "| --- | ---: | ---: | ---: | ---: | ---: | ---: |"]
+    for row in pooled:
+        names = ("part_accuracy_easy", "part_accuracy_medium", "part_accuracy_hard",
+                 "tournament_team_bonus_ppg_mae", "tournament_team_bonus_ppg_spearman",
+                 "bonus_game_margin_mae")
+        lines.append(f"| {row['arm']} | " + " | ".join(f"{row[k]:.4f}" for k in names) + " |")
+    for row in pooled:
+        lines += ["", f"[{row['arm']} team PPG]({row['arm']}/bonus_team_ppg_leaderboard.csv); "
+                  f"[tournament metrics]({row['arm']}/bonus_team_ranking_metrics.csv); "
+                  f"[game margins]({row['arm']}/bonus_game_margin_predictions.csv).", ""]
     lines += ["", f"Scored {pooled[0]['parts']:,} parts / {pooled[0]['responses']:,} bonuses / "
               f"{pooled[0]['games']:,} games / {pooled[0]['teams']:,} teams in {pooled[0]['folds']} folds.", "",
               "See `per_fold.csv` and `fold_mean_std.csv` for fold variation; one optimization seed was used. "

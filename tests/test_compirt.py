@@ -539,6 +539,47 @@ class ModelTests(unittest.TestCase):
         synergy = synergy_contribution(psi, roster, mask)
         self.assertEqual(float(synergy), 2.0)
 
+    def test_phi_psi_synergy_pairs_dimensions_masks_and_gradients(self):
+        phi = torch.tensor([[1., 2.], [3., -1.], [-2., .5], [99., 99.]], requires_grad=True)
+        psi = torch.tensor([[2., -1.], [-1., 3.], [4., 2.], [99., 99.]], requires_grad=True)
+        roster = torch.tensor([[0, 1, 3], [0, 1, 2], [0, 3, 3]])
+        mask = torch.tensor([[True, True, False], [True, True, True], [True, False, False]])
+        synergy = synergy_contribution(psi, roster, mask, phi=phi)
+        # Pair sums are -1, -11, and -20.5; singleton rosters have no pairs.
+        torch.testing.assert_close(synergy, torch.tensor([-1., -32.5, 0.]))
+        torch.testing.assert_close(
+            synergy_contribution(psi, roster.flip(1), mask.flip(1), phi=phi), synergy
+        )
+        synergy[0].backward()
+        torch.testing.assert_close(phi.grad, torch.tensor([[3., -2.], [1., 4.], [0., 0.], [0., 0.]]))
+        torch.testing.assert_close(psi.grad, torch.tensor([[3., -2.], [3., -2.], [0., 0.], [0., 0.]]))
+
+    def test_phi_psi_bonus_likelihood_matches_replay(self):
+        data = {
+            "part_ids": ["part-1"], "part": torch.tensor([0]),
+            "roster": torch.tensor([[0, 1]]),
+            "roster_mask": torch.tensor([[True, True]]), "y": torch.tensor([1.]),
+        }
+        theta = torch.tensor([[.2], [.8]])
+        posterior = {
+            "alpha": torch.tensor([[.5]]), "beta": torch.tensor([.1]),
+            "tau": torch.tensor(.7), "phi": torch.tensor([[1., 2.], [3., -1.]]),
+            "psi": torch.tensor([[2., -1.], [-1., 3.]]),
+            "correctness_scale": torch.tensor(1.2), "correctness_bias": torch.tensor(.3),
+        }
+        trace = pyro.poutine.trace(pyro.poutine.condition(
+            compositional_model, data=posterior
+        )).get_trace(data, theta, use_synergy=True, synergy_dimensions=2,
+                    synergy_form="phi-psi", calibrate_correctness=True)
+        predicted, aggregate, synergy = posterior_predictions(
+            data, theta, posterior, use_synergy=True, calibrate_correctness=True
+        )
+        self.assertNotIn("theta", trace.nodes)
+        torch.testing.assert_close(synergy, torch.tensor([-1.]))
+        expected = torch.sigmoid(1.2 * (aggregate - .1 - 1.) + .3)
+        torch.testing.assert_close(predicted, expected)
+        torch.testing.assert_close(trace.nodes["obs"]["fn"].probs, expected)
+
     def test_multidim_difficulty_curve_and_r_weighted_formula(self):
         theta = torch.tensor([[10.0, 0.0]])
         r = torch.tensor([[0.25, 0.75]])
@@ -999,6 +1040,24 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(team["roster_size"], 3)
         self.assertEqual(team["pair_count"], 3)
         self.assertAlmostEqual(team["synergy_per_pair"], 11 / 3)
+
+    def test_saved_phi_psi_pair_scores_match_team_contribution(self):
+        observations = pd.DataFrame({
+            "response_id": ["r1"], "team_id": ["team-a"],
+            "player_ids": [["p1", "p2", "p3"]],
+        })
+        posterior = {
+            "phi": torch.tensor([[1., 2.], [3., -1.], [-2., .5]]),
+            "psi": torch.tensor([[2., -1.], [-1., 3.], [4., 2.]]),
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            output_dir = Path(directory)
+            save_synergy_outputs(output_dir, ["p1", "p2", "p3"], observations,
+                                 posterior, [-32.5])
+            pairs = pd.read_csv(output_dir / "pairwise_synergy_scores.csv")
+            profiles = pd.read_csv(output_dir / "player_synergy_profiles.csv")
+        self.assertEqual(sorted(pairs.synergy_score), [-20.5, -11., -1.])
+        np.testing.assert_allclose(profiles[["phi_1", "phi_2"]], posterior["phi"])
 
 
 class BouncebackEvaluationTests(unittest.TestCase):

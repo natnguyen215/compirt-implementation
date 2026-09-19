@@ -21,18 +21,27 @@ from compirt_eval.scenario_b_bonuses.figures import (
     team_ppb_plot,
 )
 from compirt_eval.scenario_b_bonuses.metrics import (
+    bonus_accuracy_by_difficulty,
     bonus_metrics,
+    bonus_parts_with_difficulty,
     bonus_ranked_probability_scores,
 )
 from compirt_eval.common.categories import top_level_category
+from compirt_eval.scenario_b_bonuses.outcomes import write_bonus_outcomes
 
 
-def evaluate_bonuses(results_dir, output_dir, dimension_labels=None):
+def evaluate_bonuses(results_dir, output_dir, dimension_labels=None, *, tables=None):
     """Evaluate binary bonus parts and total expected points per bonus."""
     parts = pd.read_csv(results_dir / "bonus_part_predictions.csv")
+    parts = bonus_parts_with_difficulty(parts, tables["bonuses"] if tables is not None else None)
     teams = pd.read_csv(results_dir / "team_predictions.csv")
     response_scores = bonus_ranked_probability_scores(parts)
     metrics = bonus_metrics(parts, teams, response_scores)
+    if tables is not None:
+        metrics.update(write_bonus_outcomes(parts, tables, csv_path(output_dir, "bonus_metrics.csv").parent))
+    bonus_accuracy_by_difficulty(parts).to_csv(
+        csv_path(output_dir, "bonus_part_accuracy_by_difficulty.csv"), index=False
+    )
     response_scores.to_csv(
         csv_path(output_dir, "bonus_score_probability_predictions.csv"), index=False
     )
@@ -46,7 +55,7 @@ def evaluate_bonuses(results_dir, output_dir, dimension_labels=None):
         "correct",
         "predicted_correct",
         "bonus_part_correctness",
-        {"tier": "tier", "category": "category_group"},
+        {"tier": "tier", "category": "category_group", "difficulty": "difficulty"},
     )
     diagnostics.to_csv(
         csv_path(output_dir, "bonus_prediction_diagnostics_by_stratum.csv"),

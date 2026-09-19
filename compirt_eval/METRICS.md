@@ -40,6 +40,10 @@ more weight. The table states the exact order used:
 | Bonus part accuracy (macro) | Score parts → average within each team or bonus question → average the group means | One vote per team or bonus question | Higher |
 | Exact three-part accuracy | Group parts by `response_id` → mark whether all three labels match → average response marks | One vote per bonus response | Higher |
 | PPB MAE | Sum three part scores within each response → average all responses for each team → take each team's absolute PPB error → average team errors | One vote per team | Lower |
+| Bonus accuracy by difficulty | Join declared part labels → score all rows within easy, medium, hard, or unknown | One vote per part within its difficulty | Higher |
+| Bonus-only team PPG MAE | Pool held-out games → sum team bonus points → divide team totals by games → absolute team PPG error → mean within tournament → mean across tournaments | Equal tournaments; equal teams within tournament | Lower |
+| Bonus-only team PPG Spearman | Pool games and compute team PPG → rank observed and predicted PPG within tournament → correlate ranks → average defined tournament correlations | Equal tournaments | Higher |
+| Bonus-only game margin MAE | Sum each team’s bonus points per game → subtract opponent totals → absolute error in the signed margin → mean across games | Equal games | Lower |
 
 ## How to read the notation
 
@@ -285,6 +289,18 @@ part-level accuracy is reported as `part_accuracy`. For these micro metrics, all
 rows are one batch and each part has one vote. Thus a bonus question with ten
 responses has five times the weight of one with two.
 
+`part_accuracy_easy`, `part_accuracy_medium`, and `part_accuracy_hard` repeat
+micro part accuracy separately for the source's declared difficulty labels.
+Join `bonuses.parts[part_index].difficulty` by `bonus_id` and zero-based
+`part_index`; position alone does not imply difficulty. Empty, missing, and
+nonstandard labels go to `unknown`, never an inferred difficulty group.
+`part_count_{easy,medium,hard,unknown}` records all denominators. Empty groups
+have undefined accuracy. These fields are in `bonus_metrics.csv`; the long
+table is `csvs/bonus_part_accuracy_by_difficulty.csv`, and the diagnostic
+strata also include difficulty. Direct Python callers supply linked `tables`
+to `evaluate_bonuses` for metadata enrichment; otherwise saved difficulty is
+used when available, with missing labels explicitly unknown.
+
 More explicitly, let $a_{rb}=1$ when thresholding $p_{rb}$ at 0.5 gives the
 correct label and let $a_{rb}=0$ otherwise. For either grouping choice, let
 $\mathcal G$ be the observed teams or bonus questions and let
@@ -386,6 +402,68 @@ metric.
 `csvs/bonus_metrics.csv` stores `ppb_mae`; and
 `graphs/bonus/bonus_team_ppb_predictions.png` scatters predicted against observed
 PPB with one point per team, the same pooling as the metric.
+
+### Bonus-only team PPG and tournament rankings
+
+Observed response points are recorded `total_points`; predicted response
+points are the expectation `10 * sum(predicted_correct)` across three parts.
+These are predictions conditional on the recorded bonus opportunities; the
+metric does not replay which team earns a bonus.
+
+For team u in tournament t, sum its bonus points across responses,
+then divide by its unique games. The game's `team_ids` define participation,
+including teams that hear no bonuses and games with zero bonuses. No player
+attribution is used. A tournament is a mirror-site `tournament_id`.
+
+The caller must supply tables for exactly the evaluated game population.
+Exclude an entire game if any recorded bonus response is missing, any response
+lacks the three distinct parts 0/1/2, or predictions include unrecorded responses.
+Duplicate response-part predictions, invalid probabilities/labels, inconsistent
+response identities, and disagreements with recorded response scores are errors.
+Predicted team and tournament IDs must agree with game metadata. Games must have
+two distinct teams. Exclusion and included-game counts are saved in the scalar
+metrics. Both PPG and margin metrics use these same complete games.
+
+Each team's `absolute_error` is `abs(predicted_bonus_ppg - observed_bonus_ppg)`.
+Average these errors equally across teams within each tournament to get its
+`bonus_ppg_mae`. This is the error in tournament PPG, not the mean of absolute
+game-score errors. Spearman compares observed and predicted team PPG within
+that tournament using average ranks for ties. Constant or single-team
+rankings have undefined correlation, recorded as NaN.
+
+Pool disjoint held-out game predictions **before** computing full-tournament
+PPG or ranks. `tournament_team_bonus_ppg_mae` averages tournament MAEs
+equally. `tournament_team_bonus_ppg_spearman` averages defined tournament
+correlations equally; `bonus_ppg_spearman_tournaments` records the denominator.
+No fold-ranking averages substitute for this pooling.
+
+Audit outputs under `csvs/` are `bonus_team_game_predictions.csv`,
+`bonus_team_ppg_leaderboard.csv` (one team/tournament row, including its
+absolute error), and `bonus_team_ranking_metrics.csv` (one tournament row,
+with team/game counts, PPG MAE, Spearman, and game margin MAE).
+The compositional-fold runner also writes pooled ledgers under
+`aggregate/<arm>/`. The historical familiar/new-roster comparison's generator
+writes these under `aggregate/bonus_metrics/<model>/<arm>/`, plus
+`bonus_ppg_summary.csv`, `bonus_ppg_by_tournament.csv`, and
+`bonus_metrics_report.md`. PPG uses all scored rosters together, since a
+team's tournament may contain both familiar and new lineups.
+
+### Bonus-only game margins
+
+For each complete game, order its two teams by ID as A and B. Sum observed
+and expected bonus points separately for each team, including a zero when a
+team hears no bonuses. The observed signed margin is `observed_A - observed_B`;
+the predicted margin is `predicted_A - predicted_B`.
+`bonus_game_margin_mae` is the mean of
+`abs(predicted_margin - observed_margin)` across games, with each game counted
+once. Reversing A and B leaves the error unchanged. This is a bonus-points
+margin, with no tossup points or predicted bonus ownership.
+
+`bonus_game_margin_mae_games` is the denominator. The per-tournament table
+also reports the mean margin error within each tournament; the overall scalar
+weights games equally, not tournaments. `bonus_game_margin_predictions.csv`
+records team IDs, observed/expected team points, both signed margins, and each
+game's absolute margin error. Empty populations have undefined MAE.
 
 ## Player summary
 
@@ -524,7 +602,7 @@ size against the uniform 1/n baseline.
 
 ### Tossup ownership, game margins, and tournament PPG
 
-All downstream scoring uses an end-to-end, tossup-only token replay (outcome
+Standard downstream scoring uses an end-to-end, tossup-only token replay (outcome
 schema version 3). For each recorded game and its actual question lineups,
 read tokens 1 through T. The first eligible player whose **current-token** buzz
 probability is at least 0.5 buzzes. This is neither a cumulative-hazard threshold
@@ -566,6 +644,33 @@ full token/buzzer/correctness/points sequences), `tossup_player_predictions.csv`
 `player_ppg_leaderboard.csv`, `player_ranking_metrics.csv`,
 `tossup_round_metrics.csv`, and `tossup_outcome_metrics.csv`. Schema versions
 invalidate cached expected-points leaderboards when aggregating old runs.
+
+### Conditional correctness-only game-winner diagnostic
+
+The separate [saved game-winner study](../results/compirt/holdout/common/game-winner-ablations/2026-09-16/README.md)
+compares the standard replay with skills-only and correctness-only team scores.
+It does not replace the evaluator's game replay. Correctness-only scores use
+each phase-0 player's canonical correctness logit at the observed first-buzz
+cell, clamped to `1..T_j`; dead tossups use `T_j`. Both teams use the same cell.
+Saved question relevance, difficulty, player correctness intercepts, and
+terminal correctness intercepts apply. The studied fits have no correctness
+calibration; the study rejects nonidentity calibration rather than ignoring it.
+
+For each active team lineup, apply unnormalized temperature-1 LSE to these
+player logits and sigmoid to the aggregate. Average the resulting team-question
+scores over the game; the team with the larger mean is the predicted winner.
+This score is a heuristic, not a calibrated team race probability or predicted
+points total. No hazard parameters, observed correctness labels, observed
+buzzer identity, or bounceback rows enter the score. Observed timing does enter,
+so this is a conditional diagnostic, not an end-to-end forecasting comparison.
+
+Use exactly the full replay's complete-game population and literal recorded
+tossup-only winners. Exclude recorded ties, count predicted ties as incorrect,
+and pool all decisive held-out games equally before calculating accuracy.
+`summary.csv` records `correctness_accuracy`, its correct-game numerator,
+`decisive_games`, and predicted tie counts. `game_predictions.csv` records the
+team scores and decisions; `validation.json` records source hashes, event
+counts, and dead-event counts. These artifacts live beside the study code.
 
 ## Difficulty and parameter figures
 
@@ -649,6 +754,18 @@ dashboard describe training rosters. These densities summarize variation
 across fitted posterior medians, not posterior uncertainty for one parameter.
 
 ### Bonus-model comparison
+
+The standalone [bonus-only team IRT study](../analysis/bonus_team_irt/README.md)
+uses the same bonus metrics on a matched subset of the existing whole-game
+folds. It excludes entire games requiring unseen training teams/parts or
+missing any reference prediction, recording the exclusions per fold. All arms
+share identical parts and complete games; zero-bonus games remain in game
+denominators. Pooled team metrics are computed after concatenating folds.
+Subject, declared difficulty, and subject-by-difficulty binary metrics give
+each observed part one vote and retain Unknown labels. Study artifacts are
+`aggregate/metrics.csv`, `metrics_by_fold.csv`, `metrics_by_question_type.csv`,
+and per-model team/game tables. The report uses the existing compositional
+metric columns and difficulty/PPG/margin layout.
 
 `compirt_eval/synergy_comparison/` (run through
 `run_scripts/common/run_synergy_comparison.py`) reads the

@@ -246,18 +246,17 @@ def save_synergy_outputs(
     output_dir, player_ids, observations, posterior, synergy_values, *, details=True
 ):
     """Always save replayable profiles; optionally export pairs and contributions."""
-    # Synergy depends on pairwise psi dot products, which are rotation-invariant.
     profiles = {"player_id": player_ids}
-    for dimension in range(posterior["psi"].shape[1]):
-        profiles[f"psi_{dimension + 1}"] = tensor_values(
-            posterior["psi"][:, dimension]
-        )
+    for name in ("psi", "phi"):
+        if name in posterior:
+            add_numbered_tensor_columns(profiles, name, posterior[name])
     pd.DataFrame(profiles).to_csv(output_dir / "player_synergy_profiles.csv", index=False)
 
     if not details:
         return
 
     psi = tensor_values(posterior["psi"])
+    phi = tensor_values(posterior["phi"]) if "phi" in posterior else None
     # Export only observed teammate pairs; all pairs would grow quadratically.
     player_index = {player_id: index for index, player_id in enumerate(player_ids)}
     observed_pairs = set()
@@ -273,7 +272,10 @@ def save_synergy_outputs(
             {
                 "player_1": player_1,
                 "player_2": player_2,
-                "synergy_score": float(np.dot(psi[left], psi[right])),
+                "synergy_score": float(
+                    np.dot(psi[left], psi[right]) if phi is None else
+                    np.sum(phi[left] * phi[right] * (psi[left] + psi[right]))
+                ),
             }
         )
     pair_df = pd.DataFrame(

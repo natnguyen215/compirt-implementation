@@ -29,6 +29,15 @@ double-difficulty families — see
 
 Each folder documents its own reproduction command in its `README.md`.
 
+## Bonus-prediction experiments
+
+[`bonus_team_irt/`](bonus_team_irt/README.md) learns team skill vectors directly
+from bonus outcomes, with one- and three-dimensional IRT arms. It compares
+frozen whole-game predictions with part-conversion rates and saved
+compositional models on matched complete games. Outputs live under
+`results/compirt/holdout/common/bonus-team-irt/`; findings are recorded in
+[`../RESEARCH_LOG_2.md`](../RESEARCH_LOG_2.md).
+
 ## Correctness-prediction experiments
 
 [`correctness/`](correctness/) is a single research line in three packages: given

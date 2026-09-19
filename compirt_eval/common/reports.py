@@ -98,6 +98,16 @@ TOSSUP_METRIC_GROUPS: list[tuple[str, list[str]]] = [
 ]
 BONUS_METRIC_GROUPS: list[tuple[str, list[str]]] = [
     (
+        "Bonus-Only Team PPG (recorded opportunities)",
+        ["tournament_team_bonus_ppg_mae", "tournament_team_bonus_ppg_spearman",
+         "bonus_ppg_tournaments", "bonus_ppg_spearman_tournaments",
+         "bonus_ppg_games", "bonus_ppg_incomplete_games"],
+    ),
+    (
+        "Bonus-Only Game Margins (recorded opportunities)",
+        ["bonus_game_margin_mae", "bonus_game_margin_mae_games"],
+    ),
+    (
         "Part-Level Correctness",
         [
             "auc",
@@ -105,10 +115,18 @@ BONUS_METRIC_GROUPS: list[tuple[str, list[str]]] = [
             "ece",
             "brier",
             "part_accuracy",
+            "part_accuracy_easy",
+            "part_accuracy_medium",
+            "part_accuracy_hard",
+            "part_accuracy_unknown",
             "part_all_correct_accuracy",
             "accuracy_lift_over_all_correct",
             "part_accuracy_macro_team",
             "part_accuracy_macro_bonus",
+            "part_count_easy",
+            "part_count_medium",
+            "part_count_hard",
+            "part_count_unknown",
         ],
     ),
     (
@@ -141,6 +159,17 @@ REPORT_HIDDEN_METRICS = {"survival_events_skipped"}
 # less familiar metrics.  Keep the full mathematical contract in METRICS.md;
 # these notes make the standalone experiment report interpretable.
 METRIC_GROUP_NOTES = {
+    "Bonus-Only Team PPG (recorded opportunities)": (
+        "Team bonus totals are divided by games played, including zero-bonus games. "
+        "MAE averages team PPG errors within tournaments, then weights tournaments equally; "
+        "Spearman is also averaged across tournaments with defined correlations. "
+        "Predictions use expected points on recorded bonus opportunities."
+    ),
+    "Bonus-Only Game Margins (recorded opportunities)": (
+        "For each complete game, subtract team B's bonus points from team A's. "
+        "MAE compares predicted and observed signed margins, weighting games equally. "
+        "Predictions use expected points on recorded bonus opportunities."
+    ),
     "Buzz Timing (survival replay over all lineup rows)": (
         "The survival replay reconstructs each event's probability that someone "
         "has buzzed by each relative question position. `integrated_brier_score` "
@@ -366,6 +395,7 @@ def _stage_summary_rows(evaluation_dir: Path) -> pd.DataFrame:
             "final_loss",
             "calibrate_correctness",
             "synergy_dimensions",
+            "synergy_form",
             "topic_vectors",
         ):
             if field in summary:
@@ -562,11 +592,16 @@ def _synergy_section_lines(evaluation_dir: Path) -> list[str]:
                 },
             ]
         )
+    formula = (
+        "`sum over dimensions d and pairs i<j of phi_id phi_jd (psi_id + psi_jd)`"
+        if summary.get("synergy_form", "dot") == "phi-psi" else
+        "`sum over pairs i<j of psi_i . psi_j` (Eq. 10)"
+    )
     return [
         "## Synergy Contributions",
         "",
-        "Each lineup's synergy contribution is the Eq. 10 pairwise sum "
-        "`sum over pairs i<j of psi_i . psi_j` across its members, added to "
+        f"Each lineup's synergy contribution is the pairwise sum {formula} "
+        "across its members, added to "
         "that team's aggregation logit for every bonus the lineup hears. The "
         "`*_synergy_fraction` rows weight each bonus response equally; the "
         "`distinct_*` rows count each lineup or team once.",
@@ -646,6 +681,11 @@ def experiment_report_markdown(
     if bonus is not None:
         lines.extend(["## Stage 2: Bonus Metrics", ""])
         lines.extend(_grouped_metric_lines(bonus, BONUS_METRIC_GROUPS))
+        bonus_rankings = _read_csv(metrics_path(evaluation_dir, "bonus_team_ranking_metrics.csv"))
+        if not bonus_rankings.empty:
+            lines.extend(["### Bonus-Only PPG by Tournament", "", markdown_table(bonus_rankings), "",
+                          "[Team PPG and absolute errors](csvs/bonus_team_ppg_leaderboard.csv); "
+                          "[game bonus margins](csvs/bonus_game_margin_predictions.csv).", ""])
         lines.extend(_synergy_section_lines(evaluation_dir))
     if game is not None:
         lines.extend(["## Tossup Game Replay", ""])
@@ -690,6 +730,11 @@ def _summary_sections(
             "No bonus metrics CSV was found.",
         ),
         (
+            "Bonus-Only PPG by Tournament",
+            _read_csv(csv_dir / "bonus_team_ranking_metrics.csv"),
+            "No tournament bonus PPG metrics CSV was found.",
+        ),
+        (
             "Stage 1 Tossup Metrics",
             _metric_frame(
                 load_metrics_row(evaluation_dir, "tossup_metrics.csv"),
@@ -730,6 +775,7 @@ def _summary_sections(
     if include_bonus:
         return sections
     bonus_titles = {
+        "Bonus-Only PPG by Tournament",
         "Bonus Stage Scalars",
         "Stage 2 Bonus Metrics",
         "No-Synergy Versus Synergy Deltas",

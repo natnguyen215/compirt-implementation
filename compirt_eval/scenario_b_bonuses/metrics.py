@@ -17,6 +17,41 @@ from compirt_eval.common.metrics import (
 )
 
 
+def bonus_parts_with_difficulty(parts, bonuses=None):
+    """Join declared part difficulty by bonus ID and zero-based part index."""
+    parts = parts.copy()
+    if bonuses is not None:
+        labels = pd.DataFrame(
+            [
+                {"bonus_id": bonus.bonus_id, "part_index": index,
+                 "difficulty": part.get("difficulty", "")}
+                for bonus in bonuses.itertuples(index=False)
+                for index, part in enumerate(bonus.parts)
+            ],
+            columns=["bonus_id", "part_index", "difficulty"],
+        )
+        parts = parts.drop(columns="difficulty", errors="ignore").merge(
+            labels, on=["bonus_id", "part_index"], how="left", validate="many_to_one"
+        )
+    if "difficulty" not in parts:
+        parts["difficulty"] = "unknown"
+    labels = parts["difficulty"].fillna("").astype(str).str.strip().str.lower()
+    parts["difficulty"] = labels.where(labels.isin(["easy", "medium", "hard"]), "unknown")
+    return parts
+
+
+def bonus_accuracy_by_difficulty(parts):
+    """Micro accuracy and denominator for each declared difficulty, including unknown."""
+    parts = bonus_parts_with_difficulty(parts)
+    matches = (parts["predicted_correct"] >= 0.5) == parts["correct"].astype(bool)
+    return pd.DataFrame([
+        {"difficulty": difficulty, "parts": int(selected.sum()),
+         "part_accuracy": float(matches[selected].mean())}
+        for difficulty in ("easy", "medium", "hard", "unknown")
+        for selected in [parts["difficulty"].eq(difficulty)]
+    ])
+
+
 def bonus_score_distribution(part_probabilities):
     """Return probabilities of scoring 0, 10, 20, or 30 on a three-part bonus."""
     probabilities = np.asarray(part_probabilities, dtype=float)
@@ -91,6 +126,9 @@ def bonus_metrics(parts, teams, response_scores=None):
     metrics = classification_metrics(parts["correct"], parts["predicted_correct"])
     metrics["part_accuracy"] = metrics.pop("accuracy")
     metrics["part_all_correct_accuracy"] = metrics.pop("all_correct_accuracy")
+    for row in bonus_accuracy_by_difficulty(parts).itertuples(index=False):
+        metrics[f"part_accuracy_{row.difficulty}"] = row.part_accuracy
+        metrics[f"part_count_{row.difficulty}"] = row.parts
     part_matches = (parts["predicted_correct"] >= 0.5) == parts["correct"].astype(bool)
     metrics["part_accuracy_macro_team"] = _macro_group_mean(
         part_matches, parts["team_id"] if "team_id" in parts else None

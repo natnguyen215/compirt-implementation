@@ -43,10 +43,12 @@ def test_audit_rejects_invalid_or_partial_predictions():
         audit_predictions(train, test, {"train"})
 
 
-@pytest.mark.parametrize("use_synergy,calibration,prior", [
-    (False, False, "normal"), (True, False, "gamma"), (True, True, "gamma"),
+@pytest.mark.parametrize("use_synergy,calibration,prior,synergy_form", [
+    (False, False, "normal", "dot"), (True, False, "gamma", "dot"),
+    (True, True, "gamma", "dot"), (True, False, "normal", "phi-psi"),
+    (True, True, "gamma", "phi-psi"),
 ])
-def test_bonus_train_save_replay_and_evaluate(tmp_path, monkeypatch, use_synergy, calibration, prior):
+def test_bonus_train_save_replay_and_evaluate(tmp_path, monkeypatch, use_synergy, calibration, prior, synergy_form):
     observations = pd.DataFrame([
         {"observation_id": f"{response}:{part}", "response_id": response,
          "game_id": "game", "team_id": response, "bonus_part_id": f"part-{part}",
@@ -68,10 +70,12 @@ def test_bonus_train_save_replay_and_evaluate(tmp_path, monkeypatch, use_synergy
         output_dir=training, player_skills=pyramidal / "players.csv",
         data_dir=tmp_path, split="all", tournament=None, device="cpu", seed=42,
         steps=3, lr=0.01, use_synergy=use_synergy, synergy_dimensions=2,
+        synergy_form=synergy_form,
         save_synergy_details=False, calibrate_correctness=calibration, alpha_prior=prior,
         posterior_draws=0,
     )
     train_compositional.run_experiment(args)
+    assert json.loads((training / "summary.json").read_text())["synergy_form"] == synergy_form
     assert (training / "player_synergy_profiles.csv").exists() == use_synergy
     assert not (training / "pairwise_synergy_scores.csv").exists()
     # Saved rows must align by ID, independently of their CSV order.
@@ -105,6 +109,10 @@ def test_bonus_train_save_replay_and_evaluate(tmp_path, monkeypatch, use_synergy
         replay_args.use_synergy = True
         profile_path = training / "player_synergy_profiles.csv"
         profiles = pd.read_csv(profile_path)
+        if synergy_form == "phi-psi":
+            profiles.drop(columns=["phi_1", "phi_2"]).to_csv(profile_path, index=False)
+            with pytest.raises(ValueError, match="phi profiles disagree"):
+                frozen_predict.frozen_predict_bonuses(replay_args)
         profiles[profiles.player_id != "p1"].to_csv(profile_path, index=False)
         with pytest.raises(ValueError, match="Missing fitted synergy profiles"):
             frozen_predict.frozen_predict_bonuses(replay_args)
