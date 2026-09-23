@@ -19,5 +19,6 @@ adds tossup-only records from nine 2023 tournaments to the `all` split;
 `build_report.json` there records both sources and the resulting counts.
 Rebuilding from `data/database.db` alone does not reproduce that extension.
 
-See [`../docs/dataset-schema.md`](../docs/dataset-schema.md) for table schemas
-and [`../docs/lineup-inference.md`](../docs/lineup-inference.md) for lineup rules.
+See the [model data contract](../docs/dataset-schema.md) for table schemas,
+derived training rows, and conversion requirements. Active-lineup inference is
+specified in [`../lineup.py`](../lineup.py).

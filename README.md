@@ -18,6 +18,104 @@ python -m venv --system-site-packages .venv
 Training and evaluation need the generated dataset described in
 [`data/README.md`](data/README.md).
 
+This project builds linked quizbowl datasets and uses Pyro to model player and
+team performance.
+
+## Repository Layout
+
+The root CompIRT files are separated by responsibility through their names:
+
+- `pyramidal_model.py` and `compositional_model.py`: paper equation implementations.
+- `compirt_data.py`: observation and tensor construction.
+- `train_pyramidal.py` and `train_compositional.py`: experiment training.
+- `evaluate_compirt.py` and the `compirt_eval/` package: the executed evaluation code
+   plus its metrics, figures, and per-scenario (tossup/bonus) modules. See
+   [`compirt_eval/METRICS.md`](compirt_eval/METRICS.md) for the scored populations,
+   aggregation order, equations, graphs, and interpretation limits.
+- `data_pipeline/`: source-database to Hugging Face dataset builder and validator.
+- `run_scripts/common/run_compirt.py`: end to end configurable experiment (train,
+  evaluate, and compare in one pass). `run_scripts/common/run_compirt.sh` is a thin
+  wrapper around it.
+- `run_scripts/common/run_compirt_2024.py`: full-2024 reproducibility wrapper. It runs
+  dataset validation, then calls the configurable runner with all-2024
+  defaults. `run_scripts/common/run_compirt_2024.sh` is a thin wrapper around it.
+- `run_scripts/common/run_compirt_round_holdout.py`: derives linked train/test data by
+  holding out the final 20% of complete rounds in every tournament, then reuses
+  the standard transductive holdout runner. Its `.sh` file is the shell entry
+  point.
+- `holdout/`: held-out evaluation infrastructure — the round/game split builders,
+  the cross-split player priors used by the transductive runners, and
+  `frozen_predict.py`, which replays both stages at the training posterior
+  medians for a pure "matrix infill" forward pass with no test-set learning.
+- `lineup.py`: per-game active-lineup inference from buzz evidence.
+- `scenario_c_model.py`: the paper's Scenario C fit — new bonus-item parameters
+  learned while player/team parameters stay frozen.
+- `utils/`: shared saving, training, posterior, and run-logging helpers.
+- `simple_mirt/`: legacy/pedagogical MIRT baseline outside the two-stage
+  pipeline; also supplies the plain-IRT comparator for the drop-robustness study.
+- `neg_test/`: 5-fold cross-validated neg/buzz comparison across difficulty-curve
+  families.
+- `topic/`: topic-model experiments — `topic/fixed/` (topics fit upstream via
+  LDA/PLDA/categories and fed in as fixed weights), `topic/learned/` (topics
+  learned jointly with the IRT model), and shared topic helpers in `topic/utils/`.
+- `tfidf/`: isolated cumulative IDF-aware pyramidal model for clue timing.
+- `multidimensional/`: multidimensional-difficulty experiments —
+  `multidimensional/multidim_mirt/` (the multidimensional-skill pyramidal
+  variant, with a free learned relevance vector `r`),
+  `multidimensional/embedding_mirt/` (sibling whose `r` is instead a
+  CAIMIRA-style relevance vector computed from a frozen Qwen3-Embedding-8B
+  vector of the question text through a learned linear projection). The
+  embedding variant reuses `multidim_mirt`'s tossup math and the root
+  `compositional_model.py` rather than duplicating them. Both name the weight
+  `r` rather than the baseline's `alpha` because their difficulty is
+  per-dimension: `alpha` weights a scalar-difficulty dot product, while `r`
+  weights per-dimension skill-minus-difficulty gaps.
+- `polynomial_compirt/`: isolated multidimensional Stage-1 variant whose
+  per-tossup difficulty coordinates are strictly decreasing degree 3--6
+  Bernstein polynomials, plus the resumable 1D/5D degree sweep launcher.
+
+Variant scripts run as modules from the repo root, e.g.
+`.venv/bin/python -m topic.fixed.train_topic_pyramidal --help`.
+
+Start with the [documentation index](docs/README.md). Reproduction entry points
+live under `run_scripts/`; for scored populations and equations, see the
+[evaluation metric contract](compirt_eval/METRICS.md).
+
+# CompIRT Paper Implementation
+
+Each file has a module docstring and per-function paper-equation references; the smaller
+helper functions sit above the `run_experiment`/`main` entry point that ties
+them together.
+
+1. `compirt_data.py`: turns the linked tables into model-ready observations and
+   padded tensors (paper Section 3.1 tossups, Section 3.2 bonus parts).
+2. `pyramidal_model.py`: the Stage 1 tossup competing-risks model
+   (Eq. 3-7 and the dead-tossup survival term in Eq. 13).
+3. `train_pyramidal.py`: fits Stage 1 and saves player/tossup parameters; start
+   at `run_experiment`.
+4. `compositional_model.py`: the Stage 2 bonus model that holds player skill
+   `theta` fixed and learns how parts reward it (Eq. 8 aggregation, Eq. 10
+   synergy, Eq. 11 outcome).
+5. `train_compositional.py`: fits Stage 2 from the saved `theta`; start at
+   `run_experiment`.
+6. `evaluate_compirt.py`: turns saved predictions into metrics and figures; start
+   at `main`, which calls `compirt_eval/scenario_a_tossups/` for paper Scenario A
+   and `compirt_eval/scenario_b_bonuses/` for Scenario B. Cross-scenario metrics,
+   figures, report paths, and report builders live in `compirt_eval/common/`.
+
+## Dataset Pipeline
+
+`data_pipeline.dataset` builds the linked HuggingFace tables from
+`data/database.db`. Player rows that share the same raw player slug are grouped
+under that slug; the builder does not attempt cross-slug identity resolution.
+
+Rebuild and validate the generated data:
+
+```bash
+.venv/bin/python -m data_pipeline.build --overwrite
+.venv/bin/python -m data_pipeline.validate
+```
+
 ## Repository layout
 
 | Path | Contents |
