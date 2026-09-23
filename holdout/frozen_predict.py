@@ -643,6 +643,9 @@ def frozen_predict_bonuses(args) -> dict:
 
     summary_path = train_bonus / "summary.json"
     training_summary = json.loads(summary_path.read_text()) if summary_path.exists() else {}
+    synergy_form = training_summary.get("synergy_form", "dot")
+    if synergy_form not in ("dot", "phi-psi"):
+        raise ValueError(f"Unknown saved synergy form: {synergy_form}")
     for setting in ("use_synergy", "calibrate_correctness"):
         if setting in training_summary and bool(training_summary[setting]) != getattr(args, setting):
             raise ValueError(
@@ -707,7 +710,6 @@ def frozen_predict_bonuses(args) -> dict:
             for column in profiles.columns
             if column.startswith("psi_") and column.removeprefix("psi_").isdigit()
         )
-        psi_columns = _numbered_columns(profiles, "psi", synergy_dimensions)
         if not synergy_dimensions or profiles["player_id"].astype(str).duplicated().any():
             raise ValueError(f"Invalid synergy profiles in {train_bonus}")
         # Unused players may be absent; every evaluated roster needs fitted psi.
@@ -717,16 +719,24 @@ def frozen_predict_bonuses(args) -> dict:
         if missing:
             raise ValueError(f"Missing fitted synergy profiles for {len(missing)} evaluated players")
         present = [pid for pid in player_ids if pid in indexed.index]
-        psi = torch.zeros((len(player_ids), synergy_dimensions), device=args.device)
-        if present:
-            aligned = indexed.loc[present, psi_columns].to_numpy(dtype="float32")
-            if not np.isfinite(aligned).all():
-                raise ValueError(f"Nonfinite synergy profiles in {train_bonus}")
-            row_of = {pid: row for row, pid in enumerate(player_ids)}
-            psi[[row_of[pid] for pid in present]] = torch.tensor(
-                aligned, dtype=torch.float32, device=args.device
-            )
-        posterior["psi"] = psi
+        has_phi = any(
+            column.startswith("phi_") and column.removeprefix("phi_").isdigit()
+            for column in profiles
+        )
+        if has_phi != (synergy_form == "phi-psi"):
+            raise ValueError("Saved phi profiles disagree with summary synergy_form")
+        for name in (("psi", "phi") if synergy_form == "phi-psi" else ("psi",)):
+            columns = _numbered_columns(profiles, name, synergy_dimensions)
+            values = torch.zeros((len(player_ids), synergy_dimensions), device=args.device)
+            if present:
+                aligned = indexed.loc[present, columns].to_numpy(dtype="float32")
+                if not np.isfinite(aligned).all():
+                    raise ValueError(f"Nonfinite synergy profiles in {train_bonus}")
+                row_of = {pid: row for row, pid in enumerate(player_ids)}
+                values[[row_of[pid] for pid in present]] = torch.tensor(
+                    aligned, dtype=torch.float32, device=args.device
+                )
+            posterior[name] = values
     if args.calibrate_correctness:
         calibration = _load_calibration(train_bonus / "summary.json", args.device)
         if calibration is None:
@@ -749,6 +759,7 @@ def frozen_predict_bonuses(args) -> dict:
         "split": args.split,
         "tournament": args.tournament or "",
         "use_synergy": args.use_synergy,
+        "synergy_form": synergy_form,
         "calibrate_correctness": args.calibrate_correctness,
         "skill_dimensions": dimensions,
         "bonus_part_observations": len(observations),

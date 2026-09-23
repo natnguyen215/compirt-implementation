@@ -70,6 +70,13 @@ def load_player_skills(path, device):
 
 def run_experiment(args):
     """Run the complete compositional bonus training and output pipeline."""
+    synergy_form = getattr(args, "synergy_form", "dot")
+    if synergy_form not in ("dot", "phi-psi"):
+        raise ValueError(f"Unknown synergy form: {synergy_form}")
+    if synergy_form != "dot" and not args.use_synergy:
+        raise ValueError("--synergy-form phi-psi requires --use-synergy")
+    if args.use_synergy and args.synergy_dimensions < 1:
+        raise ValueError("--synergy-dimensions must be positive")
     args.output_dir.mkdir(parents=True, exist_ok=True)
     require_device(args.device)
     pyro.set_rng_seed(args.seed)
@@ -106,6 +113,7 @@ def run_experiment(args):
         "theta": theta,
         "use_synergy": args.use_synergy,
         "synergy_dimensions": args.synergy_dimensions,
+        "synergy_form": synergy_form,
         "calibrate_correctness": args.calibrate_correctness,
         "alpha_prior": args.alpha_prior,
     }
@@ -160,6 +168,7 @@ def run_experiment(args):
         "player_skills": str(args.player_skills.resolve()),
         "dropped_rows_unknown_roster": dropped_rows_unknown_roster,
         "use_synergy": args.use_synergy,
+        "synergy_form": synergy_form,
         "synergy_dimensions": args.synergy_dimensions if args.use_synergy else 0,
         "saved_synergy_details": args.use_synergy and args.save_synergy_details,
         "calibrate_correctness": args.calibrate_correctness,
@@ -195,6 +204,10 @@ def parse_args():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     parser.add_argument("--use-synergy", action="store_true")
+    parser.add_argument(
+        "--synergy-form", choices=("dot", "phi-psi"), default="dot",
+        help="Pair formula: psi_i dot psi_j, or sum_d phi_id phi_jd (psi_id + psi_jd).",
+    )
     parser.add_argument("--synergy-dimensions", type=int, default=1)
     parser.add_argument("--save-synergy-details", action="store_true")
     parser.add_argument("--calibrate-correctness", action="store_true")

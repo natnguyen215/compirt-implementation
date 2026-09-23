@@ -10,6 +10,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from compirt_eval.common.reports import experiment_report_markdown
 from compirt_eval.common.metrics import (
     binary_brier_score,
     calibration_table,
@@ -26,10 +27,95 @@ from compirt_eval.scenario_a_tossups.timing import buzz_density_fit_plot
 from compirt_eval.scenario_a_tossups.reconstruction import event_first_buzz_components
 from compirt_eval.scenario_a_tossups.metrics import tossup_joint_event_scores
 from compirt_eval.scenario_b_bonuses.metrics import (
+    bonus_accuracy_by_difficulty,
+    bonus_parts_with_difficulty,
     bonus_ranked_probability_scores,
     bonus_score_distribution,
 )
 from compirt_eval.scenario_b_bonuses.distributions import bonus_parameter_distribution_plots
+from compirt_eval.scenario_b_bonuses.outcomes import bonus_team_outcomes, write_bonus_outcomes
+
+
+def test_bonus_difficulty_uses_metadata_not_part_position():
+    parts = pd.DataFrame({"bonus_id": ["b"] * 3 + ["missing"],
+                          "part_index": [0, 1, 2, 0], "correct": [0, 1, 1, 0],
+                          "predicted_correct": [0.5, 0.9, 0.1, 0.2]})
+    bonuses = pd.DataFrame({"bonus_id": ["b"], "parts": [[
+        {"difficulty": "hard"}, {"difficulty": " EASY "}, {"difficulty": "medium"}]]})
+    rows = bonus_accuracy_by_difficulty(bonus_parts_with_difficulty(parts, bonuses)).set_index("difficulty")
+    assert rows["part_accuracy"].to_dict() == {"easy": 1., "medium": 0., "hard": 0., "unknown": 1.}
+    assert rows["parts"].sum() == 4
+
+
+def test_bonus_team_ppg_and_signed_margins(tmp_path):
+    import pytest
+
+    official_games = pd.DataFrame([
+        {"tournament_id": "t", "game_id": game, "team_ids": ["b", "a"]}
+        for game in ("g1", "g2", "missing", "zero")
+    ] + [{"tournament_id": "constant", "game_id": "g4", "team_ids": ["c", "d"]}])
+    parts = pd.DataFrame([
+        {"response_id": response, "game_id": game, "team_id": team, "tournament_id": "t",
+         "part_index": index, "correct": correct, "predicted_correct": probability}
+        for response, game, team, labels, probability in (
+            ("r1", "g1", "a", [1, 1, 1], 0.8),
+            ("r2", "g1", "b", [1, 0, 0], 0.5),
+            ("r3", "g2", "a", [0, 0, 0], 0.2),
+            ("r4", "g2", "b", [1, 1, 1], 0.3))
+        for index, correct in enumerate(labels)
+    ])
+    recorded = parts.groupby(["response_id", "game_id", "team_id"], as_index=False).agg(
+        total_points=("correct", lambda values: 10 * values.sum()))
+    recorded.loc[len(recorded)] = ["unpredicted", "missing", "a", 20]
+    summary, games, leaderboard, tournaments, margins = bonus_team_outcomes(parts, official_games, recorded)
+    teams = leaderboard.set_index("team_id")
+    assert teams.loc["a", "games"] == 3
+    assert teams.loc["a", "observed_bonus_ppg"] == 10
+    assert teams.loc["a", "predicted_bonus_ppg"] == pytest.approx(10)
+    # PPG error is taken after pooling games; opposite game errors cancel.
+    assert teams.loc["a", "absolute_error"] == pytest.approx(0)
+    assert teams.loc["b", "absolute_error"] == pytest.approx(16 / 3)
+    assert teams.loc["c", "observed_bonus_ppg"] == 0
+    assert len(games) == 8
+    ranks = tournaments.set_index("tournament_id")
+    assert ranks.loc["t", "bonus_ppg_mae"] == pytest.approx(8 / 3)
+    assert ranks.loc["t", "bonus_ppg_spearman"] == pytest.approx(-1)
+    assert np.isnan(ranks.loc["constant", "bonus_ppg_spearman"])
+    assert summary["tournament_team_bonus_ppg_mae"] == pytest.approx(4 / 3)
+    assert summary["bonus_ppg_incomplete_games"] == 1
+    assert summary["bonus_ppg_spearman_tournaments"] == 1
+    assert summary["bonus_game_margin_mae_games"] == 4
+    assert summary["bonus_game_margin_mae"] == pytest.approx(9.5)
+    margin = margins.set_index("game_id").loc["g1"]
+    assert margin["observed_bonus_margin"] == 20
+    assert margin["predicted_bonus_margin"] == pytest.approx(9)
+    assert margin["absolute_bonus_margin_error"] == pytest.approx(11)
+    assert ranks.loc["t", "bonus_game_margin_mae"] == pytest.approx(38 / 3)
+
+    tables = {"games": official_games, "bonus_responses": recorded}
+    write_bonus_outcomes(parts, tables, tmp_path)
+    report = experiment_report_markdown(tmp_path, tossup=None, bonus=summary)
+    assert "bonus_game_margin_mae" in report
+    assert "bonus_team_ppg_leaderboard.csv" in report
+    assert pd.read_csv(tmp_path / "bonus_team_ranking_metrics.csv").shape[0] == 2
+    assert pd.read_csv(tmp_path / "bonus_game_margin_predictions.csv").shape[0] == 4
+
+    with pytest.raises(ValueError, match="Duplicate"):
+        bonus_team_outcomes(pd.concat([parts, parts.iloc[:1]]), official_games, recorded)
+    partial_summary, _, _, _, _ = bonus_team_outcomes(parts.iloc[1:], official_games, recorded)
+    assert partial_summary["bonus_ppg_incomplete_games"] == 2
+    # An entirely unscored population produces explicit undefined scores.
+    empty_summary, _, _, _, _ = bonus_team_outcomes(parts.iloc[:0], official_games.iloc[:2], recorded)
+    assert empty_summary["bonus_ppg_games"] == 0
+    assert np.isnan(empty_summary["bonus_game_margin_mae"])
+    invalid = parts.copy()
+    invalid.loc[0, "team_id"] = "other"
+    with pytest.raises(ValueError, match="metadata"):
+        bonus_team_outcomes(invalid, official_games, recorded)
+    invalid = parts.copy()
+    invalid.loc[0, "correct"] = 0
+    with pytest.raises(ValueError, match="score"):
+        bonus_team_outcomes(invalid, official_games, recorded)
 
 
 class FrozenBonusParameterPlotTests(unittest.TestCase):

@@ -1,0 +1,282 @@
+[
+  {
+    "model": "DD-Bernstein historical (bonus reference)",
+    "fold": 0,
+    "events": 9420,
+    "no_buzz_events": 125,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_0/train/pyramidal/players.csv": "9c5292f73222931ff9c91576a666d365e2be6f925f4f0dacd92e06c344b78529",
+      "results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-locations-terminal/fold_0/csvs/tossup_game_predictions.csv": "0dc04e362188fd14af2d8688d5b8074b090ffd21ccc74037c2e7e5c14fdff642",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_0/holdout/pyramidal/players.csv": "293282fb02cb41332f0793731be0b96ef4d57c96f0f42ab606b06ca0dfdced08",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_0/holdout/pyramidal/tossups.csv": "942d5ed7e4bc0e86d8035d08cecec8e8d3c0e80a2afcc308f45df117920bc275",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_0/holdout/pyramidal/tossup_predictions.csv": "31208a3fe26e115d731284dd677187c8331de13fb59fc7841a8652b13bafe2c6",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_0/holdout/pyramidal/summary.json": "66ac87eb6ad7d1f6af14d271981ac71133cdf70c9dcf7f0f3121f76b85a9e312"
+    }
+  },
+  {
+    "model": "DD-Bernstein historical (bonus reference)",
+    "fold": 1,
+    "events": 9240,
+    "no_buzz_events": 147,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_1/train/pyramidal/players.csv": "8a80108d6bcd3dcf058eaa17701005b78329a01a932a065924a587b255757775",
+      "results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-locations-terminal/fold_1/csvs/tossup_game_predictions.csv": "5daed57e9bebd81cb9787c568666543bcd926e11656a2114a602fc42350861c8",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_1/holdout/pyramidal/players.csv": "c85640ed5fcfc841b8c8007133cb4669ca9d9e9903467ccabc6a14c264f73983",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_1/holdout/pyramidal/tossups.csv": "3f9e57235475a8b57f75123abef3b32eadba82149c1457aa971d4976a8c1c595",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_1/holdout/pyramidal/tossup_predictions.csv": "19bc4edc190dbc114dab8bda7082a29ab326e832f4747ce9eb59d2895ff9ef88",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_1/holdout/pyramidal/summary.json": "5b478c81abe475a0fad7c5be2af5aeae96d3f7c157944c7c3df6bb98032e479a"
+    }
+  },
+  {
+    "model": "DD-Bernstein historical (bonus reference)",
+    "fold": 2,
+    "events": 9360,
+    "no_buzz_events": 122,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_2/train/pyramidal/players.csv": "80c8f67ef6970a47661c0f955809eb22bb918b80b841bfb0dd9fc98a778911c5",
+      "results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-locations-terminal/fold_2/csvs/tossup_game_predictions.csv": "7e572952b6423c335acc290ff4c6e479ee78670b88c83d1c412685493eb41f8c",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_2/holdout/pyramidal/players.csv": "bff83ac6ffbf8b155b6f8514538073357c13a7ed80d298e62e7d8d7e902bb74c",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_2/holdout/pyramidal/tossups.csv": "37e9b3836de6686a027d4fb5d6a3f68edc887f843187fb773df1fc6b6173eeba",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_2/holdout/pyramidal/tossup_predictions.csv": "166e75558433db372c54eda24efa7a80faf9c8e09d9acb5ff73f798435ced37c",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_2/holdout/pyramidal/summary.json": "b9f82b06e12418a95dc7ee5b50801ab9325499199aed4abe48a22c7e448cbaa5"
+    }
+  },
+  {
+    "model": "DD-Bernstein historical (bonus reference)",
+    "fold": 3,
+    "events": 9220,
+    "no_buzz_events": 140,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_3/train/pyramidal/players.csv": "a45aa94200d9c2691be1a756db8db253c3754df93b57b89131e4fe8de599ffff",
+      "results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-locations-terminal/fold_3/csvs/tossup_game_predictions.csv": "d444cfa8d69c3b92caeb307798af3da53ef8df11dbfb4016d0c328d5d9689121",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_3/holdout/pyramidal/players.csv": "f41a00b4d2756fe72da67f06e68fe9cbce94e799d4941e853477ccfbf19632bc",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_3/holdout/pyramidal/tossups.csv": "59156005612088ba872f0fcdaa857945a3ead0dd9472ecbd3cf0468a9a449e55",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_3/holdout/pyramidal/tossup_predictions.csv": "cf182955ded38585a4bc2b2e23689ce938021ed44c495dea63775777c8f96060",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_3/holdout/pyramidal/summary.json": "e7ab916add2554c08711e172ca0c04a7f414180b8662a9857d6463cb55644065"
+    }
+  },
+  {
+    "model": "DD-Bernstein historical (bonus reference)",
+    "fold": 4,
+    "events": 9380,
+    "no_buzz_events": 110,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_4/train/pyramidal/players.csv": "5211ef86362c539f8a8edf46e7b24516e556d19c96046d7513b9130fd3a1d7c3",
+      "results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-locations-terminal/fold_4/csvs/tossup_game_predictions.csv": "975a01cf628f048fbab311e4d8dc918954b165bbf6bc4dfef48d03d85da33479",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_4/holdout/pyramidal/players.csv": "ef7de73f1a079b950b6187c6ec4658fa2269b41c9648ca0ac0193fb8703809cf",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_4/holdout/pyramidal/tossups.csv": "9dd9adfd2dc5ae2f86fdf4dc51cbb442fb1fad4d85d62f28a88e6b3f44b74354",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_4/holdout/pyramidal/tossup_predictions.csv": "7e6d97e38eb771be1b7f3bfde997a67cbd7139e7a2d3f0a010d0f19f8a04871a",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/fold_4/holdout/pyramidal/summary.json": "90e75ce0d7676e641bd053f712f6995cc1b91b458d0698b70166af24c02e9df4"
+    }
+  },
+  {
+    "model": "DD-Bernstein historical (unconstrained terminal)",
+    "fold": 0,
+    "events": 9420,
+    "no_buzz_events": 125,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_0/train/pyramidal/players.csv": "64f2fe12199d8210eafd51e4ec7768bc74017355c6ab7bf520a7a410e4e96115",
+      "results/compirt/holdout/common/token-threshold-replay/2026-09-13/dd-bernstein-3-3-2-terminal/fold_0/csvs/tossup_game_predictions.csv": "4690e05b5bda5ff5390e5b7263c9e107699518334797cdcb99c044023beb6937",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_0/holdout/pyramidal/players.csv": "ea4c6deacd2caddccf35434bb7e06fbc195c15036479082dd9693fc21548c5a3",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_0/holdout/pyramidal/tossups.csv": "93834a5828946b635b03a2cf37bcd5272d425bba302f0184874d7530f3bc0050",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_0/holdout/pyramidal/tossup_predictions.csv": "88eea8636baed9c17c67ad9466ff09421b259aedcb2d57e4d836b9951e13b934",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_0/holdout/pyramidal/summary.json": "4dc520ca7e8872b02d1967b8365164cecf56669259f35d52bf87f6c3ee367c91"
+    }
+  },
+  {
+    "model": "DD-Bernstein historical (unconstrained terminal)",
+    "fold": 1,
+    "events": 9240,
+    "no_buzz_events": 147,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_1/train/pyramidal/players.csv": "522ea9464e565121eaf704b45b456f6a338d28ac9036193b711c916865ec28f5",
+      "results/compirt/holdout/common/token-threshold-replay/2026-09-13/dd-bernstein-3-3-2-terminal/fold_1/csvs/tossup_game_predictions.csv": "03281e91fe4240163364d9e591b8e0787f7e7c78725028af35617e039baab85f",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_1/holdout/pyramidal/players.csv": "39165c44581c50c65391e33b6e77d19d3ea4e9decfe196b5c0e7b65e60ca0f4d",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_1/holdout/pyramidal/tossups.csv": "be21d2f2ccbe83b344b54d9b48fdbc0c42e81b7346db1e828d893b5996419de0",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_1/holdout/pyramidal/tossup_predictions.csv": "ee651c708379044f887dcf59b501405ed6800d5c67cb2fc468cd9a5470845f8a",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_1/holdout/pyramidal/summary.json": "d97872998afaa4e77496944bb2ec51c7c9644fbbce96d53cbfda1e566b5b40f3"
+    }
+  },
+  {
+    "model": "DD-Bernstein historical (unconstrained terminal)",
+    "fold": 2,
+    "events": 9360,
+    "no_buzz_events": 122,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_2/train/pyramidal/players.csv": "b628dfa7d673c28eb48dc6b0a0d2a44e670ac8c41252ca9898b6f4d7ab04230f",
+      "results/compirt/holdout/common/token-threshold-replay/2026-09-13/dd-bernstein-3-3-2-terminal/fold_2/csvs/tossup_game_predictions.csv": "4850ad8d505088c80cdea0443321c67ee766677896be9db01ffdb537d1cc91d8",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_2/holdout/pyramidal/players.csv": "f4380cd85e0f107ec4074748157cb98d41b56d1f2278cf5dad1b3e8a6e66a331",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_2/holdout/pyramidal/tossups.csv": "874efcd010c87d468725eaca583a53a92dc19e2a84307d0d65a2ef50b01890b8",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_2/holdout/pyramidal/tossup_predictions.csv": "74696909644bc4a029ccc4f7b4144adff769560972982f785276d9b39561d04d",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_2/holdout/pyramidal/summary.json": "2fa8902073cd0737f3f163a410c9473f081ae0811082323cc99b5552a5d7b6e0"
+    }
+  },
+  {
+    "model": "DD-Bernstein historical (unconstrained terminal)",
+    "fold": 3,
+    "events": 9220,
+    "no_buzz_events": 140,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_3/train/pyramidal/players.csv": "8028527b3182c16f0d763943da9cbae23ce8e1e259905172080f07a9c35acc6d",
+      "results/compirt/holdout/common/token-threshold-replay/2026-09-13/dd-bernstein-3-3-2-terminal/fold_3/csvs/tossup_game_predictions.csv": "9ed4ee985dd2ac002a25d9d9283a1c0fcd808f4fe8dce5732d57416107df37d7",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_3/holdout/pyramidal/players.csv": "631c8ec525bdfab8c3b98428f48b0125c17b4c3df5b2dc6d7ab21986390562be",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_3/holdout/pyramidal/tossups.csv": "c757251b41be89b49f828960f8bbe14b86e9d16dc7051db3bfed326071cb8c6e",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_3/holdout/pyramidal/tossup_predictions.csv": "ddd5373c6ca5affb98be3a5c5f34074fec6122f84ba714cfaeefef12a0a006a0",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_3/holdout/pyramidal/summary.json": "6a1f0e07fd2e638cceb5a67896e351c4746d3087c72d2e84483c2c20eb7d9160"
+    }
+  },
+  {
+    "model": "DD-Bernstein historical (unconstrained terminal)",
+    "fold": 4,
+    "events": 9380,
+    "no_buzz_events": 110,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_4/train/pyramidal/players.csv": "53058ea69b7ad6a2e3a676f7b1d17871417bba7ee40e3660f85e6b6e3841b1ed",
+      "results/compirt/holdout/common/token-threshold-replay/2026-09-13/dd-bernstein-3-3-2-terminal/fold_4/csvs/tossup_game_predictions.csv": "c4e177ac8ba58a721e72399a124628282abba95b56a03d4c97a1fbf416045bd0",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_4/holdout/pyramidal/players.csv": "764b1318bdba1993daeee8ae3eec08f44a763b4bc5cb6efcb9f742469c178850",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_4/holdout/pyramidal/tossups.csv": "733ba63b538a1b375e268f0a0ed693426c77f107ae083c67481b5c08849b396d",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_4/holdout/pyramidal/tossup_predictions.csv": "b79037ca5533a6db03cb3871849cdd645e2778c870bd1834c530ae2205314d18",
+      "results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/fold_4/holdout/pyramidal/summary.json": "e9e5ce39e0e685cfffaf7545e97792628df8e41ad83ad2bafbe6b8990b8bb504"
+    }
+  },
+  {
+    "model": "DD-Bernstein normalized 3000 steps",
+    "fold": 0,
+    "events": 9420,
+    "no_buzz_events": 125,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/train/pyramidal/players.csv": "5fcfd5944d3b414f11f01aed7c4822b6e8c2cc4d06cba55cf23fb76662375fbb",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/holdout/evaluation/csvs/tossup_game_predictions.csv": "62f7fcad7eee5d9e65243c087b61380fb0293b0f02e0703802473fcf28169e03",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/holdout/pyramidal/players.csv": "20fa9b07534bacd6c764eceb7c41c63112349340cc1006759f1a9bdcb01f4b68",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/holdout/pyramidal/tossups.csv": "4ef8c51a0a279b1eca514133125804a26e51e6ecdcf5226c2d74b10027ccfdcf",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/holdout/pyramidal/tossup_predictions.csv": "f1da2aeeaea3dc19f62e750af0454cad84a093476d6110283f764c9ab44e3465",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_0/holdout/pyramidal/summary.json": "92c660d0a2cb058dff1cebb2c804729b9b353ffe21281c09b2dee0f658d23e7a"
+    }
+  },
+  {
+    "model": "DD-Bernstein normalized 3000 steps",
+    "fold": 1,
+    "events": 9240,
+    "no_buzz_events": 147,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/train/pyramidal/players.csv": "bafbbe550070a97c9b2876dea348beba5ad9086cd23fb87fd540b948c8c7bc2e",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/holdout/evaluation/csvs/tossup_game_predictions.csv": "871ebba90df1046751363fc59156fdef98e5a7a2492bce41743c4deaf56e926f",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/holdout/pyramidal/players.csv": "6955d6ae3703f3b4d628ea8830524916511912b74c228bafd7973aed5792d615",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/holdout/pyramidal/tossups.csv": "23ac02f6583fbf4b19b45aad4f4fa327e0e8578f96167d77880cc7014fc0778b",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/holdout/pyramidal/tossup_predictions.csv": "447613b774bf644760f350124433795b800ab3b273923d7e977ffac7f25345d2",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_1/holdout/pyramidal/summary.json": "7cf87e5291afd6bb4969bd28354fdf9b7114873b55b1033c13206b49f19b9051"
+    }
+  },
+  {
+    "model": "DD-Bernstein normalized 3000 steps",
+    "fold": 2,
+    "events": 9360,
+    "no_buzz_events": 122,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/train/pyramidal/players.csv": "f7e38a50f8469e970d696b08b1db90f7325928dacd186f29a9631f82200fea86",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/holdout/evaluation/csvs/tossup_game_predictions.csv": "ac3e5bdffd72faf18a3527bd2d1dc9a15d443c86f9483a67227c0dcf4512c492",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/holdout/pyramidal/players.csv": "4321fcfaa08fe7362abbb3d43db41a53b34f959a93dec56d20e72b0d8f592cd3",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/holdout/pyramidal/tossups.csv": "7c189b2adb531f592793fd731ce283fa5ba5c9d65c472972cb360a6c18a00244",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/holdout/pyramidal/tossup_predictions.csv": "9d35b32b3b71f80461e3f163673407bedf4e4d04fbe9c0d1dd08cab01a92222e",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_2/holdout/pyramidal/summary.json": "b0d6343cc1463a1a209e2a5bca5c66980dcc26d6b0d14ba69619c51b3e9cf441"
+    }
+  },
+  {
+    "model": "DD-Bernstein normalized 3000 steps",
+    "fold": 3,
+    "events": 9220,
+    "no_buzz_events": 140,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/train/pyramidal/players.csv": "a5523acf8b8d23f60c7700bd78db862f312278117050de52ed139a7577819f99",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/holdout/evaluation/csvs/tossup_game_predictions.csv": "8fa9c1d22a4b45b5105947ff07d458376855ccd4bd76798bb3507339f7da0cce",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/holdout/pyramidal/players.csv": "5441ac453dbde0e19620b43380988689aa66acd5912dbdad7f0e564af09143b2",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/holdout/pyramidal/tossups.csv": "a7687a0088d638f7856f496d746ec1be0fbe37da93fd141bfbc63b605f7d33b8",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/holdout/pyramidal/tossup_predictions.csv": "693a2c51732d9817d515f56f5bfe647dc86541d3106a1cc492b00f0b4733088b",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_3/holdout/pyramidal/summary.json": "db0e421e54f71a6fd5110e1c7061b47a0c472feb68c93b30f93ddfb264a2ea49"
+    }
+  },
+  {
+    "model": "DD-Bernstein normalized 3000 steps",
+    "fold": 4,
+    "events": 9380,
+    "no_buzz_events": 110,
+    "sha256": {
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/train/pyramidal/players.csv": "b7d69f9307f446885aeae81822a9cdd0a82a57f19ddf937fefe785f3eba69a74",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/holdout/evaluation/csvs/tossup_game_predictions.csv": "091c13df45ca28d5e298ce363cc5df2bf20a458fc1a02252c95830ae021aa90b",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/holdout/pyramidal/players.csv": "443b631f7c9d3c0ffc43acd45dfa9c586d5f192c92e26bdff9bdc1b3186aa116",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/holdout/pyramidal/tossups.csv": "a56dd4b16f78907fe8d82c86edb5a1e03cea96b9d275a8b4ff91464a4069db7c",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/holdout/pyramidal/tossup_predictions.csv": "dd071adba06f743c176ad09592a1200de40a556a4406a9450b2c448e4b06f14b",
+      "results/compirt/holdout/double-difficulty/dd-332-normalized-v1-20260913-150350/fold_4/holdout/pyramidal/summary.json": "6ff375d5b649da93955f9381a6f42bc0133cccfff08a8ed99595bf3b1d0c975f"
+    }
+  },
+  {
+    "model": "Multidimensional normalized 3000 steps",
+    "fold": 0,
+    "events": 9420,
+    "no_buzz_events": 125,
+    "sha256": {
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/train/pyramidal/players.csv": "822bf8f6acad03c396eeade8cfc475e041f48771b2d5076a42bcc449e8c15129",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/evaluation/csvs/tossup_game_predictions.csv": "83bdf3e7913ab142d062c2fb3e89355b6a050abaf9bf711fbf9af771fce948a4",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/pyramidal/players.csv": "5ecfa24b5db989f32a03fbc2b0c1cfff40ae73b4776ea0e0de0d6469e517444a",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/pyramidal/tossups.csv": "ff9a85d858e7c28e9c7c81f4de71b6c437673f5fadb7d6f99b22ee78c69d50bc",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/pyramidal/tossup_predictions.csv": "ff023c38521ad144193e64c241e408b2b5c90d76a45569066f42614b88ed896e",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_0/holdout/pyramidal/summary.json": "e9e52aec1912fc8b77d8124debaab78de521dd98d4c5b9b6a9fc13a9caf7bc18"
+    }
+  },
+  {
+    "model": "Multidimensional normalized 3000 steps",
+    "fold": 1,
+    "events": 9240,
+    "no_buzz_events": 147,
+    "sha256": {
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/train/pyramidal/players.csv": "01ba3534f22be652ee55584d697068739da6df83bc5ce2a6a5192b80d6a0734d",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/evaluation/csvs/tossup_game_predictions.csv": "a4b62bb37b67c7bf2a83aaf7b3a67aa4d2ee5aef5af043cb672cf8baae060008",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/pyramidal/players.csv": "c7c070db0e75e399f30683e39f780cb28b255a40d2a2ba6dfac07a2f4d4c50d5",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/pyramidal/tossups.csv": "f0802e4af18cca47ff81382ea5a897d7560b196a5350413e83a150cdf917236b",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/pyramidal/tossup_predictions.csv": "02332e51c97a2d6b772d190b81917a1395d5769058a2de5844f1ac88ec0488f8",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_1/holdout/pyramidal/summary.json": "6b2a45c5a313af062a9131d6ff16643db92395c42eb0e0e9066676d124f9d416"
+    }
+  },
+  {
+    "model": "Multidimensional normalized 3000 steps",
+    "fold": 2,
+    "events": 9360,
+    "no_buzz_events": 122,
+    "sha256": {
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/train/pyramidal/players.csv": "01d76438a83660fd029280072e23484254cc64793eb4d4188da4b3508494d005",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/evaluation/csvs/tossup_game_predictions.csv": "4d6906268b92e00f914249751ed7d827853713b41fc81c1555f78d992f0faf92",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/pyramidal/players.csv": "e210cb5c43e910735446bf9dc8be0dbe40927136874420af651bf45e17a3f0f9",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/pyramidal/tossups.csv": "acd7c83b5ab8c9c1a5850a66a0ac69dec9b911d76fb5a51569331cdfafd788a4",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/pyramidal/tossup_predictions.csv": "dc6e1d5417a5abab75db96411d79be0a32d28bbcf96947ca9f9ec7927a521907",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_2/holdout/pyramidal/summary.json": "aa207b343a587cc7d45123c94703d17e675833343a14df250afaa8d5c4e6dbd9"
+    }
+  },
+  {
+    "model": "Multidimensional normalized 3000 steps",
+    "fold": 3,
+    "events": 9220,
+    "no_buzz_events": 140,
+    "sha256": {
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/train/pyramidal/players.csv": "e1114a9879d1beff2d96573e7c9bcce72bf2a87b325039e6eaf743c5b368ee75",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/evaluation/csvs/tossup_game_predictions.csv": "d076e6cfe1b9afb04c1f7bd9fff681e294e3dd97ddb024ff54b0d44db8d427ae",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/pyramidal/players.csv": "91e309ef7e8c3feb96b0835814e14bc29e2108004d782e0433d296cc8141b02b",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/pyramidal/tossups.csv": "4012329d0ede36f3df8e5eb26ce3b55739020af3de995087e4b96884423a82e8",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/pyramidal/tossup_predictions.csv": "80e4fe02af5d745eaa2e38aabf256cbd31aecc4fcb86dd54b7ce7942c994ea4b",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_3/holdout/pyramidal/summary.json": "cedd563b202a8a4b9cdb935b761bcd4741596d7e0b254dbb90f10ca33fdf0cb6"
+    }
+  },
+  {
+    "model": "Multidimensional normalized 3000 steps",
+    "fold": 4,
+    "events": 9380,
+    "no_buzz_events": 110,
+    "sha256": {
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/train/pyramidal/players.csv": "fc1d6121dd8edd72d3c9e5992ebabb84b94188b2f74f384d0e621335b34921d4",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/evaluation/csvs/tossup_game_predictions.csv": "135e773d24bac1db526c4d803f9efd08613ec8071c0e7c75854124b550d7f278",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/pyramidal/players.csv": "afab7dbf5bf933bea8757977edd33917a91acd7c7ce25ea52b35dcf12b10a216",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/pyramidal/tossups.csv": "f22b4a6f9494e129c632f6f50098f7a562c07f1b28477daf0dffe3fc8583ffd7",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/pyramidal/tossup_predictions.csv": "3750edd3148d3eda6969df2b97a424042ce6437254e2fe9ae0f8d8f63253ca89",
+      "results/compirt/holdout/multidim/multidim-normalized-v1-20260913-150350/fold_4/holdout/pyramidal/summary.json": "a08522efbdaa9880c681ab2df7b5ef286d6cc5460c566d4765902d339318e824"
+    }
+  }
+]

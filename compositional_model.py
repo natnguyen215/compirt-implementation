@@ -28,6 +28,7 @@ Important Shapes:
     - 'alpha' has shape '(n_parts, n_dimensions)'
     - 'beta' has shape '(n_parts,)'.
 * 'tau' is a single scalar, and 'psi' has shape '(n_players, synergy_dimensions)'.
+  The phi-psi variant also learns 'phi' with the same shape as 'psi'.
 * 'data["part"]' has shape '(n_observations,)'. It says which bonus part each
   row attempts.
 * 'data["roster"]' and 'data["roster_mask"]' each have shape
@@ -60,14 +61,16 @@ def lse_aggregation(member_abilities, roster_mask, tau):
     return tau * torch.logsumexp(scaled, dim=1)
 
 
-def synergy_contribution(psi, roster, roster_mask):
+def synergy_contribution(psi, roster, roster_mask, phi=None):
     """Return the summed pairwise synergy for every roster.
 
     'psi' is the per-player synergy profile. A pair's synergy is the dot product
     of their two profiles, and a roster's synergy is that dot product summed over
     every active/non-padded pair.
 
-    'psi' has shape (n_players, synergy_dimensions)
+    'psi' has shape (n_players, synergy_dimensions). When 'phi' is supplied
+    with the same shape, each pair instead contributes
+    sum_d phi_id * phi_jd * (psi_id + psi_jd).
 
     When rosters are mostly fixed, this can behave like a learned team intercept. Its
     sign should not be read as teamwork quality without held-out
@@ -76,14 +79,21 @@ def synergy_contribution(psi, roster, roster_mask):
     # Index psi by roster to get one profile per slot:
     # profiles has shape (n_observations, max_roster_size, synergy_dimensions).
     profiles = psi[roster]
+    if phi is not None and phi.shape != psi.shape:
+        raise ValueError("phi and psi must have the same shape")
+    weights = phi[roster] if phi is not None else None
     result = profiles.new_zeros(len(roster))
-    # Eq. 10: synergy(R) = sum_{i < k in R} psi_i^T psi_k.
-    # Walk the upper triangle of roster slot pairs and add each pair's dot
-    # product. 'active' zeros out any pair that touches a padded slot.
+    # Walk unordered pairs once. 'active' zeros out pairs touching padding.
     for left in range(roster.shape[1]):
         for right in range(left + 1, roster.shape[1]):
             active = roster_mask[:, left] & roster_mask[:, right]
-            result = result + (profiles[:, left] * profiles[:, right]).sum(-1) * active
+            if weights is None:
+                pair = profiles[:, left] * profiles[:, right]
+            else:
+                pair = weights[:, left] * weights[:, right] * (
+                    profiles[:, left] + profiles[:, right]
+                )
+            result = result + pair.sum(-1) * active
     # Return shape: (n_observations,).
     return result
 
@@ -110,6 +120,7 @@ def compositional_model(
     synergy_dimensions=1,
     calibrate_correctness=False,
     alpha_prior="normal",
+    synergy_form="dot",
 ):
     """Define the team bonus-part correctness likelihood.
 
@@ -120,7 +131,14 @@ def compositional_model(
     'beta' is bonus-part difficulty
     'tau' is the aggregation temperature
     'psi' is the optional per-player synergy profile
+    'phi' is a second per-player vector for synergy_form='phi-psi'
     """
+    if synergy_form not in ("dot", "phi-psi"):
+        raise ValueError(f"Unknown synergy form: {synergy_form}")
+    if synergy_form != "dot" and not use_synergy:
+        raise ValueError("phi-psi synergy requires use_synergy=True")
+    if use_synergy and synergy_dimensions < 1:
+        raise ValueError("synergy_dimensions must be positive")
     n_parts = len(data["part_ids"])
     n_dimensions = theta.shape[1]
     zero = theta.new_tensor(0.0)
@@ -167,8 +185,18 @@ def compositional_model(
                     theta.new_full((synergy_dimensions,), math.sqrt(0.5)),
                 ).to_event(1),
             )
-        # Eq. 10 adds the pairwise roster synergy term to Eq. 11's logit.
-        logits = logits + synergy_contribution(psi, data["roster"], data["roster_mask"])
+            phi = None
+            if synergy_form == "phi-psi":
+                phi = pyro.sample(
+                    "phi",
+                    dist.Normal(
+                        theta.new_zeros(synergy_dimensions),
+                        theta.new_ones(synergy_dimensions),
+                    ).to_event(1),
+                )
+        logits = logits + synergy_contribution(
+            psi, data["roster"], data["roster_mask"], phi=phi
+        )
 
     if calibrate_correctness:
         # Platt-scale the full part-correctness logit.
@@ -200,9 +228,10 @@ def posterior_predictions(
     aggregate = lse_aggregation(member_abilities, data["roster_mask"], posterior["tau"])
     synergy = aggregate.new_zeros(len(aggregate))
     if use_synergy:
-        # Posterior replay of Eq. 10.
+        # Replay Eq. 10 or the phi-psi variant, identified by its extra site.
         synergy = synergy_contribution(
-            posterior["psi"], data["roster"], data["roster_mask"]
+            posterior["psi"], data["roster"], data["roster_mask"],
+            phi=posterior.get("phi"),
         )
     # Posterior replay of Eq. 11.
     logits = aggregate + synergy - posterior["beta"][data["part"]]

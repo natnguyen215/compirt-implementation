@@ -79,28 +79,31 @@ def _synergy_panels_and_summary(results_dir):
     profile_path = results_dir / "player_synergy_profiles.csv"
     if profile_path.exists():
         profiles = pd.read_csv(profile_path)
-        psi_columns = numeric_columns(profiles, "psi_")
-        if psi_columns:
-            profiles["psi_norm"] = np.linalg.norm(
-                profiles[psi_columns].to_numpy(dtype=float), axis=1
+        for name in ("psi", "phi"):
+            columns = numeric_columns(profiles, f"{name}_")
+            if not columns:
+                continue
+            norm = f"{name}_norm"
+            profiles[norm] = np.linalg.norm(
+                profiles[columns].to_numpy(dtype=float), axis=1
             )
             panels.extend(
                 [
                     density_panel_spec(
-                        profiles[psi_columns],
-                        "Synergy profile coordinates",
-                        "psi",
+                        profiles[columns],
+                        f"Synergy {name} profile coordinates",
+                        name,
                         zero_line=True,
                     ),
                     density_panel_spec(
-                        profiles["psi_norm"],
-                        "Synergy profile magnitude",
-                        "psi norm",
+                        profiles[norm],
+                        f"Synergy {name} profile magnitude",
+                        f"{name} norm",
                         bounds=(0, None),
                     ),
                 ]
             )
-            for column in [*psi_columns, "psi_norm"]:
+            for column in [*columns, norm]:
                 summary = distribution_summary("synergy_player", column, profiles[column])
                 if summary:
                     rows.append(summary)

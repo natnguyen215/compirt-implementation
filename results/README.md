@@ -71,6 +71,8 @@ Completed studies keep the code that produced them beside their results:
 - `in_sample/multidim/multidim-all2024-cal/imaginary-tournament/code/`
 - `holdout/double-difficulty/compositional/dd-bernstein-332-simplex-locations-terminal/code/`
 - `holdout/common/token-threshold-replay/2026-09-13/replay_research_log_outcomes.py`
+- `holdout/common/bonus-team-irt/2026-09-17/code/` (snapshot of the configurable
+  `analysis/bonus_team_irt/` study)
 - `ranking_comparison/code/`
 
 This code is a record. It is not imported or checked, its imports and READMEs

@@ -73,6 +73,16 @@ train_pyramidal.py          train_compositional.py [--use-synergy]
 Training writes no evaluation artifacts; everything under the evaluation
 directory comes from replaying the saved files above.
 
+Bonus evaluation joins declared easy/medium/hard part difficulty from the
+linked tables and reports separate accuracies and counts. With those tables,
+it also writes team-game bonus totals, team/tournament bonus-only PPG and
+absolute errors, per-tournament MAE and Spearman correlations, and signed
+bonus-only game margins with MAE. Both metrics use expected points on recorded
+bonus opportunities and include zero-bonus games. Pass the exact evaluated game population as `tables=` to the Python
+`evaluate_bonuses` API; the CLI supplies its `--split`/`--tournament` selection.
+The compositional-fold runner pools held-out games before calculating full
+tournament rankings. See [the metric contract](METRICS.md#bonus-only-team-ppg-and-tournament-rankings).
+
 ## Input contract
 
 These are the files the evaluator reads and the columns it depends on.
@@ -207,7 +217,7 @@ An unknown group name raises.
 | `common/report_paths.py` | Path helpers: `csv_path`, `graph_path` (+ `GRAPH_GROUPS`), `metrics_path`, `evaluation_output_dirs` |
 | `common/reports.py` | Everything Markdown: metric groups, `experiment_report_markdown`, `write_eval_docs_summary`, regime notes, result-layout discovery (`load_metrics_row`, `bonus_stage_name`, …) |
 | `scenario_a_tossups/` | Scenario A, split by concern: `evaluation` (orchestration), `metrics`, `parameters` (schema detection + difficulty reconstruction), `position`, `reliability`, `difficulty`, `distributions`, `reconstruction` (saved inputs and first-buzz replay), `survival`, `timing`, and `outcomes` (ownership, games, player PPG) |
-| `scenario_b_bonuses/` | Scenario B: `metrics` (pure scoring), `distributions` (parameter figures/summaries), `figures` (PPB and score plots), `evaluation` (orchestration) |
+| `scenario_b_bonuses/` | Scenario B: `metrics` (pure scoring), `distributions` (parameter figures/summaries), `figures` (PPB and score plots), `outcomes` (team PPG, tournament rankings and game margins), `evaluation` (orchestration) |
 | `synergy_comparison/` | No-synergy vs synergy metric deltas (CSV/MD/PNG under `comparison/`); run by `run_scripts/common/run_synergy_comparison.py` |
 
 ## Extension recipes
