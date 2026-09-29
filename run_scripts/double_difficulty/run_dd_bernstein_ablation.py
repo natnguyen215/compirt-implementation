@@ -45,7 +45,7 @@ from holdout.game_splits import game_holdout_split_name
 from utils.run_logging import resolve_result_root
 
 
-DEFAULT_ROOT = Path("results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid")
+DEFAULT_ROOT = Path("results/compirt/holdout/double-difficulty/ablations/capacity/degree-dimensions-drop-prior")
 DEFAULT_DEGREES = (3, 4, 5, 6)
 DEFAULT_DIMENSIONS = (1, 2, 3, 4, 5)
 DEFAULT_CONCENTRATIONS = (0.67, 1.0, 1.33, 1.66, 2.0)

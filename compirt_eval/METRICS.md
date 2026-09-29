@@ -41,6 +41,8 @@ more weight. The table states the exact order used:
 | Exact three-part accuracy | Group parts by `response_id` → mark whether all three labels match → average response marks | One vote per bonus response | Higher |
 | PPB MAE | Sum three part scores within each response → average all responses for each team → take each team's absolute PPB error → average team errors | One vote per team | Lower |
 | Bonus accuracy by difficulty | Join declared part labels → score all rows within easy, medium, hard, or unknown | One vote per part within its difficulty | Higher |
+| Bonus precision, recall, F1 (research log) | Threshold correctness → pool confusion counts over held-out folds → calculate ratios | One vote per response-part row | Higher |
+| Bonus difficulty-order accuracy (research log) | Compute effective part difficulty → mark each distinct bonus 1 if easy < medium < hard, otherwise 0 → average marks | One vote per fitted bonus question | Higher |
 | Bonus-only team PPG MAE | Pool held-out games → sum team bonus points → divide team totals by games → absolute team PPG error → mean within tournament → mean across tournaments | Equal tournaments; equal teams within tournament | Lower |
 | Bonus-only team PPG Spearman | Pool games and compute team PPG → rank observed and predicted PPG within tournament → correlate ranks → average defined tournament correlations | Equal tournaments | Higher |
 | Bonus-only game margin MAE | Sum each team’s bonus points per game → subtract opponent totals → absolute error in the signed margin → mean across games | Equal games | Lower |
@@ -323,6 +325,125 @@ vote regardless of volume.
 `csvs/bonus_metrics.csv` stores the micro and macro metrics; and
 `graphs/bonus/bonus_reliability.png` visualizes part-level calibration.
 
+### Research-log bonus classification and difficulty ordering
+
+[`RESEARCH_LOG_2.md`](../RESEARCH_LOG_2.md) records these additional tables
+directly from saved fits. They are report calculations, not new automatic
+outputs of the standard evaluator.
+
+**Confusion counts and precision/recall/F1.** Predict correct at `p >= 0.5`.
+For the overall table, correct is the positive class: TP is a predicted and
+observed correct answer, TN a predicted and observed miss, FN a correct answer
+predicted to miss, and FP a miss predicted to be correct. Pool counts over
+held-out folds before calculating
+
+$$
+P=\frac{TP}{TP+FP},\qquad R=\frac{TP}{TP+FN},\qquad
+F1=\frac{2TP}{2TP+FP+FN}.
+$$
+
+An undefined denominator gives an undefined score. The difficulty-specific
+table treats the minority outcome as positive: incorrect for easy, correct
+for medium and hard. The decision at exactly 0.5 still predicts correct.
+Overall scores retain correct as positive across all difficulties; they are
+not averages of the difficulty-specific scores. The matched rows restrict each
+fold to the shared comparison's `scored_game_ids` before pooling; the seven
+additional synergy variants retain their saved populations. Source files are
+`fold_N/holdout/{compositional,synergy}/bonus_part_predictions.csv`,
+`fold_N/team_irt_{1d,3d}/bonus_part_predictions.csv`, the comparison's
+`fold_N/split.json`, and the bonus metadata labels.
+
+**Difficulty-order accuracy.** Let the effective difficulty of part $b$ be
+$D_b=d_b$ for scalar difficulty (`beta` in saved tables), or
+$D_b=\sum_k r_{bk}d_{bk}$ for per-dimension difficulty (`r_k * beta_k`).
+Use the saved posterior medians in that expression. Do not replace relevance
+with uniform weights or divide scalar difficulty by discrimination. Join the
+declared easy/medium/hard labels by bonus ID and part index. For each distinct
+bonus question $j$ with exactly one finite part of each label, calculate
+
+$$
+O_j=\mathbf{1}[D_{j,e}<D_{j,m}<D_{j,h}],\qquad
+\operatorname{OrderAccuracy}=\frac{1}{|\mathcal J|}\sum_{j\in\mathcal J}O_j.
+$$
+
+Ties and either reversal score zero. Missing or nonstandard triples are
+excluded with their counts reported. Each fitted bonus gets one vote,
+regardless of how often it was heard. This checks parameter ordering, not
+response classification or held-out prediction.
+
+The full-season diagnostic uses fresh `season_2024_25` in-sample fits, covering
+Fall 2024 through Nationals 2025. It includes every fitted complete bonus in
+that season, independently of the calendar-2024 held-out scoring exclusions.
+For a mirror-site mean, average distinct fitted parts of a declared difficulty
+heard at that site. Check easy < medium < hard separately at each site.
+Season averages over sites give each site equal weight. For question-set
+means, count each distinct fitted part once across all mirrors; mirrors sharing
+a set are not different difficulty tiers. Within each declared difficulty,
+compare the four set means against Fall < Winter < Regionals < Nationals;
+report strict full-order agreement and the number of correctly ordered pairs
+out of six. A tie earns no correctly ordered pair.
+
+**Related files:** the full-season run is
+`results/compirt/in_sample/common/bonus-difficulty-season-2024-25/`.
+Its `configuration.json` maps model names to saved `bonus_parts.csv` tables.
+`bonus_difficulty_order.csv` retains each bonus's three effective difficulties
+and 0/1 score; `difficulty_means_by_tournament.csv`,
+`difficulty_means_by_set.csv`, and `difficulty_summary.csv` retain the
+aggregates. Cross-model difficulty scales can differ. Team IRT uses distinct
+team parameters for each tournament and has disconnected question-set blocks,
+so agreement with the external tier order is descriptive rather than proof
+of an identified common difficulty scale.
+
+**Uncertainty in within-bonus ordering.** The follow-up in
+[`RESEARCH_LOG_2.md`](../RESEARCH_LOG_2.md#how-certain-are-the-individual-bonus-orderings)
+covers the full-season `dd/multidim-difficulty-synergy` fit only. Retain its
+original $O_j$ and add point gaps $G_{j,em}=D_{j,m}-D_{j,e}$ and
+$G_{j,mh}=D_{j,h}-D_{j,m}$, using $D$ at saved parameter medians as above.
+Positive gaps follow the declared order; zero is a tie and negative is a
+reversal. Do not substitute the posterior median of a gap for this point gap.
+
+For each bonus, draw relevance and difficulty from the saved mean-field
+AutoNormal approximation, recompute each part's $D=r^\top d$, and calculate
+
+$$
+\widehat p_j=\frac{1}{M}\sum_{s=1}^{M}
+\mathbf{1}[G^{(s)}_{j,em}>0\ \text{and}\ G^{(s)}_{j,mh}>0].
+$$
+
+Both gaps must use the same sampled medium-part difficulty. Do not multiply
+their marginal ordering probabilities or subtract marginal interval endpoints.
+The gap intervals are the 2.5% and 97.5% quantiles of sampled differences.
+$\widehat p_j$ measures support for parameter ordering, not response accuracy.
+At least 95% and at most 5% are descriptive support thresholds; the full
+probability is retained for every bonus.
+
+The saved fit has quantiles but no joint draw files. For this model, `beta`
+is Normal and `log(r)` is Normal in the AutoNormal guide. Reconstruct each
+coordinate with $\mu=q_{0.5}$ and
+$\sigma=(q_{0.975}-q_{0.025})/[2\Phi^{-1}(0.975)]$, applying log to the `r`
+quantiles first. Draw all coordinates independently as the fitted guide does,
+then exponentiate `log(r)`. Use 20,000 draws per bonus and NumPy PCG64 seed 42;
+the maximum Monte Carlo standard error of an individual probability is about
+0.00354. These approximate intervals omit posterior correlations, uncertainty
+in frozen Stage-1 skills, and variation across optimization runs. This
+reconstruction is specific to the selected model's Normal/positive sites;
+it is not a generic recipe for simplex relevance or other joint distributions.
+
+**Sensitivity to number of attempts.** Count distinct `response_id` values
+per bonus in the selected fit's predictions. Each response contains three
+distinct part rows and counts once. Summarize 1–9, 10–19, 20–29, and 30+ attempts,
+both across the season and within each question set. Within a group, give
+each distinct bonus one vote: sum $O_j$ then divide by the number of bonuses;
+report that denominator. The 10+ sensitivity excludes bonuses from this
+summary only; all parameters still come from the unchanged full-season fit.
+Differences between groups are descriptive and can reflect question-set or
+question differences as well as exposure.
+
+The run directory stores `bonus_difficulty_uncertainty.csv` (per-bonus values),
+`bonus_difficulty_uncertainty_by_attempts.csv` (group summaries), and
+`bonus_difficulty_uncertainty_method.json` (inputs, sampling and checks).
+These are report calculations, not new standard-evaluator outputs.
+
 ### Exact three-part accuracy
 
 After thresholding each part at 0.5, exact accuracy is
@@ -441,12 +562,20 @@ Audit outputs under `csvs/` are `bonus_team_game_predictions.csv`,
 `bonus_team_ppg_leaderboard.csv` (one team/tournament row, including its
 absolute error), and `bonus_team_ranking_metrics.csv` (one tournament row,
 with team/game counts, PPG MAE, Spearman, and game margin MAE).
-The compositional-fold runner also writes pooled ledgers under
+The compositional-fold runner delegates scoring and pooling to
+`compirt_eval/scenario_b_bonuses/folds.py`, which writes pooled ledgers under
 `aggregate/<arm>/`. The historical familiar/new-roster comparison's generator
 writes these under `aggregate/bonus_metrics/<model>/<arm>/`, plus
 `bonus_ppg_summary.csv`, `bonus_ppg_by_tournament.csv`, and
 `bonus_metrics_report.md`. PPG uses all scored rosters together, since a
 team's tournament may contain both familiar and new lineups.
+
+`aggregate/pooled.csv` and `pooled.json` contain scores recomputed from pooled
+predictions; `per_fold.csv` contains fold metrics and audits, and
+`fold_mean_std.csv` describes their mean and standard deviation. Generated
+`aggregate/report.md` links fold artifacts and labels the saved
+synergy form, link, and dimensions. `--report-only` rewrites the Markdown from
+these artifacts.
 
 ### Bonus-only game margins
 
@@ -647,7 +776,7 @@ invalidate cached expected-points leaderboards when aggregating old runs.
 
 ### Conditional correctness-only game-winner diagnostic
 
-The separate [saved game-winner study](../results/compirt/holdout/common/game-winner-ablations/2026-09-16/README.md)
+The separate [saved game-winner study](../results/compirt/holdout/common/game-winner-ablations/skills-lse-observed-position-correctness-and-token-replay-5fold/README.md)
 compares the standard replay with skills-only and correctness-only team scores.
 It does not replace the evaluator's game replay. Correctness-only scores use
 each phase-0 player's canonical correctness logit at the observed first-buzz
@@ -716,8 +845,22 @@ probabilities and aggregate ability $A_k(T)$ once per part row, plus the
 synergy contribution $\Phi(T)$ once per bonus response. Its statistics are in
 `csvs/bonus_prediction_distribution_summary.csv`. These are distributions
 over evaluated observations at saved parameter medians, not uncertainty
-intervals. A negative $\Phi(T)$ lowers the bonus logit relative to aggregation
-alone; this does not establish a causal teamwork effect.
+intervals. For `bonus_aggregation=noisy-or`, the saved `aggregate` is the
+effective team logit including difficulty, and synergy is zero. The synergy
+contribution is the raw pair sum for either `synergy_form`.
+With the default `synergy_link=additive`, a negative $\Phi(T)$ lowers the
+bonus logit. With `synergy_link=multiplicative`, the full base logit
+$(A_k(T)-\beta_k)$ is multiplied by $1+\Phi(T)$ before optional calibration;
+the logit change depends on the part as well as the lineup. Neither setting
+establishes a causal teamwork effect.
+
+For `bonus_difficulty=multidim`, LSE pools players separately on each skill
+axis: `ts_k = tau * logsumexp_i(theta_ik / tau)`. The saved `aggregate` is
+`sum_k r_bk * ts_k`, and the effective difficulty subtracted from it is
+`sum_k r_bk * beta_bk`. The same synergy links and calibration follow this
+base logit. Parameter dashboards use `r_1..K` and `beta_1..K`; responses
+identify only `sum_k r_bk * beta_bk`, so individual difficulty coordinates
+follow their prior.
 
 Three dashboards under `graphs/parameters/` (plus a synergy one when that
 branch saved profiles) show each fitted parameter class as a
@@ -755,7 +898,7 @@ across fitted posterior medians, not posterior uncertainty for one parameter.
 
 ### Bonus-model comparison
 
-The standalone [bonus-only team IRT study](../analysis/bonus_team_irt/README.md)
+The [shared bonus comparison](../results/compirt/comparisons/bonuses/dd-bernstein-and-team-irt-5fold/README.md)
 uses the same bonus metrics on a matched subset of the existing whole-game
 folds. It excludes entire games requiring unseen training teams/parts or
 missing any reference prediction, recording the exclusions per fold. All arms
@@ -765,7 +908,26 @@ Subject, declared difficulty, and subject-by-difficulty binary metrics give
 each observed part one vote and retain Unknown labels. Study artifacts are
 `aggregate/metrics.csv`, `metrics_by_fold.csv`, `metrics_by_question_type.csv`,
 and per-model team/game tables. The report uses the existing compositional
-metric columns and difficulty/PPG/margin layout.
+metric columns and difficulty/PPG/margin layout. DD-Bernstein uses the normalized
+first-buzz skill source, alongside Team IRT 1D/3D and the multidimensional
+references. All seven arms use 127,986 parts / 42,662 bonuses / 2,330 complete
+games; the two additional game exclusions relative to the compositional-only
+population enforce team-IRT training coverage. Roster strata classify exact
+team/active-lineup combinations from training bonuses only and share that
+classification across every arm. `metrics_by_question_type.csv` contains these
+`roster_group` rows as well as question strata. Source hashes and the full
+exclusion list are saved with the comparison.
+
+The bonus research log also reports minority-class precision, recall, and F1
+by declared difficulty from these saved part predictions. Correctness is
+classified with `p >= 0.5`; the scored positive class is incorrect (0) for easy
+and correct (1) for medium and hard. Pool TP, FP, and FN across the five held-out
+folds within each difficulty before computing `TP / (TP + FP)`,
+`TP / (TP + FN)`, and `2 TP / (2 TP + FP + FN)` respectively. Join source
+difficulty by `bonus_id` and zero-based `part_index`. The seven matched arms use
+42,662 parts per difficulty; additional synergy variants in the log keep their
+42,700-part populations. These summaries appear only in the `RESEARCH_LOG_2.md`
+table.
 
 `compirt_eval/synergy_comparison/` (run through
 `run_scripts/common/run_synergy_comparison.py`) reads the

@@ -1,0 +1,4 @@
+#!/bin/bash
+set -euo pipefail
+cd /teapot/students/natnguyen/CompIRT-Implementation
+exec /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -B -u -m run_scripts.common.run_parallel_game_holdout --root /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-and-multidim-normalized-first-buzz-3000steps --dd-root /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-3000steps --bonus-root /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/compositional/no-synergy-and-dot-additive-1d --multidim-root /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/likelihood-refits/multidim-5d-normalized-first-buzz-3000steps-5fold --gpus 0 1 --jobs-per-gpu 2 --cpu-jobs 2

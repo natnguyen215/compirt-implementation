@@ -1,0 +1,8 @@
+{
+  "pid": 1409384,
+  "gpu": null,
+  "log": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-and-multidim-normalized-first-buzz-3000steps/logs/bonus-aggregate.log",
+  "started_at": "2026-09-13T23:33:03.043466+00:00",
+  "signature": "a763b20ad42f0d7a5e27d6fa7276c3a8800b11466ff4ef1d8fbb0087070f4c6c",
+  "exit_code": 0
+}

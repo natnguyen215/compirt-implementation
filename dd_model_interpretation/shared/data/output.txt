@@ -1,0 +1,4 @@
+# Bonus direction vs tossup relevance: results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy and results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal
+subcategories with >= 15 tossups and bonus parts: 26
+Spearman, tossup hazard relevance vs bonus w_k: [0.93, 0.91, 0.88]
+Spearman, tossup correctness relevance vs bonus w_k: [0.86, 0.54, 0.66]

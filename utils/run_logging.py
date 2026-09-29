@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import atexit
 import codecs
+from contextlib import nullcontext
 import difflib
 import json
 import os
@@ -214,28 +215,44 @@ def tee_run_output(log_path: Path, *, append: bool = False):
     return handle
 
 
-def run_logged(args: list[str], *, cwd: Path | None = None) -> None:
-    """Run a child command while streaming combined stdout/stderr through Python."""
+def run_logged(
+    args: list[str], *, cwd: Path | None = None,
+    env: Mapping[str, str] | None = None, log_path: Path | None = None,
+) -> None:
+    """Run a child command, streaming its combined stdout/stderr as it arrives.
+
+    Output goes through sys.stdout, so an active tee_run_output log also
+    receives it. 'log_path' additionally writes this command's output to its
+    own file.
+    """
     printable = [str(arg) for arg in args]
-    process = subprocess.Popen(
-        printable,
-        cwd=cwd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        bufsize=0,
-    )
-    assert process.stdout is not None
-    # Raw reads preserve the carriage returns that tqdm uses to redraw progress
-    # bars in place. Incremental decoding handles UTF-8 characters split across
-    # chunks. Writing through sys.stdout lets TeeStream mirror output to the log.
-    decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
-    while True:
-        chunk = process.stdout.read(4096)
-        if not chunk:
-            break
-        sys.stdout.write(decoder.decode(chunk))
-        sys.stdout.flush()
-    sys.stdout.write(decoder.decode(b"", final=True))
-    return_code = process.wait()
+    if log_path is not None:
+        log_path = Path(log_path)
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+    with (log_path.open("w", encoding="utf-8") if log_path else nullcontext()) as log:
+        output = TeeStream(sys.stdout, log) if log else sys.stdout
+        with subprocess.Popen(
+            printable, cwd=cwd, env=env, stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT, bufsize=0,
+        ) as process:
+            assert process.stdout is not None
+            # Raw reads keep the carriage returns tqdm uses to redraw progress
+            # bars in place. Incremental decoding handles UTF-8 characters
+            # split across chunks.
+            decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
+            try:
+                while True:
+                    chunk = process.stdout.read(4096)
+                    if not chunk:
+                        break
+                    output.write(decoder.decode(chunk))
+                    output.flush()
+                output.write(decoder.decode(b"", final=True))
+                output.flush()
+            except BaseException:
+                # Stop the child when the parent is interrupted, e.g. by Ctrl-C.
+                process.terminate()
+                raise
+            return_code = process.wait()
     if return_code:
         raise subprocess.CalledProcessError(return_code, printable)

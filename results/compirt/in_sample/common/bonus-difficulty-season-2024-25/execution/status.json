@@ -1,0 +1,35 @@
+{
+  "state": "complete",
+  "pid": 1992349,
+  "total": 19,
+  "completed": [
+    "bonus-dd-compositional",
+    "bonus-dd-dot-multiplicative-1d",
+    "bonus-dd-dot-multiplicative-3d",
+    "bonus-dd-max-skill",
+    "bonus-dd-max-skill-synergy",
+    "bonus-dd-multidim-difficulty-synergy",
+    "bonus-dd-multidim-difficulty-synergy-3d",
+    "bonus-dd-noisy-or",
+    "bonus-dd-phi-psi-additive-1d",
+    "bonus-dd-phi-psi-additive-3d",
+    "bonus-dd-phi-psi-multiplicative-1d",
+    "bonus-dd-phi-psi-multiplicative-3d",
+    "bonus-dd-synergy",
+    "bonus-multidim-compositional",
+    "bonus-multidim-synergy",
+    "stage1-dd",
+    "stage1-multidim",
+    "team-irt-1d",
+    "team-irt-3d"
+  ],
+  "failed": {},
+  "pending": [],
+  "running": {},
+  "gpus": [
+    0,
+    1
+  ],
+  "jobs_per_gpu": 1,
+  "updated_at": "2026-09-27T00:51:02.416433+00:00"
+}

@@ -32,7 +32,8 @@ Training and evaluation need the generated dataset described in
 | `hazard_double_difficulty/` | Stage 1 with separate correctness and buzz-timing curves, plus player-perception variants |
 | `holdout/` | Round, game, and season splits; transferred player priors; frozen replay of training medians |
 | [`run_scripts/`](run_scripts/README.md) | Experiment pipelines and runners |
-| [`analysis/`](analysis/README.md) | Descriptive EDA and conditional-correctness studies |
+| [`analysis/`](analysis/README.md) | Descriptive EDA, bonus comparisons, and conditional-correctness studies |
+| [`dd_model_interpretation/`](dd_model_interpretation/README.md) | Saved DD fits: difficulty distributions, ordering, skill overlap, and question clustering |
 | `data_pipeline/` | SQLite to Hugging Face table builder and validator |
 | `utils/` | SVI, posterior, saving, roster, and run-logging helpers |
 | [`results/`](results/README.md) | Saved runs and reports |
@@ -65,7 +66,8 @@ available. Individual suites are listed in [`tests/README.md`](tests/README.md).
 ## Implementation notes
 
 - Bonus team skill uses the paper's Eq. 8 log-sum-exp aggregation, unnormalized
-  by roster size. Eq. 9 Noisy-OR is not implemented.
+  by roster size. `--bonus-aggregation noisy-or` selects the paper's Eq. 9
+  independent-member baseline with no synergy or temperature parameter.
 - Only the first buzz is modeled by default. `--include-bounceback` on the
   baseline and `multidim_mirt` Stage-1 trainers adds the paper's opponent-only
   continuation after a neg.

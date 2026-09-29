@@ -1,0 +1,26 @@
+{
+  "root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-gamma-locations-terminal",
+  "base_split": "year_2024",
+  "folds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "split_seed": 42,
+  "optimization_seed": 42,
+  "degree": 3,
+  "dimensions": 3,
+  "drop_concentration": 2.0,
+  "relevance_prior": "gamma",
+  "learned_curve_locations": true,
+  "terminal_intercepts": true,
+  "steps": 3000,
+  "lr": 0.005,
+  "device": "cuda",
+  "posterior_draws": 0,
+  "incorrect_weight": 1.0,
+  "player_neg_propensity": false,
+  "data_dir": null
+}

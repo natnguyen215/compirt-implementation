@@ -44,6 +44,6 @@ results/compirt/**/polynomial/
 
 # Double-difficulty hyperparameter grid: ~2.7 GB of per-fold loss curves and
 # quantile summaries across 100 points, regenerable from the runner. Its 3/3/2
-# point is tracked, but it lives in ablations/relevance-locations-terminal/ as
+# point is tracked, but it lives in ablations/model-components/relevance-locations-terminal/ as
 # dd-bernstein-332-unconstrained/, so the whole sweep directory is ignored.
-results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/
+results/compirt/holdout/double-difficulty/ablations/capacity/degree-dimensions-drop-prior/

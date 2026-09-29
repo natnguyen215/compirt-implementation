@@ -7,11 +7,14 @@ neighboring ``metrics`` and ``distributions`` modules.
 
 from __future__ import annotations
 
+import json
+
 import pandas as pd
 
 from compirt_eval.common.figures import reliability_plot
 from compirt_eval.common.metrics import stratified_prediction_metrics
 from compirt_eval.common.report_paths import csv_path, graph_path
+from compirt_eval.common.bonus_reports import write_bonus_evaluation_report
 from compirt_eval.scenario_b_bonuses.distributions import (
     bonus_parameter_distribution_plots,
     bonus_prediction_distribution_plots,
@@ -30,8 +33,12 @@ from compirt_eval.common.categories import top_level_category
 from compirt_eval.scenario_b_bonuses.outcomes import write_bonus_outcomes
 
 
-def evaluate_bonuses(results_dir, output_dir, dimension_labels=None, *, tables=None):
-    """Evaluate binary bonus parts and total expected points per bonus."""
+def evaluate_bonuses(results_dir, output_dir, dimension_labels=None, *, tables=None, write_report=False):
+    """Evaluate binary bonus parts and total expected points per bonus.
+
+    Always writes csvs/bonus_metrics.csv; 'write_report' also writes
+    experiment_report.md. Returns the metric dictionary.
+    """
     parts = pd.read_csv(results_dir / "bonus_part_predictions.csv")
     parts = bonus_parts_with_difficulty(parts, tables["bonuses"] if tables is not None else None)
     teams = pd.read_csv(results_dir / "team_predictions.csv")
@@ -68,7 +75,13 @@ def evaluate_bonuses(results_dir, output_dir, dimension_labels=None, *, tables=N
         graph_path(output_dir, "bonus_reliability.png", "bonus"),
     )
     bonus_parameter_distribution_plots(results_dir, output_dir, dimension_labels)
-    bonus_prediction_distribution_plots(parts, output_dir)
+    # The fit summary names the aggregation, which sets the aggregate plot's label.
+    summary_path = results_dir / "summary.json"
+    summary = json.loads(summary_path.read_text()) if summary_path.exists() else {}
+    bonus_prediction_distribution_plots(parts, output_dir, summary.get("bonus_aggregation", "lse"))
     team_ppb_plot(teams, output_dir)
     bonus_score_by_observed_plot(teams, output_dir)
+    pd.DataFrame([metrics]).to_csv(csv_path(output_dir, "bonus_metrics.csv"), index=False)
+    if write_report:
+        write_bonus_evaluation_report(output_dir, metrics)
     return metrics

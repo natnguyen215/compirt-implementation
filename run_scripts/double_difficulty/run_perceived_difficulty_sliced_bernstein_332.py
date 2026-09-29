@@ -11,7 +11,7 @@ from run_scripts.double_difficulty import run_perceived_difficulty_bernstein_332
 PERCEPTION_SLICES = 3
 DEFAULT_ROOT = Path(
     "results/compirt/holdout/double-difficulty/"
-    "variants/perceived-difficulty/three-slice"
+    "variants/perception/perceived-difficulty/three-slice"
 )
 Configuration = shared.Configuration
 

@@ -396,6 +396,8 @@ def _stage_summary_rows(evaluation_dir: Path) -> pd.DataFrame:
             "calibrate_correctness",
             "synergy_dimensions",
             "synergy_form",
+            "synergy_link",
+            "bonus_difficulty",
             "topic_vectors",
         ):
             if field in summary:
@@ -597,24 +599,45 @@ def _synergy_section_lines(evaluation_dir: Path) -> list[str]:
         if summary.get("synergy_form", "dot") == "phi-psi" else
         "`sum over pairs i<j of psi_i . psi_j` (Eq. 10)"
     )
+    if summary.get("synergy_link", "additive") == "multiplicative":
+        base_logit = ("sum_k r_bk * (ts_k(R) - beta_bk)"
+                      if summary.get("bonus_difficulty") == "multidim" else "A_b(R) - beta_b")
+        application = (
+            f"The full base logit `{base_logit}` is multiplied by `1 + s(R)` "
+            "before optional correctness calibration. The saved contribution is "
+            "the raw `s(R)`, so its logit effect also depends on the bonus part. "
+        )
+        interpretation = (
+            "**Read the multiplier as a fitted scale on the base logit.** `s(R)` "
+            "is unconstrained: `s(R) = -1` zeros the base logit, and `s(R) < -1` "
+            "reverses its sign. Interpreting synergy as teamwork requires a "
+            "held-out recombined-roster experiment."
+        )
+    else:
+        application = (
+            "This sum is added to that team's aggregation logit for every bonus "
+            "the lineup hears. "
+        )
+        interpretation = (
+            "**Read the sign as a fitted offset, not a teamwork measure.** With "
+            "mostly fixed rosters this term can act as a team-level intercept — "
+            "for example absorbing the unnormalized Eq. 8 log-sum-exp's growth "
+            "with roster size — so a predominantly one-signed distribution says "
+            "as much about the logit's other terms as about the teams. A "
+            "held-out recombined-roster experiment is required "
+            "before interpreting synergy as teamwork."
+        )
     return [
         "## Synergy Contributions",
         "",
         f"Each lineup's synergy contribution is the pairwise sum {formula} "
-        "across its members, added to "
-        "that team's aggregation logit for every bonus the lineup hears. The "
+        f"across its members. {application}The "
         "`*_synergy_fraction` rows weight each bonus response equally; the "
         "`distinct_*` rows count each lineup or team once.",
         "",
         markdown_table(pd.DataFrame(rows)),
         "",
-        "**Read the sign as a fitted offset, not a teamwork measure.** With "
-        "mostly fixed rosters this term can act as a team-level intercept — "
-        "for example absorbing the unnormalized Eq. 8 log-sum-exp's growth "
-        "with roster size — so a predominantly one-signed distribution says "
-        "as much about the logit's other terms as about the teams. A "
-        "held-out recombined-roster experiment is required "
-        "before interpreting synergy as teamwork.",
+        interpretation,
         "",
     ]
 
@@ -687,6 +710,20 @@ def experiment_report_markdown(
                           "[Team PPG and absolute errors](csvs/bonus_team_ppg_leaderboard.csv); "
                           "[game bonus margins](csvs/bonus_game_margin_predictions.csv).", ""])
         lines.extend(_synergy_section_lines(evaluation_dir))
+        # Link whichever distribution figures this evaluation drew.
+        figures = (
+            ("graphs/bonus/bonus_prediction_distributions.png",
+             "Evaluated probabilities, aggregate ability, and synergy contributions"),
+            ("graphs/parameters/bonus_part_parameter_distributions.png", "Fitted bonus parameters"),
+            ("graphs/parameters/synergy_parameter_distributions.png", "Fitted synergy parameters"),
+        )
+        available = [(path, label) for path, label in figures if (evaluation_dir / path).exists()]
+        if available:
+            lines.extend(["### Bonus Distributions", "",
+                          "Aggregate ability is part-weighted; synergy is response-weighted. "
+                          "Parameter plots show the spread of fitted training medians across "
+                          "entities.", ""])
+            lines.extend([f"[{label}]({path}).\n" for path, label in available])
     if game is not None:
         lines.extend(["## Tossup Game Replay", ""])
         if game:

@@ -1,0 +1,776 @@
+{
+  "tasks": [
+    {
+      "name": "stage1-dd",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "hazard_double_difficulty.bernstein.train_pyramidal",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--dimensions",
+        "3",
+        "--degree",
+        "3",
+        "--drop-concentration",
+        "2",
+        "--relevance-prior",
+        "simplex",
+        "--learn-curve-locations",
+        "--lr",
+        "0.005",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal"
+      ],
+      "needs": [],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "stage1-multidim",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-m",
+        "multidimensional.multidim_mirt.train_pyramidal",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--dimensions",
+        "5",
+        "--lr",
+        "0.01",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/pyramidal"
+      ],
+      "needs": [],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/pyramidal/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/pyramidal/players.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "bonus-multidim-compositional",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "2000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "normal",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/compositional"
+      ],
+      "needs": [
+        "stage1-multidim"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/compositional/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/compositional/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-multidim-synergy",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "2000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "normal",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/synergy",
+        "--use-synergy",
+        "--synergy-dimensions",
+        "3"
+      ],
+      "needs": [
+        "stage1-multidim"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/synergy/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/synergy/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-compositional",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/compositional"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/compositional/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/compositional/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-synergy",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/synergy",
+        "--use-synergy"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/synergy/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/synergy/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-noisy-or",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/noisy-or",
+        "--bonus-aggregation",
+        "noisy-or"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/noisy-or/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/noisy-or/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-max-skill",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/max-skill",
+        "--bonus-aggregation",
+        "max"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/max-skill/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/max-skill/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-max-skill-synergy",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/max-skill-synergy",
+        "--bonus-aggregation",
+        "max",
+        "--use-synergy"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/max-skill-synergy/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/max-skill-synergy/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-multidim-difficulty-synergy",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy",
+        "--bonus-difficulty",
+        "multidim",
+        "--use-synergy"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-phi-psi-additive-1d",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-additive-1d",
+        "--use-synergy",
+        "--synergy-form",
+        "phi-psi",
+        "--synergy-link",
+        "additive",
+        "--synergy-dimensions",
+        "1"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-additive-1d/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-additive-1d/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-phi-psi-additive-3d",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-additive-3d",
+        "--use-synergy",
+        "--synergy-form",
+        "phi-psi",
+        "--synergy-link",
+        "additive",
+        "--synergy-dimensions",
+        "3"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-additive-3d/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-additive-3d/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-dot-multiplicative-1d",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/dot-multiplicative-1d",
+        "--use-synergy",
+        "--synergy-form",
+        "dot",
+        "--synergy-link",
+        "multiplicative",
+        "--synergy-dimensions",
+        "1"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/dot-multiplicative-1d/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/dot-multiplicative-1d/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-dot-multiplicative-3d",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/dot-multiplicative-3d",
+        "--use-synergy",
+        "--synergy-form",
+        "dot",
+        "--synergy-link",
+        "multiplicative",
+        "--synergy-dimensions",
+        "3"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/dot-multiplicative-3d/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/dot-multiplicative-3d/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-phi-psi-multiplicative-1d",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-multiplicative-1d",
+        "--use-synergy",
+        "--synergy-form",
+        "phi-psi",
+        "--synergy-link",
+        "multiplicative",
+        "--synergy-dimensions",
+        "1"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-multiplicative-1d/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-multiplicative-1d/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-phi-psi-multiplicative-3d",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-multiplicative-3d",
+        "--use-synergy",
+        "--synergy-form",
+        "phi-psi",
+        "--synergy-link",
+        "multiplicative",
+        "--synergy-dimensions",
+        "3"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-multiplicative-3d/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-multiplicative-3d/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "bonus-dd-multidim-difficulty-synergy-3d",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "train_compositional.py",
+        "--split",
+        "season_2024_25",
+        "--steps",
+        "3000",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--lr",
+        "0.01",
+        "--alpha-prior",
+        "gamma",
+        "--player-skills",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal/players.csv",
+        "--output-dir",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy-3d",
+        "--bonus-difficulty",
+        "multidim",
+        "--use-synergy",
+        "--synergy-dimensions",
+        "3"
+      ],
+      "needs": [
+        "stage1-dd"
+      ],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy-3d/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy-3d/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "team-irt-1d",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-c",
+        "from pathlib import Path\nfrom types import SimpleNamespace\nimport torch\nfrom analysis.bonus_team_irt.run import fit_arm\nfrom analysis.bonus_team_irt.model import observations\nfrom compirt_data import load_hf_tables\nfrom compirt_eval.scenario_b_bonuses.metrics import bonus_parts_with_difficulty\ntorch.set_num_threads(1)\ntables=load_hf_tables(split='season_2024_25')\nframe=bonus_parts_with_difficulty(observations(tables),tables['bonuses'])\nargs=SimpleNamespace(seed=42,device='cuda',steps=3000,lr=0.01)\nfit_arm(frame,frame,Path('results/compirt/in_sample/common/bonus-difficulty-season-2024-25/team_irt_1d'),args,1)\n"
+      ],
+      "needs": [],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/team_irt_1d/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/team_irt_1d/bonus_parts.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "team-irt-3d",
+      "command": [
+        "/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-c",
+        "from pathlib import Path\nfrom types import SimpleNamespace\nimport torch\nfrom analysis.bonus_team_irt.run import fit_arm\nfrom analysis.bonus_team_irt.model import observations\nfrom compirt_data import load_hf_tables\nfrom compirt_eval.scenario_b_bonuses.metrics import bonus_parts_with_difficulty\ntorch.set_num_threads(1)\ntables=load_hf_tables(split='season_2024_25')\nframe=bonus_parts_with_difficulty(observations(tables),tables['bonuses'])\nargs=SimpleNamespace(seed=42,device='cuda',steps=3000,lr=0.01)\nfit_arm(frame,frame,Path('results/compirt/in_sample/common/bonus-difficulty-season-2024-25/team_irt_3d'),args,3)\n"
+      ],
+      "needs": [],
+      "gpu": true,
+      "outputs": [
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/team_irt_3d/summary.json",
+        "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/team_irt_3d/bonus_parts.csv"
+      ],
+      "priority": 0
+    }
+  ],
+  "environment": {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "COMPIRT_SURVIVAL_CHUNK": "8192",
+    "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True",
+    "MPLCONFIGDIR": "/tmp/mpl-bonus-season"
+  },
+  "contract": {
+    "split": "season_2024_25",
+    "regime": "in_sample parameter diagnostics; all season games; no held-out performance claims",
+    "seed": 42,
+    "models": {
+      "Multidimensional": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/compositional",
+      "Multidimensional + synergy": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/synergy",
+      "DD-Bernstein": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/compositional",
+      "DD-Bernstein + synergy": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/synergy",
+      "DD-Bernstein, Noisy-OR": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/noisy-or",
+      "DD-Bernstein, max skill": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/max-skill",
+      "DD-Bernstein, max skill + synergy": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/max-skill-synergy",
+      "DD-Bernstein, multidimensional difficulty + synergy": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy",
+      "DD-Bernstein, additive phi-psi 1D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-additive-1d",
+      "DD-Bernstein, additive phi-psi 3D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-additive-3d",
+      "DD-Bernstein, multiplicative dot 1D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/dot-multiplicative-1d",
+      "DD-Bernstein, multiplicative dot 3D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/dot-multiplicative-3d",
+      "DD-Bernstein, multiplicative phi-psi 1D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-multiplicative-1d",
+      "DD-Bernstein, multiplicative phi-psi 3D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-multiplicative-3d",
+      "DD-Bernstein, multidimensional difficulty + 3D synergy": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy-3d",
+      "Team IRT 1D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/team_irt_1d",
+      "Team IRT 3D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/team_irt_3d"
+    },
+    "table_counts": {
+      "tournaments": 33,
+      "teams": 492,
+      "games": 2661,
+      "tossup_buzzes": 64037,
+      "bonus_responses": 49042,
+      "tossups": 1360,
+      "bonuses": 1359
+    },
+    "source_sha256": {
+      "compirt_data.py": "876869c4fad710f56fad4b27ec914a68124326d42dc848b6d88607e7eba423a5",
+      "holdout/season_splits.py": "78456a218cfa42eabbd071aac128280f52c16035ec5e4cf065a8ed0a6347917f",
+      "compositional_model.py": "0718f7fbef7a84aa4f3cbb8a989975532b19bee34263ae9b74599e114de8711a",
+      "train_compositional.py": "5fb5591721a0959fa0efa3aada3bdb730524ddb5bb5e89e2dd812065b72a8627",
+      "compirt_race.py": "33fd7e4ded72a359d07fd53a317a17f2412b5b03f18fb7a25105f35a110a6d45",
+      "utils/training.py": "b82b89b5861c0c8dd8d466a44406857e50ee934dc9cb6537f15479ca8854cad5",
+      "analysis/bonus_team_irt/model.py": "80e04c4ef8d9b915bfbe413eb52dc7f0e3a9b683afa315eb851a9f6a9dfe1028",
+      "analysis/bonus_team_irt/run.py": "4ee248cd46257bfa2af61d6c72cf545072fa46a266de7ed0f52d563feb72c215",
+      "hazard_double_difficulty/bernstein/pyramidal_model.py": "292f932ebaf99fe18b87e577b15cd384631ff0287cbe5c29f316e87be76a6b0e",
+      "hazard_double_difficulty/bernstein/train_pyramidal.py": "6e1fba37d710dc863925f03db07346e6b29b8405045c7b3c30ef2a38d5968092",
+      "multidimensional/multidim_mirt/pyramidal_model.py": "a9b9e765b232aaa6132fa31194210bad1e9544906aaa5b80e1b13b20b52781a3",
+      "multidimensional/multidim_mirt/train_pyramidal.py": "67156fa566fc8eb50474ffdf0f8db73d9212e27f0946c3435467f0335d44fdfd"
+    },
+    "data_sha256": {
+      "tournaments": "db3962b105c0411b394196a425ac92952c604b71db67e7632d7839e3bd0deabf",
+      "teams": "d92ba2ca46d0429af92883b385d5cddac4190114bae992be683aec2a671fe7bd",
+      "games": "11274b0cad12fae10f5e0f0475802274c5c5891743b8456e4644109671e5a843",
+      "tossup_buzzes": "f0b8866a66b11a35f5efe051a7a0b21f5d7201f869d11fd446b8fc522276a85a",
+      "bonus_responses": "c2191c08f4a63536f5a9578f8d46c1cc594bc01232b9ab7f2820506053db6843",
+      "tossups": "e1a9be0bad7e457d24acef999032b73e6273f6528231aa370b2466331e5becb0",
+      "bonuses": "3d6be3e47e909ee10bdd3ae0fd85f44017fe5d933aa8dc3c7c52503e04132163"
+    },
+    "stages": 19
+  }
+}

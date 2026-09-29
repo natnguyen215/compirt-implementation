@@ -1,0 +1,49 @@
+# Tossup relevance axes: results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/pyramidal
+tossups 1300, players 1372; player skill correlation:
+         theta_1  theta_2  theta_3
+theta_1     1.00    -0.29    -0.29
+theta_2    -0.29     1.00     0.06
+theta_3    -0.29     0.06     1.00
+
+## Share of tossup-level variance explained (eta^2, permutation-null mean in parentheses)
+
+ relevance           category        subcategory
+hazard_r_1 0.670 (null 0.008) 0.690 (null 0.019)
+hazard_r_2 0.359 (null 0.008) 0.398 (null 0.019)
+hazard_r_3 0.428 (null 0.008) 0.463 (null 0.019)
+       r_1 0.073 (null 0.008) 0.084 (null 0.019)
+       r_2 0.043 (null 0.008) 0.057 (null 0.019)
+       r_3 0.055 (null 0.007) 0.064 (null 0.020)
+
+## Mean relevance by subcategory (>= 15 tossups), sorted by hazard axis 1
+
+                                  hazard_r_1  hazard_r_2  hazard_r_3   r_1   r_2   r_3   n
+subcategory
+Science/Chemistry                       0.85        0.10        0.05  0.41  0.31  0.28  65
+Science/Physics                         0.83        0.12        0.05  0.43  0.31  0.26  65
+Science/Biology                         0.74        0.18        0.08  0.38  0.30  0.32  65
+Science/Other                           0.69        0.25        0.07  0.37  0.34  0.29  65
+Fine Arts/Classical Music               0.47        0.34        0.19  0.37  0.30  0.33  65
+Literature/World/Other                  0.45        0.05        0.50  0.33  0.24  0.43  15
+Literature/European                     0.41        0.10        0.49  0.37  0.25  0.38  65
+Fine Arts/                              0.41        0.24        0.35  0.33  0.29  0.37  34
+Fine Arts/Visual                        0.40        0.22        0.38  0.38  0.29  0.33  15
+Mythology/                              0.40        0.31        0.29  0.32  0.34  0.35  55
+Literature/British                      0.38        0.12        0.50  0.33  0.31  0.36  65
+Literature/World                        0.38        0.13        0.49  0.34  0.30  0.36  50
+Literature/American                     0.38        0.08        0.54  0.32  0.31  0.37  65
+Philosophy/                             0.35        0.31        0.35  0.35  0.32  0.34  61
+Fine Arts/Other                         0.34        0.32        0.34  0.32  0.35  0.33  65
+Fine Arts/Painting and Sculpture        0.33        0.28        0.39  0.35  0.29  0.36  16
+Social Science/                         0.32        0.43        0.25  0.35  0.34  0.31  62
+Religion/                               0.26        0.38        0.36  0.26  0.41  0.33  65
+Popular Culture/                        0.24        0.40        0.36  0.35  0.28  0.37  15
+Other Academic/                         0.19        0.54        0.28  0.28  0.40  0.31  18
+History/Other                           0.15        0.40        0.45  0.28  0.34  0.39  45
+Geography/CE/                           0.14        0.51        0.35  0.28  0.34  0.38  49
+History/American                        0.10        0.39        0.51  0.26  0.36  0.38  65
+History/                                0.10        0.67        0.23  0.31  0.34  0.35  20
+History/World                           0.09        0.44        0.46  0.27  0.34  0.39  65
+History/European                        0.07        0.47        0.46  0.27  0.35  0.39  65
+
+range of subcategory means: hazard ['0.07-0.85', '0.05-0.67', '0.05-0.54'] correctness ['0.26-0.43', '0.24-0.41', '0.26-0.43']

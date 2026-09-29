@@ -50,8 +50,8 @@ locations, terminal intercepts, and simplex relevance:
 
 ```bash
 .venv/bin/python -m run_scripts.common.run_compositional_from_folds \
-  --stage1-root results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal \
-  --root results/compirt/holdout/double-difficulty/compositional/dd-bernstein-332-simplex-locations-terminal
+  --stage1-root results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-3000steps \
+  --root results/compirt/holdout/double-difficulty/compositional/no-synergy-and-dot-additive-1d
 ```
 
 This reuses the source folds' player skills and split definitions, then fits
@@ -61,17 +61,70 @@ Stage-1 skill basis; the Stage-1 simplex is a tossup relevance constraint.
 Defaults are 2,000 bonus steps, learning rate 0.01, seed 42, and CUDA. Use
 `--alpha-prior normal` for a signed Stage-1 basis, `--arms compositional` for
 the base model alone, or `--collect-only` to rebuild the aggregate reports.
+
+For the paper's Eq. 9 Noisy-OR baseline, use `--bonus-aggregation noisy-or
+--arms compositional --steps 3000 --lr 0.01 --seed 42 --alpha-prior gamma`
+with the DD source above and a fresh root such as
+`results/compirt/holdout/double-difficulty/compositional/noisy-or`.
+Noisy-OR fits only the part weights and scalar difficulties. Replay reads the
+aggregation from the saved fit summary.
+
+For the per-dimension highest-skill baseline, use `--bonus-aggregation max
+--steps 3000 --lr 0.01 --seed 42 --alpha-prior gamma` with the DD source above
+and a fresh root such as
+`results/compirt/holdout/double-difficulty/compositional/max-skill-no-synergy-and-dot-additive-1d`.
+The default arms are no synergy and additive dot 1D synergy. The aggregate is
+`sum_k alpha_bk * max_i(theta_ik)` over active teammates, followed by the same
+scalar difficulty and synergy terms as LSE. The [model contract](../docs/code-guide.md#maximum-skill-bonus-aggregation)
+also describes its optional multidimensional-difficulty form.
+
+Training and replay output streams live to the terminal and each stage's
+`run.log`, using the shared pipeline logger. Training prints the first step,
+every 100 completed steps, and the final step as `Step completed/total` with
+ELBO loss. Fold/stage labels identify training, replay, evaluation, and skipped
+completed stages. Full commands are saved in each fold's `*_commands.json`;
+`--dry-run` prints them and exits.
+
+For multiplicative phi–psi synergy, add `--synergy-form phi-psi
+--synergy-link multiplicative`; `--synergy-dimensions` selects the length of
+both player profiles. These options affect the synergy arm and are saved in
+the configuration. Use a fresh `--root` when changing them.
+For multidimensional difficulty, add `--bonus-difficulty multidim
+--alpha-prior gamma` with a fresh root. This applies to both arms: LSE pools
+players separately per skill axis, then the base logit is
+`sum_k r_bk * (ts_k(R) - beta_bk)`. Difficulty and relevance each have as many
+coordinates as the saved player skills. See the
+[model contract](../docs/code-guide.md#multidimensional-bonus-difficulty),
+including the difficulty identification limit.
 Source hashes and configuration are checked on resume. Each fold's split comes
 from its saved Stage-1 summary, and the runner checks that bonus test games occur
 in neither the Stage-1 nor the bonus training predictions. Results and fold
 variation are written to `aggregate/`; each fold retains predictions, training
 logs, posterior quantiles, calibration figures, and train/test coverage checks.
 
+The runner owns training and replay commands. Shared bonus evaluation and pooling
+live in `compirt_eval/scenario_b_bonuses/folds.py`; Markdown generation lives in
+`compirt_eval/common/bonus_reports.py`. Each run's `aggregate/report.md` links
+its fold artifacts and identifies the saved synergy form, link,
+and dimensions. The [saved-results index](../results/compirt/holdout/double-difficulty/compositional/README.md)
+lists the completed five-fold runs.
+
+| Mode | Reads | Writes | Fits or replays models? |
+| --- | --- | --- | --- |
+| Normal run | Stage-1 skills and linked tables | Fits, frozen predictions, evaluations, pooled results | Yes; completed stages resume |
+| `--evaluate-only` | Saved predictions, source artifacts, linked tables | Fold metrics/figures, pooled metrics, reports | No |
+| `--collect-only` | Saved predictions and fold metrics, source artifacts, linked tables | Pooled metrics and reports | No |
+| `--report-only` | Saved configuration and metrics | Fold and pooled reports | No |
+
+All refresh modes take just `--root` plus the mode; they read the fitting
+settings from `configuration.json`. Report-only reads just the saved
+configuration and metrics, so it runs without the source data.
+
 Refresh completed bonus folds without fitting or replaying predictions:
 
 ```bash
 .venv/bin/python -m run_scripts.common.run_compositional_from_folds \
-  --root results/compirt/holdout/double-difficulty/bonuses-normalized-v1-20260913-150350 \
+  --root results/compirt/holdout/double-difficulty/compositional/no-synergy-and-dot-additive-1d \
   --evaluate-only
 ```
 
@@ -128,7 +181,8 @@ manifest and never aggregates shared outputs.
 ## Retired runners
 
 Runners for finished experiments are deleted rather than kept; recover one
-from git history if it is needed again. Code for completed evaluation studies
-sits in a `code/` folder beside its results (listed in
-[`../results/README.md`](../results/README.md)). Runners for archived model
+from git history if it is needed again. Preserved compositional study analyses
+live in [`analysis/compositional/`](../analysis/README.md#saved-compositional-analyses).
+Some historical studies retain code snapshots beside their results, listed in
+[`../results/README.md`](../results/README.md). Runners for archived model
 families are under `../archive/run_scripts/`.

@@ -245,7 +245,7 @@ def test_trainer_smoke_evaluator_and_runner_contract(tmp_path):
     assert defaults.steps == 3000
     assert defaults.lr == 0.005
     assert defaults.device == "cuda"
-    assert "variants/perceived-logit/positive-alpha" in str(defaults.root)
+    assert "variants/perception/perceived-logit/positive-alpha" in str(defaults.root)
 
     config = Configuration(
         root="/tmp/perceived-logit-332",

@@ -22,7 +22,7 @@ from utils.run_logging import resolve_result_root
 from utils.training import convergence_summary, fit_svi, require_device
 
 
-DD_ROOT = "results/compirt/holdout/double-difficulty/compositional/dd-bernstein-332-simplex-locations-terminal"
+DD_ROOT = "results/compirt/holdout/double-difficulty/compositional/no-synergy-and-dot-additive-1d"
 MULTIDIM_ROOT = "results/compirt/holdout/multidim/multidim-all2024-gameinfill-5fold"
 
 
@@ -59,10 +59,16 @@ def fit_arm(train, test, output, args, dimensions):
         write_json(output / "ids.json", {"team_ids": data["team_ids"], "part_ids": data["part_ids"]})
         pd.DataFrame({"step": np.arange(1, len(losses) + 1), "loss": losses}).to_csv(output / "losses.csv", index=False)
         teams = pd.DataFrame({"team_id": data["team_ids"]})
-        parts = pd.DataFrame({"bonus_part_id": data["part_ids"], "beta": parameters["beta"]})
         for dimension in range(dimensions):
             teams[f"theta_{dimension + 1}"] = parameters["theta"][:, dimension]
-            parts[f"alpha_{dimension + 1}"] = parameters["alpha"][:, dimension]
+        parts = pd.DataFrame({"bonus_part_id": data["part_ids"]})
+        if dimensions == 1:
+            parts["beta"] = parameters["beta"]
+            parts["alpha_1"] = parameters["alpha"][:, 0]
+        else:
+            for dimension in range(dimensions):
+                parts[f"beta_{dimension + 1}"] = parameters["beta"][:, dimension]
+                parts[f"r_{dimension + 1}"] = parameters["r"][:, dimension]
         teams.to_csv(output / "team_skills.csv", index=False)
         parts.to_csv(output / "bonus_parts.csv", index=False)
         write_json(output / "summary.json", {
@@ -80,6 +86,10 @@ def fit_arm(train, test, output, args, dimensions):
     predictions = test.copy()
     predictions["predicted_correct"] = predict(test, parameters, **ids)
     predictions.to_csv(output / "bonus_part_predictions.csv", index=False)
+    # Replay the training rows at the same medians.
+    fitted = train.copy()
+    fitted["predicted_correct"] = predict(train, parameters, **ids)
+    fitted.to_csv(output / "train_bonus_part_predictions.csv", index=False)
 
 
 def parse_args():
@@ -121,7 +131,8 @@ def main():
     config = {key: value for key, value in vars(args).items() if key != "stage"}
     config["data_sha256"] = hashlib.sha256(pd.util.hash_pandas_object(frame, index=False).values.tobytes()).hexdigest()
     config["games_sha256"] = hashlib.sha256(tables["games"].to_json().encode()).hexdigest()
-    config["priors"] = {"theta": "Normal(0,1)", "alpha": "Gamma(2,2) shape/rate", "beta": "Normal(0,1)"}
+    config["priors"] = {"theta": "Normal(0,1)", "beta": "Normal(0,1) per dimension",
+                        "alpha (1D)": "Gamma(2,2) shape/rate", "r (multidimensional)": "Dirichlet(1)"}
     config["code_sha256"] = {str(path): sha256(path) for path in [
         *sorted(Path("analysis/bonus_team_irt").glob("*.py")),
         Path("utils/training.py"), Path("holdout/game_splits.py"),

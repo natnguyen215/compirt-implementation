@@ -1,8 +1,0 @@
-{
-  "pid": 1396960,
-  "gpu": 1,
-  "log": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/parallel-normalized-v1-20260913-150350/logs/dd-2-train.log",
-  "started_at": "2026-09-13T22:18:39.903931+00:00",
-  "signature": "a763b20ad42f0d7a5e27d6fa7276c3a8800b11466ff4ef1d8fbb0087070f4c6c",
-  "exit_code": 0
-}

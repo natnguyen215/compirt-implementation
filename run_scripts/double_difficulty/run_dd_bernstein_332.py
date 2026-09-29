@@ -48,7 +48,7 @@ PYTHON = str(REPO_ROOT / ".venv" / "bin" / "python")
 FOLD_COUNT = 5
 TRAIN_MODULE = "hazard_double_difficulty.bernstein.train_pyramidal"
 EVALUATE_MODULE = "run_scripts.double_difficulty.evaluate_fold"
-DEFAULT_ROOT = Path("results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal")
+DEFAULT_ROOT = Path("results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal")
 
 
 @dataclass(frozen=True)

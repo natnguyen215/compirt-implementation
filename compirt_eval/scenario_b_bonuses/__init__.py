@@ -1,7 +1,8 @@
 """Scenario B: bonus-part and points-per-bonus evaluation.
 
 ``metrics`` owns pure bonus scoring, ``distributions`` owns fitted-parameter
-diagnostics, and ``evaluation`` orchestrates saved predictions and figures.
+diagnostics, ``evaluation`` orchestrates saved predictions and figures, and
+``folds`` audits and pools frozen held-out bonus runs.
 """
 
 from compirt_eval.scenario_b_bonuses.distributions import (

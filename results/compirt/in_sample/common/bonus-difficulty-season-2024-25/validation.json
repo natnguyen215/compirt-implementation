@@ -1,0 +1,183 @@
+{
+  "models": [
+    {
+      "model": "Multidimensional",
+      "summary_sha256": "2713e621daae53759a4cd9b8634490460aa4d9fb5d3e6ced6be67771e9e1d6d7",
+      "parameters_sha256": "51e61adfa0e48fc3916c80df79286044831c19df1249c0ce5e3baffcaa26394a",
+      "steps": 2000,
+      "finite_losses": true,
+      "final_loss": 70869.92055118084,
+      "last_100_loss_slope": -0.1610447856394976,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "Multidimensional + synergy",
+      "summary_sha256": "734e0f67ec9a02c200b7d99d35a36b1010891adf2f4898a925268b266a0fb6f9",
+      "parameters_sha256": "5bb8a3ee7bda3301e5794e52ad76d05fd932fb7b388d98b8def1420bebc778f6",
+      "steps": 2000,
+      "finite_losses": true,
+      "final_loss": 70219.92222601175,
+      "last_100_loss_slope": -0.3441029965702144,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein",
+      "summary_sha256": "26f3210c229db12b8f2d92921389a3deab9a9bef6c224646eec73023b69c72a0",
+      "parameters_sha256": "73e593d5a239c849959b70b69602030403b2326a2a6df6b9fc13bb8a39a11e6b",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 69903.24795126915,
+      "last_100_loss_slope": 0.18255606243102301,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein + synergy",
+      "summary_sha256": "551099f9b000e6b4d97be2fa62563ebf9b81978d6f7b82f965ad67d0537cc4e1",
+      "parameters_sha256": "d6c341b1b0cb1abf713f9fe8c6f92a660637e139287b98a776eb95923743bdfb",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 68161.42935425043,
+      "last_100_loss_slope": -0.15845262360124202,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein, Noisy-OR",
+      "summary_sha256": "e2a54171b029d1d2c947e4a2493e3c5c908a9d4b53c195a348d85e996518eb1b",
+      "parameters_sha256": "44768ab6f5ce9e1ce2abd8fb50a52b188f5b0e16d5caf31a2022d1772f08b5c8",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 69655.77734375,
+      "last_100_loss_slope": 0.4344041320636846,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein, max skill",
+      "summary_sha256": "345cb83c5f1ae91ccd9b1bf3dc0b450ed0832d1b892d8901c39a4f48a2c4a64d",
+      "parameters_sha256": "4255cec1af7bd99c5751f284a38c625f71f191486aa7da32367e88667de37c7d",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 72768.45068359375,
+      "last_100_loss_slope": 0.42181032654041284,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein, max skill + synergy",
+      "summary_sha256": "b72e895205cf5ff9423ed10e25cb1abf1557571ec678e51b02bbae11234b18dc",
+      "parameters_sha256": "797b8760bf930ed103a7aa1a0d424cbac98615fce7ce6b7b77c13352edeccbf3",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 69314.69943237305,
+      "last_100_loss_slope": 0.18606085217878648,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein, multidimensional difficulty + synergy",
+      "summary_sha256": "48a1e4bcddd43ce37f7b4d09da17b068eedd57d6ac6cff6b29268d68d68adbc9",
+      "parameters_sha256": "9f4d8a97646eb13f3f4ef1d12ed980e3d828b4f01081224f7b39fd3e39379fd2",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 69216.79072254896,
+      "last_100_loss_slope": 0.6204337639092942,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein, additive phi-psi 1D",
+      "summary_sha256": "87af35539797751d2349c03e76e341dc661e509391a4253c9682235c90e51158",
+      "parameters_sha256": "54d485913207a77fc2150769953baf1ee15003456b49e39c9df0194af574eca6",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 69461.576007545,
+      "last_100_loss_slope": -0.5490387404699903,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein, additive phi-psi 3D",
+      "summary_sha256": "d5a8ffda37fa0a7dec2ecf4066d5f6e365889602bb66b5f3082995479a5619e0",
+      "parameters_sha256": "1239320f6c8d7d535d193f30056da5fb2c8879c1ea122c1bdbf37920a6c26b8a",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 71829.91342896223,
+      "last_100_loss_slope": -0.3818004560947777,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein, multiplicative dot 1D",
+      "summary_sha256": "20f1f61e188cfcc02558077b51b6371da8286147065e0f6f6be3a0e041594102",
+      "parameters_sha256": "3a0d799d0ff9384aac527fab3a7c4922db091f0ea3e6120c848f2c4f3176da02",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 70239.99014216661,
+      "last_100_loss_slope": 0.0772260823866087,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein, multiplicative dot 3D",
+      "summary_sha256": "61f5d44acdf007f2555611188cdbd58ad1d1cb67fb271737db2c20774251249a",
+      "parameters_sha256": "307c2351d4e148be1cca58d57d65fa2a1ca6ddd986cdce11a483416a0773ef26",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 72624.38308686018,
+      "last_100_loss_slope": 0.19943755180270148,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein, multiplicative phi-psi 1D",
+      "summary_sha256": "5c60f88f5227e6b278ff5388a709f6a00a95be9da96012fabf4932b2ba33524d",
+      "parameters_sha256": "7ca10cdddfbd84cc98fd806d6d50254f5d040197853b475cfb21a210f7a486bb",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 71186.09091895819,
+      "last_100_loss_slope": -0.7468198567387273,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein, multiplicative phi-psi 3D",
+      "summary_sha256": "d442010eef1ae9c6cf70a2347750555124c4bb27dc345ede25e89d1f1a43669c",
+      "parameters_sha256": "d2ac68715fabd6a0ab1ca02db8617330f3c9fcba47ce38f19b0b4935078b56d3",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 74506.40591973066,
+      "last_100_loss_slope": -2.6920021962825413,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "DD-Bernstein, multidimensional difficulty + 3D synergy",
+      "summary_sha256": "575fe9456c6346d6f7e4e71806d0f4b98119d83553260432c20fe8bfb38139b7",
+      "parameters_sha256": "78d69c3e5b64ed21f4093ca4c85d9d46cb0b308954b82f8b1a7b5c08c8f33b7d",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 71161.64679020643,
+      "last_100_loss_slope": 0.786975764501692,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "Team IRT 1D",
+      "summary_sha256": "08f99a646e4ff14b8d8a563e6ed283c5957303ea1ca67744258a76a8c900b868",
+      "parameters_sha256": "cec48a5de4124ce28170a55521b3937fc9b96de32c2a8a8ccc3f8254cf3d997a",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 64718.841796875,
+      "last_100_loss_slope": -0.10734069961585195,
+      "dropped_rows_unknown_roster": 0
+    },
+    {
+      "model": "Team IRT 3D",
+      "summary_sha256": "0003f5cfbb939657fd6ce5d1244be5d4992fb3378a4b393f0fa248eb82cccaf3",
+      "parameters_sha256": "9fb6407bc277df39935ff35d54e9cd603a8ce2a8e8fe1ba31ddf6e9c3522f0cf",
+      "steps": 3000,
+      "finite_losses": true,
+      "final_loss": 68104.1455078125,
+      "last_100_loss_slope": -0.2541818809567416,
+      "dropped_rows_unknown_roster": 0
+    }
+  ],
+  "identical_fitted_parts": 3888,
+  "unknown_roster_drops": 0,
+  "declared_complete_bonuses": 1296,
+  "season_tournaments": 33,
+  "source_hashes_unchanged": true,
+  "training_stages_complete": 19,
+  "data_hashes_unchanged": true,
+  "stage1_parameters_and_final_losses_finite": true,
+  "markdown_tables_match_artifacts": true
+}

@@ -1,0 +1,104 @@
+
+[root tests]
++ /teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python -B -m pytest -q tests
+........................................................... [ 26%]
+............s....s..ss.................................................. [ 58%]
+........................................................................ [ 91%]
+....................                                                     [100%]
+219 passed, 4 skipped, 13 subtests passed in 59.81s
+
+[double-difficulty tests]
++ /teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python -B -m unittest discover -s hazard_double_difficulty/tests -t . -v
+test_both_curves_stay_strictly_decreasing (hazard_double_difficulty.tests.test_hazard_double_difficulty.BernsteinTests.test_both_curves_stay_strictly_decreasing) ... ok
+test_incorrect_weight_only_scales_incorrect_correctness_terms (hazard_double_difficulty.tests.test_hazard_double_difficulty.BernsteinTests.test_incorrect_weight_only_scales_incorrect_correctness_terms) ... ok
+test_learned_locations_add_two_global_curve_start_mus (hazard_double_difficulty.tests.test_hazard_double_difficulty.BernsteinTests.test_learned_locations_add_two_global_curve_start_mus) ... ok
+test_model_trace_carries_both_curve_families (hazard_double_difficulty.tests.test_hazard_double_difficulty.BernsteinTests.test_model_trace_carries_both_curve_families) ... ok
+test_player_neg_propensity_adds_hierarchical_scale_and_player_effects (hazard_double_difficulty.tests.test_hazard_double_difficulty.BernsteinTests.test_player_neg_propensity_adds_hierarchical_scale_and_player_effects) ... ok
+test_simplex_prior_applies_independently_to_both_relevance_vectors (hazard_double_difficulty.tests.test_hazard_double_difficulty.BernsteinTests.test_simplex_prior_applies_independently_to_both_relevance_vectors) ... ok
+test_buzz_replay_uses_hazard_but_correctness_uses_canonical_curve (hazard_double_difficulty.tests.test_hazard_double_difficulty.EvaluatorRoutingTests.test_buzz_replay_uses_hazard_but_correctness_uses_canonical_curve) ... ok
+test_curve_reader_selects_each_multidim_family_explicitly (hazard_double_difficulty.tests.test_hazard_double_difficulty.EvaluatorRoutingTests.test_curve_reader_selects_each_multidim_family_explicitly) ... ok
+test_grid_shapes_collapse_the_dimension_axis (hazard_double_difficulty.tests.test_hazard_double_difficulty.MultidimEquivalenceTests.test_grid_shapes_collapse_the_dimension_axis) ... ok
+test_matches_parent_when_both_curves_are_equal (hazard_double_difficulty.tests.test_hazard_double_difficulty.MultidimEquivalenceTests.test_matches_parent_when_both_curves_are_equal) ... ok
+test_model_trace_carries_both_curve_families (hazard_double_difficulty.tests.test_hazard_double_difficulty.MultidimEquivalenceTests.test_model_trace_carries_both_curve_families) ... ok
+test_simplex_terminal_sigmoid_trace_has_requested_sites (hazard_double_difficulty.tests.test_hazard_double_difficulty.MultidimEquivalenceTests.test_simplex_terminal_sigmoid_trace_has_requested_sites) ... ok
+test_survival_ignores_an_all_ones_t_start (hazard_double_difficulty.tests.test_hazard_double_difficulty.MultidimEquivalenceTests.test_survival_ignores_an_all_ones_t_start) ... ok
+test_terminal_intercept_changes_only_final_cell (hazard_double_difficulty.tests.test_hazard_double_difficulty.MultidimEquivalenceTests.test_terminal_intercept_changes_only_final_cell) ... ok
+test_bernstein_trainer_saves_both_curve_column_families (hazard_double_difficulty.tests.test_hazard_double_difficulty.TrainerSmokeTests.test_bernstein_trainer_saves_both_curve_column_families) ... Rows: 6  Players: 3  Tossups: 2
+z
+NO-BUZZ     3
+CENSORED    2
+BUZZ        1
+Step 1/1  ELBO loss: 111.2
+ok
+test_multidim_trainer_saves_both_curve_column_families (hazard_double_difficulty.tests.test_hazard_double_difficulty.TrainerSmokeTests.test_multidim_trainer_saves_both_curve_column_families) ... Rows: 6  Players: 3  Tossups: 2
+Rows: 6  Players: 3  Tossups: 2
+z
+NO-BUZZ     3
+CENSORED    2
+BUZZ        1
+Step 1/1  ELBO loss: 95.4
+ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 7.777s
+
+OK
+Rows: 6  Players: 3  Tossups: 2
+
+[correctness study tests]
++ /teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python -B -m pytest -q analysis/correctness
+.....                                                                    [100%]
+5 passed in 4.21s
+
+[Pyflakes: 145 files]
++ /teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python -B -m pyflakes analysis/compositional/compare_dot_multiplicative.py analysis/compositional/compare_phi_psi.py analysis/compositional/novel_roster_metrics.py compirt_eval/common/bonus_reports.py compirt_eval/scenario_b_bonuses/folds.py analysis/bonus_team_irt/__init__.py analysis/bonus_team_irt/model.py analysis/bonus_team_irt/report.py analysis/bonus_team_irt/run.py analysis/correctness/bayesian_mark_study/blend.py analysis/correctness/bayesian_mark_study/models.py analysis/correctness/bayesian_mark_study/run.py analysis/correctness/bayesian_mark_study/summarize.py analysis/correctness/bayesian_mark_study/test_models.py analysis/correctness/bayesian_mark_study/verify.py analysis/correctness/paper_readiness/audit_data.py analysis/correctness/paper_readiness/bootstrap_baselines.py analysis/correctness/paper_readiness/first_buzz_features.py analysis/correctness/paper_readiness/run_correctness_baselines.py analysis/correctness/tossup_accuracy_study/__init__.py analysis/correctness/tossup_accuracy_study/boosting.py analysis/correctness/tossup_accuracy_study/evaluate_timing.py analysis/correctness/tossup_accuracy_study/export.py analysis/correctness/tossup_accuracy_study/models.py analysis/correctness/tossup_accuracy_study/predict.py analysis/correctness/tossup_accuracy_study/predictor.py analysis/correctness/tossup_accuracy_study/report.py analysis/correctness/tossup_accuracy_study/report_timing.py analysis/correctness/tossup_accuracy_study/run.py analysis/correctness/tossup_accuracy_study/summarize.py analysis/correctness/tossup_accuracy_study/test_contracts.py analysis/season_2024_25_eda/analyze.py analysis/terminal_cell/analyze.py compirt_data.py compirt_eval/__init__.py compirt_eval/common/__init__.py compirt_eval/common/categories.py compirt_eval/common/figures.py compirt_eval/common/metrics.py compirt_eval/common/report_paths.py compirt_eval/common/reports.py compirt_eval/scenario_a_tossups/__init__.py compirt_eval/scenario_a_tossups/difficulty.py compirt_eval/scenario_a_tossups/distributions.py compirt_eval/scenario_a_tossups/evaluation.py compirt_eval/scenario_a_tossups/metrics.py compirt_eval/scenario_a_tossups/outcomes.py compirt_eval/scenario_a_tossups/parameters.py compirt_eval/scenario_a_tossups/position.py compirt_eval/scenario_a_tossups/reconstruction.py compirt_eval/scenario_a_tossups/reliability.py compirt_eval/scenario_a_tossups/survival.py compirt_eval/scenario_a_tossups/timing.py compirt_eval/scenario_b_bonuses/__init__.py compirt_eval/scenario_b_bonuses/distributions.py compirt_eval/scenario_b_bonuses/evaluation.py compirt_eval/scenario_b_bonuses/figures.py compirt_eval/scenario_b_bonuses/metrics.py compirt_eval/scenario_b_bonuses/outcomes.py compirt_eval/synergy_comparison/__init__.py compirt_eval/synergy_comparison/evaluation.py compirt_race.py compositional_model.py data_pipeline/__init__.py data_pipeline/build.py data_pipeline/dataset.py data_pipeline/identity.py data_pipeline/schema.py data_pipeline/text_cleaning.py data_pipeline/validate.py evaluate_compirt.py hazard_double_difficulty/__init__.py hazard_double_difficulty/bernstein/__init__.py hazard_double_difficulty/bernstein/pyramidal_model.py hazard_double_difficulty/bernstein/train_pyramidal.py hazard_double_difficulty/multidim/__init__.py hazard_double_difficulty/multidim/pyramidal_model.py hazard_double_difficulty/multidim/train_pyramidal.py hazard_double_difficulty/perceived_difficulty_bernstein/__init__.py hazard_double_difficulty/perceived_difficulty_bernstein/pyramidal_model.py hazard_double_difficulty/perceived_difficulty_bernstein/train_pyramidal.py hazard_double_difficulty/perceived_logit_bernstein/__init__.py hazard_double_difficulty/perceived_logit_bernstein/pyramidal_model.py hazard_double_difficulty/perceived_logit_bernstein/train_pyramidal.py hazard_double_difficulty/tests/__init__.py hazard_double_difficulty/tests/perception_contracts.py hazard_double_difficulty/tests/test_hazard_double_difficulty.py holdout/__init__.py holdout/aggregate_reports.py holdout/frozen_predict.py holdout/game_splits.py holdout/player_priors.py holdout/round_splits.py holdout/season_splits.py lineup.py multidimensional/__init__.py multidimensional/multidim_mirt/__init__.py multidimensional/multidim_mirt/pyramidal_model.py multidimensional/multidim_mirt/train_pyramidal.py pyramidal_model.py run_scripts/common/check_repo.py run_scripts/common/lib/gpu_queue.py run_scripts/common/run_compirt.py run_scripts/common/run_compirt_game_holdout.py run_scripts/common/run_compirt_holdout.py run_scripts/common/run_compositional_from_folds.py run_scripts/common/run_parallel_game_holdout.py run_scripts/common/run_synergy_comparison.py run_scripts/double_difficulty/__init__.py run_scripts/double_difficulty/evaluate_fold.py run_scripts/double_difficulty/perception_ablation_report.py run_scripts/double_difficulty/run_dd_bernstein_332.py run_scripts/double_difficulty/run_dd_bernstein_ablation.py run_scripts/double_difficulty/run_perceived_difficulty_bernstein_332.py run_scripts/double_difficulty/run_perceived_difficulty_sliced_alternating_bernstein_332.py run_scripts/double_difficulty/run_perceived_difficulty_sliced_bernstein_332.py run_scripts/double_difficulty/run_perceived_logit_bernstein_332.py run_scripts/double_difficulty/run_perception_dimension_ablation.py run_scripts/double_difficulty/run_perception_dimension_ablation_parallel.py tests/test_bonus_team_irt.py tests/test_compirt.py tests/test_compirt_eval_suite.py tests/test_compositional_from_folds.py tests/test_dd_bernstein_ablation.py tests/test_first_buzz_likelihood.py tests/test_game_holdout.py tests/test_holdout_aggregate_reports.py tests/test_holdout_priors.py tests/test_lineup.py tests/test_perceived_difficulty_bernstein.py tests/test_perceived_logit_bernstein.py tests/test_perception_dimension_ablation.py tests/test_posterior_artifacts.py tests/test_prediction.py tests/test_round_holdout.py tests/test_season_splits.py tests/test_tossup_outcomes.py train_compositional.py train_pyramidal.py utils/__init__.py utils/posterior.py utils/prediction.py utils/run_logging.py utils/saving.py utils/training.py
+
+[shell syntax: 0 files]
+
+[source/document working-tree whitespace]
++ git diff --check -- . ':(exclude)results/**'
+
+[generated dataset validation]
++ /teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python -B -m data_pipeline.validate
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/teapot-old/students/natnguyen/CompIRT-Implementation/data_pipeline/validate.py", line 421, in <module>
+    main()
+    ~~~~^^
+  File "/teapot-old/students/natnguyen/CompIRT-Implementation/data_pipeline/validate.py", line 412, in main
+    result = validate_dataset(
+        data_dir=args.data_dir.expanduser(),
+        db_path=args.db_path.expanduser(),
+        response_matrix_path=args.response_matrix.expanduser(),
+    )
+  File "/teapot-old/students/natnguyen/CompIRT-Implementation/data_pipeline/validate.py", line 374, in validate_dataset
+    raise ValueError(preview + extra)
+ValueError: tournaments: expected 68 source-derived rows, found 77
+teams: expected 1054 source-derived rows, found 1184
+players: expected 2661 source-derived rows, found 2868
+games: expected 5704 source-derived rows, found 6530
+tossups: expected 2686 source-derived rows, found 4089
+tossup_buzzes: expected 136586 source-derived rows, found 156526
+Traceback (most recent call last):
+  File "/teapot-old/students/natnguyen/CompIRT-Implementation/run_scripts/common/check_repo.py", line 141, in <module>
+    main()
+    ~~~~^^
+  File "/teapot-old/students/natnguyen/CompIRT-Implementation/run_scripts/common/check_repo.py", line 131, in main
+    _run(
+    ~~~~^
+        "generated dataset validation",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        [python, "-B", "-m", "data_pipeline.validate"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        environment,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/teapot-old/students/natnguyen/CompIRT-Implementation/run_scripts/common/check_repo.py", line 49, in _run
+    subprocess.run(command, cwd=REPO_ROOT, env=environment, check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/teapot-old/students/natnguyen/CompIRT-Implementation/.venv/bin/python', '-B', '-m', 'data_pipeline.validate']' returned non-zero exit status 1.

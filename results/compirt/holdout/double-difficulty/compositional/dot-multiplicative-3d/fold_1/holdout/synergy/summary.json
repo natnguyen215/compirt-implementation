@@ -1,0 +1,20 @@
+{
+  "frozen_predict": true,
+  "train_pyramidal": "/teapot-old/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-3000steps/fold_1/train/pyramidal",
+  "train_compositional": "/teapot-old/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/compositional/dot-multiplicative-3d/fold_1/train/synergy",
+  "split": "game-holdout:year_2024:test:5:1:42",
+  "tournament": "",
+  "use_synergy": true,
+  "synergy_form": "dot",
+  "synergy_link": "multiplicative",
+  "bonus_difficulty": "scalar",
+  "calibrate_correctness": false,
+  "skill_dimensions": 3,
+  "bonus_part_observations": 25260,
+  "bonus_parts": 3561,
+  "tau": 1.5346745252609253,
+  "dropped_responses": 0,
+  "missing_parts": [],
+  "dropped_rows_unknown_roster": 0,
+  "dropped_responses_unknown_roster": 0
+}

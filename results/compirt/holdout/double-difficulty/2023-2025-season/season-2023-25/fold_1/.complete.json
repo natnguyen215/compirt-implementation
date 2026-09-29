@@ -1,7 +1,7 @@
 {
   "fold": 1,
   "configuration": {
-    "root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/data-splits/season-2023-25",
+    "root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/2023-2025-season/season-2023-25",
     "base_split": "all",
     "folds": [
       0,
@@ -27,7 +27,7 @@
   "stages": [
     {
       "name": "train",
-      "expected_output": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/data-splits/season-2023-25/fold_1/train/pyramidal/summary.json",
+      "expected_output": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/2023-2025-season/season-2023-25/fold_1/train/pyramidal/summary.json",
       "command": [
         "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
         "-m",
@@ -54,12 +54,12 @@
         "--posterior-draws",
         "0",
         "--output-dir",
-        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/data-splits/season-2023-25/fold_1/train/pyramidal"
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/2023-2025-season/season-2023-25/fold_1/train/pyramidal"
       ]
     },
     {
       "name": "frozen-replay",
-      "expected_output": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/data-splits/season-2023-25/fold_1/holdout/pyramidal/summary.json",
+      "expected_output": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/2023-2025-season/season-2023-25/fold_1/holdout/pyramidal/summary.json",
       "command": [
         "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
         "-m",
@@ -68,26 +68,26 @@
         "--split",
         "game-holdout:all:test:5:1:42",
         "--train-pyramidal",
-        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/data-splits/season-2023-25/fold_1/train/pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/2023-2025-season/season-2023-25/fold_1/train/pyramidal",
         "--dimensions",
         "3",
         "--device",
         "cuda",
         "--output-dir",
-        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/data-splits/season-2023-25/fold_1/holdout/pyramidal"
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/2023-2025-season/season-2023-25/fold_1/holdout/pyramidal"
       ]
     },
     {
       "name": "evaluation",
-      "expected_output": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/data-splits/season-2023-25/fold_1/evaluation/csvs/tossup_metrics.csv",
+      "expected_output": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/2023-2025-season/season-2023-25/fold_1/evaluation/csvs/tossup_metrics.csv",
       "command": [
         "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
         "-m",
         "run_scripts.paper_model_selection.evaluate_fold",
         "--pyramidal-results",
-        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/data-splits/season-2023-25/fold_1/holdout/pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/2023-2025-season/season-2023-25/fold_1/holdout/pyramidal",
         "--output-dir",
-        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/data-splits/season-2023-25/fold_1/evaluation"
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/2023-2025-season/season-2023-25/fold_1/evaluation"
       ]
     }
   ]

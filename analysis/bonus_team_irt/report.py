@@ -122,15 +122,19 @@ def write_report(root, args):
         f"{args.steps:,} AutoNormal SVI steps, learning rate {args.lr}, fit seed {args.seed}; "
         f"{args.n_folds} {args.split} whole-game folds, split seed {args.split_seed}.", "",
         "Team parameters use tournament-specific team IDs. "
-        "P(correct) = sigmoid(theta_team dot alpha_part - beta_part), with independent "
-        "theta ~ Normal(0,1), alpha ~ Gamma(2,2) (shape/rate), beta ~ Normal(0,1). "
+        "1D: P(correct) = sigmoid(theta_team * alpha_part - beta_part), with alpha ~ Gamma(2,2) (shape/rate). "
+        "Multidimensional: P(correct) = sigmoid(sum_k r_part,k * (theta_team,k - beta_part,k)), with "
+        "r_part ~ Dirichlet(1) on the simplex. Priors are independent theta ~ Normal(0,1) and beta ~ Normal(0,1) "
+        "per dimension; only r dot beta is identified, not each beta_k. "
         "Both team and part parameters are learned only from training bonuses and frozen at posterior medians.", "",
         f"All arms score the same {int(summary.iloc[0].bonus_ppg_games):,} games and {int(summary.iloc[0].parts):,} parts. "
         f"{len(exclusions):,} whole games were excluded for missing training entity coverage or saved predictions. "
         "See excluded_games.csv and fold split manifests. Zero-bonus games remain in the game denominator.", "",
         "Saved DD and multidimensional compositional arms are reused without refitting. "
-        "Training summaries and prediction hashes are recorded in ../configuration.json; "
-        "their optimization budgets and player-skill sources differ from this bonus-only study.", "",
+        "Training provenance is recorded in ../configuration.json. "
+        + ("Current comparison inputs are recorded in evaluation_sources.json. "
+           if (output / "evaluation_sources.json").exists() else "") +
+        "Optimization budgets and player-skill sources differ between model families.", "",
         "## Overall", "",
         markdown_table(display, ["Model", "Part AUC", "Part log loss", "Part accuracy", "Brier", "ECE", "Exact accuracy", "PPB MAE"]), "",
         "## Difficulty, bonus-only team PPG and game margins", "",

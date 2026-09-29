@@ -237,18 +237,18 @@ The main five-fold means are:
 | Model | Accuracy | Neg F1 | Lift over all-correct | Joint event LL | Correctness LL | AUC | ECE | Position MAE | First-buzzer top-1 | No-buzz error | Predicted final-decile mass |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | [Single-difficulty Bernstein 5/5/2, legacy](results/compirt/holdout/double-difficulty/model-comparisons/double-vs-single-difficulty/single-curve-bernstein-baseline/seed_42/) | 65.71% | 38.91% | −10.99 pp | 6.7289 | 0.7286 | 0.6314 | 0.1918 | 0.1375 | **40.07%** | +4.78 pp | 13.92% |
-| [DD-Bernstein 3/3/2, no terminal](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained/) | 76.28% | 40.07% | −0.42 pp | 6.4959 | 0.5094 | 0.7114 | 0.0725 | 0.1389 | 38.08% | +4.53 pp | 12.92% |
-| [DD-Bernstein 3/3/2, terminal](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/) | 76.55% | 41.11% | −0.15 pp | 6.4375 | 0.5059 | 0.7166 | 0.0706 | 0.1364 | 37.99% | −0.49 pp | 18.94% |
-| [Simplex relevance, no terminal](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex/) | 77.16% | 36.84% | +0.46 pp | 6.7444 | 0.5025 | 0.7115 | 0.0673 | 0.1783 | 34.04% | +6.44 pp | 9.48% |
-| [Simplex relevance, terminal](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-terminal/) | 77.31% | 37.34% | +0.61 pp | 6.7216 | 0.5021 | 0.7140 | 0.0707 | 0.1667 | 33.67% | −0.19 pp | **17.52%** |
-| [Simplex relevance, locations + terminal](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/) | **77.95%** | 23.21% | **+1.25 pp** | 6.6123 | 0.4878 | 0.7155 | 0.0125 | 0.1519 | 35.16% | **+0.09 pp** | 18.82% |
-| [Simplex relevance 3/3/0.67, locations + terminal](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-330p67-simplex-locations-terminal/) | 77.94% | 23.88% | +1.24 pp | 6.6090 | **0.4873** | 0.7160 | **0.0110** | 0.1494 | 35.11% | +0.13 pp | 19.62% |
+| [DD-Bernstein 3/3/2, no terminal](results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-unconstrained/) | 76.28% | 40.07% | −0.42 pp | 6.4959 | 0.5094 | 0.7114 | 0.0725 | 0.1389 | 38.08% | +4.53 pp | 12.92% |
+| [DD-Bernstein 3/3/2, terminal](results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/) | 76.55% | 41.11% | −0.15 pp | 6.4375 | 0.5059 | 0.7166 | 0.0706 | 0.1364 | 37.99% | −0.49 pp | 18.94% |
+| [Simplex relevance, no terminal](results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex/) | 77.16% | 36.84% | +0.46 pp | 6.7444 | 0.5025 | 0.7115 | 0.0673 | 0.1783 | 34.04% | +6.44 pp | 9.48% |
+| [Simplex relevance, terminal](results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex-terminal/) | 77.31% | 37.34% | +0.61 pp | 6.7216 | 0.5021 | 0.7140 | 0.0707 | 0.1667 | 33.67% | −0.19 pp | **17.52%** |
+| [Simplex relevance, locations + terminal](results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/) | **77.95%** | 23.21% | **+1.25 pp** | 6.6123 | 0.4878 | 0.7155 | 0.0125 | 0.1519 | 35.16% | **+0.09 pp** | 18.82% |
+| [Simplex relevance 3/3/0.67, locations + terminal](results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-330p67-simplex-locations-terminal/) | 77.94% | 23.88% | +1.24 pp | 6.6090 | **0.4873** | 0.7160 | **0.0110** | 0.1494 | 35.11% | +0.13 pp | 19.62% |
 | [Simplex relevance, locations + terminal + player `a_i`](results/compirt/holdout/double-difficulty/variants/player-neg-propensity/) | **77.95%** | 23.92% | **+1.25 pp** | 6.5828 | 0.4878 | 0.7158 | 0.0128 | 0.1511 | 36.09% | **+0.07 pp** | 18.66% |
-| [Perceived difficulty, unconstrained `alpha`](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/unconstrained/) | 76.83% | 21.77% | +0.13 pp | 7.6178 | 0.5166 | 0.6605 | 0.0350 | 0.3277 | 35.10% | +20.81 pp | 3.23% |
-| [Perceived difficulty, `alpha > 0`](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/positive-alpha/) | 64.87% | 35.59% | −11.83 pp | 6.6373 | 0.6359 | 0.6017 | 0.2022 | 0.1363 | 39.18% | +3.43 pp | 13.85% |
-| [Perceived difficulty, three-slice `alpha,beta`](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/three-slice/) | 58.57% | 37.99% | −18.13 pp | 6.8075 | 0.7050 | 0.6009 | 0.2584 | 0.1383 | 37.50% | +3.76 pp | 13.67% |
-| [Perceived logit, unconstrained `alpha`](results/compirt/holdout/double-difficulty/variants/perceived-logit/unconstrained/) | 76.65% | 1.67% | −0.05 pp | 7.7776 | 0.6080 | 0.5486 | 0.1058 | 0.3418 | 35.15% | +22.28 pp | 2.86% |
-| [Perceived logit, `alpha > 0`](results/compirt/holdout/double-difficulty/variants/perceived-logit/positive-alpha/) | 37.59% | 39.21% | −39.11 pp | 6.7589 | 0.7875 | 0.6065 | 0.3458 | 0.1376 | 39.18% | +3.65 pp | 12.75% |
+| [Perceived difficulty, unconstrained `alpha`](results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/unconstrained/) | 76.83% | 21.77% | +0.13 pp | 7.6178 | 0.5166 | 0.6605 | 0.0350 | 0.3277 | 35.10% | +20.81 pp | 3.23% |
+| [Perceived difficulty, `alpha > 0`](results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/positive-alpha/) | 64.87% | 35.59% | −11.83 pp | 6.6373 | 0.6359 | 0.6017 | 0.2022 | 0.1363 | 39.18% | +3.43 pp | 13.85% |
+| [Perceived difficulty, three-slice `alpha,beta`](results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/three-slice/) | 58.57% | 37.99% | −18.13 pp | 6.8075 | 0.7050 | 0.6009 | 0.2584 | 0.1383 | 37.50% | +3.76 pp | 13.67% |
+| [Perceived logit, unconstrained `alpha`](results/compirt/holdout/double-difficulty/variants/perception/perceived-logit/unconstrained/) | 76.65% | 1.67% | −0.05 pp | 7.7776 | 0.6080 | 0.5486 | 0.1058 | 0.3418 | 35.15% | +22.28 pp | 2.86% |
+| [Perceived logit, `alpha > 0`](results/compirt/holdout/double-difficulty/variants/perception/perceived-logit/positive-alpha/) | 37.59% | 39.21% | −39.11 pp | 6.7589 | 0.7875 | 0.6065 | 0.3458 | 0.1376 | 39.18% | +3.65 pp | 12.75% |
 | [DD linear spline](results/compirt/holdout/double-difficulty/model-comparisons/curve-family/linear-spline/seed_42/) | 73.45% | **46.28%** | −3.25 pp | 6.4596 | 0.5651 | **0.7228** | 0.1185 | **0.1359** | 39.74% | +3.37 pp | 17.76% |
 | [Monotone DD linear spline](results/compirt/holdout/double-difficulty/model-comparisons/curve-family/monotone-linear-spline/) | 63.40% | 43.01% | −13.30 pp | 8.1446 | 0.8367 | 0.6571 | 0.2265 | 0.1510 | 32.47% | +18.22 pp | 16.39% |
 
@@ -275,7 +275,7 @@ questions with an observed buzz. Tossup-winner accuracy uses 2,265 decisive
 recorded games; margin error includes recorded ties. The direct event/game
 table uses **unweighted five-fold means**. The zero-predicted-margin baseline
 is **57.16 points MAE** on this coverage. The earlier expected-point/argmax
-tables are [superseded](results/compirt/holdout/common/token-threshold-replay/2026-09-13/superseded-probability-tables.md).
+tables are [superseded](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/superseded-probability-tables.md).
 
 #### Direct replay and tournament PPG prediction quality
 
@@ -288,21 +288,21 @@ removes that chance expectation.
 
 | Model | Replayed first player | Replayed first team | Tossup game winner | Margin MAE | PPG rank correlation (n) | PPG MAE | Top-10 overlap | Chance-adjusted overlap |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| [Single-difficulty Bernstein 5/5/2, legacy](results/compirt/holdout/common/token-threshold-replay/2026-09-13/single-difficulty-bernstein-5-5-2-legacy/) | 8.30% | 12.34% | 58.50% | 49.37 | 0.6707 (29) | 17.97 | 59.31% | 46.77% |
-| [DD-Bernstein 3/3/2, no terminal](results/compirt/holdout/common/token-threshold-replay/2026-09-13/dd-bernstein-3-3-2-no-terminal/) | 4.55% | 6.61% | 46.09% | 51.82 | 0.6265 (29) | 20.06 | 61.03% | 48.55% |
-| [DD-Bernstein 3/3/2, terminal](results/compirt/holdout/common/token-threshold-replay/2026-09-13/dd-bernstein-3-3-2-terminal/) | **23.89%** | **54.94%** | **69.27%** | **48.33** | **0.8305 (29)** | **6.43** | **75.17%** | **68.36%** |
-| [Simplex relevance, no terminal](results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-no-terminal/) | 0.80% | 1.37% | 19.12% | 55.63 | 0.4948 (26) | 22.05 | 50.00% | 32.99% |
-| [Simplex relevance, terminal](results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-terminal/) | 18.16% | 45.79% | 65.70% | 50.74 | 0.7868 (29) | 7.43 | 71.38% | 62.80% |
-| [Simplex relevance, locations + terminal](results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-locations-terminal/) | 18.37% | 47.53% | 64.73% | 49.62 | 0.7829 (29) | 7.72 | 69.31% | 60.63% |
-| [Simplex relevance 3/3/0.67, locations + terminal](results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-3-3-0-67-locations-terminal/) | 18.34% | 47.44% | 65.52% | 49.45 | 0.7799 (29) | 7.62 | 70.34% | 61.96% |
-| [Simplex relevance, locations + terminal + player `a_i`](results/compirt/holdout/common/token-threshold-replay/2026-09-13/simplex-relevance-locations-terminal-player-a-i/) | 18.93% | 47.93% | 66.05% | 49.37 | 0.7879 (29) | 7.62 | 72.41% | 64.83% |
-| [Perceived difficulty, unconstrained `alpha`](results/compirt/holdout/common/token-threshold-replay/2026-09-13/perceived-difficulty-unconstrained-alpha/) | 0.00% | 0.00% | 0.04% | 57.16 | -0.1621 (1) | 22.65 | 22.76% | -1.97% |
-| [Perceived difficulty, `alpha > 0`](results/compirt/holdout/common/token-threshold-replay/2026-09-13/perceived-difficulty-alpha-0/) | 4.16% | 8.20% | 49.99% | 52.95 | 0.5909 (29) | 19.54 | 52.41% | 38.28% |
-| [Perceived difficulty, three-slice `alpha,beta`](results/compirt/holdout/common/token-threshold-replay/2026-09-13/perceived-difficulty-three-slice-alpha-beta/) | 2.73% | 5.89% | 45.79% | 53.95 | 0.6416 (29) | 20.32 | 55.86% | 43.13% |
-| [Perceived logit, unconstrained `alpha`](results/compirt/holdout/common/token-threshold-replay/2026-09-13/perceived-logit-unconstrained-alpha/) | 0.00% | 0.00% | 0.00% | 57.16 | — (0) | 22.65 | 22.76% | -1.97% |
-| [Perceived logit, `alpha > 0`](results/compirt/holdout/common/token-threshold-replay/2026-09-13/perceived-logit-alpha-0/) | 3.65% | 6.83% | 42.97% | 54.31 | 0.3280 (29) | 20.15 | 36.21% | 15.82% |
-| [DD linear spline](results/compirt/holdout/common/token-threshold-replay/2026-09-13/dd-linear-spline/) | 8.14% | 11.41% | 58.59% | 49.44 | 0.6890 (29) | 18.65 | 65.17% | 54.75% |
-| [Monotone DD linear spline](results/compirt/holdout/common/token-threshold-replay/2026-09-13/monotone-dd-linear-spline/) | 3.25% | 4.73% | 32.71% | 54.22 | 0.3870 (29) | 21.40 | 44.48% | 24.45% |
+| [Single-difficulty Bernstein 5/5/2, legacy](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/single-difficulty-bernstein-5-5-2-legacy/) | 8.30% | 12.34% | 58.50% | 49.37 | 0.6707 (29) | 17.97 | 59.31% | 46.77% |
+| [DD-Bernstein 3/3/2, no terminal](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/dd-bernstein-3-3-2-no-terminal/) | 4.55% | 6.61% | 46.09% | 51.82 | 0.6265 (29) | 20.06 | 61.03% | 48.55% |
+| [DD-Bernstein 3/3/2, terminal](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/dd-bernstein-3-3-2-terminal/) | **23.89%** | **54.94%** | **69.27%** | **48.33** | **0.8305 (29)** | **6.43** | **75.17%** | **68.36%** |
+| [Simplex relevance, no terminal](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/simplex-relevance-no-terminal/) | 0.80% | 1.37% | 19.12% | 55.63 | 0.4948 (26) | 22.05 | 50.00% | 32.99% |
+| [Simplex relevance, terminal](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/simplex-relevance-terminal/) | 18.16% | 45.79% | 65.70% | 50.74 | 0.7868 (29) | 7.43 | 71.38% | 62.80% |
+| [Simplex relevance, locations + terminal](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/simplex-relevance-locations-terminal/) | 18.37% | 47.53% | 64.73% | 49.62 | 0.7829 (29) | 7.72 | 69.31% | 60.63% |
+| [Simplex relevance 3/3/0.67, locations + terminal](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/simplex-relevance-3-3-0-67-locations-terminal/) | 18.34% | 47.44% | 65.52% | 49.45 | 0.7799 (29) | 7.62 | 70.34% | 61.96% |
+| [Simplex relevance, locations + terminal + player `a_i`](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/simplex-relevance-locations-terminal-player-a-i/) | 18.93% | 47.93% | 66.05% | 49.37 | 0.7879 (29) | 7.62 | 72.41% | 64.83% |
+| [Perceived difficulty, unconstrained `alpha`](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/perceived-difficulty-unconstrained-alpha/) | 0.00% | 0.00% | 0.04% | 57.16 | -0.1621 (1) | 22.65 | 22.76% | -1.97% |
+| [Perceived difficulty, `alpha > 0`](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/perceived-difficulty-alpha-0/) | 4.16% | 8.20% | 49.99% | 52.95 | 0.5909 (29) | 19.54 | 52.41% | 38.28% |
+| [Perceived difficulty, three-slice `alpha,beta`](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/perceived-difficulty-three-slice-alpha-beta/) | 2.73% | 5.89% | 45.79% | 53.95 | 0.6416 (29) | 20.32 | 55.86% | 43.13% |
+| [Perceived logit, unconstrained `alpha`](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/perceived-logit-unconstrained-alpha/) | 0.00% | 0.00% | 0.00% | 57.16 | — (0) | 22.65 | 22.76% | -1.97% |
+| [Perceived logit, `alpha > 0`](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/perceived-logit-alpha-0/) | 3.65% | 6.83% | 42.97% | 54.31 | 0.3280 (29) | 20.15 | 36.21% | 15.82% |
+| [DD linear spline](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/dd-linear-spline/) | 8.14% | 11.41% | 58.59% | 49.44 | 0.6890 (29) | 18.65 | 65.17% | 54.75% |
+| [Monotone DD linear spline](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/monotone-dd-linear-spline/) | 3.25% | 4.73% | 32.71% | 54.22 | 0.3870 (29) | 21.40 | 44.48% | 24.45% |
 
 #### Replay behavior and round summaries
 
@@ -361,11 +361,11 @@ its 74.13 percentage points of ties.
 | DD linear spline | 68.07 | 67.80 | 14.04 | 13.90% |
 | Monotone DD linear spline | 76.88 | 77.43 | 5.04 | 50.32% |
 
-Artifacts: [run manifest and command](results/compirt/holdout/common/token-threshold-replay/2026-09-13/README.md),
-[fold rows](results/compirt/holdout/common/token-threshold-replay/2026-09-13/fold_metrics.csv),
-[model metrics](results/compirt/holdout/common/token-threshold-replay/2026-09-13/model_metrics.csv),
-[round/replay diagnostics](results/compirt/holdout/common/token-threshold-replay/2026-09-13/replay_diagnostics.csv), and
-[scored game IDs](results/compirt/holdout/common/token-threshold-replay/2026-09-13/game_coverage.csv).
+Artifacts: [run manifest and command](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/README.md),
+[fold rows](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/fold_metrics.csv),
+[model metrics](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/model_metrics.csv),
+[round/replay diagnostics](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/replay_diagnostics.csv), and
+[scored game IDs](results/compirt/holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/game_coverage.csv).
 
 Model names link directly to their artifacts. Plain DD-Bernstein uses Gamma
 relevance; simplex rows use Dirichlet(1). The no-terminal Gamma 3/3/2 fit also
@@ -615,14 +615,14 @@ concentration selection; the existing
 materially affects joint event LL.
 
 Artifacts are under
-[`dd-bernstein-330p67-simplex-locations-terminal`](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-330p67-simplex-locations-terminal/),
+[`dd-bernstein-330p67-simplex-locations-terminal`](results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-330p67-simplex-locations-terminal/),
 with pooled metrics in
-[`aggregate/pooled.csv`](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-330p67-simplex-locations-terminal/aggregate/pooled.csv).
+[`aggregate/pooled.csv`](results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-330p67-simplex-locations-terminal/aggregate/pooled.csv).
 
 ### Bernstein hyperparameter grid
 
 The
-[`dd-bernstein-ablation` summary](results/compirt/holdout/double-difficulty/ablations/hyperparameter-grid/aggregate/summary.md)
+[`dd-bernstein-ablation` summary](results/compirt/holdout/double-difficulty/ablations/capacity/degree-dimensions-drop-prior/aggregate/summary.md)
 covers 100 no-terminal configurations: degree 3–6, one to five dimensions, and
 Dirichlet drop concentration 0.67–2.0.
 
@@ -719,11 +719,11 @@ not generalize better. All five fits have
 finite losses; their final-100-step slopes average −3.34, so the optimization
 is still descending slightly at 3,000 steps, as in several other arms.
 
-Artifacts: [unconstrained](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/unconstrained/configuration.json),
-[positive `alpha`](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/positive-alpha/configuration.json), and
-[three-slice `alpha,beta`](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/three-slice/configuration.json).
+Artifacts: [unconstrained](results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/unconstrained/configuration.json),
+[positive `alpha`](results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/positive-alpha/configuration.json), and
+[three-slice `alpha,beta`](results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/three-slice/configuration.json).
 Three-slice fold and pooled summaries are under
-[`aggregate/`](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/three-slice/aggregate/).
+[`aggregate/`](results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/three-slice/aggregate/).
 
 #### Alternating-optimization follow-up
 
@@ -755,9 +755,9 @@ alternating updates. Position MAE and integrated Brier are nearly equal. The
 matched-budget comparison attributes the gains to training duration, not the
 alternating schedule.
 
-Artifacts: [alternating 3k](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/three-slice-alternating/configuration.json),
-[alternating 10k](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/three-slice-alternating-10000-steps/configuration.json),
-and [standard 10k](results/compirt/holdout/double-difficulty/variants/perceived-difficulty/three-slice-10000-steps/configuration.json).
+Artifacts: [alternating 3k](results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/three-slice-alternating/configuration.json),
+[alternating 10k](results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/three-slice-alternating-10000-steps/configuration.json),
+and [standard 10k](results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/three-slice-10000-steps/configuration.json).
 
 ### Perceived logit Bernstein
 
@@ -788,15 +788,15 @@ and accuracy worsen in all five. Mean fitted `alpha` is 5.32 and mean `beta` is
 objective then reshapes shared `z^C` at the expense of correctness. This fitted
 scalar coupling underperforms the reference model.
 
-Artifacts: [unconstrained](results/compirt/holdout/double-difficulty/variants/perceived-logit/unconstrained/configuration.json),
-[positive `alpha`](results/compirt/holdout/double-difficulty/variants/perceived-logit/positive-alpha/configuration.json).
+Artifacts: [unconstrained](results/compirt/holdout/double-difficulty/variants/perception/perceived-logit/unconstrained/configuration.json),
+[positive `alpha`](results/compirt/holdout/double-difficulty/variants/perception/perceived-logit/positive-alpha/configuration.json).
 
 #### Unconstrained dimension and optimization-budget ablation
 
-The [dimension/budget comparison](results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained-10000-steps/aggregate/comparison.md)
-links the complete [3,000-step grid](results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained/aggregate/summary.md)
-and the 10,000-step [logit](results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained-10000-steps/perceived-logit-grid/aggregate/summary.md)
-and [three-slice difficulty](results/compirt/holdout/double-difficulty/ablations/perception-dimensions-unconstrained-10000-steps/three-slice-grid/aggregate/summary.md)
+The [dimension/budget comparison](results/compirt/holdout/double-difficulty/variants/perception/dimension-sweeps/normal-alpha-10000steps/aggregate/comparison.md)
+links the complete [3,000-step grid](results/compirt/holdout/double-difficulty/variants/perception/dimension-sweeps/normal-alpha-3000steps/aggregate/summary.md)
+and the 10,000-step [logit](results/compirt/holdout/double-difficulty/variants/perception/dimension-sweeps/normal-alpha-10000steps/perceived-logit-grid/aggregate/summary.md)
+and [three-slice difficulty](results/compirt/holdout/double-difficulty/variants/perception/dimension-sweeps/normal-alpha-10000steps/three-slice-grid/aggregate/summary.md)
 follow-ups. These sweeps use unconstrained alpha: `Normal(1,1)` for scalar logit and independent
 `Normal(0,1)` for each player/slice/dimension in three-slice difficulty.
 Both use beta `Normal(0,1)`, degree 3, relevance/drop concentration 2, learning
@@ -951,10 +951,10 @@ average precision, and the models are similar after threshold correction. For
 calibrated probabilities or maximum accuracy, retain the ordinary likelihood
 and tune the deployment threshold.
 
-Artifacts: [1× baseline](results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/configuration.json),
-[1.5× incorrect loss](results/compirt/holdout/double-difficulty/ablations/incorrect-loss-weight/weight-1.5/configuration.json),
-[2× incorrect loss](results/compirt/holdout/double-difficulty/ablations/incorrect-loss-weight/weight-2/configuration.json),
-and [3× incorrect loss](results/compirt/holdout/double-difficulty/ablations/incorrect-loss-weight/weight-3/configuration.json).
+Artifacts: [1× baseline](results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/configuration.json),
+[1.5× incorrect loss](results/compirt/holdout/double-difficulty/ablations/training/incorrect-loss-weight/weight-1.5/configuration.json),
+[2× incorrect loss](results/compirt/holdout/double-difficulty/ablations/training/incorrect-loss-weight/weight-2/configuration.json),
+and [3× incorrect loss](results/compirt/holdout/double-difficulty/ablations/training/incorrect-loss-weight/weight-3/configuration.json).
 
 ### Tossup ownership, game outcomes, and player leaderboards
 
