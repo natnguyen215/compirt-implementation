@@ -1,0 +1,7 @@
+pair_type,pairs,similarity
+same bonus,3888,0.19397759322166608
+"same packet, other bonus, same category",12249,0.20750965638093363
+"same packet, other category",98226,0.010628197550912575
+"other set, same subcategory",243144,0.1024211756836327
+"other set, same category",862182,0.10874056173508044
+"other set, other category",4770945,-0.030595104028381843

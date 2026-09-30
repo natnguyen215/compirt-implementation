@@ -22,7 +22,7 @@ TRAIN_MODULE = (
 EVALUATE_MODULE = shared.EVALUATE_MODULE
 DEFAULT_ROOT = Path(
     "results/compirt/holdout/double-difficulty/"
-    "variants/perceived-logit/positive-alpha"
+    "variants/perception/perceived-logit/positive-alpha"
 )
 Configuration = shared.Configuration
 snapshot_configuration = shared.snapshot_configuration

@@ -48,7 +48,7 @@ PYTHON = str(REPO_ROOT / ".venv" / "bin" / "python")
 FOLD_COUNT = 5
 DEFAULT_ROOT = Path(
     "results/compirt/holdout/double-difficulty/"
-    "ablations/perception-dimensions-unconstrained"
+    "variants/perception/dimension-sweeps/normal-alpha-3000steps"
 )
 DEFAULT_DIMENSIONS = tuple(range(1, 11))
 DEFAULT_MODELS = ("perceived-logit", "perceived-difficulty-three-slice")

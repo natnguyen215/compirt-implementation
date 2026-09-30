@@ -1,0 +1,255 @@
+# Multidimensional-difficulty bonus model: results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy
+parts 3888, responses 147126
+
+## Model terms: logit = sum(r) * (s - loc) + synergy, with s = sum_k w_k ts_k
+
+tau 0.557; synergy contribution per attempt: mean -0.241, median -0.136, negative 61%
+reconstruction check: max |sum_k r_k ts_k - saved aggregate| = 1.1e-06; max |sigmoid(logit) - saved prediction| = 2.3e-07
+
+## What d says on its own: per-axis d_k is not identified
+
+mean posterior SD of d_k by axis (prior SD 1): [0.57, 0.56, 0.57]
+share of |d|^2 along r: median 0.975 (a random direction gives 1/3)
+correlation of d_k with r.d * r_k / |r|^2: [0.987, 0.993, 0.989]
+Spearman of d_k with loc: [0.97, 0.98, 0.97]
+
+## Location vs team skill (loc and s share the pooled team-skill scale)
+
+        loc_median  loc_sd  rsum_median  s_median   s_sd  team_above_loc  synergy_mean  predicted  observed
+label
+easy        -1.148   0.424        3.006    -0.073  0.555           0.969        -0.241      0.905     0.921
+medium      -0.060   0.461        2.014    -0.089  0.561           0.543        -0.241      0.490     0.498
+hard         0.816   0.423        2.386    -0.098  0.532           0.107        -0.241      0.172     0.158
+
+median loc by question set and label, with the median team skill s of the teams that heard the set:
+                easy  medium  hard  team_s_median
+tier
+Fall 2024      -1.40   -0.35  0.45          -0.28
+Winter 2024    -1.32   -0.10  0.75          -0.09
+Regionals 2025 -1.13    0.04  0.91          -0.00
+Nationals 2025 -0.95    0.08  1.01           0.35
+
+## Team pooled skill axes vs subject-specific conversion (teams with >= 60 parts)
+
+teams: 481
+conversion minus overall   ts1   ts2   ts3
+                 Science  0.39 -0.01 -0.28
+              Literature  0.18 -0.22  0.30
+                 History -0.34  0.19  0.14
+               Fine Arts -0.06 -0.12 -0.11
+
+SD of LSE-pooled team skill per axis over observations: [0.956, 0.52, 0.734]
+
+## Variance explained by metadata (eta^2, permutation-null mean in parentheses)
+
+feature              label           category        subcategory                set           bonus_id
+     w1 0.019 (null 0.000) 0.134 (null 0.003) 0.151 (null 0.007) 0.035 (null 0.001) 0.496 (null 0.333)
+     w2 0.046 (null 0.000) 0.059 (null 0.002) 0.070 (null 0.007) 0.018 (null 0.001) 0.403 (null 0.333)
+     w3 0.005 (null 0.000) 0.103 (null 0.003) 0.119 (null 0.007) 0.026 (null 0.001) 0.466 (null 0.331)
+   rsum 0.268 (null 0.001) 0.012 (null 0.003) 0.017 (null 0.007) 0.002 (null 0.001) 0.262 (null 0.333)
+     rd 0.722 (null 0.001) 0.007 (null 0.003) 0.010 (null 0.007) 0.035 (null 0.001) 0.120 (null 0.334)
+
+Means by declared difficulty:
+           w1     w2     w3   rsum     rd   conv
+label
+easy    0.347  0.316  0.337  2.959 -3.419  0.929
+hard    0.307  0.374  0.319  2.415  1.970  0.153
+medium  0.351  0.309  0.340  2.092 -0.200  0.510
+
+Means by subcategory (>= 30 parts), sorted by w1 - w3:
+                                     w1     w2     w3   rsum   conv    n  w1_minus_w3
+subcategory
+History/American                  0.267  0.351  0.382  2.479  0.533  195       -0.115
+History/World                     0.270  0.354  0.376  2.600  0.570  192       -0.107
+Literature/World/Other            0.332  0.242  0.426  2.555  0.535   42       -0.093
+History/European                  0.275  0.368  0.357  2.575  0.553  195       -0.083
+History/                          0.273  0.379  0.348  2.581  0.513   60       -0.075
+Literature/American               0.324  0.280  0.396  2.502  0.518  195       -0.072
+Literature/British                0.318  0.292  0.390  2.465  0.519  192       -0.072
+Geography/CE/                     0.274  0.396  0.330  2.488  0.586  150       -0.056
+History/Other                     0.278  0.389  0.334  2.564  0.538  135       -0.056
+Fine Arts/Visual                  0.319  0.314  0.367  2.190  0.509   45       -0.048
+Fine Arts/Painting and Sculpture  0.318  0.333  0.349  2.336  0.479   48       -0.032
+Religion/                         0.304  0.360  0.336  2.466  0.504  189       -0.031
+Other Academic/                   0.309  0.353  0.339  2.470  0.594   54       -0.030
+Literature/European               0.342  0.287  0.372  2.548  0.544  195       -0.030
+Fine Arts/Other                   0.315  0.350  0.336  2.408  0.503  195       -0.021
+Philosophy/                       0.330  0.321  0.349  2.470  0.519  186       -0.019
+Literature/World                  0.344  0.295  0.361  2.461  0.536  150       -0.016
+Mythology/                        0.314  0.359  0.327  2.481  0.587  165       -0.013
+Popular Culture/                  0.318  0.370  0.312  2.162  0.595   42        0.005
+Social Science/                   0.317  0.374  0.308  2.534  0.501  183        0.009
+Fine Arts/                        0.363  0.341  0.296  2.307  0.544  102        0.066
+Fine Arts/Classical Music         0.380  0.329  0.291  2.350  0.494  195        0.089
+Science/Biology                   0.387  0.342  0.272  2.500  0.508  195        0.115
+Science/Other                     0.410  0.323  0.267  2.423  0.524  195        0.143
+Science/Physics                   0.443  0.294  0.263  2.610  0.528  195        0.179
+Science/Chemistry                 0.464  0.284  0.252  2.617  0.517  195        0.211
+
+Spearman(r.d, observed conversion): -0.953
+Spearman(r.d, loc): 0.992
+mean 95% posterior interval width of r_k: 1.84
+
+## Direction similarity by pair type (normalized cross-product of centered clr log r)
+
+same bonus                                 pairs=    3,888  similarity=+0.194
+same packet, other bonus, same category    pairs=   12,249  similarity=+0.208
+same packet, other category                pairs=   98,226  similarity=+0.011
+other set, same subcategory                pairs=  243,144  similarity=+0.102
+other set, same category                   pairs=  862,182  similarity=+0.109
+other set, other category                  pairs=4,770,945  similarity=-0.031
+
+## Parameter-space clustering
+
+r.d (1D) GMM BIC by k: {1: 11050, 2: 10810, 3: 10740, 4: 10748, 5: 10753, 6: 10719, 7: 10728, 8: 10752}
+  k=3: silhouette 0.565 (single-Gaussian null 0.526); posterior-draw agreement 0.84, parts kept in >=80% of draws 67%; ARI vs 3D-synergy fit 0.96; NMI label 0.481, category 0.002
+  k=4: silhouette 0.532 (single-Gaussian null 0.531); posterior-draw agreement 0.76, parts kept in >=80% of draws 48%; ARI vs 3D-synergy fit 0.57; NMI label 0.465, category 0.003
+direction (2D) GMM BIC by k: {1: 22097, 2: 21635, 3: 21598, 4: 21518, 5: 21533, 6: 21574, 7: 21593, 8: 21599}
+  k=3: silhouette 0.398 (single-Gaussian null 0.334); posterior-draw agreement 0.68, parts kept in >=80% of draws 32%; ARI vs 3D-synergy fit 0.95; NMI label 0.020, category 0.040
+  k=4: silhouette 0.374 (single-Gaussian null 0.312); posterior-draw agreement 0.58, parts kept in >=80% of draws 21%; ARI vs 3D-synergy fit 0.95; NMI label 0.020, category 0.043
+joint (4D) GMM BIC by k: {1: 43706, 2: 40554, 3: 39612, 4: 39242, 5: 38796, 6: 38611, 7: 38356, 8: 38349}
+  k=3: silhouette 0.230 (single-Gaussian null 0.183); posterior-draw agreement 0.75, parts kept in >=80% of draws 48%; ARI vs 3D-synergy fit 0.42; NMI label 0.269, category 0.028
+  k=4: silhouette 0.249 (single-Gaussian null 0.176); posterior-draw agreement 0.68, parts kept in >=80% of draws 35%; ARI vs 3D-synergy fit 0.91; NMI label 0.247, category 0.035
+
+r.d_k3 profiles:
+          w1    w2    w3  rsum    rd   loc  conv  easy  hard  medium  size
+r.d_k3
+0       0.35  0.31  0.34  2.06 -0.30 -0.12  0.54  0.18  0.19    0.63  1771
+1       0.31  0.38  0.32  2.57  2.42  0.92  0.10  0.00  0.88    0.12  1076
+2       0.34  0.32  0.34  3.14 -4.05 -1.28  0.96  0.94  0.00    0.06  1041
+category lift (share of the category in the cluster / cluster share):
+category  Fine Arts  Geography/CE  History  Literature  Mythology  Other Academic  Philosophy  Popular Culture  Religion  Science  Social Science
+r.d_k3
+0              1.01          0.98     1.01        0.99       1.08            0.94        1.06             1.10      0.88     1.00            0.96
+1              1.11          0.94     0.88        1.03       0.66            1.07        0.95             0.69      1.13     1.07            1.07
+2              0.87          1.10     1.10        0.99       1.22            1.04        0.94             1.16      1.07     0.92            1.00
+
+direction_k4 profiles:
+                w1    w2    w3  rsum    rd   loc  conv  easy  hard  medium  size
+direction_k4
+0             0.37  0.29  0.35  2.40 -0.65 -0.18  0.59  0.35  0.27    0.38  1189
+1             0.23  0.25  0.52  2.54 -1.03 -0.30  0.58  0.38  0.26    0.35   873
+2             0.57  0.24  0.20  2.47 -0.88 -0.28  0.56  0.36  0.27    0.37   734
+3             0.23  0.52  0.25  2.55  0.16  0.12  0.41  0.26  0.50    0.24  1092
+category lift (share of the category in the cluster / cluster share):
+category      Fine Arts  Geography/CE  History  Literature  Mythology  Other Academic  Philosophy  Popular Culture  Religion  Science  Social Science
+direction_k4
+0                  1.08          1.07     0.88        1.07       1.21            1.45        1.13             0.54      1.02     0.93            0.84
+1                  0.76          0.77     1.39        1.52       0.92            0.66        1.13             1.06      1.04     0.37            0.78
+2                  1.11          0.35     0.33        0.78       0.58            0.59        0.74             1.01      0.62     2.24            0.78
+3                  1.03          1.54     1.26        0.66       1.12            1.05        0.94             1.44      1.21     0.75            1.50
+
+joint_k4 profiles:
+            w1    w2    w3  rsum    rd   loc  conv  easy  hard  medium  size
+joint_k4
+0         0.52  0.24  0.24  2.38 -0.31 -0.12  0.54  0.30  0.28    0.43   981
+1         0.30  0.33  0.37  3.27 -4.10 -1.24  0.96  0.92  0.01    0.07   879
+2         0.28  0.29  0.43  1.96  0.28  0.12  0.42  0.11  0.36    0.53  1217
+3         0.24  0.51  0.25  2.57  1.76  0.63  0.21  0.08  0.71    0.21   811
+category lift (share of the category in the cluster / cluster share):
+category  Fine Arts  Geography/CE  History  Literature  Mythology  Other Academic  Philosophy  Popular Culture  Religion  Science  Social Science
+joint_k4
+0              1.06          0.58     0.38        0.90       0.84            0.51        0.98             0.57      0.78     1.95            0.78
+1              0.85          1.21     1.25        1.00       1.18            1.15        0.93             0.95      1.01     0.79            1.02
+2              1.05          0.87     1.15        1.34       1.06            1.12        1.15             1.52      0.96     0.48            0.79
+3              1.01          1.47     1.26        0.62       0.90            1.24        0.88             0.80      1.32     0.85            1.57
+
+## Bonus-level profiles: r.d of the easy, medium, and hard parts
+
+GMM BIC by k: {1: 10964, 2: 10851, 3: 10870, 4: 10881, 5: 10848, 6: 10906}
+within-bonus correlation of part difficulties:
+label   easy  medium  hard
+label
+easy    1.00    0.16  0.07
+medium  0.16    1.00  0.27
+hard    0.07    0.27  1.00
+strictly easy < medium < hard: 0.906
+
+hardest declared-easy parts:
+                                   bonus_part_id  category         answer   rd  conv  n
+ 2025-acf-nationals::04192025::p143::b15::part-1   History         quilts 0.92  0.29 24
+ 2025-acf-nationals::04192025::p145::b18::part-1  Religion       Hanukkah 0.69  0.33  3
+  2025-acf-nationals::04192025::p126::b7::part-3   Science carbon dioxide 0.32  0.64 22
+  2025-acf-nationals::04192025::p128::b8::part-1   Science       carbenes 0.23  0.50 20
+  2025-acf-nationals::04192025::p140::b1::part-1 Fine Arts        mirrors 0.09  0.46 24
+2025-acf-regionals::2025-02-01::p111::b3::part-2   Science         kernel 0.01  0.39 57
+easiest declared-hard parts:
+                        bonus_part_id  category              answer    rd  conv  n
+2024-acf-fall::fall::p41::b17::part-2   History        Golden Horde -2.42  0.84 58
+2024-acf-fall::fall::p39::b16::part-1   History Taíno (“tah-EE-no”) -1.74  0.75 56
+ 2024-acf-fall::fall::p45::b3::part-3   History              Panama -1.58  0.81 16
+ 2024-acf-fall::fall::p45::b5::part-2  Religion               names -1.39  0.88 16
+ 2024-acf-fall::fall::p44::b8::part-3   History             Aramaic -1.35  0.67 54
+ 2024-acf-fall::fall::p42::b8::part-1 Mythology         being white -0.93  0.67 64
+
+## Text-topic clustering (TF-IDF + 100-component LSA of lead-in, part text, and answer)
+
+clr1: 26 topics eta2 0.115 (null 0.006); after subcategory means 0.011 (null 0.006)
+clr3: 26 topics eta2 0.097 (null 0.006); after subcategory means 0.008 (null 0.006)
+rd: 26 topics eta2 0.014 (null 0.006); after subcategory means 0.007 (null 0.007)
+held-out R2 (bonus-grouped 5-fold) for clr1: {'text': 0.13, 'subcategory': 0.136, 'both': 0.14}
+held-out R2 (bonus-grouped 5-fold) for clr3: {'text': 0.099, 'subcategory': 0.109, 'both': 0.111}
+held-out R2 (bonus-grouped 5-fold) for rd: {'text': 0.003, 'subcategory': 0.003, 'both': 0.003}
+         w1    w2    w3    n  hard top_category                                                 terms
+topic
+16     0.27  0.35  0.38  281  0.31      History                  war, battle, party, film, led, event
+22     0.28  0.36  0.36  151  0.35      History        empire, dynasty, ruler, king, emperor, kingdom
+17     0.28  0.36  0.36  141  0.28      History       country, republic, modern, day, leader, kingdom
+3      0.28  0.37  0.35  144  0.34      History            city, capital, mosque, river, ruler, named
+15     0.30  0.37  0.33  126  0.30      History            people, prompt, like, named, used, culture
+14     0.30  0.36  0.33   63  0.33    Fine Arts                   new, york, city, museum, genre, art
+23     0.30  0.36  0.34   87  0.33   Literature      language, script, arabic, used, latin, languages
+0      0.31  0.37  0.33  432  0.35    Fine Arts             prompt, called, named, period, word, used
+4      0.31  0.35  0.34  172  0.40   Philosophy           book, concept, theory, thinker, essay, term
+12     0.31  0.30  0.38  100  0.36   Literature    story, author, short, collection, wrote, character
+5      0.32  0.28  0.40  164  0.34   Literature        novel, author, wrote, protagonist, novels, man
+21     0.33  0.33  0.34   91  0.30   Philosophy  philosopher, philosophy, book, theory, essay, debate
+11     0.33  0.29  0.38  106  0.35   Literature    character, novel, title, author, opera, profession
+24     0.33  0.34  0.33  244  0.33      History     following, answer, prompt, named, english, reject
+25     0.34  0.35  0.31   74  0.30     Religion           objects, named, art, people, prompt, called
+18     0.34  0.29  0.37  166  0.34   Literature             poem, poet, author, wrote, speaker, poems
+6      0.34  0.35  0.31  160  0.31    Mythology         god, figure, animals, deity, depicted, action
+9      0.35  0.26  0.39  120  0.33   Literature       play, author, character, plays, playwright, man
+13     0.36  0.32  0.32  123  0.36    Fine Arts       artist, painting, depicts, painter, art, series
+2      0.36  0.33  0.30   86  0.28      Science             type, prompt, element, named, used, using
+10     0.38  0.34  0.29  153  0.36      Science          phenomenon, model, effect, et, al, organisms
+1      0.39  0.32  0.29  154  0.35    Fine Arts     composer, piece, piano, movement, music, symphony
+7      0.40  0.31  0.29   88  0.36      Science            process, occurs, prompt, form, time, forms
+19     0.42  0.32  0.26  243  0.33      Science  used, compound, acid, molecule, molecules, technique
+8      0.45  0.29  0.26  117  0.29      Science     quantity, value, equals, energy, prompt, constant
+20     0.45  0.28  0.27  102  0.31      Science     property, theorem, named, quantum, number, states
+
+## Residual structure (observed - predicted), split-half by bonus
+
+team overall residual, split-half r = 0.467 (491 teams)
+team category-specific deviation, split-half r: {'Fine Arts': '+0.36 (n=426)', 'Geography/CE': '+0.46 (n=56)', 'History': '+0.43 (n=468)', 'Literature': '+0.45 (n=469)', 'Mythology': '+0.35 (n=81)', 'Philosophy': '+0.47 (n=73)', 'Religion': '+0.06 (n=127)', 'Science': '+0.38 (n=471)', 'Social Science': '+0.34 (n=100)'}
+team label-specific deviation, split-half r: {'easy': '+0.34 (n=480)', 'hard': '+0.39 (n=480)', 'medium': '+0.26 (n=480)'}
+Spearman(team conversion, mean residual by label): {'easy': -0.04, 'medium': 0.48, 'hard': -0.15}
+                   predicted  observed      n
+label  bin
+easy   (0.0, 0.1]      0.063     0.094     53
+       (0.1, 0.3]      0.224     0.256    426
+       (0.3, 0.5]      0.415     0.449   1344
+       (0.5, 0.7]      0.615     0.631   2813
+       (0.7, 0.9]      0.824     0.860   8671
+       (0.9, 1.0]      0.975     0.986  35735
+hard   (0.0, 0.1]      0.039     0.026  23632
+       (0.1, 0.3]      0.182     0.153  15632
+       (0.3, 0.5]      0.386     0.382   6251
+       (0.5, 0.7]      0.584     0.606   2624
+       (0.7, 0.9]      0.775     0.839    821
+       (0.9, 1.0]      0.939     0.988     82
+medium (0.0, 0.1]      0.056     0.042   2951
+       (0.1, 0.3]      0.206     0.179  10507
+       (0.3, 0.5]      0.400     0.381  12397
+       (0.5, 0.7]      0.597     0.637  11166
+       (0.7, 0.9]      0.795     0.845   8742
+       (0.9, 1.0]      0.948     0.973   3279
+
+## Replication in the five-fold calendar-2024 fits (each fold has its own player skills)
+
+fold 0: category eta2 [0.037, 0.018, 0.041]; subcategory profile Spearman with season (same axis) [0.79, 0.71, 0.88]; w2 easy/medium/hard [0.332, 0.32, 0.359]; rsum [2.81, 2.11, 2.46]
+fold 1: category eta2 [0.039, 0.031, 0.035]; subcategory profile Spearman with season (same axis) [0.75, 0.71, 0.86]; w2 easy/medium/hard [0.338, 0.317, 0.348]; rsum [2.81, 2.12, 2.48]
+fold 2: category eta2 [0.041, 0.013, 0.032]; subcategory profile Spearman with season (same axis) [0.79, 0.74, 0.83]; w2 easy/medium/hard [0.337, 0.321, 0.354]; rsum [2.83, 2.11, 2.47]
+fold 3: category eta2 [0.076, 0.029, 0.047]; subcategory profile Spearman with season (same axis) [0.72, 0.44, 0.83]; w2 easy/medium/hard [0.336, 0.321, 0.353]; rsum [2.79, 2.09, 2.47]
+fold 4: category eta2 [0.043, 0.014, 0.045]; subcategory profile Spearman with season (same axis) [0.86, 0.68, 0.78]; w2 easy/medium/hard [0.339, 0.328, 0.353]; rsum [2.84, 2.13, 2.44]

@@ -20,8 +20,15 @@ compirt_eval/
 ```
 
 The `scenario_*` names follow the paper: Scenario A means tossups and Scenario B
-means bonuses. Completed evaluation studies keep their code beside their
-results; see [`../results/README.md`](../results/README.md).
+means bonuses. Saved compositional study analyses live in
+[`analysis/compositional/`](../analysis/README.md#saved-compositional-analyses).
+Historical code snapshots elsewhere are listed in
+[`../results/README.md`](../results/README.md).
+
+For bonuses, `scenario_b_bonuses/evaluation.py` owns single-fold scoring and
+figures, `scenario_b_bonuses/folds.py` owns frozen-fold audits and pooling,
+and `common/bonus_reports.py` renders reports from saved
+metrics. The fold runner runs training and replay, then calls these functions.
 
 ## Quick start
 
@@ -33,6 +40,12 @@ results; see [`../results/README.md`](../results/README.md).
   --output-dir results/compirt/in_sample/<run>/synergy-evaluation
 
 # --split/--tournament select the recorded ground-truth tables.
+
+# Evaluate only saved bonus predictions (omit --pyramidal-results):
+.venv/bin/python evaluate_compirt.py \
+  --compositional-results <run>/fold_0/holdout/synergy \
+  --output-dir <run>/fold_0/synergy-evaluation \
+  --split game-holdout:year_2024:test:5:0:42
 
 # Compare the no-synergy and synergy bonus branches of one run:
 .venv/bin/python run_scripts/common/run_synergy_comparison.py \
@@ -72,6 +85,14 @@ train_pyramidal.py          train_compositional.py [--use-synergy]
 
 Training writes no evaluation artifacts; everything under the evaluation
 directory comes from replaying the saved files above.
+
+`evaluate_bonuses` always writes `csvs/bonus_metrics.csv` and returns the same
+metric dictionary; `write_report=True` also writes `experiment_report.md`.
+The standard CLI and frozen-fold evaluator share that entry point.
+For a complete fold run, `aggregate/pooled.csv` is computed
+from pooled predictions; `per_fold.csv` and `fold_mean_std.csv` describe fold
+variation separately. The pooled report links training, predictions, evaluations,
+and audits. The fold runner's `--report-only` rewrites the Markdown from saved metrics.
 
 Bonus evaluation joins declared easy/medium/hard part difficulty from the
 linked tables and reports separate accuracies and counts. With those tables,

@@ -1,4 +1,0 @@
-#!/bin/bash
-set -euo pipefail
-cd /teapot/students/natnguyen/CompIRT-Implementation
-exec /teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python -B -u -c 'import hashlib,json,sys; from pathlib import Path; from run_scripts.common.lib.gpu_queue import Task,run_queue; m=json.loads(Path(sys.argv[1]).read_text()); assert all(hashlib.sha256((Path(m["cwd"])/p).read_bytes()).hexdigest()==h for p,h in m["contract"].items()), "Training source changed; review before resuming"; run_queue([Task(**t) for t in m["tasks"]],m["root"],cwd=m["cwd"],environment=m["environment"],gpus=m["gpus"],jobs_per_gpu=m["jobs_per_gpu"],cpu_jobs=m["cpu_jobs"],contract=m["contract"])' /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/parallel-dd-normalized-v1-10000-20260913-195429/launch_manifest.json

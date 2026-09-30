@@ -1,0 +1,206 @@
+Bonus results: results/compirt/holdout/double-difficulty/compositional/noisy-or
+Steps: 3,000 | Learning rate: 0.01 | Seed: 42 | Device: cuda
+Difficulty: scalar | Alpha prior: gamma
+
+Fold 0 | compositional | train (3,000 steps)
+Bonus part rows: 107,643  Parts: 3,768
+Step 1/3,000  ELBO loss: 130,062.8
+Step 100/3,000  ELBO loss: 62,304.2
+Step 200/3,000  ELBO loss: 55,354.2
+Step 300/3,000  ELBO loss: 53,629.9
+Step 400/3,000  ELBO loss: 53,191.5
+Step 500/3,000  ELBO loss: 52,991.7
+Step 600/3,000  ELBO loss: 52,962.4
+Step 700/3,000  ELBO loss: 52,872.4
+Step 800/3,000  ELBO loss: 52,951.7
+Step 900/3,000  ELBO loss: 52,910.7
+Step 1,000/3,000  ELBO loss: 52,979.0
+Step 1,100/3,000  ELBO loss: 52,976.8
+Step 1,200/3,000  ELBO loss: 52,818.4
+Step 1,300/3,000  ELBO loss: 52,973.0
+Step 1,400/3,000  ELBO loss: 52,770.1
+Step 1,500/3,000  ELBO loss: 52,911.9
+Step 1,600/3,000  ELBO loss: 52,912.6
+Step 1,700/3,000  ELBO loss: 53,085.8
+Step 1,800/3,000  ELBO loss: 52,739.3
+Step 1,900/3,000  ELBO loss: 52,846.3
+Step 2,000/3,000  ELBO loss: 52,963.9
+Step 2,100/3,000  ELBO loss: 52,755.9
+Step 2,200/3,000  ELBO loss: 52,968.7
+Step 2,300/3,000  ELBO loss: 52,912.8
+Step 2,400/3,000  ELBO loss: 53,044.2
+Step 2,500/3,000  ELBO loss: 52,885.4
+Step 2,600/3,000  ELBO loss: 52,736.9
+Step 2,700/3,000  ELBO loss: 52,970.5
+Step 2,800/3,000  ELBO loss: 52,845.1
+Step 2,900/3,000  ELBO loss: 52,884.7
+Step 3,000/3,000  ELBO loss: 52,909.8
+
+Fold 0 | compositional | replay
+Bonus part rows: 25,818  Parts: 3,633
+
+Fold 0 | compositional | evaluate
+Fold 0 compositional: AUC=0.8921, log loss=0.4153, PPB MAE=2.3154
+
+Fold 1 | compositional | train (3,000 steps)
+Bonus part rows: 108,201  Parts: 3,768
+Step 1/3,000  ELBO loss: 130,259.9
+Step 100/3,000  ELBO loss: 62,594.5
+Step 200/3,000  ELBO loss: 55,524.4
+Step 300/3,000  ELBO loss: 53,841.9
+Step 400/3,000  ELBO loss: 53,464.0
+Step 500/3,000  ELBO loss: 53,218.8
+Step 600/3,000  ELBO loss: 53,129.1
+Step 700/3,000  ELBO loss: 53,044.3
+Step 800/3,000  ELBO loss: 53,149.2
+Step 900/3,000  ELBO loss: 53,129.3
+Step 1,000/3,000  ELBO loss: 53,155.7
+Step 1,100/3,000  ELBO loss: 53,151.2
+Step 1,200/3,000  ELBO loss: 52,997.0
+Step 1,300/3,000  ELBO loss: 53,169.6
+Step 1,400/3,000  ELBO loss: 52,956.4
+Step 1,500/3,000  ELBO loss: 53,135.4
+Step 1,600/3,000  ELBO loss: 53,114.7
+Step 1,700/3,000  ELBO loss: 53,256.4
+Step 1,800/3,000  ELBO loss: 52,931.4
+Step 1,900/3,000  ELBO loss: 53,017.3
+Step 2,000/3,000  ELBO loss: 53,138.6
+Step 2,100/3,000  ELBO loss: 52,940.9
+Step 2,200/3,000  ELBO loss: 53,120.7
+Step 2,300/3,000  ELBO loss: 53,146.1
+Step 2,400/3,000  ELBO loss: 53,196.1
+Step 2,500/3,000  ELBO loss: 53,071.3
+Step 2,600/3,000  ELBO loss: 52,932.4
+Step 2,700/3,000  ELBO loss: 53,170.4
+Step 2,800/3,000  ELBO loss: 53,041.9
+Step 2,900/3,000  ELBO loss: 53,051.6
+Step 3,000/3,000  ELBO loss: 53,092.7
+
+Fold 1 | compositional | replay
+Bonus part rows: 25,260  Parts: 3,561
+
+Fold 1 | compositional | evaluate
+Fold 1 compositional: AUC=0.8913, log loss=0.4165, PPB MAE=2.3836
+
+Fold 2 | compositional | train (3,000 steps)
+Bonus part rows: 107,670  Parts: 3,768
+Step 1/3,000  ELBO loss: 128,546.8
+Step 100/3,000  ELBO loss: 62,334.7
+Step 200/3,000  ELBO loss: 55,306.0
+Step 300/3,000  ELBO loss: 53,623.3
+Step 400/3,000  ELBO loss: 53,220.9
+Step 500/3,000  ELBO loss: 52,983.4
+Step 600/3,000  ELBO loss: 52,932.5
+Step 700/3,000  ELBO loss: 52,866.9
+Step 800/3,000  ELBO loss: 52,947.6
+Step 900/3,000  ELBO loss: 52,858.3
+Step 1,000/3,000  ELBO loss: 52,961.8
+Step 1,100/3,000  ELBO loss: 52,944.9
+Step 1,200/3,000  ELBO loss: 52,803.3
+Step 1,300/3,000  ELBO loss: 52,980.4
+Step 1,400/3,000  ELBO loss: 52,774.3
+Step 1,500/3,000  ELBO loss: 52,895.8
+Step 1,600/3,000  ELBO loss: 52,887.3
+Step 1,700/3,000  ELBO loss: 53,064.7
+Step 1,800/3,000  ELBO loss: 52,716.8
+Step 1,900/3,000  ELBO loss: 52,847.9
+Step 2,000/3,000  ELBO loss: 52,950.7
+Step 2,100/3,000  ELBO loss: 52,751.0
+Step 2,200/3,000  ELBO loss: 52,985.2
+Step 2,300/3,000  ELBO loss: 52,939.8
+Step 2,400/3,000  ELBO loss: 52,968.4
+Step 2,500/3,000  ELBO loss: 52,887.7
+Step 2,600/3,000  ELBO loss: 52,743.5
+Step 2,700/3,000  ELBO loss: 52,981.5
+Step 2,800/3,000  ELBO loss: 52,860.6
+Step 2,900/3,000  ELBO loss: 52,884.7
+Step 3,000/3,000  ELBO loss: 52,894.3
+
+Fold 2 | compositional | replay
+Bonus part rows: 25,791  Parts: 3,630
+
+Fold 2 | compositional | evaluate
+Fold 2 compositional: AUC=0.8895, log loss=0.4202, PPB MAE=2.3011
+
+Fold 3 | compositional | train (3,000 steps)
+Bonus part rows: 108,096  Parts: 3,768
+Step 1/3,000  ELBO loss: 129,382.6
+Step 100/3,000  ELBO loss: 62,715.5
+Step 200/3,000  ELBO loss: 55,756.4
+Step 300/3,000  ELBO loss: 54,086.4
+Step 400/3,000  ELBO loss: 53,667.1
+Step 500/3,000  ELBO loss: 53,466.2
+Step 600/3,000  ELBO loss: 53,438.1
+Step 700/3,000  ELBO loss: 53,350.6
+Step 800/3,000  ELBO loss: 53,422.1
+Step 900/3,000  ELBO loss: 53,382.2
+Step 1,000/3,000  ELBO loss: 53,462.6
+Step 1,100/3,000  ELBO loss: 53,461.6
+Step 1,200/3,000  ELBO loss: 53,310.6
+Step 1,300/3,000  ELBO loss: 53,423.0
+Step 1,400/3,000  ELBO loss: 53,248.1
+Step 1,500/3,000  ELBO loss: 53,420.6
+Step 1,600/3,000  ELBO loss: 53,366.1
+Step 1,700/3,000  ELBO loss: 53,559.6
+Step 1,800/3,000  ELBO loss: 53,172.5
+Step 1,900/3,000  ELBO loss: 53,370.7
+Step 2,000/3,000  ELBO loss: 53,426.1
+Step 2,100/3,000  ELBO loss: 53,270.6
+Step 2,200/3,000  ELBO loss: 53,473.9
+Step 2,300/3,000  ELBO loss: 53,430.2
+Step 2,400/3,000  ELBO loss: 53,491.7
+Step 2,500/3,000  ELBO loss: 53,350.4
+Step 2,600/3,000  ELBO loss: 53,193.6
+Step 2,700/3,000  ELBO loss: 53,414.1
+Step 2,800/3,000  ELBO loss: 53,310.0
+Step 2,900/3,000  ELBO loss: 53,331.0
+Step 3,000/3,000  ELBO loss: 53,354.9
+
+Fold 3 | compositional | replay
+Bonus part rows: 25,365  Parts: 3,639
+
+Fold 3 | compositional | evaluate
+Fold 3 compositional: AUC=0.8898, log loss=0.4184, PPB MAE=2.3397
+
+Fold 4 | compositional | train (3,000 steps)
+Bonus part rows: 107,595  Parts: 3,768
+Step 1/3,000  ELBO loss: 129,576.8
+Step 100/3,000  ELBO loss: 62,353.1
+Step 200/3,000  ELBO loss: 55,366.4
+Step 300/3,000  ELBO loss: 53,632.6
+Step 400/3,000  ELBO loss: 53,231.2
+Step 500/3,000  ELBO loss: 53,001.0
+Step 600/3,000  ELBO loss: 52,974.1
+Step 700/3,000  ELBO loss: 52,867.5
+Step 800/3,000  ELBO loss: 52,965.4
+Step 900/3,000  ELBO loss: 52,894.1
+Step 1,000/3,000  ELBO loss: 52,985.5
+Step 1,100/3,000  ELBO loss: 52,980.7
+Step 1,200/3,000  ELBO loss: 52,811.5
+Step 1,300/3,000  ELBO loss: 52,970.2
+Step 1,400/3,000  ELBO loss: 52,784.2
+Step 1,500/3,000  ELBO loss: 52,919.4
+Step 1,600/3,000  ELBO loss: 52,908.7
+Step 1,700/3,000  ELBO loss: 53,090.2
+Step 1,800/3,000  ELBO loss: 52,744.5
+Step 1,900/3,000  ELBO loss: 52,876.4
+Step 2,000/3,000  ELBO loss: 52,948.0
+Step 2,100/3,000  ELBO loss: 52,792.4
+Step 2,200/3,000  ELBO loss: 52,956.0
+Step 2,300/3,000  ELBO loss: 52,931.7
+Step 2,400/3,000  ELBO loss: 53,038.7
+Step 2,500/3,000  ELBO loss: 52,888.2
+Step 2,600/3,000  ELBO loss: 52,760.0
+Step 2,700/3,000  ELBO loss: 52,989.3
+Step 2,800/3,000  ELBO loss: 52,858.5
+Step 2,900/3,000  ELBO loss: 52,896.3
+Step 3,000/3,000  ELBO loss: 52,902.1
+
+Fold 4 | compositional | replay
+Bonus part rows: 25,866  Parts: 3,648
+
+Fold 4 | compositional | evaluate
+Fold 4 compositional: AUC=0.8908, log loss=0.4164, PPB MAE=2.3551
+
+Pooling 5 folds
+Pooled bonus results: /teapot-old/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/compositional/noisy-or/aggregate/report.md

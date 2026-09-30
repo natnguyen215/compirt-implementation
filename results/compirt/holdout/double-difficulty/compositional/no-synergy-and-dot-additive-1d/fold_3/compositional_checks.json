@@ -1,0 +1,11 @@
+{
+  "train_games": 1970,
+  "test_games": 461,
+  "train_responses": 36032,
+  "test_responses": 8455,
+  "test_parts": 25365,
+  "disjoint_games": true,
+  "finite_probabilities": true,
+  "train_dropped_rows_unknown_roster": 0,
+  "test_dropped_rows_unknown_roster": 0
+}

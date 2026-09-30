@@ -1,0 +1,8 @@
+{
+  "pid": 1421107,
+  "gpu": null,
+  "log": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-normalized-first-buzz-10000steps/logs/dd-prepare.log",
+  "started_at": "2026-09-14T02:54:29.908943+00:00",
+  "signature": "9fbc87edd6aca5a262d7ddd4828ee56ad0c9d0d511a8ccc4853fdbbe92de05bd",
+  "exit_code": 0
+}

@@ -151,7 +151,7 @@ The 3/3/2 simplex-relevance, learned-location, terminal-intercept arm is:
 ```bash
 .venv/bin/python -m run_scripts.double_difficulty.run_dd_bernstein_332 \
   --relevance-prior simplex --learn-curve-locations \
-  --root results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal
+  --root results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal
 ```
 
 Its sigmoid counterpart (three dimensions, independent simplex relevance, and

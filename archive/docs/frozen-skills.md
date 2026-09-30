@@ -179,7 +179,7 @@ The September 7 replay compares all five outer timing checkpoints with saved
 DD-Bernstein **3/3/2, simplex relevance, learned locations and terminal
 intercepts**, without player propensity. The common population is 46,640 race
 events: 45,995 buzzes and 645 dead questions. The reference path is
-[`dd-bernstein-332-simplex-locations-terminal/`](../../results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/).
+[`dd-bernstein-332-simplex-locations-terminal/`](../../results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/).
 
 Frozen improves position MAE **0.15186 → 0.14307**, integrated timing Brier
 **0.10170 → 0.09477**, first-buzzer accuracy **35.16% → 39.67%**, and full

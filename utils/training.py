@@ -85,8 +85,8 @@ def fit_svi(
     for step in range(n_steps):
         loss = svi.step(**model_kwargs)
         losses.append(float(loss))
-        if step % 100 == 0:
-            print(f"step {step:4d}  ELBO loss: {loss:,.1f}")
+        if step == 0 or (step + 1) % 100 == 0 or step + 1 == n_steps:
+            print(f"Step {step + 1:,}/{n_steps:,}  ELBO loss: {loss:,.1f}", flush=True)
     # Return posterior medians (point estimates) plus the full loss trace.
     medians = guide.median(**model_kwargs)
     if posterior_output_dir is not None:
@@ -163,11 +163,11 @@ def fit_svi_alternating(
             _set_autonormal_site_trainability(frozen_sites)
             loss = float(svi.step(**model_kwargs))
             losses.append(loss)
-            if step % 100 == 0:
+            if step == 0 or (step + 1) % 100 == 0 or step + 1 == n_steps:
                 frozen_names = ", ".join(sorted(frozen_sites))
                 print(
-                    f"step {step:4d}  ELBO loss: {loss:,.1f}  "
-                    f"frozen: {frozen_names}"
+                    f"Step {step + 1:,}/{n_steps:,}  ELBO loss: {loss:,.1f}  "
+                    f"frozen: {frozen_names}", flush=True,
                 )
     finally:
         # Leave the returned guide in the standard fully trainable state for

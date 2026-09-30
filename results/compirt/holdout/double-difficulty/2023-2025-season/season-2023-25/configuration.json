@@ -1,5 +1,5 @@
 {
-  "root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/data-splits/season-2023-25",
+  "root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/2023-2025-season/season-2023-25",
   "base_split": "all",
   "folds": [
     0,

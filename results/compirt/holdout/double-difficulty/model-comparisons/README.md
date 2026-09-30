@@ -1,7 +1,7 @@
 # Model comparisons
 
 Each subdirectory compares model structures under a common protocol. The
-reference configuration is [`dd-bernstein-332-simplex-locations-terminal`](../ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/).
+reference configuration is [`dd-bernstein-332-simplex-locations-terminal`](../ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/).
 
 | Folder | Comparison | Result |
 | --- | --- | --- |

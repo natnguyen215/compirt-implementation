@@ -2,8 +2,12 @@
 
 Each source fold must contain train/pyramidal/{summary.json,players.csv,
 tossup_predictions.csv}. Its summary determines the train/test split. Player
-skills stay frozen; only training-game bonuses fit alpha, beta, tau and optional
-rank-one synergy. The two arms share the root compositional implementation.
+skills stay frozen; training-game bonuses fit the bonus-part parameters and
+optional pairwise synergy. The 'compositional' arm fits without synergy and the
+'synergy' arm adds it; both use the root compositional model.
+
+This runner owns the training and replay commands. Fold audits, evaluation,
+and pooling live in compirt_eval/scenario_b_bonuses/folds.py.
 """
 
 from __future__ import annotations
@@ -15,23 +19,37 @@ import math
 import os
 from pathlib import Path
 import shlex
-import subprocess
 import sys
 
-import numpy as np
-import pandas as pd
-
-from compirt_data import DEFAULT_DATA_DIR, load_hf_tables
-from compirt_eval.common.report_paths import csv_path, evaluation_output_dirs
-from compirt_eval.common.reports import experiment_report_markdown, write_eval_docs_summary
-from compirt_eval.scenario_b_bonuses.evaluation import evaluate_bonuses
-from compirt_eval.scenario_b_bonuses.metrics import bonus_metrics, bonus_parts_with_difficulty
-from compirt_eval.scenario_b_bonuses.outcomes import write_bonus_outcomes
-from holdout.game_splits import game_holdout_split_name, parse_game_holdout_split, select_game_holdout_tables
-from utils.run_logging import resolve_result_root
+from compirt_eval.common.bonus_reports import write_bonus_fold_reports
+from compirt_eval.scenario_b_bonuses.folds import aggregate, evaluate_fold
+from compositional_model import (
+    BONUS_AGGREGATIONS,
+    BONUS_DIFFICULTIES,
+    SYNERGY_FORMS,
+    SYNERGY_LINKS,
+    validate_bonus_settings,
+)
+from holdout.game_splits import game_holdout_split_name, parse_game_holdout_split
+from utils.run_logging import resolve_result_root, run_logged
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ARMS = ("compositional", "synergy")
+
+# Command-line options that choose how to run, kept out of the saved configuration.
+EXECUTION_OPTIONS = (
+    "dry_run", "collect_only", "evaluate_only", "report_only", "prepare_only",
+    "worker_fold", "worker_arm", "worker_stage",
+)
+
+# Source files whose hashes are saved; resuming requires the same code.
+HASHED_SOURCES = (
+    "compositional_model.py", "train_compositional.py", "holdout/frozen_predict.py",
+    "compirt_data.py", "lineup.py", "holdout/game_splits.py", "utils/training.py",
+    "compirt_eval/scenario_b_bonuses/metrics.py", "compirt_eval/common/metrics.py",
+    "compirt_eval/scenario_b_bonuses/folds.py", "compirt_eval/common/bonus_reports.py",
+    "run_scripts/common/run_compositional_from_folds.py",
+)
 
 
 def sha256(path):
@@ -43,19 +61,12 @@ def write_json(path, value):
     path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
 
 
-def evaluation_tables(config, folds):
-    """Select the union of evaluated folds, including games with zero bonuses."""
-    specs = [parse_game_holdout_split(config["sources"][str(fold)]["test_split"]) for fold in folds]
-    tables = load_hf_tables(config.get("data_dir") or DEFAULT_DATA_DIR, specs[0].base_split)
-    selected = pd.concat([select_game_holdout_tables(tables, spec)["games"] for spec in specs])
-    if selected["game_id"].duplicated().any():
-        raise ValueError("Evaluation folds overlap in games")
-    tables["games"] = selected
-    return tables
-
-
 def source_fold(stage1_root, fold):
-    """Derive scoring splits from the actual source fit, rejecting wrong folds."""
+    """Describe one saved Stage-1 training fold: its splits, hashes, and settings.
+
+    The test split is derived from the fit's own training split, so a fold
+    saved under the wrong index raises ValueError.
+    """
     source = stage1_root / f"fold_{fold}" / "train" / "pyramidal"
     summary = json.loads((source / "summary.json").read_text())
     spec = parse_game_holdout_split(summary["split"])
@@ -83,20 +94,25 @@ def source_fold(stage1_root, fold):
 
 
 def commands(config, fold, arm):
+    """Return (stage, output directory, command) for training and frozen replay."""
     source = config["sources"][str(fold)]
     run = Path(config["root"]) / f"fold_{fold}"
     train = run / "train" / arm
     test = run / "holdout" / arm
     data_args = ["--data-dir", config["data_dir"]] if config["data_dir"] else []
     common = [*data_args, "--device", config["device"]]
+    # Configurations saved before an option existed used its default.
     training = [
         sys.executable, "-u", str(REPO_ROOT / "train_compositional.py"),
         "--split", source["train_split"], *common,
         "--player-skills", str(Path(source["path"]) / "players.csv"),
         "--steps", str(config["steps"]), "--lr", str(config["lr"]),
         "--seed", str(config["seed"]), "--alpha-prior", config["alpha_prior"],
+        "--bonus-difficulty", config.get("bonus_difficulty", "scalar"),
+        "--bonus-aggregation", config.get("bonus_aggregation", "lse"),
         "--posterior-draws", "0", "--output-dir", str(train),
     ]
+    # Replay reads the bonus settings from the training summary.
     replay = [
         sys.executable, "-u", "-m", "holdout.frozen_predict", "bonus",
         "--split", source["test_split"], *common,
@@ -105,39 +121,22 @@ def commands(config, fold, arm):
         "--on-missing", "error",
     ]
     if arm == "synergy":
-        training += ["--use-synergy", "--synergy-dimensions", "1", "--save-synergy-details"]
+        training += [
+            "--use-synergy", "--save-synergy-details",
+            "--synergy-dimensions", str(config.get("synergy_dimensions", 1)),
+            "--synergy-form", config.get("synergy_form", "dot"),
+            "--synergy-link", config.get("synergy_link", "additive"),
+        ]
         replay += ["--use-synergy"]
     return [("train", train, training), ("replay", test, replay)]
 
 
-def audit_predictions(train_parts, test_parts, stage1_games):
-    """Fail on leakage, invalid probabilities, or incomplete bonus responses."""
-    train_games = set(train_parts["game_id"])
-    test_games = set(test_parts["game_id"])
-    if train_games & test_games or set(stage1_games) & test_games:
-        raise ValueError("Held-out bonus games overlap a training stage")
-    if not train_games <= set(stage1_games):
-        raise ValueError("Bonus training games are absent from the saved Stage-1 fit")
-    if set(train_parts["response_id"]) & set(test_parts["response_id"]):
-        raise ValueError("Bonus responses overlap between train and test")
-    for parts in (train_parts, test_parts):
-        if parts.empty or parts["observation_id"].duplicated().any():
-            raise ValueError("Empty or duplicate bonus-part predictions")
-        p = parts["predicted_correct"].to_numpy()
-        if not np.isfinite(p).all() or not ((0 <= p) & (p <= 1)).all():
-            raise ValueError("Invalid bonus probabilities")
-        if not (parts.groupby("response_id").size() == 3).all():
-            raise ValueError("Expected complete three-part bonus responses")
-    return {
-        "train_games": len(train_games), "test_games": len(test_games),
-        "train_responses": train_parts["response_id"].nunique(),
-        "test_responses": test_parts["response_id"].nunique(),
-        "test_parts": len(test_parts), "disjoint_games": True,
-        "finite_probabilities": True,
-    }
-
-
 def run_arm(config, fold, arm, dry_run=False, only_stage=None):
+    """Train, replay, and evaluate one fold and arm, skipping completed stages.
+
+    Each stage streams to the console and to its own run.log. 'only_stage'
+    limits the call to one of "train", "replay", or "evaluate".
+    """
     run = Path(config["root"]) / f"fold_{fold}"
     stages = commands(config, fold, arm)
     if only_stage is not None:
@@ -149,134 +148,22 @@ def run_arm(config, fold, arm, dry_run=False, only_stage=None):
     suffix = f"_{only_stage}" if only_stage else ""
     write_json(run / f"{arm}{suffix}_commands.json", [c for _, _, c in stages])
     for name, output, command in stages:
+        # A stage's summary.json marks it complete.
         if (output / "summary.json").exists():
-            print(f"Resume fold {fold} {arm} {name}", flush=True)
+            print(f"Fold {fold} | {arm} | {name}: already complete, skipping", flush=True)
             continue
         output.mkdir(parents=True, exist_ok=True)
-        print(f"Fold {fold} {arm} {name}: {shlex.join(command)}", flush=True)
+        detail = f" ({config['steps']:,} steps)" if name == "train" else ""
+        print(f"\nFold {fold} | {arm} | {name}{detail}", flush=True)
         env = {**os.environ, "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": "1"}
-        with (output / "run.log").open("w") as log:
-            subprocess.run(command, cwd=REPO_ROOT, env=env, stdout=log,
-                           stderr=subprocess.STDOUT, check=True)
+        run_logged(command, cwd=REPO_ROOT, env=env, log_path=output / "run.log")
     if only_stage in ("train", "replay"):
         return
-    train, test = run / "train" / arm, run / "holdout" / arm
-    train_parts = pd.read_csv(train / "bonus_part_predictions.csv")
-    test_parts = pd.read_csv(test / "bonus_part_predictions.csv")
-    source = Path(config["sources"][str(fold)]["path"])
-    stage1_games = pd.read_csv(source / "tossup_predictions.csv", usecols=["game_id"])["game_id"]
-    audit = audit_predictions(train_parts, test_parts, stage1_games)
-    for name, directory in (("train", train), ("test", test)):
-        summary = json.loads((directory / "summary.json").read_text())
-        audit[f"{name}_dropped_rows_unknown_roster"] = summary.get("dropped_rows_unknown_roster", 0)
-        if audit[f"{name}_dropped_rows_unknown_roster"]:
-            raise ValueError(f"Uncovered players in {directory}")
-    summary = json.loads((train / "summary.json").read_text())
-    if not summary["finite_losses"]:
-        raise ValueError(f"Nonfinite training losses in {train}")
-    evaluation = run / ("evaluation" if arm == "compositional" else "synergy-evaluation")
-    evaluation_output_dirs(evaluation)
-    metrics = evaluate_bonuses(test, evaluation, tables=evaluation_tables(config, [fold]))
-    pd.DataFrame([metrics]).to_csv(csv_path(evaluation, "bonus_metrics.csv"), index=False)
-    report = experiment_report_markdown(
-        evaluation, tossup=None, bonus=metrics, title="Frozen Bonus Evaluation"
-    )
-    report += (
-        "\n## Distributions\n\n"
-        "[Evaluated probabilities, aggregate ability, and synergy contributions]"
-        "(graphs/bonus/bonus_prediction_distributions.png). "
-        "Aggregate ability is part-weighted; synergy is response-weighted.\n\n"
-        "[Fitted bonus parameters](graphs/parameters/bonus_part_parameter_distributions.png) "
-        "describe the training fit. These distributions are across entities, "
-        "not posterior uncertainty intervals.\n"
-    )
-    if arm == "synergy":
-        report += "\n[Synergy parameters](graphs/parameters/synergy_parameter_distributions.png).\n"
-    (evaluation / "experiment_report.md").write_text(report, encoding="utf-8")
-    write_eval_docs_summary(evaluation)
-    write_json(run / f"{arm}_checks.json", audit)
-    print(f"Fold {fold} {arm}: AUC={metrics['auc']:.4f}, "
-          f"log loss={metrics['log_loss']:.4f}, PPB MAE={metrics['ppb_mae']:.4f}", flush=True)
+    print(f"\nFold {fold} | {arm} | evaluate", flush=True)
+    evaluate_fold(config, fold, arm)
 
 
-def aggregate(config):
-    rows, pooled = [], []
-    tables = evaluation_tables(config, config["folds"])
-    output = Path(config["root"]) / "aggregate"
-    output.mkdir(parents=True, exist_ok=True)
-    for arm in config["arms"]:
-        all_parts, all_teams = [], []
-        for fold in config["folds"]:
-            run = Path(config["root"]) / f"fold_{fold}"
-            test = run / "holdout" / arm
-            checks = json.loads((run / f"{arm}_checks.json").read_text())
-            evaluation = run / ("evaluation" if arm == "compositional" else "synergy-evaluation")
-            metrics = pd.read_csv(evaluation / "csvs" / "bonus_metrics.csv").iloc[0].to_dict()
-            summary = json.loads((run / "train" / arm / "summary.json").read_text())
-            rows.append({"fold": fold, "arm": arm, **metrics, **checks,
-                         **{k: summary[k] for k in ("tau", "final_loss", "best_loss", "last_100_loss_slope", "finite_losses")}})
-            all_parts.append(pd.read_csv(test / "bonus_part_predictions.csv"))
-            all_teams.append(pd.read_csv(test / "team_predictions.csv"))
-        parts, teams = pd.concat(all_parts, ignore_index=True), pd.concat(all_teams, ignore_index=True)
-        parts = bonus_parts_with_difficulty(parts, tables["bonuses"])
-        if parts["observation_id"].duplicated().any():
-            raise ValueError("A held-out observation was scored in multiple folds")
-        pooled.append({"arm": arm, "folds": len(config["folds"]),
-                       "parts": len(parts), "responses": len(teams),
-                       "games": teams["game_id"].nunique(), "teams": teams["team_id"].nunique(),
-                       **bonus_metrics(parts, teams),
-                       **write_bonus_outcomes(parts, tables, output / arm)})
-    frame = pd.DataFrame(rows)
-    frame.to_csv(output / "per_fold.csv", index=False)
-    pd.DataFrame(pooled).to_csv(output / "pooled.csv", index=False)
-    numeric = frame.select_dtypes("number").columns.drop("fold")
-    frame.groupby("arm")[numeric].agg(["mean", "std"]).to_csv(output / "fold_mean_std.csv")
-    write_json(output / "pooled.json", pooled)
-    lines = ["# Compositional bonuses from frozen Stage-1 folds", "",
-             f"Source: `{config['stage1_root']}`.", "",
-             f"{config['steps']} SVI steps, learning rate {config['lr']}, seed {config['seed']}; "
-             f"bonus discrimination prior `{config['alpha_prior']}`. Skills are fixed at the saved Stage-1 medians. "
-             "Synergy uses one latent coordinate per player.", "",
-             "All bonus parameters are fit on training games and frozen for held-out replay. "
-             "The source Stage-1 fits are reused without refitting. Coverage requires familiar players and parts; "
-             "lineups are inferred from the observed game buzzes. These are matrix-infill results, "
-             "not cold-start or recombined-team validation.", "",
-             "Pooled PPB MAE averages each team's observed and predicted points across all its held-out bonuses, "
-             "then averages absolute errors equally across teams. Exact accuracy requires all three part labels to match.", "",
-             "| Model | Part AUC | Part log loss | Part accuracy | Brier | ECE | Exact accuracy | PPB MAE |",
-             "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"]
-    for row in pooled:
-        names = ("auc", "log_loss", "part_accuracy", "brier", "ece", "exact_acc", "ppb_mae")
-        lines.append(f"| {row['arm']} | " + " | ".join(f"{row[k]:.4f}" for k in names) + " |")
-    lines += ["", "## Difficulty, bonus-only team PPG and game margins", "",
-              "Difficulty uses the declared easy/medium/hard part labels. Bonus-only PPG uses "
-              "team bonus totals divided by games played, conditional on the "
-              "recorded bonuses heard. Zero-bonus games "
-              "count, incomplete prediction games are excluded. Pool folds before computing "
-              "team PPG, then average team absolute errors within each tournament and "
-              "macro-average tournament MAE and defined Spearman correlations. Bonus margin "
-              "MAE averages absolute errors in the signed team score difference across games.", "",
-              "| Model | Easy acc. | Medium acc. | Hard acc. | PPG MAE | PPG Spearman | Margin MAE |",
-              "| --- | ---: | ---: | ---: | ---: | ---: | ---: |"]
-    for row in pooled:
-        names = ("part_accuracy_easy", "part_accuracy_medium", "part_accuracy_hard",
-                 "tournament_team_bonus_ppg_mae", "tournament_team_bonus_ppg_spearman",
-                 "bonus_game_margin_mae")
-        lines.append(f"| {row['arm']} | " + " | ".join(f"{row[k]:.4f}" for k in names) + " |")
-    for row in pooled:
-        lines += ["", f"[{row['arm']} team PPG]({row['arm']}/bonus_team_ppg_leaderboard.csv); "
-                  f"[tournament metrics]({row['arm']}/bonus_team_ranking_metrics.csv); "
-                  f"[game margins]({row['arm']}/bonus_game_margin_predictions.csv).", ""]
-    lines += ["", f"Scored {pooled[0]['parts']:,} parts / {pooled[0]['responses']:,} bonuses / "
-              f"{pooled[0]['games']:,} games / {pooled[0]['teams']:,} teams in {pooled[0]['folds']} folds.", "",
-              "See `per_fold.csv` and `fold_mean_std.csv` for fold variation; one optimization seed was used. "
-              "All folds passed checks for disjoint training/test games, unique complete bonus responses, "
-              "finite losses and probabilities, and zero uncovered roster rows."]
-    (output / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print("\n".join(lines), flush=True)
-
-
-def main(argv=None):
+def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--stage1-root", type=Path)
     parser.add_argument("--root", type=Path, required=True)
@@ -286,48 +173,69 @@ def main(argv=None):
     parser.add_argument("--lr", type=float, default=0.01)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--alpha-prior", choices=("normal", "gamma"), default="gamma")
+    parser.add_argument("--bonus-difficulty", choices=BONUS_DIFFICULTIES, default="scalar")
+    parser.add_argument("--bonus-aggregation", choices=BONUS_AGGREGATIONS, default="lse")
+    parser.add_argument("--synergy-form", choices=SYNERGY_FORMS, default="dot")
+    parser.add_argument("--synergy-link", choices=SYNERGY_LINKS, default="additive")
+    parser.add_argument("--synergy-dimensions", type=int, default=1)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
     parser.add_argument("--data-dir", type=Path)
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--collect-only", action="store_true")
+    parser.add_argument("--collect-only", action="store_true",
+                        help="re-pool saved fold predictions and metrics, then rewrite reports")
+    parser.add_argument("--report-only", action="store_true",
+                        help="rewrite Markdown reports from saved metrics")
     parser.add_argument("--evaluate-only", action="store_true",
-                        help="refresh saved predictions' graphs, metrics and reports without fitting or replay")
+                        help="rescore saved predictions and redraw figures, then re-pool and rewrite reports")
     parser.add_argument("--prepare-only", action="store_true",
-                        help="validate sources and save the configuration without fitting")
+                        help="validate sources and save the configuration")
     parser.add_argument("--worker-fold", type=int,
-                        help="run one configured fold without aggregating shared outputs")
+                        help="run one configured fold; pool afterwards with --collect-only")
     parser.add_argument("--worker-arm", choices=ARMS)
     parser.add_argument("--worker-stage", choices=("train", "replay", "evaluate"))
-    args = parser.parse_args(argv)
-    if args.evaluate_only or args.collect_only:
-        if (args.evaluate_only and args.collect_only) or args.dry_run or args.prepare_only or any(
-            value is not None for value in (args.worker_fold, args.worker_arm, args.worker_stage)
-        ):
-            parser.error("evaluate-only and collect-only cannot be combined with other execution modes")
-        manifest = args.root / "configuration.json"
-        config = json.loads(manifest.read_text())
-        if Path(config["root"]).resolve() != args.root.resolve():
-            raise ValueError(f"Saved root differs from --root: {manifest}")
-        if args.stage1_root is not None and args.stage1_root.resolve() != Path(config["stage1_root"]).resolve():
-            raise ValueError("--stage1-root differs from the saved configuration")
-        for fold in config["folds"]:
-            if source_fold(Path(config["stage1_root"]), fold) != config["sources"][str(fold)]:
-                raise ValueError(f"Source artifacts changed for fold {fold}; cannot refresh this evaluation")
-        if args.evaluate_only:
-            for fold in config["folds"]:
-                for arm in config["arms"]:
-                    run_arm(config, fold, arm, only_stage="evaluate")
-        aggregate(config)
+    return parser, parser.parse_args(argv)
+
+
+def refresh_saved_run(args):
+    """Rescore, re-pool, or rewrite reports for a saved run using its configuration."""
+    manifest = args.root / "configuration.json"
+    config = json.loads(manifest.read_text())
+    if Path(config["root"]).resolve() != args.root.resolve():
+        raise ValueError(f"Saved root differs from --root: {manifest}")
+    if args.stage1_root is not None and args.stage1_root.resolve() != Path(config["stage1_root"]).resolve():
+        raise ValueError("--stage1-root differs from the saved configuration")
+    if args.report_only:
+        write_bonus_fold_reports(config)
+        print(f"Bonus report: {args.root / 'aggregate/report.md'}")
         return
+    for fold in config["folds"]:
+        # Compare resolved paths so a saved symlinked source still matches.
+        saved_source = dict(config["sources"][str(fold)])
+        if "path" in saved_source:
+            saved_source["path"] = str(Path(saved_source["path"]).resolve())
+        if source_fold(Path(config["stage1_root"]), fold) != saved_source:
+            raise ValueError(f"Source artifacts changed for fold {fold}; cannot refresh this evaluation")
+    if args.evaluate_only:
+        for fold in config["folds"]:
+            for arm in config["arms"]:
+                run_arm(config, fold, arm, only_stage="evaluate")
+    aggregate(config)
+
+
+def check_training_args(parser, args):
+    """Report invalid training options through the argument parser."""
     if args.stage1_root is None:
         parser.error("--stage1-root is required for training")
-    args.root = Path(resolve_result_root(args.root, "holdout"))
+    validate_bonus_settings(args.bonus_aggregation, args.bonus_difficulty,
+                            use_synergy="synergy" in args.arms)
     if args.steps < 1 or not math.isfinite(args.lr) or args.lr <= 0:
         parser.error("steps and learning rate must be positive and finite")
+    if args.bonus_difficulty == "multidim" and args.alpha_prior != "gamma":
+        parser.error("--bonus-difficulty multidim requires --alpha-prior gamma")
+    if args.synergy_dimensions < 1:
+        parser.error("synergy dimensions must be positive")
     if len(set(args.folds)) != len(args.folds) or len(set(args.arms)) != len(args.arms):
         parser.error("duplicate folds or arms are not allowed")
-    if args.collect_only and args.dry_run:
-        parser.error("--collect-only and --dry-run are mutually exclusive")
     worker = args.worker_fold is not None
     if worker and args.worker_fold not in args.folds:
         parser.error("--worker-fold must belong to --folds")
@@ -335,40 +243,63 @@ def main(argv=None):
         parser.error("--worker-arm requires a worker fold and must belong to --arms")
     if args.worker_stage is not None and args.worker_arm is None:
         parser.error("--worker-stage requires --worker-arm")
-    if (worker and (args.collect_only or args.prepare_only)) or (
-        args.prepare_only and (args.collect_only or args.dry_run)
-    ):
-        parser.error("worker, prepare-only, and collect-only modes cannot be combined")
+    if (worker and args.prepare_only) or (args.prepare_only and args.dry_run):
+        parser.error("worker, prepare-only, and dry-run modes cannot be combined")
+
+
+def training_config(args):
+    """Return the saved configuration: settings, source folds, and code hashes."""
     config = {k: (str(v.resolve()) if isinstance(v, Path) else v)
-              for k, v in vars(args).items() if k not in (
-                  "dry_run", "collect_only", "evaluate_only", "prepare_only", "worker_fold",
-                  "worker_arm", "worker_stage",
-              )}
+              for k, v in vars(args).items() if k not in EXECUTION_OPTIONS}
     config["sources"] = {str(fold): source_fold(args.stage1_root, fold) for fold in args.folds}
     specs = [parse_game_holdout_split(s["train_split"]) for s in config["sources"].values()]
     if len({(s.base_split, s.n_folds, s.seed) for s in specs}) != 1:
         raise ValueError("Source folds must use the same base split, fold count and split seed")
-    config["code_sha256"] = {p: sha256(REPO_ROOT / p) for p in (
-        "compositional_model.py", "train_compositional.py", "holdout/frozen_predict.py",
-        "compirt_data.py", "lineup.py", "holdout/game_splits.py", "utils/training.py",
-        "compirt_eval/scenario_b_bonuses/metrics.py", "compirt_eval/common/metrics.py",
-        "run_scripts/common/run_compositional_from_folds.py",
-    )}
+    config["code_sha256"] = {p: sha256(REPO_ROOT / p) for p in HASHED_SOURCES}
+    return config
+
+
+def main(argv=None):
+    parser, args = parse_args(argv)
+    args.root = Path(resolve_result_root(args.root, "holdout"))
+
+    refresh_modes = (args.evaluate_only, args.collect_only, args.report_only)
+    if any(refresh_modes):
+        if sum(refresh_modes) > 1 or args.dry_run or args.prepare_only or any(
+            value is not None for value in (args.worker_fold, args.worker_arm, args.worker_stage)
+        ):
+            parser.error("refresh modes cannot be combined with other execution modes")
+        refresh_saved_run(args)
+        return
+
+    check_training_args(parser, args)
+    worker = args.worker_fold is not None
+    config = training_config(args)
     manifest = args.root / "configuration.json"
     if manifest.exists():
         if json.loads(manifest.read_text()) != config:
             raise ValueError(f"Resume configuration or source files changed: use a new --root ({manifest})")
     elif not args.dry_run:
-        if args.collect_only or worker:
+        # Workers resume a configuration their launcher already saved.
+        if worker:
             raise ValueError(f"No saved configuration at {manifest}")
         write_json(manifest, config)
     if args.prepare_only:
         return
-    if not args.collect_only:
-        for fold in ([args.worker_fold] if worker else args.folds):
-            for arm in ([args.worker_arm] if args.worker_arm else args.arms):
-                run_arm(config, fold, arm, args.dry_run, args.worker_stage)
+
+    if not args.dry_run:
+        print(f"Bonus results: {args.root}", flush=True)
+        print(f"Steps: {args.steps:,} | Learning rate: {args.lr} | "
+              f"Seed: {args.seed} | Device: {args.device}", flush=True)
+        print(f"Difficulty: {args.bonus_difficulty} | Alpha prior: {args.alpha_prior}", flush=True)
+        if "synergy" in args.arms:
+            print(f"Synergy: {args.synergy_link} {args.synergy_form}, "
+                  f"{args.synergy_dimensions}D", flush=True)
+    for fold in ([args.worker_fold] if worker else args.folds):
+        for arm in ([args.worker_arm] if args.worker_arm else args.arms):
+            run_arm(config, fold, arm, args.dry_run, args.worker_stage)
     if not args.dry_run and not worker:
+        print(f"\nPooling {len(args.folds)} folds", flush=True)
         aggregate(config)
 
 

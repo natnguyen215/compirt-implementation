@@ -12,7 +12,7 @@ PERCEPTION_SLICES = 3
 TRAIN_EXTRA_ARGS = ("--alternate-player-steps",)
 DEFAULT_ROOT = Path(
     "results/compirt/holdout/double-difficulty/"
-    "variants/perceived-difficulty/three-slice-alternating"
+    "variants/perception/perceived-difficulty/three-slice-alternating"
 )
 Configuration = shared.Configuration
 

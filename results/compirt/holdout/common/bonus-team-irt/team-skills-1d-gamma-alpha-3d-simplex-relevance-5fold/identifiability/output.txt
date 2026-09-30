@@ -1,0 +1,132 @@
+## 1. Exact likelihood symmetries (fold 0 training responses)
+- beta + 3 * (unit vector orthogonal to r_b): max |change in logit| = 1.78e-15, change in log-likelihood = +0.00e+00
+- theta_k + c_k and beta_k + c_k for the Nationals set only, c = (1, -2, 0.5): max |change in logit| = 0.00e+00, change in log-likelihood = +0.00e+00
+- relabel axes (3,1,2) for the Nationals set only: max |change in logit| = 8.88e-16, change in log-likelihood = +0.00e+00
+- beta_b is the prior's minimum-norm solution (r_b dot beta_b) r_b / |r_b|^2: R^2 = 0.9471; median |cos(beta_b, r_b)| = 0.9630
+- Data informativeness about r: median 95% interval width 0.201 (Dirichlet(1) prior: 0.829); SD of r medians per axis [0.298, 0.257, 0.2]; parts with max share > 0.5: 80.7%
+- Team skill axes: correlation matrix [-0.681, -0.08, 0.415] (pairs 12, 13, 23); singular-value variance shares [0.652, 0.271, 0.077]
+
+## 2. Same fold-0 data, different seed or difficulty prior
+- seed_43: training probabilities max |diff| 0.411, corr 0.9910; effective difficulty Spearman 0.9817; per-axis r Spearman: global best perm 0.394, per-set best perm 0.816 (perms [(0, 2, 1), (1, 2, 0), (2, 1, 0)]); per-axis beta Spearman 0.918; null-space beta Spearman 0.767
+- seed_44: training probabilities max |diff| 0.371, corr 0.9946; effective difficulty Spearman 0.9894; per-axis r Spearman: global best perm 0.269, per-set best perm 0.925 (perms [(0, 1, 2), (0, 2, 1), (1, 2, 0), (2, 0, 1)]); per-axis beta Spearman 0.936; null-space beta Spearman 0.773
+- shifted_beta_prior_seed_42: training probabilities max |diff| 0.460, corr 0.9922; effective difficulty Spearman 0.9833; per-axis r Spearman: global best perm 0.513, per-set best perm 0.837 (perms [(0, 2, 1), (2, 0, 1), (2, 1, 0)]); per-axis beta Spearman 0.540; null-space beta Spearman -0.562; mean beta per axis [-0.124, 0.073, 0.077] -> [1.14, -0.013, -1.14] under prior mean (1, 0, -1); mean effective difficulty -0.026 -> -0.027
+
+## 3. Cross-fold stability (10 fold pairs; each part is in every training fold)
+- effective difficulty Spearman 0.973; per-axis r Spearman 0.881; identity permutation in 1/10 pairs
+
+## 4. Question sets are disconnected blocks; cross-set difficulty is prior-anchored
+                                team_irt_3d  dd_multidim  observed_conversion  team_irt_mean_theta
+set                                                                                               
+2024-acf-fall::fall                  -0.110       -0.938                0.598                0.252
+2024-acf-nationals::2024-04-21       -0.001        0.411                0.433               -0.615
+2024-acf-regionals::01272024          0.007       -0.561                0.485               -0.189
+2024-acf-winter::2024-11-16          -0.011       -0.513                0.512               -0.134
+- Team IRT 3D: Spearman of effective difficulty with declared easy<medium<hard, mean within set 0.860
+- DD multidim: Spearman of effective difficulty with declared easy<medium<hard, mean within set 0.877
+
+## 5. What the identified relevance r tracks (fold 0)
+- within-set eta^2 of r shares by category (sets with category labels): 0.047 (label-shuffle chance 0.011)
+- within-set eta^2 of r shares by subcategory (sets with category labels): 0.031 (label-shuffle chance 0.011)
+- within-set eta^2 of r shares by declared difficulty: 0.540 (label-shuffle chance 0.002)
+- within-set eta^2 of r shares by part position: 0.017 (label-shuffle chance 0.002)
+- pooled eta^2 of r shares by question set: 0.003
+Mean r by set and declared difficulty:
+                                              r1     r2     r3
+set                            difficulty                     
+2024-acf-fall::fall            easy        0.730  0.134  0.136
+                               hard        0.114  0.526  0.360
+                               medium      0.342  0.339  0.319
+2024-acf-nationals::2024-04-21 easy        0.692  0.148  0.160
+                               hard        0.089  0.523  0.387
+                               medium      0.293  0.334  0.373
+2024-acf-regionals::01272024   easy        0.087  0.694  0.219
+                               hard        0.686  0.119  0.195
+                               medium      0.324  0.253  0.423
+2024-acf-winter::2024-11-16    easy        0.753  0.109  0.137
+                               hard        0.088  0.604  0.308
+                               medium      0.268  0.299  0.433
+Mean r by set and category (last column: axis with the largest mean):
+                                                  r1     r2     r3  dominant
+set                            category                                     
+2024-acf-fall::fall            Fine Arts       0.361  0.412  0.227         2
+                               History         0.438  0.287  0.275         1
+                               Literature      0.369  0.453  0.178         2
+                               Mythology       0.454  0.280  0.266         1
+                               Philosophy      0.372  0.257  0.371         1
+                               Religion        0.382  0.301  0.317         1
+                               Science         0.383  0.257  0.361         1
+                               Social Science  0.383  0.315  0.302         1
+2024-acf-nationals::2024-04-21 Fine Arts       0.361  0.330  0.309         1
+                               History         0.356  0.328  0.316         1
+                               Literature      0.354  0.324  0.322         1
+                               Mythology       0.336  0.343  0.320         2
+                               Philosophy      0.308  0.324  0.367         3
+                               Religion        0.363  0.341  0.296         1
+                               Science         0.367  0.346  0.287         1
+                               Social Science  0.338  0.368  0.294         2
+2024-acf-winter::2024-11-16    Fine Arts       0.348  0.392  0.261         2
+                               History         0.399  0.357  0.244         1
+                               Literature      0.340  0.223  0.438         3
+                               Mythology       0.457  0.279  0.265         1
+                               Philosophy      0.311  0.317  0.372         3
+                               Religion        0.348  0.420  0.232         2
+                               Science         0.365  0.375  0.260         2
+                               Social Science  0.344  0.389  0.267         2
+
+## 6. Words and answers on the most-loaded parts of each axis, per set (fold 0)
+- 2024-acf-fall::fall axis 1: top-decile r1 parts; categories Literature 27%, History 24%, Science 17%; difficulty easy 96%, medium 4%; distinctive words capital, long, greek, city, states, depicted, end, british, accept, story
+    top answers: black holes | Greece | raven | tragedy | giraffes
+- 2024-acf-fall::fall axis 2: top-decile r2 parts; categories Literature 42%, Fine Arts 17%, History 15%; difficulty hard 87%, medium 13%; distinctive words author, line, poet, poem, army, appears, battle, opens, title, character
+    top answers: David Mamet | Music for the Royal Fireworks | Hill | plural | Sweden
+- 2024-acf-fall::fall axis 3: top-decile r3 parts; categories Science 38%, History 20%, Social Science 7%; difficulty hard 67%, medium 33%; distinctive words property, equals, general, organisms, model, body, form, number, reject, person
+    top answers: Vancouver, Canada | equivalence principle | half-equivalence point | Magnus effect | index fossils
+- 2024-acf-nationals::2024-04-21 axis 1: top-decile r1 parts; categories Literature 26%, Science 21%, Fine Arts 16%; difficulty easy 99%, medium 1%; distinctive words william, people, pieces, calls, study, country, water, class, god, wrote
+    top answers: carbon-14 | griots | Dixie | accessibility | Charles Dickens
+- 2024-acf-nationals::2024-04-21 axis 2: top-decile r2 parts; categories Science 23%, Literature 19%, History 17%; difficulty hard 87%, medium 13%; distinctive words force, thomas, created, developed, include, titles, style, robert, use, process
+    top answers: Teichmüller space | FERC | wear | incretins | kegare
+- 2024-acf-nationals::2024-04-21 axis 3: top-decile r3 parts; categories Literature 24%, History 23%, Science 17%; difficulty medium 53%, hard 45%, easy 2%; distinctive words brother, second, line, author, character, general, subject, history, great, names
+    top answers: Johann Stamitz | Ihara Saikaku | Yoruba | Juba II | second virial coefficient
+- 2024-acf-regionals::01272024 axis 1: top-decile r1 parts; categories Unknown 100%; difficulty hard 100%; distinctive words figure, largest, structures, old, model, created, john, reject, process, used
+    top answers: César Cui | Truth and Method | markup | autoinducers | Lorentz invariance
+- 2024-acf-regionals::01272024 axis 2: top-decile r2 parts; categories Unknown 100%; difficulty easy 100%; distinctive words greek, inspired, god, using, according, country, wrote, created, like, art
+    top answers: Brothers Grimm | solar panels | fats | Herman Melville | kosher laws
+- 2024-acf-regionals::01272024 axis 3: top-decile r3 parts; categories Unknown 100%; difficulty medium 83%, easy 12%, hard 4%; distinctive words night, composer, pioneered, husband, prize, sea, wrote, collection, author, protagonist
+    top answers: Gian Carlo Menotti | Rakim | Horacio Quiroga | W. G. Sebald | neutrino oscillations
+- 2024-acf-winter::2024-11-16 axis 1: top-decile r1 parts; categories History 24%, Literature 21%, Science 20%; difficulty easy 100%; distinctive words republic, country, british, using, river, describes, people, day, american, theory
+    top answers: India | the Bible | Socrates | the Philippines | Lisbon
+- 2024-acf-winter::2024-11-16 axis 2: top-decile r2 parts; categories History 24%, Fine Arts 22%, Science 19%; difficulty hard 91%, medium 9%; distinctive words company, developed, river, reject, includes, people, french, end, style, written
+    top answers: Claus | Pārśvanātha | Leo Africanus | Yellow River Cantata | James Farley
+- 2024-acf-winter::2024-11-16 axis 3: top-decile r3 parts; categories Literature 56%, History 9%, Science 8%; difficulty medium 63%, hard 36%, easy 1%; distinctive words author, wrote, poem, works, play, collection, titled, character, ends, title
+    top answers: Carl Sandburg | Geoffrey Chaucer | pubs | a tub | The Mandarins
+
+## 7. Do team skill axes track subject strengths? (fold 0, within set)
+- Literature (teams with >= 15 parts: 342): Spearman of axis contrast theta_k - mean(theta) with the team's category conversion minus overall conversion [-0.025, -0.03, 0.015]; with the fitted model's residual [0.015, -0.086, 0.039]
+- Science (teams with >= 15 parts: 341): Spearman of axis contrast theta_k - mean(theta) with the team's category conversion minus overall conversion [0.013, -0.101, 0.068]; with the fitted model's residual [-0.029, -0.06, 0.068]
+- History (teams with >= 15 parts: 342): Spearman of axis contrast theta_k - mean(theta) with the team's category conversion minus overall conversion [-0.035, 0.003, 0.09]; with the fitted model's residual [-0.008, -0.067, 0.103]
+- Fine Arts (teams with >= 15 parts: 325): Spearman of axis contrast theta_k - mean(theta) with the team's category conversion minus overall conversion [0.047, 0.175, -0.224]; with the fitted model's residual [-0.028, 0.064, -0.057]
+- Religion (teams with >= 15 parts: 133): Spearman of axis contrast theta_k - mean(theta) with the team's category conversion minus overall conversion [0.031, -0.017, -0.02]; with the fitted model's residual [-0.134, -0.126, 0.183]
+- Mythology (teams with >= 15 parts: 115): Spearman of axis contrast theta_k - mean(theta) with the team's category conversion minus overall conversion [-0.089, 0.079, -0.001]; with the fitted model's residual [-0.119, 0.071, 0.025]
+- Philosophy (teams with >= 15 parts: 119): Spearman of axis contrast theta_k - mean(theta) with the team's category conversion minus overall conversion [-0.181, -0.099, 0.236]; with the fitted model's residual [-0.086, -0.119, 0.161]
+- Social Science (teams with >= 15 parts: 104): Spearman of axis contrast theta_k - mean(theta) with the team's category conversion minus overall conversion [-0.004, 0.016, -0.03]; with the fitted model's residual [-0.097, 0.028, 0.022]
+
+## 8. Axes aligned to declared-difficulty roles within each set
+- fold 0 seed 42: within-set eta^2 by declared difficulty 0.540; fall easy/med/hard = axes 1/3/2; nationals easy/med/hard = axes 1/3/2; regionals easy/med/hard = axes 2/3/1; winter easy/med/hard = axes 1/3/2
+- fold 1 seed 42: within-set eta^2 by declared difficulty 0.543; fall easy/med/hard = axes 1/3/2; nationals easy/med/hard = axes 3/1/2; regionals easy/med/hard = axes 2/3/1; winter easy/med/hard = axes 3/1/2
+- fold 2 seed 42: within-set eta^2 by declared difficulty 0.548; fall easy/med/hard = axes 1/3/2; nationals easy/med/hard = axes 2/3/1; regionals easy/med/hard = axes 2/3/1; winter easy/med/hard = axes 3/1/2
+- fold 3 seed 42: within-set eta^2 by declared difficulty 0.558; fall easy/med/hard = axes 1/3/2; nationals easy/med/hard = axes 1/2/3; regionals easy/med/hard = axes 2/3/1; winter easy/med/hard = axes 3/1/2
+- fold 4 seed 42: within-set eta^2 by declared difficulty 0.554; fall easy/med/hard = axes 1/3/2; nationals easy/med/hard = axes 1/2/3; regionals easy/med/hard = axes 2/3/1; winter easy/med/hard = axes 3/1/2
+- fold 0 seed_43: within-set eta^2 by declared difficulty 0.523; fall easy/med/hard = axes 1/2/3; nationals easy/med/hard = axes 2/1/3; regionals easy/med/hard = axes 2/1/3; winter easy/med/hard = axes 1/2/3
+- fold 0 seed_44: within-set eta^2 by declared difficulty 0.534; fall easy/med/hard = axes 1/3/2; nationals easy/med/hard = axes 2/1/3; regionals easy/med/hard = axes 3/2/1; winter easy/med/hard = axes 3/2/1
+- fold 0 shifted_beta_prior_seed_42: within-set eta^2 by declared difficulty 0.550; fall easy/med/hard = axes 3/2/1; nationals easy/med/hard = axes 3/2/1; regionals easy/med/hard = axes 3/2/1; winter easy/med/hard = axes 3/2/1
+- Within-set correlation of role-aligned team skills (theta_easy, theta_medium, theta_hard):
+    2024-acf-fall::fall: easy-medium 0.358, easy-hard 0.348, medium-hard 0.169
+    2024-acf-nationals::2024-04-21: easy-medium 0.307, easy-hard 0.016, medium-hard 0.345
+    2024-acf-regionals::01272024: easy-medium 0.564, easy-hard -0.149, medium-hard 0.111
+    2024-acf-winter::2024-11-16: easy-medium 0.405, easy-hard 0.107, medium-hard 0.262
+- Spearman of theta_hard - theta_easy with the team's hard-part minus easy-part conversion: 0.492; theta_hard with hard-part conversion 0.667; theta_easy with easy-part conversion 0.702
+- Role-aligned team contrasts (easy, medium, hard) vs category conversion minus overall, Spearman: Literature [-0.025, 0.015, -0.03]; Science [0.013, 0.068, -0.101]; History [-0.035, 0.09, 0.003]; Fine Arts [0.047, -0.224, 0.175]; Religion [0.031, -0.02, -0.017]; Mythology [-0.089, -0.001, 0.079]; Philosophy [-0.181, 0.236, -0.099]; Social Science [-0.004, -0.03, 0.016]
+
+## 9. Same declared-difficulty and category tests for the other 3D models (fold 0)
+- Old Team IRT 3D (alpha / sum alpha, from git f0206078): within-set eta^2 by declared difficulty 0.171, by category (known labels) 0.069; pooled by difficulty 0.017
+- DD multidim difficulty 3D synergy (r / sum r): within-set eta^2 by declared difficulty 0.046, by category (known labels) 0.113; pooled by difficulty 0.010
+- New Team IRT 3D (r): within-set eta^2 by declared difficulty 0.540, by category (known labels) 0.047; pooled by difficulty 0.168

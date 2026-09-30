@@ -30,13 +30,18 @@ def fixture():
     return tables, parts
 
 
-def test_likelihood_matches_frozen_replay_and_labels_do_not_change_predictions():
+@pytest.mark.parametrize("dimensions, parameters", [
+    (1, {"theta": torch.tensor([[0.3], [0.7]]),
+         "alpha": torch.tensor([[1.0], [0.2], [0.8]]),
+         "beta": torch.tensor([-1.0, 0.0, 1.0])}),
+    (2, {"theta": torch.tensor([[0.3, -0.2], [0.7, 0.1]]),
+         "r": torch.tensor([[0.6, 0.4], [0.1, 0.9], [0.5, 0.5]]),
+         "beta": torch.tensor([[-1.0, 0.5], [0.0, 0.3], [1.0, -0.4]])}),
+])
+def test_likelihood_matches_frozen_replay_and_labels_do_not_change_predictions(dimensions, parameters):
     _, parts = fixture()
     data = training_tensors(parts, "cpu")
-    parameters = {"theta": torch.tensor([[0.3, -0.2], [0.7, 0.1]]),
-                  "alpha": torch.tensor([[1.0, 0.5], [0.2, 1.3], [0.8, 0.8]]),
-                  "beta": torch.tensor([-1.0, 0.0, 1.0])}
-    trace = pyro.poutine.trace(pyro.poutine.condition(team_irt, data=parameters)).get_trace(data, 2)
+    trace = pyro.poutine.trace(pyro.poutine.condition(team_irt, data=parameters)).get_trace(data, dimensions)
     values = {key: value.numpy().copy() for key, value in parameters.items()}
     expected = predict(parts, values, data["team_ids"], data["part_ids"])
     np.testing.assert_allclose(expected, trace.nodes["correct"]["fn"].probs.numpy(), rtol=1e-6)
@@ -46,14 +51,34 @@ def test_likelihood_matches_frozen_replay_and_labels_do_not_change_predictions()
         predict(parts.assign(team_id="unseen"), values, data["team_ids"], data["part_ids"])
 
 
-def test_small_svi_fit_is_finite():
+def test_relevance_logit_uses_only_r_weighted_difficulty():
+    _, parts = fixture()
+    data = training_tensors(parts, "cpu")
+    theta = np.array([[0.3, -0.2], [0.7, 0.1]])
+    r = np.array([[0.6, 0.4], [0.1, 0.9], [0.5, 0.5]])
+    beta = np.array([[-1.0, 0.5], [0.0, 0.3], [1.0, -0.4]])
+    expected = 1 / (1 + np.exp(-(r[data["part"].numpy()] * (theta[data["team"].numpy()] - beta[data["part"].numpy()])).sum(-1)))
+    null = np.stack([r[:, 1], -r[:, 0]], axis=1) * 5.0  # r_b dot null_b = 0
+    for shifted in (beta, beta + null):
+        np.testing.assert_allclose(
+            predict(parts, {"theta": theta, "r": r, "beta": shifted}, data["team_ids"], data["part_ids"]),
+            expected, rtol=1e-12)
+
+
+@pytest.mark.parametrize("dimensions", [1, 3])
+def test_small_svi_fit_is_finite(dimensions):
     _, parts = fixture()
     pyro.set_rng_seed(42)
     data = training_tensors(parts, "cpu")
-    medians, _, losses = fit_svi(team_irt, model_kwargs={"data": data, "dimensions": 2}, n_steps=3, lr=0.01)
+    medians, _, losses = fit_svi(team_irt, model_kwargs={"data": data, "dimensions": dimensions}, n_steps=3, lr=0.01)
     assert np.isfinite(losses).all()
-    assert medians["theta"].shape == (2, 2)
-    assert torch.all(medians["alpha"] > 0)
+    assert medians["theta"].shape == (2, dimensions)
+    if dimensions == 1:
+        assert torch.all(medians["alpha"] > 0)
+    else:
+        assert medians["beta"].shape == (3, dimensions)
+        assert torch.all(medians["r"] > 0)
+        torch.testing.assert_close(medians["r"].sum(-1), torch.ones(3))
 
 
 def test_matching_drops_entire_game_and_rejects_label_mismatch():

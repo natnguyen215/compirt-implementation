@@ -1,8 +1,0 @@
-{
-  "pid": 1421161,
-  "gpu": 1,
-  "log": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/parallel-dd-normalized-v1-10000-20260913-195429/logs/dd-1-train.log",
-  "started_at": "2026-09-14T02:54:32.912640+00:00",
-  "signature": "9fbc87edd6aca5a262d7ddd4828ee56ad0c9d0d511a8ccc4853fdbbe92de05bd",
-  "exit_code": 0
-}

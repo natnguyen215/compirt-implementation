@@ -34,7 +34,7 @@ TRAIN_MODULE = (
 EVALUATE_MODULE = "run_scripts.double_difficulty.evaluate_fold"
 DEFAULT_ROOT = Path(
     "results/compirt/holdout/double-difficulty/"
-    "variants/perceived-difficulty/positive-alpha"
+    "variants/perception/perceived-difficulty/positive-alpha"
 )
 
 

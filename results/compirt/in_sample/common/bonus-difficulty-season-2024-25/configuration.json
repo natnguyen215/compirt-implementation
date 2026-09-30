@@ -1,0 +1,57 @@
+{
+  "split": "season_2024_25",
+  "regime": "in_sample parameter diagnostics; all season games; no held-out performance claims",
+  "seed": 42,
+  "models": {
+    "Multidimensional": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/compositional",
+    "Multidimensional + synergy": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/multidim/synergy",
+    "DD-Bernstein": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/compositional",
+    "DD-Bernstein + synergy": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/synergy",
+    "DD-Bernstein, Noisy-OR": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/noisy-or",
+    "DD-Bernstein, max skill": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/max-skill",
+    "DD-Bernstein, max skill + synergy": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/max-skill-synergy",
+    "DD-Bernstein, multidimensional difficulty + synergy": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy",
+    "DD-Bernstein, additive phi-psi 1D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-additive-1d",
+    "DD-Bernstein, additive phi-psi 3D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-additive-3d",
+    "DD-Bernstein, multiplicative dot 1D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/dot-multiplicative-1d",
+    "DD-Bernstein, multiplicative dot 3D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/dot-multiplicative-3d",
+    "DD-Bernstein, multiplicative phi-psi 1D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-multiplicative-1d",
+    "DD-Bernstein, multiplicative phi-psi 3D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/phi-psi-multiplicative-3d",
+    "DD-Bernstein, multidimensional difficulty + 3D synergy": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy-3d",
+    "Team IRT 1D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/team_irt_1d",
+    "Team IRT 3D": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/team_irt_3d"
+  },
+  "table_counts": {
+    "tournaments": 33,
+    "teams": 492,
+    "games": 2661,
+    "tossup_buzzes": 64037,
+    "bonus_responses": 49042,
+    "tossups": 1360,
+    "bonuses": 1359
+  },
+  "source_sha256": {
+    "compirt_data.py": "876869c4fad710f56fad4b27ec914a68124326d42dc848b6d88607e7eba423a5",
+    "holdout/season_splits.py": "78456a218cfa42eabbd071aac128280f52c16035ec5e4cf065a8ed0a6347917f",
+    "compositional_model.py": "0718f7fbef7a84aa4f3cbb8a989975532b19bee34263ae9b74599e114de8711a",
+    "train_compositional.py": "5fb5591721a0959fa0efa3aada3bdb730524ddb5bb5e89e2dd812065b72a8627",
+    "compirt_race.py": "33fd7e4ded72a359d07fd53a317a17f2412b5b03f18fb7a25105f35a110a6d45",
+    "utils/training.py": "b82b89b5861c0c8dd8d466a44406857e50ee934dc9cb6537f15479ca8854cad5",
+    "analysis/bonus_team_irt/model.py": "80e04c4ef8d9b915bfbe413eb52dc7f0e3a9b683afa315eb851a9f6a9dfe1028",
+    "analysis/bonus_team_irt/run.py": "4ee248cd46257bfa2af61d6c72cf545072fa46a266de7ed0f52d563feb72c215",
+    "hazard_double_difficulty/bernstein/pyramidal_model.py": "292f932ebaf99fe18b87e577b15cd384631ff0287cbe5c29f316e87be76a6b0e",
+    "hazard_double_difficulty/bernstein/train_pyramidal.py": "6e1fba37d710dc863925f03db07346e6b29b8405045c7b3c30ef2a38d5968092",
+    "multidimensional/multidim_mirt/pyramidal_model.py": "a9b9e765b232aaa6132fa31194210bad1e9544906aaa5b80e1b13b20b52781a3",
+    "multidimensional/multidim_mirt/train_pyramidal.py": "67156fa566fc8eb50474ffdf0f8db73d9212e27f0946c3435467f0335d44fdfd"
+  },
+  "data_sha256": {
+    "tournaments": "db3962b105c0411b394196a425ac92952c604b71db67e7632d7839e3bd0deabf",
+    "teams": "d92ba2ca46d0429af92883b385d5cddac4190114bae992be683aec2a671fe7bd",
+    "games": "11274b0cad12fae10f5e0f0475802274c5c5891743b8456e4644109671e5a843",
+    "tossup_buzzes": "f0b8866a66b11a35f5efe051a7a0b21f5d7201f869d11fd446b8fc522276a85a",
+    "bonus_responses": "c2191c08f4a63536f5a9578f8d46c1cc594bc01232b9ab7f2820506053db6843",
+    "tossups": "e1a9be0bad7e457d24acef999032b73e6273f6528231aa370b2466331e5becb0",
+    "bonuses": "3d6be3e47e909ee10bdd3ae0fd85f44017fe5d933aa8dc3c7c52503e04132163"
+  },
+  "stages": 19
+}

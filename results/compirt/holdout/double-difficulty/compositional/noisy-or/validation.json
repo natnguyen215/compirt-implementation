@@ -1,0 +1,103 @@
+{
+  "all_five_fits_complete": true,
+  "all_finite_losses": true,
+  "matched_configuration_fields": [
+    "stage1_root",
+    "folds",
+    "steps",
+    "lr",
+    "seed",
+    "alpha_prior",
+    "bonus_difficulty",
+    "sources"
+  ],
+  "observed_outcomes_equal_baseline": true,
+  "matched_parts": 127986,
+  "matched_games": 2330,
+  "fold_checks": {
+    "0": {
+      "train_games": 1960,
+      "test_games": 471,
+      "train_responses": 35881,
+      "test_responses": 8606,
+      "test_parts": 25818,
+      "disjoint_games": true,
+      "finite_probabilities": true,
+      "train_dropped_rows_unknown_roster": 0,
+      "test_dropped_rows_unknown_roster": 0
+    },
+    "1": {
+      "train_games": 1969,
+      "test_games": 462,
+      "train_responses": 36067,
+      "test_responses": 8420,
+      "test_parts": 25260,
+      "disjoint_games": true,
+      "finite_probabilities": true,
+      "train_dropped_rows_unknown_roster": 0,
+      "test_dropped_rows_unknown_roster": 0
+    },
+    "2": {
+      "train_games": 1962,
+      "test_games": 469,
+      "train_responses": 35890,
+      "test_responses": 8597,
+      "test_parts": 25791,
+      "disjoint_games": true,
+      "finite_probabilities": true,
+      "train_dropped_rows_unknown_roster": 0,
+      "test_dropped_rows_unknown_roster": 0
+    },
+    "3": {
+      "train_games": 1970,
+      "test_games": 461,
+      "train_responses": 36032,
+      "test_responses": 8455,
+      "test_parts": 25365,
+      "disjoint_games": true,
+      "finite_probabilities": true,
+      "train_dropped_rows_unknown_roster": 0,
+      "test_dropped_rows_unknown_roster": 0
+    },
+    "4": {
+      "train_games": 1962,
+      "test_games": 469,
+      "train_responses": 35865,
+      "test_responses": 8622,
+      "test_parts": 25866,
+      "disjoint_games": true,
+      "finite_probabilities": true,
+      "train_dropped_rows_unknown_roster": 0,
+      "test_dropped_rows_unknown_roster": 0
+    }
+  },
+  "root_tests": {
+    "passed": 219,
+    "skipped": 4,
+    "subtests_passed": 13
+  },
+  "family_tests_passed": 16,
+  "correctness_study_tests_passed": 5,
+  "pyflakes_passed": true,
+  "whitespace_passed": true,
+  "final_noisy_or_roundtrip": {
+    "passed": 1,
+    "skipped": 1
+  },
+  "optional_data_validation": "failed: generated tables differ from local SQLite source (77 versus 68 tournaments); existing comparison data retained",
+  "final_code_sha256": {
+    "compositional_model.py": "321489bf80942e8f639b05bc508d9a0672b5c8697fe40861fda1246f0269cfe9",
+    "train_compositional.py": "db62a095ffbe34b0732648fdc054ab9d98b4d6b1d3ecc12e3aaef53b7d139fa1",
+    "holdout/frozen_predict.py": "498a5cf34be6b8f6951887da7456fbbc58c319c0733440d786d52f16e27f2e36",
+    "compirt_data.py": "876869c4fad710f56fad4b27ec914a68124326d42dc848b6d88607e7eba423a5",
+    "lineup.py": "2f9f94404f99c8e4cb870bd382686267178eb3a63f0b08b6743df0311a36e721",
+    "holdout/game_splits.py": "b3bc42cd71b69a24b85b4ec7cdad2305c6bbf7bf6f9088f7d33aac4a310140e2",
+    "utils/training.py": "b82b89b5861c0c8dd8d466a44406857e50ee934dc9cb6537f15479ca8854cad5",
+    "compirt_eval/scenario_b_bonuses/metrics.py": "89dc48662b30f01c34a91f1ab00dc5245ab72a2b98d36e61dc58edd3fa362795",
+    "compirt_eval/common/metrics.py": "1edf5ba8643353765c7eeb2b77a5acb0a933286371a0560a2ad247fb6b23060e",
+    "compirt_eval/scenario_b_bonuses/folds.py": "83ff0716329b97d033819e12b2afaceaf993ee6ae053e68f4d9f05ae130ba97d",
+    "compirt_eval/common/bonus_reports.py": "45f6efbf5d4b64a7da95e9ef592b329088eaf22ab372abdb2fc4e639cb5ddf63",
+    "run_scripts/common/run_compositional_from_folds.py": "d7e59c24afd083062ea9e0c5394525a755540f6982a607168e1a199b0b58dd09"
+  },
+  "code_provenance_note": "configuration.json retains launch hashes. Concurrent additions for the separate max aggregation leave the Noisy-OR branch unchanged; final hashes are retained here."
+}

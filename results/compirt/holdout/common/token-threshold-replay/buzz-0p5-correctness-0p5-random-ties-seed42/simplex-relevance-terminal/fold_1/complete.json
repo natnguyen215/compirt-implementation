@@ -1,0 +1,30 @@
+{
+  "signature": {
+    "inputs": {
+      "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex-terminal/degree_3/curves_3/dirichlet_2/fold_1/holdout/pyramidal/players.csv": [
+        77213,
+        1786776296572428005
+      ],
+      "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex-terminal/degree_3/curves_3/dirichlet_2/fold_1/holdout/pyramidal/tossups.csv": [
+        590185,
+        1786776296616261690
+      ],
+      "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex-terminal/degree_3/curves_3/dirichlet_2/fold_1/holdout/pyramidal/tossup_predictions.csv": [
+        20874043,
+        1786776297256832903
+      ],
+      "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex-terminal/degree_3/curves_3/dirichlet_2/fold_1/holdout/pyramidal/summary.json": [
+        1611,
+        1786776297310547628
+      ]
+    },
+    "code": {
+      "compirt_eval/scenario_a_tossups/outcomes.py": "b2b7e67b79bbef861d4128bc0667980ee5088286bcecfeba0a0d50b06a7302f4",
+      "compirt_eval/scenario_a_tossups/reconstruction.py": "467115814d6eb7688406615f5bbca226827c7ae9e9ff0090dfddb0ab008e2738",
+      "compirt_eval/scenario_a_tossups/parameters.py": "0f98dd16697d76da1e46c73dd98b577ed01e4760a0d7cc839fd690d5e2c97f8e"
+    },
+    "schema": 3,
+    "seed": 42
+  },
+  "elapsed_seconds": 86.65521206217818
+}

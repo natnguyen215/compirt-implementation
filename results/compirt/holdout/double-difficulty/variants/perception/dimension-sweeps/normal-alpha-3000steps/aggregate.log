@@ -1,0 +1,2 @@
+Perception dimension ablation: 2 models x 10 dimensions x 5 folds = 100 fits; root=/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/variants/perception/dimension-sweeps/normal-alpha-3000steps
+Aggregate results: /teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/variants/perception/dimension-sweeps/normal-alpha-3000steps/aggregate/summary.md

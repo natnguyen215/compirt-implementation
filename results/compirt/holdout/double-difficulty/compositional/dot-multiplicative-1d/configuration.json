@@ -1,0 +1,110 @@
+{
+  "stage1_root": "/teapot-old/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-3000steps",
+  "root": "/teapot-old/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/compositional/dot-multiplicative-1d",
+  "folds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "arms": [
+    "synergy"
+  ],
+  "steps": 3000,
+  "lr": 0.01,
+  "seed": 42,
+  "alpha_prior": "gamma",
+  "bonus_difficulty": "scalar",
+  "synergy_form": "dot",
+  "synergy_link": "multiplicative",
+  "synergy_dimensions": 1,
+  "device": "cuda",
+  "data_dir": null,
+  "sources": {
+    "0": {
+      "path": "/teapot-old/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-3000steps/fold_0/train/pyramidal",
+      "train_split": "game-holdout:year_2024:train:5:0:42",
+      "test_split": "game-holdout:year_2024:test:5:0:42",
+      "players_sha256": "5fcfd5944d3b414f11f01aed7c4822b6e8c2cc4d06cba55cf23fb76662375fbb",
+      "summary_sha256": "094e134664a4c13a2ec91b95b493d03d85d174a35f5974308d564c2732e56db2",
+      "tossup_predictions_sha256": "a557a96f08a6a7f755f07aec0b7dbb8298086fd3a5761f6fdd875bb08c0f5b0a",
+      "model": "bernstein-double-difficulty-competing-risks",
+      "dimensions": 3,
+      "degree": 3,
+      "relevance_prior": "simplex",
+      "learned_curve_locations": true,
+      "terminal_intercepts": true
+    },
+    "1": {
+      "path": "/teapot-old/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-3000steps/fold_1/train/pyramidal",
+      "train_split": "game-holdout:year_2024:train:5:1:42",
+      "test_split": "game-holdout:year_2024:test:5:1:42",
+      "players_sha256": "bafbbe550070a97c9b2876dea348beba5ad9086cd23fb87fd540b948c8c7bc2e",
+      "summary_sha256": "4752478c1952d42a156d11ca28b0cad3f48457266e767d66519724e5f80a4a5a",
+      "tossup_predictions_sha256": "3d7cf3f6e1b5a9edccd8452d98dfa8a815d7070f2dd93136d74acb9a31092acf",
+      "model": "bernstein-double-difficulty-competing-risks",
+      "dimensions": 3,
+      "degree": 3,
+      "relevance_prior": "simplex",
+      "learned_curve_locations": true,
+      "terminal_intercepts": true
+    },
+    "2": {
+      "path": "/teapot-old/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-3000steps/fold_2/train/pyramidal",
+      "train_split": "game-holdout:year_2024:train:5:2:42",
+      "test_split": "game-holdout:year_2024:test:5:2:42",
+      "players_sha256": "f7e38a50f8469e970d696b08b1db90f7325928dacd186f29a9631f82200fea86",
+      "summary_sha256": "7d493bade362d5f3ec4a293b45dbb366e07a16447a71761bb955ab351022009f",
+      "tossup_predictions_sha256": "b4e1075fea95fe8f6f79cc02da240a1670f295ad50c56985676d6fdd0214f325",
+      "model": "bernstein-double-difficulty-competing-risks",
+      "dimensions": 3,
+      "degree": 3,
+      "relevance_prior": "simplex",
+      "learned_curve_locations": true,
+      "terminal_intercepts": true
+    },
+    "3": {
+      "path": "/teapot-old/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-3000steps/fold_3/train/pyramidal",
+      "train_split": "game-holdout:year_2024:train:5:3:42",
+      "test_split": "game-holdout:year_2024:test:5:3:42",
+      "players_sha256": "a5523acf8b8d23f60c7700bd78db862f312278117050de52ed139a7577819f99",
+      "summary_sha256": "6d0b4af877fe983378f440534e125c8f6c64194852745d773c4cc34425c309eb",
+      "tossup_predictions_sha256": "8f1b5893def49fc365a5c638c82c8edabcd95a92357bdcdad492853690ebd68b",
+      "model": "bernstein-double-difficulty-competing-risks",
+      "dimensions": 3,
+      "degree": 3,
+      "relevance_prior": "simplex",
+      "learned_curve_locations": true,
+      "terminal_intercepts": true
+    },
+    "4": {
+      "path": "/teapot-old/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-3000steps/fold_4/train/pyramidal",
+      "train_split": "game-holdout:year_2024:train:5:4:42",
+      "test_split": "game-holdout:year_2024:test:5:4:42",
+      "players_sha256": "b7d69f9307f446885aeae81822a9cdd0a82a57f19ddf937fefe785f3eba69a74",
+      "summary_sha256": "95152955acfbefcabc138a85788b2c3c9c3f528367dcfe8236bc69b2b9214910",
+      "tossup_predictions_sha256": "59c8f062e93f61bbd31be6ab14a378bc479f2b56f47db07183a51a79eebbacc0",
+      "model": "bernstein-double-difficulty-competing-risks",
+      "dimensions": 3,
+      "degree": 3,
+      "relevance_prior": "simplex",
+      "learned_curve_locations": true,
+      "terminal_intercepts": true
+    }
+  },
+  "code_sha256": {
+    "compositional_model.py": "fcce6ed200e3db6056c38ebfe3dbf2f846146a2be021dc653138498f109c019e",
+    "train_compositional.py": "5f54955eb05571c14982af7fafb6d18c69a6c1556ade6e9b8eabf6f8e3235d38",
+    "holdout/frozen_predict.py": "5d6fe951d129dc5ff11f91cd0555e2c80e58611b0b44ede8160e689a6b7120d1",
+    "compirt_data.py": "876869c4fad710f56fad4b27ec914a68124326d42dc848b6d88607e7eba423a5",
+    "lineup.py": "2f9f94404f99c8e4cb870bd382686267178eb3a63f0b08b6743df0311a36e721",
+    "holdout/game_splits.py": "b3bc42cd71b69a24b85b4ec7cdad2305c6bbf7bf6f9088f7d33aac4a310140e2",
+    "utils/training.py": "b82b89b5861c0c8dd8d466a44406857e50ee934dc9cb6537f15479ca8854cad5",
+    "compirt_eval/scenario_b_bonuses/metrics.py": "89dc48662b30f01c34a91f1ab00dc5245ab72a2b98d36e61dc58edd3fa362795",
+    "compirt_eval/common/metrics.py": "1edf5ba8643353765c7eeb2b77a5acb0a933286371a0560a2ad247fb6b23060e",
+    "compirt_eval/scenario_b_bonuses/folds.py": "83ff0716329b97d033819e12b2afaceaf993ee6ae053e68f4d9f05ae130ba97d",
+    "compirt_eval/common/bonus_reports.py": "e457567d6bf60af60eaf94e793bb3ef31cdd7e2e1d4a353e0e17edef709ae1de",
+    "run_scripts/common/run_compositional_from_folds.py": "3e70c6eb4ea19c58c9da12bb583627519d6be524f928d77716b29099c0b69daa"
+  }
+}

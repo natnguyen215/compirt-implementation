@@ -46,16 +46,46 @@ def training_tensors(frame, device):
 
 
 def team_irt(data, dimensions):
+    """Bonus-part correctness from one skill vector per tournament team.
+
+    1D: logit = alpha_b * theta_t - beta_b, with alpha_b ~ Gamma(2, 2).
+    More dimensions: logit = sum_k r_bk * (theta_tk - beta_bk), with simplex
+    relevance r_b ~ Dirichlet(1) and one difficulty per skill axis. Only
+    r_b dot beta_b enters the likelihood, so the prior sets each beta_bk.
+    """
     zero = data["y"].new_tensor(0.0)
     one = data["y"].new_tensor(1.0)
+    # theta: (n_teams, dimensions).
     with pyro.plate("teams", len(data["team_ids"])):
         theta = pyro.sample("theta", dist.Normal(zero, one).expand([dimensions]).to_event(1))
+    parameters = {"theta": theta}
     with pyro.plate("parts", len(data["part_ids"])):
-        alpha = pyro.sample("alpha", dist.Gamma(2 * one, 2 * one).expand([dimensions]).to_event(1))
-        beta = pyro.sample("beta", dist.Normal(zero, one))
-    logits = (theta[data["team"]] * alpha[data["part"]]).sum(-1) - beta[data["part"]]
+        if dimensions == 1:
+            # alpha: (n_parts, 1); beta: (n_parts,).
+            parameters["alpha"] = pyro.sample(
+                "alpha", dist.Gamma(2 * one, 2 * one).expand([1]).to_event(1)
+            )
+            parameters["beta"] = pyro.sample("beta", dist.Normal(zero, one))
+        else:
+            # r and beta: (n_parts, dimensions).
+            parameters["r"] = pyro.sample("r", dist.Dirichlet(one.expand([dimensions])))
+            parameters["beta"] = pyro.sample(
+                "beta", dist.Normal(zero, one).expand([dimensions]).to_event(1)
+            )
+    logits = part_logits(parameters, data["team"], data["part"])
     with pyro.plate("observations", len(data["y"])):
         pyro.sample("correct", dist.Bernoulli(logits=logits), obs=data["y"])
+
+
+def part_logits(parameters, teams, parts):
+    """Return one logit per (team, part) row for either parameterization.
+
+    Works on tensors while fitting and on saved NumPy arrays during replay.
+    """
+    theta = parameters["theta"][teams]
+    if "r" in parameters:
+        return (parameters["r"][parts] * (theta - parameters["beta"][parts])).sum(-1)
+    return (theta * parameters["alpha"][parts]).sum(-1) - parameters["beta"][parts]
 
 
 def predict(frame, parameters, team_ids, part_ids):
@@ -64,7 +94,7 @@ def predict(frame, parameters, team_ids, part_ids):
     parts = pd.Index(part_ids).get_indexer(frame.bonus_part_id)
     if (teams < 0).any() or (parts < 0).any():
         raise ValueError("Frozen prediction requires training team and part coverage")
-    logits = (parameters["theta"][teams] * parameters["alpha"][parts]).sum(-1) - parameters["beta"][parts]
+    logits = part_logits(parameters, teams, parts)
     return 1 / (1 + np.exp(-np.clip(logits, -60, 60)))
 
 

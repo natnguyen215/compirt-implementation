@@ -1,0 +1,13 @@
+grouping,level,split_half_r,teams
+category,Fine Arts,0.35960032214592,426
+category,Geography/CE,0.45718494729119397,56
+category,History,0.43495318222860463,468
+category,Literature,0.44759188811729694,469
+category,Mythology,0.349883461093524,81
+category,Philosophy,0.4719306326899236,73
+category,Religion,0.06429325142109922,127
+category,Science,0.37537564392807016,471
+category,Social Science,0.3448420269121247,100
+label,easy,0.3405867237496894,480
+label,hard,0.39062073085011406,480
+label,medium,0.26232824953470474,480

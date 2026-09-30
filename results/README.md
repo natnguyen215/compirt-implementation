@@ -46,33 +46,67 @@ and sweep runners nest further (`<arm>/seed_N/fold_K/`, or
 
 [`holdout/double-difficulty/`](compirt/holdout/double-difficulty/README.md) is
 grouped one level deeper, by the question each run answers (`ablations/`,
-`model-comparisons/`, `variants/`, `2023-2025-season/`), and has its own index.
+`model-comparisons/`, `variants/`, `likelihood-refits/`, `compositional/`,
+`2023-2025-season/`), and has its own index.
 
-i## Naming
+The [shared bonus comparison](compirt/comparisons/bonuses/dd-bernstein-and-team-irt-5fold/README.md)
+is the current results entry point: DD-Bernstein, multidimensional references,
+and Team IRT 1D and 3D on identical games. The
+[bonus research log](../RESEARCH_LOG_2.md) contains their joint summary.
 
-Leaf names mix historical styles (`all-2024`, `all2024`) and are not renamed,
-because a leaf name is part of the run's provenance. The directories above the
-leaves have been reorganized, so `Result root:` lines in older
-`evaluation/docs/summary.md` files may name a previous location.
+The [2024–25 full-season bonus fits](compirt/in_sample/common/bonus-difficulty-season-2024-25/README.md)
+check easy/medium/hard parameter ordering within bonuses and tournament
+difficulty ordering across Fall, Winter, Regionals, and Nationals. They are
+in-sample parameter diagnostics; the research log retains the original
+calendar-2024 held-out classification comparison.
 
-`holdout/double-difficulty/` is the exception: its runs were renamed, and their
-recorded paths (`configuration.json`, `command.json`, `.complete.json` resume
-markers, and `Result root:` lines) were rewritten to match, so resume still
-works there. New runs should use the names emitted by the current runners.
+The [compositional bonus index](compirt/holdout/double-difficulty/compositional/README.md)
+links each saved bonus configuration, fold report, and pooled comparison, and
+documents the training → frozen replay → evaluation → pooling flow.
+
+## Naming
+
+Name runs by their model and configuration, without launch dates or timestamps.
+List the modifications that distinguish the run: relevance prior, learned
+locations, terminal intercepts, likelihood, synergy form/link/dimensions,
+training steps when they vary between runs, and fold coverage. Shared bonus
+training budgets belong in metadata. Parent directories supply
+the family and evaluation regime. Dataset years such as `all2024` and
+`2023-2025-season` describe the population and remain in the names.
+
+For example, `dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-3000steps`
+identifies a Stage-1 run. Here `332` means Bernstein degree 3, skill
+dimensions 3, and drop concentration 2. The `normalized-first-buzz` suffix
+identifies a refit using the corrected probability law for the first buzzer
+and dead tossups; `3000steps` stays because sibling refits use 10,000 steps.
+Bonus runs under `double-difficulty/compositional/` all use those skills,
+3,000 steps, and five folds, so their names carry only the bonus
+configuration: `phi-psi-multiplicative-3d` is the synergy form, link, and
+dimensions. The metadata value `normalized_hazard_odds_v1` names that
+likelihood.
+
+Run dates remain in metadata and research notes. When renaming a run, update
+saved paths, completion markers, dependent metadata hashes, commands, and
+report links together. Give each configuration and training copy its own
+directory, choosing a new name when a descriptive one is taken.
 
 ## Code kept beside results
 
-Completed studies keep the code that produced them beside their results:
+Compositional analysis scripts live in
+[`analysis/compositional/`](../analysis/README.md#saved-compositional-analyses);
+their results folders contain reports and saved artifacts.
+
+Some historical studies retain code snapshots beside their results:
 
 - `in_sample/common/drop-robustness/code/`
 - `in_sample/multidim/multidim-all2024/code/` (posterior predictive checks and
   match simulation)
 - `in_sample/multidim/multidim-all2024/compirt_eval/parameter-recovery/code/`
 - `in_sample/multidim/multidim-all2024-cal/imaginary-tournament/code/`
-- `holdout/double-difficulty/compositional/dd-bernstein-332-simplex-locations-terminal/code/`
-- `holdout/common/token-threshold-replay/2026-09-13/replay_research_log_outcomes.py`
-- `holdout/common/bonus-team-irt/2026-09-17/code/` (snapshot of the configurable
-  `analysis/bonus_team_irt/` study)
+- `holdout/common/token-threshold-replay/buzz-0p5-correctness-0p5-random-ties-seed42/replay_research_log_outcomes.py`
+- `holdout/common/bonus-team-irt/team-skills-1d-gamma-alpha-3d-simplex-relevance-5fold/identifiability/code/`
+  (Team IRT 3D identifiability refits and analysis)
+- `comparisons/bonuses/dd-bernstein-and-team-irt-5fold/code/` (Team IRT rescoring)
 - `ranking_comparison/code/`
 
 This code is a record. It is not imported or checked, its imports and READMEs

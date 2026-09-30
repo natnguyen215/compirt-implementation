@@ -5,14 +5,15 @@ model form fixed. Structural model changes live in [`../variants/`](../variants/
 whole model families evaluated side by side live in
 [`../model-comparisons/`](../model-comparisons/).
 
-| Folder | Factor | Result |
-| --- | --- | --- |
-| [`relevance-locations-terminal/`](relevance-locations-terminal/) | relevance parameterization x learned curve locations x terminal intercepts — one group, because the three are read together | Simplex relevance improves accuracy and correctness LL; unconstrained relevance improves timing. Terminal intercepts improve joint LL, no-buzz calibration, final-decile mass, and position MAE. §3.2, §3.5–3.6 |
-| [`optimization-steps/`](optimization-steps/) | SVI steps: `steps-6000/`, `steps-20000/` (reference is 3,000) | Joint event LL continues to improve at 20,000 steps; the 3,000-step fits have not converged. |
-| [`incorrect-loss-weight/`](incorrect-loss-weight/) | likelihood weight on incorrect responses: `weight-1.5`, `weight-2`, `weight-3` (reference is 1x) | Upweighting incorrect responses monotonically degrades correctness LL, ECE and accuracy while leaving position MAE flat. §3.11 |
-| `hyperparameter-grid/` | degree 3–6 x dimensions 1–5 x drop-concentration 0.67–2.0; 100 points | Ignored by git as regenerable (~2.7 GB); its 3/3/2 point is tracked below as `dd-bernstein-332-unconstrained/`. §3.7 |
-| `high-degree/` | degree 10 (three dimensions, drop concentration 0.67, simplex, locations, terminal) at 3,000 and 10,000 steps | See each run's `configuration.json` and fold evaluations. |
-| `perception-dimensions-unconstrained/`, `perception-dimensions-unconstrained-10000-steps/` | 1–10 dimensions for perceived-logit and three-slice perceived-difficulty with Normal alpha priors, at 3,000 and 10,000 steps | Selection and budget comparison in each folder's `aggregate/`. |
+| Group | Experiments |
+| --- | --- |
+| [model-components/](model-components/) | `relevance-locations-terminal/`: seven relevance-prior, learned-location, and terminal-intercept configurations; details below. |
+| [capacity/](capacity/) | [Degree/dimension/drop-prior grid](capacity/degree-dimensions-drop-prior/aggregate/summary.md) (100 configurations) and [degree-10 runs](capacity/high-degree/) at 3,000/10,000 steps. |
+| [training/](training/) | [Optimization steps](training/optimization-steps/): 6,000/20,000 versus the 3,000-step reference. [Incorrect-response weights](training/incorrect-loss-weight/): 1.5, 2, and 3 versus 1. |
+
+Perception-model sweeps live with their model variants under
+[variants/perception/dimension-sweeps/](../variants/perception/dimension-sweeps/).
+They change both the model family and its dimensionality.
 
 ## relevance-locations-terminal
 
@@ -23,13 +24,13 @@ configuration, so the name alone says which run it is:
 
 | Run | relevance prior | drop conc. | learned locations | terminal | Research Log row |
 | --- | --- | ---: | :-: | :-: | --- |
-| [`dd-bernstein-332-unconstrained/`](relevance-locations-terminal/dd-bernstein-332-unconstrained/) | unconstrained | 2.0 | no | no | `DD-Bernstein 3/3/2, no terminal` |
-| [`dd-bernstein-332-unconstrained-terminal/`](relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/) | unconstrained | 2.0 | no | **yes** | `DD-Bernstein 3/3/2, terminal` |
-| [`dd-bernstein-332-simplex/`](relevance-locations-terminal/dd-bernstein-332-simplex/) | **simplex** | 2.0 | no | no | `Simplex relevance, no terminal` |
-| [`dd-bernstein-332-simplex-terminal/`](relevance-locations-terminal/dd-bernstein-332-simplex-terminal/) | **simplex** | 2.0 | no | **yes** | `Simplex relevance, terminal` |
-| [`dd-bernstein-332-simplex-locations-terminal/`](relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/) | **simplex** | 2.0 | **yes** | **yes** | `Simplex relevance, locations + terminal` |
-| [`dd-bernstein-330p67-simplex-locations-terminal/`](relevance-locations-terminal/dd-bernstein-330p67-simplex-locations-terminal/) | **simplex** | **0.67** | **yes** | **yes** | `Simplex relevance 3/3/0.67, locations + terminal` |
-| [`dd-bernstein-332-gamma-locations-terminal/`](relevance-locations-terminal/dd-bernstein-332-gamma-locations-terminal/) | **Gamma(2,2)** | 2.0 | **yes** | **yes** | not in the main table |
+| [`dd-bernstein-332-unconstrained/`](model-components/relevance-locations-terminal/dd-bernstein-332-unconstrained/) | unconstrained | 2.0 | no | no | `DD-Bernstein 3/3/2, no terminal` |
+| [`dd-bernstein-332-unconstrained-terminal/`](model-components/relevance-locations-terminal/dd-bernstein-332-unconstrained-terminal/) | unconstrained | 2.0 | no | **yes** | `DD-Bernstein 3/3/2, terminal` |
+| [`dd-bernstein-332-simplex/`](model-components/relevance-locations-terminal/dd-bernstein-332-simplex/) | **simplex** | 2.0 | no | no | `Simplex relevance, no terminal` |
+| [`dd-bernstein-332-simplex-terminal/`](model-components/relevance-locations-terminal/dd-bernstein-332-simplex-terminal/) | **simplex** | 2.0 | no | **yes** | `Simplex relevance, terminal` |
+| [`dd-bernstein-332-simplex-locations-terminal/`](model-components/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal/) | **simplex** | 2.0 | **yes** | **yes** | `Simplex relevance, locations + terminal` |
+| [`dd-bernstein-330p67-simplex-locations-terminal/`](model-components/relevance-locations-terminal/dd-bernstein-330p67-simplex-locations-terminal/) | **simplex** | **0.67** | **yes** | **yes** | `Simplex relevance 3/3/0.67, locations + terminal` |
+| [`dd-bernstein-332-gamma-locations-terminal/`](model-components/relevance-locations-terminal/dd-bernstein-332-gamma-locations-terminal/) | **Gamma(2,2)** | 2.0 | **yes** | **yes** | not in the main table |
 
 `dd-bernstein-332-simplex-locations-terminal/` is the reference configuration
 for the other ablation folders.
@@ -45,11 +46,11 @@ Two layout quirks, both inherited from the runner that produced the run:
 - `dd-bernstein-332-simplex/` and `dd-bernstein-332-simplex-terminal/` keep a
   `degree_3/curves_3/dirichlet_2/` directory above their folds. The other five
   hold `fold_{0..4}/` directly.
-- `dirichlet_N` in those paths, and in `hyperparameter-grid/`, is the
+- `dirichlet_N` in those paths, and in `capacity/degree-dimensions-drop-prior/`, is the
   **drop**-concentration, not the relevance Dirichlet, which stays at `ones(k)`.
 
 `dd-bernstein-332-unconstrained/` is also an arm of two other comparisons: it
-is the `degree_3/curves_3/dirichlet_2` cell of `hyperparameter-grid/` and the
+is the `degree_3/curves_3/dirichlet_2` cell of `capacity/degree-dimensions-drop-prior/` and the
 Bernstein arm of
 [`../model-comparisons/curve-family/`](../model-comparisons/curve-family/)
 (its fold metrics match that comparison's Bernstein column).

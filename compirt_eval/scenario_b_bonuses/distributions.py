@@ -196,7 +196,7 @@ def bonus_parameter_distribution_plots(
     )
 
 
-def bonus_prediction_distribution_plots(parts, output_dir):
+def bonus_prediction_distribution_plots(parts, output_dir, bonus_aggregation="lse"):
     """Plot evaluated row contributions, separately from fitted entity parameters."""
     panels, rows = [], []
     specs = [
@@ -204,6 +204,9 @@ def bonus_prediction_distribution_plots(parts, output_dir):
         ("aggregate", "Aggregate ability (per part)", r"$A_k(T)$", "bonus_part_row"),
         ("synergy_contribution", "Synergy contribution (per response)", r"$\Phi(T)$", "bonus_response"),
     ]
+    # Noisy-OR saves the full team logit, difficulty included, as 'aggregate'.
+    if bonus_aggregation == "noisy-or":
+        specs[1] = ("aggregate", "Noisy-OR team logit (per part)", "logit(p)", "bonus_part_row")
     for column, title, label, entity in specs:
         if column not in parts:
             continue

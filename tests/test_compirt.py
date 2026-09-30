@@ -389,6 +389,113 @@ class DataTests(unittest.TestCase):
 
 
 class ModelTests(unittest.TestCase):
+    def test_max_skill_picks_each_dimension_and_preserves_synergy(self):
+        # Different players win each axis; padding would win both if unmasked.
+        theta = torch.tensor([[-1., -4.], [-3., -2.], [100., 100.]])
+        data = {"part_ids": ["part"], "part": torch.tensor([0, 0]),
+                "roster": torch.tensor([[0, 1, 2], [1, 2, 2]]),
+                "roster_mask": torch.tensor([[True, True, False], [True, False, False]]),
+                "y": torch.tensor([1., 0.])}
+        posterior = {"alpha": torch.tensor([[2., 3.]]), "beta": torch.tensor([.5]),
+                     "psi": torch.tensor([[.2], [.4], [99.]])}
+        for use_synergy in (False, True):
+            probs, aggregate, synergy = posterior_predictions(
+                data, theta, posterior, use_synergy=use_synergy, bonus_aggregation="max"
+            )
+            torch.testing.assert_close(aggregate, torch.tensor([-8., -12.]))
+            expected_synergy = torch.tensor([.08, 0.]) if use_synergy else torch.zeros(2)
+            torch.testing.assert_close(synergy, expected_synergy)
+            torch.testing.assert_close(probs, torch.sigmoid(aggregate - .5 + expected_synergy))
+            conditioned = pyro.poutine.condition(compositional_model, data=posterior)
+            trace = pyro.poutine.trace(conditioned).get_trace(
+                data, theta, use_synergy=use_synergy, bonus_aggregation="max"
+            )
+            torch.testing.assert_close(trace.nodes["obs"]["fn"].probs, probs)
+            self.assertNotIn("tau", trace.nodes)
+        vector_posterior = {"r": posterior["alpha"], "beta": torch.tensor([[.5, 1.]])}
+        probs, aggregate, _ = posterior_predictions(
+            data, theta, vector_posterior, bonus_difficulty="multidim", bonus_aggregation="max"
+        )
+        torch.testing.assert_close(probs, torch.sigmoid(aggregate - 4.))
+
+    def test_noisy_or_equation_masks_extremes_and_training_replay(self):
+        from compositional_model import noisy_or_logits
+
+        logits = torch.tensor([[0., 0., 999.], [-1000., -1000., 999.],
+                               [1000., -1000., 999.]], requires_grad=True)
+        mask = torch.tensor([[True, True, False]] * 3)
+        result = noisy_or_logits(logits, mask)
+        torch.testing.assert_close(result, torch.tensor([math.log(3), -1000 + math.log(2), 1000.]))
+        gradients, = torch.autograd.grad(result.sum(), logits)
+        self.assertTrue(torch.isfinite(gradients).all())
+        torch.testing.assert_close(gradients[:, 2], torch.zeros(3))
+        torch.testing.assert_close(noisy_or_logits(logits.flip(1), mask.flip(1)), result)
+
+        data = {"part_ids": ["p"], "part": torch.tensor([0, 0]),
+                "roster": torch.tensor([[0, 1], [1, 0]]),
+                "roster_mask": torch.tensor([[True, True], [True, False]]),
+                "y": torch.tensor([1., 0.])}
+        theta = torch.tensor([[.2], [1.]])
+        posterior = {"alpha": torch.tensor([[2.]]), "beta": torch.tensor([.7])}
+        expected = torch.stack([1 - (1 - torch.sigmoid(torch.tensor(-.3))) *
+                                (1 - torch.sigmoid(torch.tensor(1.3))),
+                                torch.sigmoid(torch.tensor(1.3))])
+        trace = pyro.poutine.trace(pyro.poutine.condition(
+            compositional_model, data=posterior
+        )).get_trace(data, theta, bonus_aggregation="noisy-or")
+        predicted, _, _ = posterior_predictions(data, theta, posterior, bonus_aggregation="noisy-or")
+        torch.testing.assert_close(predicted, expected)
+        torch.testing.assert_close(trace.nodes["obs"]["fn"].probs, expected)
+        self.assertNotIn("tau", trace.nodes)
+        for options in ({"use_synergy": True}, {"bonus_difficulty": "multidim"},
+                        {"calibrate_correctness": True}):
+            with self.assertRaisesRegex(ValueError, "Eq. 9"):
+                posterior_predictions(data, theta, posterior, bonus_aggregation="noisy-or", **options)
+
+    def test_multidim_bonus_pools_players_per_axis_and_matches_replay(self):
+        data = {
+            "part_ids": ["part"], "part": torch.tensor([0, 0]),
+            "roster": torch.tensor([[0, 1, 2], [0, 2, 2]]),
+            "roster_mask": torch.tensor([[True, True, False], [True, False, False]]),
+            "y": torch.tensor([1., 0.]),
+        }
+        theta = torch.tensor([[2., 0.], [0., 2.], [99., 99.]])
+        posterior = {
+            "r": torch.tensor([[2., .5]], requires_grad=True),
+            "beta": torch.tensor([[1., 3.]], requires_grad=True),
+            "tau": torch.tensor(1., requires_grad=True),
+            "psi": torch.tensor([[2.], [3.], [100.]]),
+        }
+        trace = pyro.poutine.trace(pyro.poutine.condition(
+            compositional_model, data=posterior
+        )).get_trace(data, theta, use_synergy=True, alpha_prior="gamma",
+                    bonus_difficulty="multidim")
+        probabilities, aggregate, synergy = posterior_predictions(
+            data, theta, posterior, use_synergy=True, bonus_difficulty="multidim"
+        )
+        pooled_axis = torch.log(torch.exp(torch.tensor(2.)) + 1)
+        expected_aggregate = torch.stack([2.5 * pooled_axis, torch.tensor(4.)])
+        expected_logits = expected_aggregate - 3.5 + torch.tensor([6., 0.])
+        torch.testing.assert_close(aggregate, expected_aggregate)
+        torch.testing.assert_close(synergy, torch.tensor([6., 0.]))
+        torch.testing.assert_close(probabilities, expected_logits.sigmoid())
+        torch.testing.assert_close(trace.nodes["obs"]["fn"].logits, expected_logits)
+        self.assertEqual(trace.nodes["beta"]["fn"].event_shape, (2,))
+        self.assertNotIn("theta", trace.nodes)
+        gradients = torch.autograd.grad(trace.nodes["obs"]["fn"].logits.sum(),
+                                        [posterior[k] for k in ("r", "beta", "tau")])
+        self.assertTrue(all(torch.isfinite(g).all() for g in gradients))
+        torch.testing.assert_close(gradients[1], torch.tensor([[-4., -1.]]))
+        reversed_data = {**data, "roster": data["roster"].flip(1),
+                         "roster_mask": data["roster_mask"].flip(1)}
+        reversed_p, _, _ = posterior_predictions(
+            reversed_data, theta, posterior, use_synergy=True, bonus_difficulty="multidim"
+        )
+        torch.testing.assert_close(reversed_p, probabilities)
+        with self.assertRaisesRegex(ValueError, "one coordinate per skill dimension"):
+            posterior_predictions(data, theta, {**posterior, "beta": torch.zeros(1, 1)},
+                                  bonus_difficulty="multidim")
+
     def test_bonus_alpha_uses_paper_normal_prior(self):
         data = {
             "part_ids": ["part-1"],
@@ -554,31 +661,70 @@ class ModelTests(unittest.TestCase):
         torch.testing.assert_close(phi.grad, torch.tensor([[3., -2.], [1., 4.], [0., 0.], [0., 0.]]))
         torch.testing.assert_close(psi.grad, torch.tensor([[3., -2.], [3., -2.], [0., 0.], [0., 0.]]))
 
-    def test_phi_psi_bonus_likelihood_matches_replay(self):
+    def test_bonus_synergy_links_match_likelihood_replay_and_gradients(self):
         data = {
-            "part_ids": ["part-1"], "part": torch.tensor([0]),
-            "roster": torch.tensor([[0, 1]]),
-            "roster_mask": torch.tensor([[True, True]]), "y": torch.tensor([1.]),
+            "part_ids": ["part-1", "part-2"], "part": torch.tensor([0, 1, 0, 1]),
+            "roster": torch.tensor([[0, 1], [0, 2], [1, 2], [0, 2]]),
+            "roster_mask": torch.tensor([[True, True], [True, True],
+                                         [True, True], [True, False]]),
+            "y": torch.tensor([1., 0., 1., 0.]),
         }
-        theta = torch.tensor([[.2], [.8]])
-        posterior = {
-            "alpha": torch.tensor([[.5]]), "beta": torch.tensor([.1]),
-            "tau": torch.tensor(.7), "phi": torch.tensor([[1., 2.], [3., -1.]]),
-            "psi": torch.tensor([[2., -1.], [-1., 3.]]),
-            "correctness_scale": torch.tensor(1.2), "correctness_bias": torch.tensor(.3),
-        }
-        trace = pyro.poutine.trace(pyro.poutine.condition(
-            compositional_model, data=posterior
-        )).get_trace(data, theta, use_synergy=True, synergy_dimensions=2,
-                    synergy_form="phi-psi", calibrate_correctness=True)
-        predicted, aggregate, synergy = posterior_predictions(
-            data, theta, posterior, use_synergy=True, calibrate_correctness=True
-        )
-        self.assertNotIn("theta", trace.nodes)
-        torch.testing.assert_close(synergy, torch.tensor([-1.]))
-        expected = torch.sigmoid(1.2 * (aggregate - .1 - 1.) + .3)
-        torch.testing.assert_close(predicted, expected)
-        torch.testing.assert_close(trace.nodes["obs"]["fn"].probs, expected)
+        theta = torch.tensor([[.2], [.8], [-.3]])
+        for form in ("dot", "phi-psi"):
+            for link in ("additive", "multiplicative"):
+                for calibrated in (False, True):
+                    with self.subTest(form=form, link=link, calibrated=calibrated):
+                        posterior = {
+                            "alpha": torch.tensor([[.5], [.8]]),
+                            "beta": torch.tensor([.1, 1.5]), "tau": torch.tensor(.7),
+                            "psi": torch.tensor([[2., -1.], [-1., 3.], [4., 2.]],
+                                                requires_grad=True),
+                            "correctness_scale": torch.tensor(1.2),
+                            "correctness_bias": torch.tensor(.3),
+                        }
+                        expected_synergy = torch.tensor([-5., 6., 2., 0.])
+                        if form == "phi-psi":
+                            posterior["phi"] = torch.tensor(
+                                [[1., 2.], [3., -1.], [-2., .5]], requires_grad=True
+                            )
+                            expected_synergy = torch.tensor([-1., -11., -20.5, 0.])
+                        trace = pyro.poutine.trace(pyro.poutine.condition(
+                            compositional_model, data=posterior
+                        )).get_trace(data, theta, use_synergy=True, synergy_dimensions=2,
+                                    synergy_form=form, synergy_link=link,
+                                    calibrate_correctness=calibrated)
+                        predicted, aggregate, synergy = posterior_predictions(
+                            data, theta, posterior, use_synergy=True,
+                            calibrate_correctness=calibrated, synergy_link=link,
+                        )
+                        self.assertNotIn("theta", trace.nodes)
+                        torch.testing.assert_close(synergy, expected_synergy)
+                        base = aggregate - posterior["beta"][data["part"]]
+                        expected_logit = (base + expected_synergy if link == "additive"
+                                          else base * (1 + expected_synergy))
+                        if calibrated:
+                            expected_logit = 1.2 * expected_logit + .3
+                        torch.testing.assert_close(predicted, torch.sigmoid(expected_logit))
+                        likelihood_logits = trace.nodes["obs"]["fn"].logits
+                        torch.testing.assert_close(likelihood_logits, expected_logit)
+                        profiles = [posterior["psi"]]
+                        if form == "phi-psi":
+                            profiles.append(posterior["phi"])
+                        gradients = torch.autograd.grad(likelihood_logits.sum(), profiles)
+                        # Explicit pair formula supplies independent gradient expectations.
+                        psi = posterior["psi"]
+                        pair_terms = torch.stack([
+                            ((psi[i] * psi[j]).sum() if form == "dot" else
+                             (posterior["phi"][i] * posterior["phi"][j]
+                              * (psi[i] + psi[j])).sum())
+                            for i, j in ((0, 1), (0, 2), (1, 2))
+                        ])
+                        weights = torch.ones(3) if link == "additive" else base[:3]
+                        if calibrated:
+                            weights = 1.2 * weights
+                        expected_gradients = torch.autograd.grad((pair_terms * weights).sum(), profiles)
+                        for actual, expected in zip(gradients, expected_gradients):
+                            torch.testing.assert_close(actual, expected)
 
     def test_multidim_difficulty_curve_and_r_weighted_formula(self):
         theta = torch.tensor([[10.0, 0.0]])

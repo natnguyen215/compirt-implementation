@@ -101,7 +101,7 @@ The practical choice therefore depends on the target:
 - DD linear spline:
   `results/compirt/holdout/double-difficulty/model-comparisons/curve-family/linear-spline/seed_42/`
 - Bernstein 3/3/2:
-  `results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-unconstrained/`
+  `results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-unconstrained/`
 
 Each fold's source metrics are stored under
 `fold_*/evaluation/csvs/tossup_metrics.csv` (the linear-spline directory uses

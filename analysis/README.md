@@ -1,12 +1,14 @@
 # Analysis
 
-Studies that sit outside the two-stage CompIRT pipeline. They fall into two
-groups that are kept separate because they answer different kinds of question
-and have different outputs.
+Studies that sit outside the two-stage CompIRT pipeline, grouped by the
+questions they answer and the outputs they produce.
 
 For the CompIRT models themselves see the model-family directories and
 `compirt_eval/`; for the dataset see
 [`../docs/dataset-schema.md`](../docs/dataset-schema.md).
+
+The saved DD parameter study lives at the repository root:
+[`../dd_model_interpretation/`](../dd_model_interpretation/README.md).
 
 ## Descriptive studies
 
@@ -34,9 +36,34 @@ Each folder documents its own reproduction command in its `README.md`.
 [`bonus_team_irt/`](bonus_team_irt/README.md) learns team skill vectors directly
 from bonus outcomes, with one- and three-dimensional IRT arms. It compares
 frozen whole-game predictions with part-conversion rates and saved
-compositional models on matched complete games. Outputs live under
-`results/compirt/holdout/common/bonus-team-irt/`; findings are recorded in
+compositional models on matched complete games. Fits live under
+`results/compirt/holdout/common/bonus-team-irt/`; the
+[shared bonus comparison](../results/compirt/comparisons/bonuses/dd-bernstein-and-team-irt-5fold/README.md)
+contains current results for all model families. Findings are recorded in
 [`../RESEARCH_LOG_2.md`](../RESEARCH_LOG_2.md).
+
+### Saved compositional analyses
+
+[`compositional/`](compositional/) preserves the analysis scripts for the
+[compositional bonus results](../results/compirt/holdout/double-difficulty/compositional/README.md).
+They read saved predictions and write comparison artifacts into each study's
+`aggregate/` directory.
+
+| Script | Study |
+| --- | --- |
+| [novel_roster_metrics.py](compositional/novel_roster_metrics.py) | Familiar/new-roster metrics and bonus PPG for every compositional run and the multidimensional reference |
+| [compare_dot_multiplicative.py](compositional/compare_dot_multiplicative.py) | Five-fold multiplicative dot 1D comparison and matched-population audit |
+| [compare_phi_psi.py](compositional/compare_phi_psi.py) | Fold-0 phi-psi 1D/3D comparison against the dot-product references, reading runs under `<root>/dim_1` and `<root>/dim_3`; five-fold additive phi-psi scores are in `phi-psi-additive-{1,3}d` |
+
+Run a script from the repository root, for example:
+
+```bash
+.venv/bin/python -B analysis/compositional/compare_dot_multiplicative.py
+```
+
+The roster and phi-psi analyses also need the linked dataset. For standard
+per-run evaluation and report refreshes, use the
+[shared fold runner](../run_scripts/README.md#bonus-stage-from-saved-folds).
 
 ## Correctness-prediction experiments
 

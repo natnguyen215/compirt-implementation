@@ -1,0 +1,594 @@
+{
+  "tasks": [
+    {
+      "name": "dd-prepare",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-c",
+        "import json, sys; from run_scripts.bernstein.run_dd_bernstein_332 import Configuration, snapshot_configuration; snapshot_configuration(Configuration(**json.loads(sys.argv[1])))",
+        "{\"root\": \"/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps\", \"base_split\": \"year_2024\", \"folds\": [0, 1, 2, 3, 4], \"split_seed\": 42, \"optimization_seed\": 42, \"degree\": 3, \"dimensions\": 3, \"drop_concentration\": 2.0, \"relevance_prior\": \"simplex\", \"learned_curve_locations\": true, \"terminal_intercepts\": true, \"steps\": 10000, \"lr\": 0.005, \"device\": \"cuda\", \"posterior_draws\": 0, \"incorrect_weight\": 1.0, \"player_neg_propensity\": false, \"data_dir\": null}"
+      ],
+      "needs": [],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/configuration.json"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "dd-0-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "hazard_double_difficulty.bernstein.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:0:42",
+        "--degree",
+        "3",
+        "--dimensions",
+        "3",
+        "--drop-concentration",
+        "2.0",
+        "--relevance-prior",
+        "simplex",
+        "--learn-curve-locations",
+        "--incorrect-weight",
+        "1.0",
+        "--steps",
+        "10000",
+        "--lr",
+        "0.005",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_0/train/pyramidal"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_0/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "dd-0-frozen-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:0:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_0/train/pyramidal",
+        "--dimensions",
+        "3",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_0/holdout/pyramidal"
+      ],
+      "needs": [
+        "dd-0-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_0/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-0-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "run_scripts.paper_model_selection.evaluate_fold",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_0/holdout/pyramidal",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_0/evaluation"
+      ],
+      "needs": [
+        "dd-0-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_0/evaluation/csvs/tossup_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-1-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "hazard_double_difficulty.bernstein.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:1:42",
+        "--degree",
+        "3",
+        "--dimensions",
+        "3",
+        "--drop-concentration",
+        "2.0",
+        "--relevance-prior",
+        "simplex",
+        "--learn-curve-locations",
+        "--incorrect-weight",
+        "1.0",
+        "--steps",
+        "10000",
+        "--lr",
+        "0.005",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_1/train/pyramidal"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_1/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "dd-1-frozen-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:1:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_1/train/pyramidal",
+        "--dimensions",
+        "3",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_1/holdout/pyramidal"
+      ],
+      "needs": [
+        "dd-1-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_1/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-1-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "run_scripts.paper_model_selection.evaluate_fold",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_1/holdout/pyramidal",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_1/evaluation"
+      ],
+      "needs": [
+        "dd-1-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_1/evaluation/csvs/tossup_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-2-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "hazard_double_difficulty.bernstein.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:2:42",
+        "--degree",
+        "3",
+        "--dimensions",
+        "3",
+        "--drop-concentration",
+        "2.0",
+        "--relevance-prior",
+        "simplex",
+        "--learn-curve-locations",
+        "--incorrect-weight",
+        "1.0",
+        "--steps",
+        "10000",
+        "--lr",
+        "0.005",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_2/train/pyramidal"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_2/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "dd-2-frozen-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:2:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_2/train/pyramidal",
+        "--dimensions",
+        "3",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_2/holdout/pyramidal"
+      ],
+      "needs": [
+        "dd-2-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_2/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-2-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "run_scripts.paper_model_selection.evaluate_fold",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_2/holdout/pyramidal",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_2/evaluation"
+      ],
+      "needs": [
+        "dd-2-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_2/evaluation/csvs/tossup_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-3-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "hazard_double_difficulty.bernstein.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:3:42",
+        "--degree",
+        "3",
+        "--dimensions",
+        "3",
+        "--drop-concentration",
+        "2.0",
+        "--relevance-prior",
+        "simplex",
+        "--learn-curve-locations",
+        "--incorrect-weight",
+        "1.0",
+        "--steps",
+        "10000",
+        "--lr",
+        "0.005",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_3/train/pyramidal"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_3/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "dd-3-frozen-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:3:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_3/train/pyramidal",
+        "--dimensions",
+        "3",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_3/holdout/pyramidal"
+      ],
+      "needs": [
+        "dd-3-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_3/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-3-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "run_scripts.paper_model_selection.evaluate_fold",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_3/holdout/pyramidal",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_3/evaluation"
+      ],
+      "needs": [
+        "dd-3-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_3/evaluation/csvs/tossup_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-4-train",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "hazard_double_difficulty.bernstein.train_pyramidal",
+        "--split",
+        "game-holdout:year_2024:train:5:4:42",
+        "--degree",
+        "3",
+        "--dimensions",
+        "3",
+        "--drop-concentration",
+        "2.0",
+        "--relevance-prior",
+        "simplex",
+        "--learn-curve-locations",
+        "--incorrect-weight",
+        "1.0",
+        "--steps",
+        "10000",
+        "--lr",
+        "0.005",
+        "--seed",
+        "42",
+        "--device",
+        "cuda",
+        "--posterior-draws",
+        "0",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_4/train/pyramidal"
+      ],
+      "needs": [
+        "dd-prepare"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_4/train/pyramidal/summary.json"
+      ],
+      "priority": 100
+    },
+    {
+      "name": "dd-4-frozen-replay",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "holdout.frozen_predict",
+        "tossup",
+        "--split",
+        "game-holdout:year_2024:test:5:4:42",
+        "--train-pyramidal",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_4/train/pyramidal",
+        "--dimensions",
+        "3",
+        "--device",
+        "cuda",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_4/holdout/pyramidal"
+      ],
+      "needs": [
+        "dd-4-train"
+      ],
+      "gpu": true,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_4/holdout/pyramidal/summary.json"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-4-evaluation",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-m",
+        "run_scripts.paper_model_selection.evaluate_fold",
+        "--pyramidal-results",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_4/holdout/pyramidal",
+        "--output-dir",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_4/evaluation"
+      ],
+      "needs": [
+        "dd-4-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/fold_4/evaluation/csvs/tossup_metrics.csv"
+      ],
+      "priority": 10
+    },
+    {
+      "name": "dd-aggregate",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "-c",
+        "import json, sys; from run_scripts.bernstein.run_dd_bernstein_332 import Configuration, run_fold, aggregate; c = Configuration(**json.loads(sys.argv[1])); [run_fold(c, f) for f in c.folds]; aggregate(c)",
+        "{\"root\": \"/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps\", \"base_split\": \"year_2024\", \"folds\": [0, 1, 2, 3, 4], \"split_seed\": 42, \"optimization_seed\": 42, \"degree\": 3, \"dimensions\": 3, \"drop_concentration\": 2.0, \"relevance_prior\": \"simplex\", \"learned_curve_locations\": true, \"terminal_intercepts\": true, \"steps\": 10000, \"lr\": 0.005, \"device\": \"cuda\", \"posterior_draws\": 0, \"incorrect_weight\": 1.0, \"player_neg_propensity\": false, \"data_dir\": null}"
+      ],
+      "needs": [
+        "dd-0-evaluation",
+        "dd-1-evaluation",
+        "dd-2-evaluation",
+        "dd-3-evaluation",
+        "dd-4-evaluation"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-10000steps/aggregate/pooled.csv"
+      ],
+      "priority": 0
+    },
+    {
+      "name": "dd-0-normalized-score",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-normalized-first-buzz-10000steps/score_saved_folds.py",
+        "0"
+      ],
+      "needs": [
+        "dd-0-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-normalized-first-buzz-10000steps/dd_full_comparison/fold_0_events.csv"
+      ],
+      "priority": 20
+    },
+    {
+      "name": "dd-1-normalized-score",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-normalized-first-buzz-10000steps/score_saved_folds.py",
+        "1"
+      ],
+      "needs": [
+        "dd-1-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-normalized-first-buzz-10000steps/dd_full_comparison/fold_1_events.csv"
+      ],
+      "priority": 20
+    },
+    {
+      "name": "dd-2-normalized-score",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-normalized-first-buzz-10000steps/score_saved_folds.py",
+        "2"
+      ],
+      "needs": [
+        "dd-2-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-normalized-first-buzz-10000steps/dd_full_comparison/fold_2_events.csv"
+      ],
+      "priority": 20
+    },
+    {
+      "name": "dd-3-normalized-score",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-normalized-first-buzz-10000steps/score_saved_folds.py",
+        "3"
+      ],
+      "needs": [
+        "dd-3-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-normalized-first-buzz-10000steps/dd_full_comparison/fold_3_events.csv"
+      ],
+      "priority": 20
+    },
+    {
+      "name": "dd-4-normalized-score",
+      "command": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+        "-B",
+        "-u",
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-normalized-first-buzz-10000steps/score_saved_folds.py",
+        "4"
+      ],
+      "needs": [
+        "dd-4-frozen-replay"
+      ],
+      "gpu": false,
+      "outputs": [
+        "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-normalized-first-buzz-10000steps/dd_full_comparison/fold_4_events.csv"
+      ],
+      "priority": 20
+    }
+  ],
+  "environment": {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "MPLBACKEND": "Agg",
+    "MPLCONFIGDIR": "/tmp/matplotlib-compirt",
+    "COMPIRT_SURVIVAL_CHUNK": "2048",
+    "PYTHONPATH": "/teapot/students/natnguyen/CompIRT-Implementation"
+  },
+  "contract": {
+    "run_scripts/common/lib/gpu_queue.py": "cecac115cfb143220f8c5e1e830633b8b7d0ee4f87b5bd6742a56a3620cd2eae",
+    "run_scripts/bernstein/run_dd_bernstein_332.py": "b574386bc8d3f4aba196864651a8645845b7be198c6b493638e73fae89f2e149",
+    "compirt_race.py": "33fd7e4ded72a359d07fd53a317a17f2412b5b03f18fb7a25105f35a110a6d45",
+    "hazard_double_difficulty/bernstein/pyramidal_model.py": "9af6c1c44a6c2d057abf2fad84098b475af688b67e8f0e0b6b341c0219ccf5ed",
+    "hazard_double_difficulty/bernstein/train_pyramidal.py": "6e1fba37d710dc863925f03db07346e6b29b8405045c7b3c30ef2a38d5968092",
+    "holdout/frozen_predict.py": "d361bf90704d08f3985dc2b5ffb10875db1c41cbca98a9e37d7d9f5452cd7326",
+    "compirt_eval/scenario_a_tossups/reconstruction.py": "467115814d6eb7688406615f5bbca226827c7ae9e9ff0090dfddb0ab008e2738"
+  }
+}

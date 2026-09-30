@@ -39,20 +39,25 @@ from compirt_eval.common.report_paths import csv_path, evaluation_output_dirs, g
 from compirt_eval.scenario_a_tossups import evaluate_tossups
 
 
-def main():
+def main(argv=None):
     """Load both stages' saved predictions and write metrics, plots, and report."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--pyramidal-results", type=Path, required=True)
+    parser.add_argument("--pyramidal-results", type=Path,
+                        help="saved tossup predictions; omit for bonus-only evaluation")
     parser.add_argument("--compositional-results", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--split", default="all")
     parser.add_argument("--tournament")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     evaluation_output_dirs(args.output_dir)
     tables = filter_tournament(
         load_hf_tables(args.data_dir, args.split), args.tournament
     )
+    # Without tossup predictions, score the bonus stage alone and write its report.
+    if args.pyramidal_results is None:
+        evaluate_bonuses(args.compositional_results, args.output_dir, tables=tables, write_report=True)
+        return
     # Saved CSVs make evaluation repeatable without rerunning model training.
     tossup = evaluate_tossups(
         args.pyramidal_results,
@@ -66,9 +71,6 @@ def main():
             if key.startswith("tossup_game_") or key == "tossup_outcome_schema_version"}
     pd.DataFrame([tossup]).to_csv(
         csv_path(args.output_dir, "tossup_metrics.csv"), index=False
-    )
-    pd.DataFrame([bonus]).to_csv(
-        csv_path(args.output_dir, "bonus_metrics.csv"), index=False
     )
     pd.DataFrame([game]).to_csv(
         csv_path(args.output_dir, "game_metrics.csv"), index=False

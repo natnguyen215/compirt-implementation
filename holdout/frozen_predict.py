@@ -56,7 +56,7 @@ from compirt_data import (
     load_hf_tables,
     tossup_tensors,
 )
-from compositional_model import posterior_predictions
+from compositional_model import part_weight_site, posterior_predictions, validate_bonus_settings
 from multidimensional.multidim_mirt import pyramidal_model as multidim_model
 from train_compositional import load_player_skills
 from multidimensional.multidim_mirt.train_pyramidal import save_multidim_parameters
@@ -643,15 +643,26 @@ def frozen_predict_bonuses(args) -> dict:
 
     summary_path = train_bonus / "summary.json"
     training_summary = json.loads(summary_path.read_text()) if summary_path.exists() else {}
+    # Replay the model the fit used. Summaries written before an option existed
+    # used its default.
+    bonus_difficulty = training_summary.get("bonus_difficulty", "scalar")
+    bonus_aggregation = training_summary.get("bonus_aggregation", "lse")
     synergy_form = training_summary.get("synergy_form", "dot")
-    if synergy_form not in ("dot", "phi-psi"):
-        raise ValueError(f"Unknown saved synergy form: {synergy_form}")
+    synergy_link = training_summary.get("synergy_link", "additive")
     for setting in ("use_synergy", "calibrate_correctness"):
         if setting in training_summary and bool(training_summary[setting]) != getattr(args, setting):
             raise ValueError(
                 f"Replay {setting}={getattr(args, setting)} disagrees with the "
                 f"saved bonus fit ({training_summary[setting]}): {summary_path}"
             )
+    validate_bonus_settings(
+        bonus_aggregation,
+        bonus_difficulty,
+        use_synergy=args.use_synergy,
+        calibrate_correctness=args.calibrate_correctness,
+        synergy_form=synergy_form,
+        synergy_link=synergy_link,
+    )
 
     player_ids, theta = load_player_skills(train_pyr / "players.csv", args.device)
     tables = filter_tournament(
@@ -688,21 +699,30 @@ def frozen_predict_bonuses(args) -> dict:
     print(f"Bonus part rows: {len(observations):,}  Parts: {len(data['part_ids']):,}")
 
     dimensions = theta.shape[1]
+    weight_site = part_weight_site(bonus_difficulty)
     posterior = {
-        "alpha": _aligned_matrix(
+        weight_site: _aligned_matrix(
             bonus_parts,
             "bonus_part_id",
             data["part_ids"],
-            _numbered_columns(bonus_parts, "alpha", dimensions),
+            _numbered_columns(bonus_parts, weight_site, dimensions),
             args.device,
         ),
-        "beta": _aligned_vector(
-            bonus_parts, "bonus_part_id", data["part_ids"], "beta", args.device
-        ),
-        "tau": torch.tensor(
-            float((train_bonus / "tau.txt").read_text().strip()), device=args.device
-        ),
     }
+    # Only LSE aggregation saves a temperature.
+    if bonus_aggregation == "lse":
+        posterior["tau"] = torch.tensor(
+            float((train_bonus / "tau.txt").read_text().strip()), device=args.device
+        )
+    if bonus_difficulty == "multidim":
+        posterior["beta"] = _aligned_matrix(
+            bonus_parts, "bonus_part_id", data["part_ids"],
+            _numbered_columns(bonus_parts, "beta", dimensions), args.device,
+        )
+    else:
+        posterior["beta"] = _aligned_vector(
+            bonus_parts, "bonus_part_id", data["part_ids"], "beta", args.device
+        )
     if args.use_synergy:
         profiles = pd.read_csv(train_bonus / "player_synergy_profiles.csv", dtype={"player_id": str})
         synergy_dimensions = sum(
@@ -747,7 +767,9 @@ def frozen_predict_bonuses(args) -> dict:
         posterior["correctness_scale"], posterior["correctness_bias"] = calibration
 
     probabilities, aggregates, synergy = posterior_predictions(
-        data, theta, posterior, args.use_synergy, args.calibrate_correctness
+        data, theta, posterior, args.use_synergy, args.calibrate_correctness,
+        synergy_link=synergy_link, bonus_difficulty=bonus_difficulty,
+        bonus_aggregation=bonus_aggregation,
     )
     save_bonus_predictions(
         args.output_dir, observations, probabilities, aggregates, synergy
@@ -760,11 +782,14 @@ def frozen_predict_bonuses(args) -> dict:
         "tournament": args.tournament or "",
         "use_synergy": args.use_synergy,
         "synergy_form": synergy_form,
+        "synergy_link": synergy_link,
+        "bonus_difficulty": bonus_difficulty,
+        "bonus_aggregation": bonus_aggregation,
         "calibrate_correctness": args.calibrate_correctness,
         "skill_dimensions": dimensions,
         "bonus_part_observations": len(observations),
         "bonus_parts": len(data["part_ids"]),
-        "tau": float(posterior["tau"].detach().cpu()),
+        "tau": float(posterior["tau"].detach().cpu()) if "tau" in posterior else None,
         **drop_info,
     }
     (args.output_dir / "summary.json").write_text(

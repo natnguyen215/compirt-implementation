@@ -1,0 +1,67 @@
+{
+  "model": "DD-Bernstein, multidimensional difficulty + synergy",
+  "fit_directory": "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy",
+  "scope": "Full-season in-sample bonus ordering; one selected DD model only; no training or test scoring",
+  "date": "2026-09-27",
+  "draws_per_bonus": 20000,
+  "random_generator": "numpy.default_rng / PCG64",
+  "seed": 42,
+  "bonus_batch_size": 24,
+  "bonus_order": "Saved bonus_difficulty_order.csv order, filtered to model",
+  "part_order": [
+    "easy",
+    "medium",
+    "hard"
+  ],
+  "dimension_order": [
+    1,
+    2,
+    3
+  ],
+  "sampling_order": "For each batch, draw all log-r coordinates, then all beta coordinates; arrays have shape (20000, batch bonuses, 3 parts, 3 dimensions).",
+  "approximation": "Independent Normal beta and Normal log-r from saved mean-field AutoNormal quantiles; r = exp(log-r)",
+  "normal_parameters": "mu = p500; sd = (p975-p025)/(2*scipy.stats.norm.ppf(0.975)); apply log to all r quantiles first",
+  "difficulty": "D = sum_k r_k * beta_k, recomputed jointly for each part in every draw",
+  "point_gaps": "Original D at saved parameter medians; medium-easy and hard-medium",
+  "gap_intervals": "numpy.quantile(draw gaps, [0.025,0.5,0.975], method=linear)",
+  "order_probability": "Fraction of draws with both gaps strictly positive; do not multiply marginal pair probabilities",
+  "mc_se": "sqrt(p*(1-p)/(20000-1)); maximum about 0.003536",
+  "attempts": "Number of distinct response_id per bonus_id in saved fit predictions; three part rows count as one attempt",
+  "attempt_bands": [
+    "1-9",
+    "10-19",
+    "20-29",
+    "30+"
+  ],
+  "weighting": "One vote per distinct fitted bonus within each reported subset; aggregate within question set as well as overall",
+  "limits": [
+    "Conditional on the saved model, dataset, optimization run and frozen Stage-1 skills",
+    "Mean-field approximation omits parameter correlations; uncertainty is approximate",
+    "Attempt subsets reuse the full fit; no responses removed for training and no refitting",
+    "Differences by attempt count do not establish effects of collecting more data"
+  ],
+  "validation": {
+    "bonuses": 1296,
+    "original_order_score_sum": 1174,
+    "bonus_attempts": 49042,
+    "each_response_has_three_distinct_parts": true,
+    "source_point_difficulties_and_order_scores_reproduced": true,
+    "max_normal_quantile_symmetry_error_below": 1e-06,
+    "no_saved_joint_draws_present": true
+  },
+  "versions": {
+    "python": "3.13.15",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scipy": "1.17.1"
+  },
+  "input_sha256": {
+    "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy/posterior_quantiles.npz": "f51f7369852996a6d28435e8cf619059fe2199ba79a92feb4acb4edaa2017a8f",
+    "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy/posterior_manifest.json": "8bcd1f00cd75eb0cc8225e83c75fec08daad71a02ab44cfbbb147eafd1cef131",
+    "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy/bonus_parts.csv": "9f4d8a97646eb13f3f4ef1d12ed980e3d828b4f01081224f7b39fd3e39379fd2",
+    "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/dd/multidim-difficulty-synergy/bonus_part_predictions.csv": "4569658a8c854ad03efd4c5d58dcd3e83ba971dd77892040ee095f08d522d508",
+    "results/compirt/in_sample/common/bonus-difficulty-season-2024-25/bonus_difficulty_order.csv": "14ee897674aa6eed7bf28e0b895c70ad8667622a3fbc2c444951f102a521615f",
+    "dd_model_interpretation/bonus/data/parts.csv": "c26b236971983b1add1e35947375bd6f0886a7d73d9138d248052ba71903f4c9"
+  },
+  "attempt_band_boundaries": "Inclusive integer counts: 1 through 9, 10 through 19, 20 through 29, and 30 or more."
+}

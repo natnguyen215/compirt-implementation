@@ -18,7 +18,7 @@ from analysis.season_2024_25_eda.analyze import clue_phase
 
 
 ROOT = Path(
-    'results/compirt/holdout/double-difficulty/ablations/'
+    'results/compirt/holdout/double-difficulty/ablations/model-components/'
     'relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal'
 )
 def load_first_buzzes(tables):

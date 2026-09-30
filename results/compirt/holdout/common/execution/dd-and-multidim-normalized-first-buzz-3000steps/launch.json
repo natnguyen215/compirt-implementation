@@ -1,0 +1,36 @@
+{
+  "tag": "normalized-v1-20260913-150350",
+  "pid": 1393882,
+  "roots": {
+    "root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-and-multidim-normalized-first-buzz-3000steps",
+    "dd-root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-3000steps",
+    "bonus-root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/compositional/no-synergy-and-dot-additive-1d",
+    "multidim-root": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/likelihood-refits/multidim-5d-normalized-first-buzz-3000steps-5fold"
+  },
+  "command": [
+    "/teapot/students/natnguyen/CompIRT-Implementation/.venv/bin/python",
+    "-B",
+    "-u",
+    "-m",
+    "run_scripts.common.run_parallel_game_holdout",
+    "--root",
+    "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-and-multidim-normalized-first-buzz-3000steps",
+    "--dd-root",
+    "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/likelihood-refits/dd-bernstein-332-simplex-locations-terminal-normalized-first-buzz-3000steps",
+    "--bonus-root",
+    "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/compositional/no-synergy-and-dot-additive-1d",
+    "--multidim-root",
+    "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/multidim/likelihood-refits/multidim-5d-normalized-first-buzz-3000steps-5fold",
+    "--gpus",
+    "0",
+    "1",
+    "--jobs-per-gpu",
+    "2",
+    "--cpu-jobs",
+    "2"
+  ],
+  "launcher": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-and-multidim-normalized-first-buzz-3000steps/resume.sh",
+  "log": "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/common/execution/dd-and-multidim-normalized-first-buzz-3000steps/nohup.log",
+  "task_count": 95,
+  "started_at": "2026-09-13T15:03:50.594162-07:00"
+}

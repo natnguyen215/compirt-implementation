@@ -1,0 +1,30 @@
+{
+  "signature": {
+    "inputs": {
+      "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/unconstrained/fold_1/holdout/pyramidal/players.csv": [
+        142976,
+        1786771803404390581
+      ],
+      "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/unconstrained/fold_1/holdout/pyramidal/tossups.csv": [
+        319234,
+        1786771803427724721
+      ],
+      "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/unconstrained/fold_1/holdout/pyramidal/tossup_predictions.csv": [
+        20902804,
+        1786771804054413048
+      ],
+      "/teapot/students/natnguyen/CompIRT-Implementation/results/compirt/holdout/double-difficulty/variants/perception/perceived-difficulty/unconstrained/fold_1/holdout/pyramidal/summary.json": [
+        1612,
+        1786771804113030089
+      ]
+    },
+    "code": {
+      "compirt_eval/scenario_a_tossups/outcomes.py": "b2b7e67b79bbef861d4128bc0667980ee5088286bcecfeba0a0d50b06a7302f4",
+      "compirt_eval/scenario_a_tossups/reconstruction.py": "467115814d6eb7688406615f5bbca226827c7ae9e9ff0090dfddb0ab008e2738",
+      "compirt_eval/scenario_a_tossups/parameters.py": "0f98dd16697d76da1e46c73dd98b577ed01e4760a0d7cc839fd690d5e2c97f8e"
+    },
+    "schema": 3,
+    "seed": 42
+  },
+  "elapsed_seconds": 101.57290053390898
+}

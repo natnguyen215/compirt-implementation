@@ -1,8 +1,0 @@
-{
-  "report_source_sha256": "307c3e090ed7d5ae1fd4ab9da578635dfc4903b7cdcf69ec37a6ba824b70b45c",
-  "input_sha256": {
-    "metrics.csv": "4bcc6affd0e0b3b35b079ee9f90b57116facc91095db9af4b9b26a4f1965b948",
-    "metrics_by_question_type.csv": "aa5312eb758a88907eed8b89c2d8e2a0dc6da68d07081ff9521593512151f3eb",
-    "excluded_games.csv": "80d4a085ccdbdb7e50cd96f99b20ccd27ac61e47f68477cab610a12a39a9e5c9"
-  }
-}

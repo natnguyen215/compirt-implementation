@@ -16,7 +16,7 @@ from compirt_data import load_hf_tables
 from holdout.game_splits import GameHoldoutSpec, game_holdout_masks
 OUTPUT = Path('results/compirt/holdout/common/paper-readiness-tossups')
 OUTPUT.mkdir(parents=True, exist_ok=True)
-root=Path('results/compirt/holdout/double-difficulty/ablations/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal')
+root=Path('results/compirt/holdout/double-difficulty/ablations/model-components/relevance-locations-terminal/dd-bernstein-332-simplex-locations-terminal')
 t=load_hf_tables(split='year_2024'); b=t['tossup_buzzes'].copy(); b['_order']=b.buzz_id.str.rsplit('-',n=1).str[-1].astype(int)
 b=b.sort_values(['game_id','tossup_id','token_position','_order']).drop_duplicates(['game_id','tossup_id']).copy()
 b['T_j']=b.num_tokens_total.clip(lower=1);b['t_star']=np.minimum(b.token_position.clip(lower=1),b.T_j);b['relative_position']=b.t_star/b.T_j;b['terminal']=(b.t_star==b.T_j).astype(int);b['y']=b.correct.astype(int)

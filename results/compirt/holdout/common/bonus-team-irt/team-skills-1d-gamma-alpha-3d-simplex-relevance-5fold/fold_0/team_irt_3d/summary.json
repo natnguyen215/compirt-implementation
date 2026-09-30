@@ -1,0 +1,15 @@
+{
+  "dimensions": 3,
+  "steps": 3000,
+  "seed": 42,
+  "lr": 0.01,
+  "train_parts": 107643,
+  "train_teams": 460,
+  "train_bonus_parts": 3768,
+  "prediction": "sigmoid at training posterior medians",
+  "initial_loss": 114090.19165039062,
+  "final_loss": 52205.767822265625,
+  "best_loss": 52063.704833984375,
+  "last_100_loss_slope": -0.19751580907607694,
+  "finite_losses": true
+}
